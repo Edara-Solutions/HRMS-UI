@@ -1,3 +1,4 @@
+import { LocaleSwitcher } from "@/shared/components/locale-switcher";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -15,6 +16,9 @@ function FoundationPage() {
         React 19, Vite 5, TypeScript 5, TanStack Router, TanStack Query, Zustand, Tailwind v4,
         Biome, Vitest, and Playwright are wired before domain modules are added.
       </p>
+      <div className="mt-6">
+        <LocaleSwitcher />
+      </div>
     </section>
   );
 }

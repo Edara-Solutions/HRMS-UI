@@ -1,3 +1,4 @@
+import { LocaleRuntime } from "@/i18n/locale-runtime";
 import type { QueryClient } from "@tanstack/react-query";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 
@@ -13,6 +14,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
   return (
     <main className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
+      <LocaleRuntime />
       <Outlet />
     </main>
   );

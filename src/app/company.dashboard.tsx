@@ -1,4 +1,5 @@
 import { useCurrentSession } from "@/auth/guards";
+import { LocaleSwitcher } from "@/shared/components/locale-switcher";
 import { Button } from "@/shared/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -18,6 +19,9 @@ function CompanyDashboardPage() {
         Dummy authenticated user from `company-portal-api.md`: {user?.firstName} {user?.lastName},
         employee code {user?.employeeCode}, company {user?.companyCode}.
       </p>
+      <div className="mt-6">
+        <LocaleSwitcher />
+      </div>
       <div className="mt-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
         <h2 className="text-lg font-semibold">Next module slice</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
