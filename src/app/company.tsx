@@ -1,4 +1,5 @@
 import { requireAuthenticated } from "@/auth/guards";
+import { AppShell } from "@/shared/layout/app-shell";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/company")({
@@ -8,8 +9,8 @@ export const Route = createFileRoute("/company")({
 
 function CompanyLayout() {
   return (
-    <section className="min-h-dvh bg-[var(--color-bg)]">
+    <AppShell portal="company">
       <Outlet />
-    </section>
+    </AppShell>
   );
 }

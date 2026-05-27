@@ -1,4 +1,5 @@
 import { requireAuthenticated } from "@/auth/guards";
+import { AppShell } from "@/shared/layout/app-shell";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin")({
@@ -8,8 +9,8 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   return (
-    <section className="min-h-dvh bg-[var(--color-bg)]">
+    <AppShell portal="admin">
       <Outlet />
-    </section>
+    </AppShell>
   );
 }
