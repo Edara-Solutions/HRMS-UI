@@ -2,13 +2,17 @@ import {
   BarChart3,
   Building2,
   Calendar,
+  CheckCircle,
   Clock,
   CreditCard,
   FileText,
   LayoutDashboard,
+  Network,
   Receipt,
   Settings,
   Shield,
+  TrendingUp,
+  UserPlus,
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -25,8 +29,7 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-// Icon size constant to avoid inline object creation
-const ICON_SIZE = 18;
+const ICON_SIZE = 16;
 
 export const companyNavGroups: NavGroup[] = [
   {
@@ -40,13 +43,18 @@ export const companyNavGroups: NavGroup[] = [
     ],
   },
   {
-    title: "People",
+    title: "Workforce",
     items: [
       {
-        label: "Employees",
+        label: "People",
         href: "/company/people",
         icon: <Users size={ICON_SIZE} />,
         badge: "248",
+      },
+      {
+        label: "Org Chart",
+        href: "/company/org-chart",
+        icon: <Network size={ICON_SIZE} />,
       },
       {
         label: "Time Off",
@@ -61,32 +69,55 @@ export const companyNavGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Operations",
+    title: "Finance",
     items: [
       {
         label: "Payroll",
         href: "/company/payroll",
         icon: <CreditCard size={ICON_SIZE} />,
+        badge: "May",
       },
+    ],
+  },
+  {
+    title: "Talent",
+    items: [
+      {
+        label: "Recruitment",
+        href: "/company/recruitment",
+        icon: <UserPlus size={ICON_SIZE} />,
+        badge: "14",
+      },
+      {
+        label: "Onboarding",
+        href: "/company/onboarding",
+        icon: <CheckCircle size={ICON_SIZE} />,
+      },
+      {
+        label: "Performance",
+        href: "/company/performance",
+        icon: <TrendingUp size={ICON_SIZE} />,
+      },
+    ],
+  },
+  {
+    title: "Operations",
+    items: [
       {
         label: "Documents",
         href: "/company/documents",
         icon: <FileText size={ICON_SIZE} />,
       },
       {
+        label: "Approvals",
+        href: "/company/approvals",
+        icon: <CheckCircle size={ICON_SIZE} />,
+        badge: "11",
+      },
+      {
         label: "Reports",
         href: "/company/reports",
         icon: <BarChart3 size={ICON_SIZE} />,
-      },
-    ],
-  },
-  {
-    title: "System",
-    items: [
-      {
-        label: "Settings",
-        href: "/company/settings",
-        icon: <Settings size={ICON_SIZE} />,
       },
     ],
   },
@@ -110,6 +141,7 @@ export const adminNavGroups: NavGroup[] = [
         label: "Companies",
         href: "/admin/companies",
         icon: <Building2 size={ICON_SIZE} />,
+        badge: "142",
       },
       {
         label: "Subscriptions",

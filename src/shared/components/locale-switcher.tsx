@@ -3,7 +3,7 @@ import { usePreferencesStore } from "@/preferences/store";
 
 const localeLabel: Record<SupportedLocale, string> = {
   en: "EN",
-  ar: "ع",
+  ar: "AR",
 };
 
 export function LocaleSwitcher() {

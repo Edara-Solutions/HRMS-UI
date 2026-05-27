@@ -8,9 +8,9 @@ export function Header() {
   const user = useAuthStore((state) => state.session?.user);
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)] px-4 lg:px-6">
+    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)] px-6">
       {/* Search */}
-      <div className="relative max-w-md flex-1">
+      <div className="relative w-full max-w-[400px]">
         <Search
           size={15}
           className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-faint)]"
@@ -18,13 +18,17 @@ export function Header() {
         <input
           type="search"
           placeholder="Search people, docs, actions…"
-          className="h-[34px] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] py-0 pe-16 ps-9 text-[13px] text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-faint)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10"
+          className="h-[34px] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] py-0 pe-[70px] ps-9 text-[13px] text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-faint)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10"
         />
         <kbd className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 rounded border border-[var(--color-border)] bg-[var(--color-surface-2)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--color-text-faint)]">
           ⌘K
         </kbd>
       </div>
 
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Actions */}
       <div className="flex items-center gap-1">
         <button
           type="button"

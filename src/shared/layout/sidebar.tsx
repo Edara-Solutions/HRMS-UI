@@ -3,9 +3,9 @@ import { usePreferencesStore } from "@/preferences/store";
 import type { NavGroup } from "@/shared/layout/nav-items";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
-import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, LogOut, Moon, Settings, Sun, User } from "lucide-react";
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import { Link, useMatchRoute } from "@tanstack/react-router";
+import { ChevronLeft, Moon, Settings, Sun } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface SidebarProps {
   groups: NavGroup[];
@@ -65,7 +65,7 @@ export function Sidebar({
         {groups.map((group) => (
           <div key={group.title} className="mb-5">
             {!collapsed && (
-              <p className="mb-1.5 px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+              <p className="mb-1.5 px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
                 {group.title}
               </p>
             )}
@@ -131,22 +131,9 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
 }
 
 function SidebarFooter({ collapsed }: { collapsed: boolean }) {
-  const navigate = useNavigate();
-  const clearSession = useAuthStore((state) => state.clearSession);
   const user = useAuthStore((state) => state.session?.user);
   const theme = usePreferencesStore((state) => state.theme);
   const toggleTheme = usePreferencesStore((state) => state.toggleTheme);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleLogout = useCallback(() => {
-    clearSession();
-    void navigate({ to: "/login" });
-  }, [clearSession, navigate]);
-
-  const handleDropdownClose = useCallback(() => {
-    setDropdownOpen(false);
-  }, []);
 
   return (
     <div className="border-t border-[var(--color-border)] px-2.5 py-3">
@@ -162,87 +149,37 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
         {!collapsed && <span>Settings</span>}
       </Link>
 
-      {/* User card */}
-      <div className="relative" ref={dropdownRef}>
-        <button
-          type="button"
-          onClick={() => setDropdownOpen((prev) => !prev)}
-          className={cn(
-            "flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-2.5 py-2 transition-colors hover:bg-[var(--color-surface-2)]",
-            collapsed && "justify-center px-0",
-          )}
-          aria-expanded={dropdownOpen}
-          aria-haspopup="true"
-        >
-          <Avatar
-            size="sm"
-            initials={user ? `${user.firstName[0]}${user.lastName[0]}` : "?"}
-            alt={user ? `${user.firstName} ${user.lastName}` : "User"}
-          />
-          {!collapsed && (
-            <div className="min-w-0 flex-1 text-start">
-              <p className="truncate text-[13px] font-semibold text-[var(--color-text)]">
-                {user ? `${user.firstName} ${user.lastName}` : "User"}
-              </p>
-              <p className="truncate text-[11px] text-[var(--color-text-faint)]">
-                {user?.status === "ACTIVE" ? "Employee" : (user?.status ?? "")}
-              </p>
-            </div>
-          )}
-          {!collapsed && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleTheme();
-              }}
-              className="shrink-0 rounded-[var(--radius-sm)] p-1 text-[var(--color-text-faint)] hover:text-[var(--color-text-muted)]"
-              aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-            >
-              {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
-            </button>
-          )}
-        </button>
-
-        {dropdownOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={handleDropdownClose}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") handleDropdownClose();
-              }}
-            />
-            <div className="absolute bottom-full start-0 z-50 mb-1 w-48 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] py-1 shadow-[var(--shadow-md)]">
-              <Link
-                to="/company/dashboard"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
-                onClick={handleDropdownClose}
-              >
-                <User size={14} />
-                Profile
-              </Link>
-              <Link
-                to="/company/dashboard"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
-                onClick={handleDropdownClose}
-              >
-                <Settings size={14} />
-                Settings
-              </Link>
-              <div className="my-1 border-t border-[var(--color-border)]" />
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-surface-2)]"
-              >
-                <LogOut size={14} />
-                Sign out
-              </button>
-            </div>
-          </>
+      {/* User card with theme toggle */}
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className={cn(
+          "flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-2.5 py-2 transition-colors hover:bg-[var(--color-surface-2)]",
+          collapsed && "justify-center px-0",
         )}
-      </div>
+        aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+      >
+        <Avatar
+          size="sm"
+          initials={user ? `${user.firstName[0]}${user.lastName[0]}` : "?"}
+          alt={user ? `${user.firstName} ${user.lastName}` : "User"}
+        />
+        {!collapsed && (
+          <div className="min-w-0 flex-1 text-start">
+            <p className="truncate text-[13px] font-semibold text-[var(--color-text)]">
+              {user ? `${user.firstName} ${user.lastName}` : "User"}
+            </p>
+            <p className="truncate text-[11px] text-[var(--color-text-faint)]">
+              {user?.status === "ACTIVE" ? "Employee" : (user?.status ?? "")}
+            </p>
+          </div>
+        )}
+        {!collapsed && (
+          <span className="shrink-0 text-[var(--color-text-faint)]">
+            {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
+          </span>
+        )}
+      </button>
     </div>
   );
 }
