@@ -21,7 +21,13 @@ export interface NavItem {
   label: string;
   href: string;
   icon: ReactNode;
-  badge?: string;
+  indicator?: NavIndicator;
+}
+
+export interface NavIndicator {
+  label: string;
+  tone: "neutral" | "primary" | "info" | "success" | "warning" | "danger";
+  effect?: "none" | "pulse";
 }
 
 export interface NavGroup {
@@ -49,7 +55,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "People",
         href: "/company/people",
         icon: <Users size={ICON_SIZE} />,
-        badge: "248",
+        indicator: { label: "248", tone: "info" },
       },
       {
         label: "Org Chart",
@@ -75,7 +81,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "Payroll",
         href: "/company/payroll",
         icon: <CreditCard size={ICON_SIZE} />,
-        badge: "May",
+        indicator: { label: "May", tone: "primary" },
       },
     ],
   },
@@ -86,7 +92,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "Recruitment",
         href: "/company/recruitment",
         icon: <UserPlus size={ICON_SIZE} />,
-        badge: "14",
+        indicator: { label: "14", tone: "warning", effect: "pulse" },
       },
       {
         label: "Onboarding",
@@ -112,7 +118,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "Approvals",
         href: "/company/approvals",
         icon: <CheckCircle size={ICON_SIZE} />,
-        badge: "11",
+        indicator: { label: "11", tone: "danger", effect: "pulse" },
       },
       {
         label: "Reports",
@@ -141,7 +147,7 @@ export const adminNavGroups: NavGroup[] = [
         label: "Companies",
         href: "/admin/companies",
         icon: <Building2 size={ICON_SIZE} />,
-        badge: "142",
+        indicator: { label: "142", tone: "info" },
       },
       {
         label: "Subscriptions",

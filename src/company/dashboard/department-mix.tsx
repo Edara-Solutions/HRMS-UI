@@ -23,7 +23,7 @@ export function DepartmentMix({ departments, totalCount }: DepartmentMixProps) {
           <div key={dept.name} className="grid grid-cols-[90px_1fr_32px] items-center gap-2.5">
             <span className="truncate text-xs text-[var(--color-text-muted)]">{dept.name}</span>
             <ProgressBar value={dept.percentage} color={dept.color} />
-            <span className="text-right text-xs font-semibold tabular-nums text-[var(--color-text)]">
+            <span className="text-end text-xs font-semibold tabular-nums text-[var(--color-text)]">
               {dept.count}
             </span>
           </div>

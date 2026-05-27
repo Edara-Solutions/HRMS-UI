@@ -23,7 +23,7 @@ export function SubscriptionDistribution({ items, totalCount }: SubscriptionDist
           <div key={item.name} className="grid grid-cols-[100px_1fr_40px] items-center gap-2.5">
             <span className="truncate text-xs text-[var(--color-text-muted)]">{item.name}</span>
             <ProgressBar value={item.percentage} color={item.color} />
-            <span className="text-right text-xs font-semibold tabular-nums text-[var(--color-text)]">
+            <span className="text-end text-xs font-semibold tabular-nums text-[var(--color-text)]">
               {item.count}
             </span>
           </div>

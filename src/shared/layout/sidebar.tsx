@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/auth/store";
 import { usePreferencesStore } from "@/preferences/store";
-import type { NavGroup } from "@/shared/layout/nav-items";
+import type { NavGroup, NavIndicator, NavItem } from "@/shared/layout/nav-items";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Link, useMatchRoute } from "@tanstack/react-router";
@@ -85,20 +85,30 @@ export function Sidebar({
 }
 
 interface SidebarLinkProps {
-  item: { label: string; href: string; icon: ReactNode; badge?: string };
+  item: NavItem;
   collapsed: boolean;
 }
+
+const indicatorClassName: Record<NavIndicator["tone"], string> = {
+  neutral: "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
+  primary: "bg-[var(--color-primary-soft)] text-[var(--color-primary)]",
+  info: "bg-[var(--color-info-soft)] text-[var(--color-info)]",
+  success: "bg-[var(--color-success-soft)] text-[var(--color-success)]",
+  warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
+  danger: "bg-[var(--color-danger-soft)] text-[var(--color-danger)]",
+};
 
 function SidebarLink({ item, collapsed }: SidebarLinkProps) {
   const matchRoute = useMatchRoute();
   const isActive = matchRoute({ to: item.href, fuzzy: true });
+  const indicator = item.indicator;
 
   return (
     <li>
       <Link
         to={item.href}
         className={cn(
-          "flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium transition-colors duration-[var(--motion-fast)]",
+          "relative flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium transition-[background-color,color,box-shadow] duration-[var(--motion-fast)]",
           isActive
             ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
             : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]",
@@ -111,22 +121,55 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
         {!collapsed && (
           <>
             <span className="truncate">{item.label}</span>
-            {item.badge && (
-              <span
-                className={cn(
-                  "ms-auto inline-flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-sm)] px-1.5 text-[10px] font-semibold tabular-nums",
-                  isActive
-                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-                    : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
-                )}
-              >
-                {item.badge}
-              </span>
-            )}
+            {indicator && <SidebarIndicator indicator={indicator} isActive={Boolean(isActive)} />}
           </>
+        )}
+        {collapsed && indicator && (
+          <SidebarIndicatorDot indicator={indicator} isActive={Boolean(isActive)} />
         )}
       </Link>
     </li>
+  );
+}
+
+function SidebarIndicator({
+  indicator,
+  isActive,
+}: {
+  indicator: NavIndicator;
+  isActive: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        "ms-auto inline-flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-sm)] border border-transparent px-1.5 text-[10px] font-semibold tabular-nums transition-transform duration-[var(--motion-fast)]",
+        indicatorClassName[indicator.tone],
+        isActive && "scale-[1.03] border-[color-mix(in_srgb,currentColor_20%,transparent)]",
+        indicator.effect === "pulse" && "motion-safe:animate-pulse",
+      )}
+    >
+      {indicator.label}
+    </span>
+  );
+}
+
+function SidebarIndicatorDot({
+  indicator,
+  isActive,
+}: {
+  indicator: NavIndicator;
+  isActive: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        "absolute end-2 top-2 size-2 rounded-[var(--radius-sm)] ring-2 ring-[var(--color-surface)] transition-transform duration-[var(--motion-fast)]",
+        indicatorClassName[indicator.tone],
+        isActive && "scale-125",
+        indicator.effect === "pulse" && "motion-safe:animate-pulse",
+      )}
+      aria-label={indicator.label}
+    />
   );
 }
 

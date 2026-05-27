@@ -26,19 +26,19 @@ export function RecentSignups({ items }: RecentSignupsProps) {
           <table className="w-full min-w-[560px]">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Company
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Plan
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Joined
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Status
                 </th>
-                <th className="px-3.5 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-end text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Employees
                 </th>
               </tr>
@@ -61,7 +61,7 @@ export function RecentSignups({ items }: RecentSignupsProps) {
                   <td className="px-3.5 py-2.5">
                     <Badge variant={item.status.variant}>{item.status.label}</Badge>
                   </td>
-                  <td className="px-3.5 py-2.5 text-right text-[13.5px] tabular-nums text-[var(--color-text)]">
+                  <td className="px-3.5 py-2.5 text-end text-[13.5px] tabular-nums text-[var(--color-text)]">
                     {item.employees}
                   </td>
                 </tr>

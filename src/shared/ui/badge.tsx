@@ -17,14 +17,14 @@ const variantClassName: Record<BadgeVariant, string> = {
   default:
     "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]",
   primary: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-transparent",
-  success: "bg-emerald-50 text-[var(--color-success)] border border-transparent",
-  warning: "bg-amber-50 text-[var(--color-warning)] border border-transparent",
-  danger: "bg-rose-50 text-[var(--color-danger)] border border-transparent",
-  info: "bg-sky-50 text-[var(--color-info)] border border-transparent",
-  warn: "bg-amber-50 text-[var(--color-warning)] border border-amber-100",
+  success: "bg-[var(--color-success-soft)] text-[var(--color-success)] border border-transparent",
+  warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)] border border-transparent",
+  danger: "bg-[var(--color-danger-soft)] text-[var(--color-danger)] border border-transparent",
+  info: "bg-[var(--color-info-soft)] text-[var(--color-info)] border border-transparent",
+  warn: "bg-[var(--color-warning-soft)] text-[var(--color-warning)] border border-[color-mix(in_srgb,var(--color-warning)_22%,transparent)]",
   teal: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-transparent",
-  risk: "bg-rose-50 text-[var(--color-danger)] border border-rose-100",
-  done: "bg-emerald-50 text-[var(--color-success)] border border-emerald-100",
+  risk: "bg-[var(--color-danger-soft)] text-[var(--color-danger)] border border-[color-mix(in_srgb,var(--color-danger)_22%,transparent)]",
+  done: "bg-[var(--color-success-soft)] text-[var(--color-success)] border border-[color-mix(in_srgb,var(--color-success)_22%,transparent)]",
 };
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

@@ -27,19 +27,19 @@ export function PeopleTable({ items }: PeopleTableProps) {
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Employee
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Department
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Status
                 </th>
-                <th className="px-3.5 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Next action
                 </th>
-                <th className="px-3.5 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                <th className="px-3.5 py-2.5 text-end text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                   Time off balance
                 </th>
               </tr>
@@ -70,7 +70,7 @@ export function PeopleTable({ items }: PeopleTableProps) {
                   <td className="max-w-[220px] truncate px-3.5 py-2.5 text-[12.5px] text-[var(--color-text-muted)]">
                     {item.nextAction}
                   </td>
-                  <td className="px-3.5 py-2.5 text-right text-[13.5px] tabular-nums text-[var(--color-text)]">
+                  <td className="px-3.5 py-2.5 text-end text-[13.5px] tabular-nums text-[var(--color-text)]">
                     {item.timeOffBalance}
                   </td>
                 </tr>

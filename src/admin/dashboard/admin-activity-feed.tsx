@@ -28,7 +28,7 @@ export function AdminActivityFeed({ items }: AdminActivityFeedProps) {
             <li key={item.id} className="relative flex gap-0 pb-3.5 last:pb-0">
               {/* Connecting line */}
               {index < items.length - 1 && (
-                <div className="absolute left-[27px] top-[16px] bottom-[-6px] w-px bg-[var(--color-border)] opacity-70" />
+                <div className="absolute start-[27px] top-[16px] bottom-[-6px] w-px bg-[var(--color-border)] opacity-70" />
               )}
               {/* Dot */}
               <div

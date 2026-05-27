@@ -73,7 +73,7 @@ function LoginPage() {
       {/* Left panel - Branding */}
       <div className="hidden w-80 flex-col justify-between bg-[var(--color-surface)] p-8 lg:flex">
         <div>
-          <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-white">
+          <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-[var(--color-on-primary)]">
             <span className="text-lg font-bold">E</span>
           </div>
           <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Edara</h1>
@@ -89,7 +89,7 @@ function LoginPage() {
         <div className="mx-auto w-full max-w-sm">
           {/* Mobile brand */}
           <div className="mb-8 lg:hidden">
-            <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-white">
+            <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-[var(--color-on-primary)]">
               <span className="text-lg font-bold">E</span>
             </div>
           </div>
@@ -102,7 +102,7 @@ function LoginPage() {
           </p>
 
           {apiError && (
-            <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-rose-50 px-4 py-3 text-sm text-[var(--color-danger)]">
+            <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]">
               {apiError}
             </div>
           )}
