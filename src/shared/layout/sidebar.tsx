@@ -1,35 +1,48 @@
 import { useAuthStore } from "@/auth/store";
+import { usePreferencesStore } from "@/preferences/store";
 import type { NavGroup } from "@/shared/layout/nav-items";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, LogOut, Settings, User } from "lucide-react";
+import { ChevronLeft, LogOut, Moon, Settings, Sun, User } from "lucide-react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 
 interface SidebarProps {
   groups: NavGroup[];
   portalLabel: string;
+  portalSubtitle: string;
   portalIcon: ReactNode;
   collapsed: boolean;
   onToggle: () => void;
 }
 
-export function Sidebar({ groups, portalLabel, portalIcon, collapsed, onToggle }: SidebarProps) {
+export function Sidebar({
+  groups,
+  portalLabel,
+  portalSubtitle,
+  portalIcon,
+  collapsed,
+  onToggle,
+}: SidebarProps) {
   return (
     <aside
       className={cn(
         "flex h-dvh flex-col border-e border-[var(--color-border)] bg-[var(--color-surface)] transition-[width] duration-[var(--motion-base)] ease-[var(--motion-easing)]",
-        collapsed ? "w-[60px]" : "w-[240px]",
+        collapsed ? "w-[60px]" : "w-[252px]",
       )}
     >
-      <div className="flex h-12 items-center gap-2.5 border-b border-[var(--color-border)] px-3">
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-primary)] text-white">
+      {/* Brand */}
+      <div className="flex items-center gap-2.5 border-b border-[var(--color-border)] px-4 py-5">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-text)] text-[13px] font-bold leading-none text-[var(--color-surface)]">
           {portalIcon}
         </div>
         {!collapsed && (
-          <span className="truncate text-[13px] font-semibold text-[var(--color-text)]">
-            {portalLabel}
-          </span>
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-semibold tracking-tight text-[var(--color-text)]">
+              {portalLabel}
+            </p>
+            <span className="text-[11px] text-[var(--color-text-faint)]">{portalSubtitle}</span>
+          </div>
         )}
         <button
           type="button"
@@ -47,15 +60,16 @@ export function Sidebar({ groups, portalLabel, portalIcon, collapsed, onToggle }
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-2.5 py-3">
         {groups.map((group) => (
-          <div key={group.title} className="mb-3">
+          <div key={group.title} className="mb-5">
             {!collapsed && (
-              <p className="mb-0.5 px-2 py-1 text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-faint)]">
+              <p className="mb-1.5 px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
                 {group.title}
               </p>
             )}
-            <ul className="space-y-px">
+            <ul className="flex flex-col gap-px">
               {group.items.map((item) => (
                 <SidebarLink key={item.href} item={item} collapsed={collapsed} />
               ))}
@@ -64,6 +78,7 @@ export function Sidebar({ groups, portalLabel, portalIcon, collapsed, onToggle }
         ))}
       </nav>
 
+      {/* Footer */}
       <SidebarFooter collapsed={collapsed} />
     </aside>
   );
@@ -83,7 +98,7 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
       <Link
         to={item.href}
         className={cn(
-          "flex items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-[13px] font-medium transition-colors duration-[var(--motion-fast)]",
+          "flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium transition-colors duration-[var(--motion-fast)]",
           isActive
             ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
             : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]",
@@ -92,12 +107,19 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
         aria-current={isActive ? "page" : undefined}
         title={collapsed ? item.label : undefined}
       >
-        <span className="shrink-0 opacity-75">{item.icon}</span>
+        <span className={cn("shrink-0 opacity-70", isActive && "opacity-100")}>{item.icon}</span>
         {!collapsed && (
           <>
             <span className="truncate">{item.label}</span>
             {item.badge && (
-              <span className="ms-auto inline-flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] px-1.5 text-[10px] font-semibold tabular-nums text-[var(--color-text-muted)]">
+              <span
+                className={cn(
+                  "ms-auto inline-flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-sm)] px-1.5 text-[10px] font-semibold tabular-nums",
+                  isActive
+                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                    : "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
+                )}
+              >
                 {item.badge}
               </span>
             )}
@@ -112,6 +134,8 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   const navigate = useNavigate();
   const clearSession = useAuthStore((state) => state.clearSession);
   const user = useAuthStore((state) => state.session?.user);
+  const theme = usePreferencesStore((state) => state.theme);
+  const toggleTheme = usePreferencesStore((state) => state.toggleTheme);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -125,13 +149,26 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   }, []);
 
   return (
-    <div className="border-t border-[var(--color-border)] px-2 py-2">
+    <div className="border-t border-[var(--color-border)] px-2.5 py-3">
+      {/* Settings link */}
+      <Link
+        to="/company/dashboard"
+        className={cn(
+          "mb-1.5 flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]",
+          collapsed && "justify-center px-0",
+        )}
+      >
+        <Settings size={16} className="opacity-70" />
+        {!collapsed && <span>Settings</span>}
+      </Link>
+
+      {/* User card */}
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
           onClick={() => setDropdownOpen((prev) => !prev)}
           className={cn(
-            "flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 transition-colors hover:bg-[var(--color-surface-2)]",
+            "flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-2.5 py-2 transition-colors hover:bg-[var(--color-surface-2)]",
             collapsed && "justify-center px-0",
           )}
           aria-expanded={dropdownOpen}
@@ -148,9 +185,22 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
                 {user ? `${user.firstName} ${user.lastName}` : "User"}
               </p>
               <p className="truncate text-[11px] text-[var(--color-text-faint)]">
-                {user?.employeeCode ?? ""}
+                {user?.status === "ACTIVE" ? "Employee" : (user?.status ?? "")}
               </p>
             </div>
+          )}
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleTheme();
+              }}
+              className="shrink-0 rounded-[var(--radius-sm)] p-1 text-[var(--color-text-faint)] hover:text-[var(--color-text-muted)]"
+              aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+            >
+              {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
+            </button>
           )}
         </button>
 

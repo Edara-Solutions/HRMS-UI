@@ -9,11 +9,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClassName: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]",
+  primary:
+    "bg-[var(--color-primary)] border border-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)]",
   secondary:
-    "border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text)] hover:bg-[var(--color-surface)]",
-  ghost: "text-[var(--color-text)] hover:bg-[var(--color-primary-soft)]",
-  destructive: "bg-[var(--color-danger)] text-white",
+    "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:bg-[var(--color-surface-2)]",
+  ghost:
+    "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]",
+  destructive: "bg-[var(--color-danger)] border border-[var(--color-danger)] text-white",
 };
 
 export function Button({
@@ -26,7 +28,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] px-4 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] px-3.5 text-[13px] font-medium transition-colors duration-[var(--motion-fast)] disabled:cursor-not-allowed disabled:opacity-60",
         variantClassName[variant],
         className,
       )}

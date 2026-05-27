@@ -1,11 +1,11 @@
 import { Header } from "@/shared/layout/header";
 import { adminNavGroups, companyNavGroups } from "@/shared/layout/nav-items";
 import { Sidebar } from "@/shared/layout/sidebar";
-import { Building2, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { type ReactNode, useCallback, useState } from "react";
 
 // Hoist static icon JSX to avoid recreating on each render
-const COMPANY_ICON = <Building2 size={14} />;
+const COMPANY_ICON = <span className="text-[13px] font-bold">E</span>;
 const ADMIN_ICON = <Shield size={14} />;
 
 interface AppShellProps {
@@ -15,12 +15,14 @@ interface AppShellProps {
 
 const portalConfig = {
   company: {
-    label: "Company Portal",
+    label: "Edara",
+    subtitle: "People Operations",
     icon: COMPANY_ICON,
     groups: companyNavGroups,
   },
   admin: {
-    label: "Admin Portal",
+    label: "Edara Admin",
+    subtitle: "Platform Management",
     icon: ADMIN_ICON,
     groups: adminNavGroups,
   },
@@ -39,6 +41,7 @@ export function AppShell({ portal, children }: AppShellProps) {
       <Sidebar
         groups={config.groups}
         portalLabel={config.label}
+        portalSubtitle={config.subtitle}
         portalIcon={config.icon}
         collapsed={collapsed}
         onToggle={handleToggle}
@@ -46,7 +49,7 @@ export function AppShell({ portal, children }: AppShellProps) {
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto">
-          <div className="px-6 py-5 lg:px-8 lg:py-6">{children}</div>
+          <div className="px-7 py-7">{children}</div>
         </main>
       </div>
     </div>

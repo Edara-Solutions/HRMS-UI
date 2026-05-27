@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/auth/store";
 import { LocaleSwitcher } from "@/shared/components/locale-switcher";
+import { ThemeToggle } from "@/shared/components/theme-toggle";
 import { Avatar } from "@/shared/ui/avatar";
 import { Bell, HelpCircle, Search } from "lucide-react";
 
@@ -44,6 +45,7 @@ export function Header() {
 
         <div className="mx-1 h-5 w-px bg-[var(--color-border)]" />
 
+        <ThemeToggle />
         <LocaleSwitcher />
 
         <Avatar

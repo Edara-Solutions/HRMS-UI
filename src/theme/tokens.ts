@@ -27,6 +27,10 @@ export const themeTokens = {
       primary: "#8FB8E8",
       primaryHover: "#A5C8F0",
       primarySoft: "#1F2F43",
+      success: "#79AB86",
+      warning: "#D0A15C",
+      danger: "#D27C8B",
+      info: "#82AEDD",
     },
   },
   font: {
