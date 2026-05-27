@@ -1,37 +1,29 @@
-import { dummyLoginCredentials } from "@/auth/fixtures";
 import { useAuthStore } from "@/auth/store";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { KeyRound, Loader2 } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const loginSchema = z.object({
-  companyCode: z
-    .string()
-    .min(1, "Company code is required")
-    .max(20, "Company code must be 20 characters or less"),
-  employeeCode: z
-    .string()
-    .min(1, "Employee code is required")
-    .max(20, "Employee code must be 20 characters or less"),
+const adminLoginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
   password: z
     .string()
     .min(1, "Password is required")
     .min(6, "Password must be at least 6 characters"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type AdminLoginFormData = z.infer<typeof adminLoginSchema>;
 
-export const Route = createFileRoute("/login")({
-  component: LoginPage,
+export const Route = createFileRoute("/admin/login")({
+  component: AdminLoginPage,
 });
 
-function LoginPage() {
+function AdminLoginPage() {
   const navigate = useNavigate();
   const signInWithDummySession = useAuthStore((state) => state.signInWithDummySession);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,16 +33,15 @@ function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<AdminLoginFormData>({
+    resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      companyCode: dummyLoginCredentials.companyCode,
-      employeeCode: dummyLoginCredentials.employeeCode,
-      password: dummyLoginCredentials.password,
+      email: "admin@edara.com",
+      password: "AdminP@ss1",
     },
   });
 
-  async function onSubmit(_data: LoginFormData) {
+  async function onSubmit(_data: AdminLoginFormData) {
     setIsSubmitting(true);
     setApiError(null);
 
@@ -58,9 +49,9 @@ function LoginPage() {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Use dummy session for now
+      // Use dummy session for now (admin role)
       signInWithDummySession();
-      void navigate({ to: "/company/dashboard" });
+      void navigate({ to: "/admin/dashboard" });
     } catch {
       setApiError("Invalid credentials. Please try again.");
     } finally {
@@ -74,13 +65,13 @@ function LoginPage() {
       <div className="hidden w-80 flex-col justify-between bg-[var(--color-surface)] p-8 lg:flex">
         <div>
           <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-white">
-            <span className="text-lg font-bold">E</span>
+            <Shield size={20} />
           </div>
-          <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Edara</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">People Operations Platform</p>
+          <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Edara Admin</h1>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">Platform Management Console</p>
         </div>
         <p className="text-xs text-[var(--color-text-faint)]">
-          Manage your workforce with clarity and confidence.
+          Manage companies, subscriptions, and platform operations.
         </p>
       </div>
 
@@ -90,15 +81,15 @@ function LoginPage() {
           {/* Mobile brand */}
           <div className="mb-8 lg:hidden">
             <div className="flex size-10 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-primary)] text-white">
-              <span className="text-lg font-bold">E</span>
+              <Shield size={20} />
             </div>
           </div>
 
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text)]">
-            Sign in to Company Portal
+            Admin Portal
           </h2>
           <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-            Enter your credentials to access your workspace.
+            Sign in with your administrator credentials.
           </p>
 
           {apiError && (
@@ -109,30 +100,17 @@ function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="companyCode">Company code</Label>
+              <Label htmlFor="email">Email address</Label>
               <Input
-                id="companyCode"
-                placeholder="e.g. EDARA"
-                autoComplete="organization"
-                aria-invalid={!!errors.companyCode}
-                {...register("companyCode")}
+                id="email"
+                type="email"
+                placeholder="admin@edara.com"
+                autoComplete="email"
+                aria-invalid={!!errors.email}
+                {...register("email")}
               />
-              {errors.companyCode && (
-                <p className="text-xs text-[var(--color-danger)]">{errors.companyCode.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="employeeCode">Employee code</Label>
-              <Input
-                id="employeeCode"
-                placeholder="e.g. EDA-001"
-                autoComplete="username"
-                aria-invalid={!!errors.employeeCode}
-                {...register("employeeCode")}
-              />
-              {errors.employeeCode && (
-                <p className="text-xs text-[var(--color-danger)]">{errors.employeeCode.message}</p>
+              {errors.email && (
+                <p className="text-xs text-[var(--color-danger)]">{errors.email.message}</p>
               )}
             </div>
 
@@ -167,20 +145,17 @@ function LoginPage() {
                 </>
               ) : (
                 <>
-                  <KeyRound size={16} />
-                  Sign in
+                  <Shield size={16} />
+                  Sign in to Admin
                 </>
               )}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
-            Admin access?{" "}
-            <Link
-              to="/admin/login"
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Sign in to Admin Portal
+            Company employee?{" "}
+            <Link to="/login" className="font-medium text-[var(--color-primary)] hover:underline">
+              Sign in to Company Portal
             </Link>
           </p>
 
