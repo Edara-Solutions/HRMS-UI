@@ -9,38 +9,184 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./app/__root"
+import { Route as LoginRouteImport } from "./app/login"
+import { Route as ForbiddenRouteImport } from "./app/forbidden"
+import { Route as CompanyRouteImport } from "./app/company"
+import { Route as ChangePasswordRouteImport } from "./app/change-password"
+import { Route as AdminRouteImport } from "./app/admin"
+import { Route as AcceptInvitationRouteImport } from "./app/accept-invitation"
 import { Route as IndexRouteImport } from "./app/index"
+import { Route as AdminIndexRouteImport } from "./app/admin.index"
+import { Route as CompanyDashboardRouteImport } from "./app/company.dashboard"
 
+const LoginRoute = LoginRouteImport.update({
+  id: "/login",
+  path: "/login",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForbiddenRoute = ForbiddenRouteImport.update({
+  id: "/forbidden",
+  path: "/forbidden",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: "/company",
+  path: "/company",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangePasswordRoute = ChangePasswordRouteImport.update({
+  id: "/change-password",
+  path: "/change-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: "/admin",
+  path: "/admin",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
+  id: "/accept-invitation",
+  path: "/accept-invitation",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminRoute,
+} as any)
+const CompanyDashboardRoute = CompanyDashboardRouteImport.update({
+  id: "/dashboard",
+  path: "/dashboard",
+  getParentRoute: () => CompanyRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/accept-invitation": typeof AcceptInvitationRoute
+  "/admin": typeof AdminRouteWithChildren
+  "/change-password": typeof ChangePasswordRoute
+  "/company": typeof CompanyRouteWithChildren
+  "/forbidden": typeof ForbiddenRoute
+  "/login": typeof LoginRoute
+  "/company/dashboard": typeof CompanyDashboardRoute
+  "/admin/": typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/accept-invitation": typeof AcceptInvitationRoute
+  "/change-password": typeof ChangePasswordRoute
+  "/company": typeof CompanyRouteWithChildren
+  "/forbidden": typeof ForbiddenRoute
+  "/login": typeof LoginRoute
+  "/company/dashboard": typeof CompanyDashboardRoute
+  "/admin": typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
+  "/accept-invitation": typeof AcceptInvitationRoute
+  "/admin": typeof AdminRouteWithChildren
+  "/change-password": typeof ChangePasswordRoute
+  "/company": typeof CompanyRouteWithChildren
+  "/forbidden": typeof ForbiddenRoute
+  "/login": typeof LoginRoute
+  "/company/dashboard": typeof CompanyDashboardRoute
+  "/admin/": typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/"
+  fullPaths:
+    | "/"
+    | "/accept-invitation"
+    | "/admin"
+    | "/change-password"
+    | "/company"
+    | "/forbidden"
+    | "/login"
+    | "/company/dashboard"
+    | "/admin/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/"
-  id: "__root__" | "/"
+  to:
+    | "/"
+    | "/accept-invitation"
+    | "/change-password"
+    | "/company"
+    | "/forbidden"
+    | "/login"
+    | "/company/dashboard"
+    | "/admin"
+  id:
+    | "__root__"
+    | "/"
+    | "/accept-invitation"
+    | "/admin"
+    | "/change-password"
+    | "/company"
+    | "/forbidden"
+    | "/login"
+    | "/company/dashboard"
+    | "/admin/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcceptInvitationRoute: typeof AcceptInvitationRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  ChangePasswordRoute: typeof ChangePasswordRoute
+  CompanyRoute: typeof CompanyRouteWithChildren
+  ForbiddenRoute: typeof ForbiddenRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/login": {
+      id: "/login"
+      path: "/login"
+      fullPath: "/login"
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/forbidden": {
+      id: "/forbidden"
+      path: "/forbidden"
+      fullPath: "/forbidden"
+      preLoaderRoute: typeof ForbiddenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company": {
+      id: "/company"
+      path: "/company"
+      fullPath: "/company"
+      preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/change-password": {
+      id: "/change-password"
+      path: "/change-password"
+      fullPath: "/change-password"
+      preLoaderRoute: typeof ChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/admin": {
+      id: "/admin"
+      path: "/admin"
+      fullPath: "/admin"
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/accept-invitation": {
+      id: "/accept-invitation"
+      path: "/accept-invitation"
+      fullPath: "/accept-invitation"
+      preLoaderRoute: typeof AcceptInvitationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/": {
       id: "/"
       path: "/"
@@ -48,11 +194,52 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/admin/": {
+      id: "/admin/"
+      path: "/"
+      fullPath: "/admin/"
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    "/company/dashboard": {
+      id: "/company/dashboard"
+      path: "/dashboard"
+      fullPath: "/company/dashboard"
+      preLoaderRoute: typeof CompanyDashboardRouteImport
+      parentRoute: typeof CompanyRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface CompanyRouteChildren {
+  CompanyDashboardRoute: typeof CompanyDashboardRoute
+}
+
+const CompanyRouteChildren: CompanyRouteChildren = {
+  CompanyDashboardRoute: CompanyDashboardRoute,
+}
+
+const CompanyRouteWithChildren =
+  CompanyRoute._addFileChildren(CompanyRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcceptInvitationRoute: AcceptInvitationRoute,
+  AdminRoute: AdminRouteWithChildren,
+  ChangePasswordRoute: ChangePasswordRoute,
+  CompanyRoute: CompanyRouteWithChildren,
+  ForbiddenRoute: ForbiddenRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
