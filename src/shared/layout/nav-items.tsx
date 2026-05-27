@@ -17,6 +17,7 @@ export interface NavItem {
   label: string;
   href: string;
   icon: ReactNode;
+  badge?: string;
 }
 
 export interface NavGroup {
@@ -45,6 +46,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "Employees",
         href: "/company/people",
         icon: <Users size={ICON_SIZE} />,
+        badge: "248",
       },
       {
         label: "Time Off",

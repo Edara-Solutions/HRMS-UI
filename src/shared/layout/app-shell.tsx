@@ -44,7 +44,7 @@ export function AppShell({ portal, children }: AppShellProps) {
         onToggle={handleToggle}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header portalLabel={config.label} />
+        <Header />
         <main className="flex-1 overflow-y-auto">
           <div className="px-6 py-5 lg:px-8 lg:py-6">{children}</div>
         </main>
