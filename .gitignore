@@ -10,3 +10,8 @@ test-results/
 .env.production
 *.tsbuildinfo
 .vite-dev.*.log
+*.md
+hrms_v1.html
+.claude
+.agents
+./ref/**
