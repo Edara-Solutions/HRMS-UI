@@ -12,7 +12,7 @@ export function RootLayout() {
 
 export function NotFoundPage() {
   return (
-    <section className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-6">
+    <section className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 sm:px-6">
       <p className="text-sm font-medium text-[var(--color-text-muted)]">404</p>
       <h1 className="mt-2 text-3xl font-semibold">Page not found</h1>
       <p className="mt-3 max-w-prose text-sm text-[var(--color-text-muted)]">

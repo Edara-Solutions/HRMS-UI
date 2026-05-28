@@ -7,9 +7,9 @@ export const Route = createFileRoute("/")({
 
 function FoundationPage() {
   return (
-    <section className="mx-auto flex min-h-dvh max-w-5xl flex-col justify-center px-6 py-12">
+    <section className="mx-auto flex min-h-dvh max-w-5xl flex-col justify-center px-4 py-10 sm:px-6 sm:py-12">
       <p className="text-sm font-medium text-[var(--color-primary)]">HRMS Frontend</p>
-      <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-normal text-[var(--color-text)]">
+      <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-[var(--color-text)] sm:text-4xl">
         Foundation scaffold is ready for the tech stack setup.
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--color-text-muted)]">

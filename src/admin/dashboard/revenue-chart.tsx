@@ -92,14 +92,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
   return (
     <Card>
-      <CardHeader className="flex-row items-start justify-between border-b border-[var(--color-border)] pb-3">
+      <CardHeader className="flex-col gap-3 border-b border-[var(--color-border)] pb-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <CardTitle>Revenue trend</CardTitle>
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
             Monthly recurring revenue: 2026
           </p>
         </div>
-        <div className="flex items-center gap-3.5 text-xs text-[var(--color-text-muted)]">
+        <div className="flex flex-wrap items-center gap-3.5 text-xs text-[var(--color-text-muted)]">
           <span className="flex items-center gap-1">
             <span className="inline-block size-1.5 rounded-full bg-[var(--color-primary)]" />
             Revenue (SAR)

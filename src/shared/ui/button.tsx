@@ -1,7 +1,7 @@
 import { cn } from "@/shared/lib/cn";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle" | "link";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle" | "link" | "nav";
 
 /**
  * Size hierarchy — pick based on where the button lives.
@@ -13,7 +13,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle
  *   icon / iconSm / iconLg  Square icon-only at matching tiers
  *   block Full-width md — replaces className="w-full"
  */
-type ButtonSize = "xs" | "sm" | "md" | "lg" | "icon" | "iconSm" | "iconLg" | "block";
+type ButtonSize = "xs" | "sm" | "md" | "lg" | "icon" | "iconXs" | "iconSm" | "iconLg" | "block";
 
 /**
  * intent maps a semantic role to a default variant + size.
@@ -82,6 +82,11 @@ const variantClassName: Record<ButtonVariant, string> = {
     "border border-transparent bg-[var(--color-surface-2)] font-medium text-[var(--color-text)] hover:bg-[color-mix(in_srgb,var(--color-surface-2)_80%,var(--color-border))]",
 
   link: "border border-transparent bg-transparent px-0 font-medium text-[var(--color-primary)] underline-offset-4 hover:underline",
+
+  // All hover/active/cursor/svg-animation handled by .btn-nav in globals.css
+  // (non-layered CSS beats @layer utilities, so it reliably overrides everything).
+  // Directional icon nudge: add .btn-nav-prev or .btn-nav-next via className prop.
+  nav: "btn-nav font-medium",
 };
 
 const sizeClassName: Record<ButtonSize, string> = {
@@ -90,6 +95,7 @@ const sizeClassName: Record<ButtonSize, string> = {
   md: "h-9 px-3.5 text-[13px]",
   lg: "h-10 px-4 text-sm",
   icon: "size-9 px-0",
+  iconXs: "size-[30px] px-0",
   iconSm: "size-[34px] px-0",
   iconLg: "size-10 px-0",
   block: "h-9 w-full justify-center px-3.5 text-[13px]",
@@ -126,7 +132,7 @@ export function Button({
     <button
       type="button"
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
         sizeClassName[size],
         variantClassName[variant],
         isDestructiveTrigger && destructiveTriggerClassName,

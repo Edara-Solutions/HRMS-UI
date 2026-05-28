@@ -12,7 +12,7 @@ interface ApprovalQueueProps {
 export function ApprovalQueue({ items, totalCount }: ApprovalQueueProps) {
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between border-b border-[var(--color-border)] pb-3">
+      <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] pb-3">
         <div>
           <CardTitle className="text-[13.5px]">Approvals queue</CardTitle>
           <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">

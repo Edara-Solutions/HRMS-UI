@@ -134,12 +134,14 @@ function PlanCard({ plan }: { plan: Plan }) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-2 px-5 py-3">
+      <div className="flex flex-col gap-2 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-xs text-[var(--color-text-muted)]">
           {plan.prices?.length ?? 0} price{plan.prices?.length !== 1 ? "s" : ""} · {plan.duration}{" "}
           mo duration
         </span>
-        <Button intent="utility">Edit plan</Button>
+        <Button intent="utility" className="w-full sm:w-auto">
+          Edit plan
+        </Button>
       </div>
     </Card>
   );
@@ -209,12 +211,12 @@ export function AdminPlansPage() {
             {totalActive} active / {totalInactive} inactive / subscription plan catalogue
           </p>
         </div>
-        <Button intent="cta" leadingIcon={<Plus size={15} />}>
+        <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
           Create plan
         </Button>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {(["all", "active", "inactive"] as const).map((option) => (
           <Button
             key={option}
@@ -237,7 +239,7 @@ export function AdminPlansPage() {
             {option === "all" ? "All visibility" : option === "public" ? "Public" : "Private"}
           </Button>
         ))}
-        <div className="relative ms-auto max-w-xs flex-1">
+        <div className="relative w-full sm:ms-auto sm:max-w-xs">
           <Search
             size={14}
             className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"

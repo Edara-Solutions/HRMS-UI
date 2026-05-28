@@ -1,4 +1,4 @@
-import type { LeadWithContacts } from "@/admin/leads/api";
+﻿import type { LeadWithContacts } from "@/admin/leads/api";
 import type { LeadSource, LeadStatus } from "@/admin/leads/api";
 import { dummyLeads } from "@/admin/leads/fixtures";
 import { Badge } from "@/shared/ui/badge";
@@ -6,9 +6,9 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ExternalLink, Plus, Search, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Plus, Search, Users } from "lucide-react";
 
-// ─── Status helpers ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Status helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const STATUS_BADGE: Record<
   LeadStatus,
@@ -43,12 +43,12 @@ const SOURCE_LABEL: Record<LeadSource, string> = {
 };
 
 const SIZE_LABEL: Record<string, string> = {
-  "1_TO_10": "1–10",
-  "11_TO_20": "11–20",
-  "21_TO_50": "21–50",
-  "51_TO_100": "51–100",
-  "101_TO_250": "101–250",
-  "251_TO_500": "251–500",
+  "1_TO_10": "1â€“10",
+  "11_TO_20": "11â€“20",
+  "21_TO_50": "21â€“50",
+  "51_TO_100": "51â€“100",
+  "101_TO_250": "101â€“250",
+  "251_TO_500": "251â€“500",
   ABOVE_500: "500+",
 };
 
@@ -62,120 +62,204 @@ const ALL_STATUSES: LeadStatus[] = [
   "LOST",
 ];
 
-// ─── Table ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function LeadsTable({ items }: { items: LeadWithContacts[] }) {
   return (
-    <div className="scrollbar-calm overflow-x-auto">
-      <table className="w-full min-w-[800px]">
-        <thead>
-          <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
-            {[
-              "Company",
-              "Primary contact",
-              "Industry / size",
-              "Source",
-              "Status",
-              "Attempts",
-              "Updated",
-              "",
-            ].map((h) => (
-              <th
-                key={h}
-                className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] ${
-                  h === "Attempts" || h === "" ? "text-end" : "text-start"
-                }`}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(({ lead, contacts }) => {
-            const primary = contacts.find((c) => c.isPrimary) ?? contacts[0];
-            const status = STATUS_BADGE[lead.status];
-            return (
-              <tr
-                key={lead.publicId}
-                className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
-              >
-                {/* Company */}
-                <td className="px-4 py-3">
-                  <p className="text-[13.5px] font-medium text-[var(--color-text)]">
-                    {lead.companyName ?? <span className="text-[var(--color-text-faint)]">–</span>}
+    <>
+      <div className="divide-y divide-[var(--color-border)] lg:hidden">
+        {items.map(({ lead, contacts }) => {
+          const primary = contacts.find((c) => c.isPrimary) ?? contacts[0];
+          const status = STATUS_BADGE[lead.status];
+          return (
+            <article key={lead.publicId} className="p-4">
+              <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-semibold text-[var(--color-text)]">
+                    {lead.companyName ?? "-"}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
+                    {lead.city ?? lead.country ?? "-"}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    {lead.city ?? lead.country ?? "–"}
-                  </p>
-                </td>
-
-                {/* Primary contact */}
-                <td className="px-4 py-3">
-                  {primary ? (
-                    <>
-                      <p className="text-[13px] text-[var(--color-text)]">{primary.name ?? "–"}</p>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        {primary.jobTitle ?? ""}
-                      </p>
-                    </>
-                  ) : (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
-
-                {/* Industry / size */}
-                <td className="px-4 py-3">
-                  <p className="text-[13px] text-[var(--color-text)]">{lead.industry ?? "–"}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
-                  </p>
-                </td>
-
-                {/* Source */}
-                <td className="px-4 py-3 text-[13px] text-[var(--color-text-muted)]">
-                  {SOURCE_LABEL[lead.source] ?? lead.source}
-                </td>
-
-                {/* Status */}
-                <td className="px-4 py-3">
+                </div>
+                <div className="flex flex-wrap gap-1.5">
                   <Badge variant={status.variant}>{status.label}</Badge>
-                  {lead.lostReason && (
-                    <p className="mt-0.5 text-[11px] text-[var(--color-text-muted)]">
-                      {lead.lostReason.toLowerCase().replace(/_/g, " ")}
-                    </p>
+                </div>
+              </div>
+
+              <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-xs min-[520px]:grid-cols-2">
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Primary contact</dt>
+                  <dd className="mt-0.5 text-[var(--color-text)]">{primary?.name ?? "-"}</dd>
+                  {primary?.jobTitle && (
+                    <dd className="text-[var(--color-text-muted)]">{primary.jobTitle}</dd>
                   )}
-                </td>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Industry / size</dt>
+                  <dd className="mt-0.5 text-[var(--color-text)]">{lead.industry ?? "-"}</dd>
+                  <dd className="text-[var(--color-text-muted)]">
+                    {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Source</dt>
+                  <dd className="mt-0.5 text-[var(--color-text-muted)]">
+                    {SOURCE_LABEL[lead.source] ?? lead.source}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Attempts</dt>
+                  <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+                    {lead.numberOfAttempts}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Updated</dt>
+                  <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+                    {new Date(lead.updatedAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </dd>
+                </div>
+                {lead.lostReason && (
+                  <div>
+                    <dt className="text-[var(--color-text-faint)]">Reason</dt>
+                    <dd className="mt-0.5 text-[var(--color-text-muted)]">
+                      {lead.lostReason.toLowerCase().replace(/_/g, " ")}
+                    </dd>
+                  </div>
+                )}
+              </dl>
 
-                {/* Attempts */}
-                <td className="px-4 py-3 text-end text-[13px] tabular-nums text-[var(--color-text-muted)]">
-                  {lead.numberOfAttempts}
-                </td>
+              <Button
+                intent="utility"
+                leadingIcon={<ExternalLink size={13} />}
+                className="mt-4 w-full min-[520px]:w-auto"
+              >
+                View
+              </Button>
+            </article>
+          );
+        })}
+      </div>
 
-                {/* Updated */}
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {new Date(lead.updatedAt).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </td>
+      <div className="scrollbar-calm hidden overflow-x-auto lg:block">
+        <table className="w-full min-w-[800px]">
+          <thead>
+            <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
+              {[
+                "Company",
+                "Primary contact",
+                "Industry / size",
+                "Source",
+                "Status",
+                "Attempts",
+                "Updated",
+                "",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] ${
+                    h === "Attempts" || h === "" ? "text-end" : "text-start"
+                  }`}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(({ lead, contacts }) => {
+              const primary = contacts.find((c) => c.isPrimary) ?? contacts[0];
+              const status = STATUS_BADGE[lead.status];
+              return (
+                <tr
+                  key={lead.publicId}
+                  className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
+                >
+                  {/* Company */}
+                  <td className="px-4 py-3">
+                    <p className="text-[13.5px] font-medium text-[var(--color-text)]">
+                      {lead.companyName ?? (
+                        <span className="text-[var(--color-text-faint)]">â€“</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {lead.city ?? lead.country ?? "â€“"}
+                    </p>
+                  </td>
 
-                {/* Actions */}
-                <td className="px-4 py-3 text-end">
-                  <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
-                    View
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  {/* Primary contact */}
+                  <td className="px-4 py-3">
+                    {primary ? (
+                      <>
+                        <p className="text-[13px] text-[var(--color-text)]">
+                          {primary.name ?? "â€“"}
+                        </p>
+                        <p className="text-xs text-[var(--color-text-muted)]">
+                          {primary.jobTitle ?? ""}
+                        </p>
+                      </>
+                    ) : (
+                      <span className="text-[var(--color-text-faint)]">â€“</span>
+                    )}
+                  </td>
+
+                  {/* Industry / size */}
+                  <td className="px-4 py-3">
+                    <p className="text-[13px] text-[var(--color-text)]">{lead.industry ?? "â€“"}</p>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
+                    </p>
+                  </td>
+
+                  {/* Source */}
+                  <td className="px-4 py-3 text-[13px] text-[var(--color-text-muted)]">
+                    {SOURCE_LABEL[lead.source] ?? lead.source}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-3">
+                    <Badge variant={status.variant}>{status.label}</Badge>
+                    {lead.lostReason && (
+                      <p className="mt-0.5 text-[11px] text-[var(--color-text-muted)]">
+                        {lead.lostReason.toLowerCase().replace(/_/g, " ")}
+                      </p>
+                    )}
+                  </td>
+
+                  {/* Attempts */}
+                  <td className="px-4 py-3 text-end text-[13px] tabular-nums text-[var(--color-text-muted)]">
+                    {lead.numberOfAttempts}
+                  </td>
+
+                  {/* Updated */}
+                  <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
+                    {new Date(lead.updatedAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-4 py-3 text-end">
+                    <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
+                      View
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function AdminLeadsPage() {
   const { page, pageSize, q, status } = useSearch({ from: "/admin/leads" });
@@ -241,10 +325,10 @@ export function AdminLeadsPage() {
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Leads</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {dummyLeads.length} total leads · CRM sales pipeline
+            {dummyLeads.length} total leads Â· CRM sales pipeline
           </p>
         </div>
-        <Button intent="cta" leadingIcon={<Plus size={15} />}>
+        <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
           Add lead
         </Button>
       </div>
@@ -276,8 +360,8 @@ export function AdminLeadsPage() {
       </div>
 
       {/* Search */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="relative flex-1 max-w-xs">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-xs">
           <Search
             size={14}
             className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
@@ -285,19 +369,19 @@ export function AdminLeadsPage() {
           />
           <Input
             type="search"
-            placeholder="Search by company, city, industry…"
+            placeholder="Search by company, city, industryâ€¦"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             className="ps-8"
           />
         </div>
-        <span className="ms-auto text-xs text-[var(--color-text-muted)]">
+        <span className="text-xs text-[var(--color-text-muted)] sm:ms-auto">
           {filtered.length} of {dummyLeads.length}
         </span>
       </div>
 
       {/* Table card */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
           {visible.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
@@ -311,26 +395,35 @@ export function AdminLeadsPage() {
             <LeadsTable items={visible} />
           )}
         </CardContent>
-        <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-3">
+        <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            Page {currentPage} of {totalPages} · showing {visible.length} leads
+            {visible.length} of {filtered.length} leads
           </span>
           <div className="flex items-center gap-1">
             <Button
-              intent="action"
-              size="xs"
+              variant="nav"
+              size="iconXs"
+              className="btn-nav-prev"
               disabled={currentPage <= 1}
               onClick={() => setPage(currentPage - 1)}
+              aria-label="Previous page"
+              title="Previous page"
             >
-              Previous
+              <ChevronLeft size={14} />
             </Button>
+            <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
+              {currentPage} / {totalPages}
+            </span>
             <Button
-              intent="action"
-              size="xs"
+              variant="nav"
+              size="iconXs"
+              className="btn-nav-next"
               disabled={currentPage >= totalPages}
               onClick={() => setPage(currentPage + 1)}
+              aria-label="Next page"
+              title="Next page"
             >
-              Next
+              <ChevronRight size={14} />
             </Button>
           </div>
         </div>

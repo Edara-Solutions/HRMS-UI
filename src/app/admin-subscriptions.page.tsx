@@ -5,7 +5,16 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { AlertTriangle, CheckCircle2, Clock, Lock, Search, XCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Lock,
+  Search,
+  XCircle,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 // ─── Status config ─────────────────────────────────────────────────────────────
@@ -62,101 +71,181 @@ function SiteFlags({
 
 function SubscriptionsTable({ items }: { items: typeof dummyCompaniesWithConfig }) {
   return (
-    <div className="scrollbar-calm overflow-x-auto">
-      <table className="w-full min-w-[800px]">
-        <thead>
-          <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
-            {["Company", "Plan", "Status", "Site flags", "Trial ends", "Sub. ends", ""].map((h) => (
-              <th
-                key={h}
-                className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] ${
-                  h === "" ? "text-end" : "text-start"
-                }`}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((co) => {
-            const cfg = co.config;
-            const statusCfg = cfg ? STATUS_CONFIG[cfg.subscriptionStatus] : null;
-            return (
-              <tr
-                key={co.publicId}
-                className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
-              >
-                {/* Company */}
-                <td className="px-4 py-3">
-                  <p className="text-[13.5px] font-medium text-[var(--color-text)]">{co.name}</p>
+    <>
+      <div className="divide-y divide-[var(--color-border)] lg:hidden">
+        {items.map((co) => {
+          const cfg = co.config;
+          const statusCfg = cfg ? STATUS_CONFIG[cfg.subscriptionStatus] : null;
+          return (
+            <article key={co.publicId} className="p-4">
+              <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-semibold text-[var(--color-text)]">
+                    {co.name}
+                  </h3>
                   <code className="text-[11px] text-[var(--color-text-muted)]">
                     {co.companyCode}
                   </code>
-                </td>
-
-                {/* Plan */}
-                <td className="px-4 py-3 text-[13.5px] text-[var(--color-text)]">
-                  {cfg?.planName ?? <span className="text-[var(--color-text-faint)]">–</span>}
-                </td>
-
-                {/* Status */}
-                <td className="px-4 py-3">
+                </div>
+                <div className="flex flex-wrap gap-1.5">
                   {statusCfg ? (
                     <Badge variant={statusCfg.variant}>
                       <span className="me-1 inline-flex">{statusCfg.icon}</span>
                       {statusCfg.label}
                     </Badge>
                   ) : (
-                    <Badge variant="default">–</Badge>
+                    <Badge variant="default">-</Badge>
                   )}
-                </td>
+                </div>
+              </div>
 
-                {/* Site flags - all clear in dummy data */}
-                <td className="px-4 py-3">
-                  {cfg?.subscriptionStatus === "FROZEN" ? (
-                    <SiteFlags flags={{ isFrozen: true }} />
-                  ) : (
-                    <SiteFlags flags={{}} />
-                  )}
-                </td>
+              <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-xs min-[520px]:grid-cols-2">
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Plan</dt>
+                  <dd className="mt-0.5 text-[var(--color-text)]">{cfg?.planName ?? "-"}</dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Site flags</dt>
+                  <dd className="mt-0.5">
+                    {cfg?.subscriptionStatus === "FROZEN" ? (
+                      <SiteFlags flags={{ isFrozen: true }} />
+                    ) : (
+                      <SiteFlags flags={{}} />
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Trial ends</dt>
+                  <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+                    {cfg?.trialEndDate
+                      ? new Date(cfg.trialEndDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-faint)]">Subscription ends</dt>
+                  <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+                    {cfg?.subscriptionEndDate
+                      ? new Date(cfg.subscriptionEndDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </dd>
+                </div>
+              </dl>
 
-                {/* Trial ends */}
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {cfg?.trialEndDate ? (
-                    new Date(cfg.trialEndDate).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  ) : (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
+              <Button intent="utility" className="mt-4 w-full min-[520px]:w-auto">
+                Manage
+              </Button>
+            </article>
+          );
+        })}
+      </div>
 
-                {/* Sub. ends */}
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {cfg?.subscriptionEndDate ? (
-                    new Date(cfg.subscriptionEndDate).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  ) : (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
+      <div className="scrollbar-calm hidden overflow-x-auto lg:block">
+        <table className="w-full min-w-[800px]">
+          <thead>
+            <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
+              {["Company", "Plan", "Status", "Site flags", "Trial ends", "Sub. ends", ""].map(
+                (h) => (
+                  <th
+                    key={h}
+                    className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] ${
+                      h === "" ? "text-end" : "text-start"
+                    }`}
+                  >
+                    {h}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((co) => {
+              const cfg = co.config;
+              const statusCfg = cfg ? STATUS_CONFIG[cfg.subscriptionStatus] : null;
+              return (
+                <tr
+                  key={co.publicId}
+                  className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
+                >
+                  {/* Company */}
+                  <td className="px-4 py-3">
+                    <p className="text-[13.5px] font-medium text-[var(--color-text)]">{co.name}</p>
+                    <code className="text-[11px] text-[var(--color-text-muted)]">
+                      {co.companyCode}
+                    </code>
+                  </td>
 
-                {/* Actions */}
-                <td className="px-4 py-3 text-end">
-                  <Button intent="utility">Manage</Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  {/* Plan */}
+                  <td className="px-4 py-3 text-[13.5px] text-[var(--color-text)]">
+                    {cfg?.planName ?? <span className="text-[var(--color-text-faint)]">–</span>}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-3">
+                    {statusCfg ? (
+                      <Badge variant={statusCfg.variant}>
+                        <span className="me-1 inline-flex">{statusCfg.icon}</span>
+                        {statusCfg.label}
+                      </Badge>
+                    ) : (
+                      <Badge variant="default">–</Badge>
+                    )}
+                  </td>
+
+                  {/* Site flags - all clear in dummy data */}
+                  <td className="px-4 py-3">
+                    {cfg?.subscriptionStatus === "FROZEN" ? (
+                      <SiteFlags flags={{ isFrozen: true }} />
+                    ) : (
+                      <SiteFlags flags={{}} />
+                    )}
+                  </td>
+
+                  {/* Trial ends */}
+                  <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
+                    {cfg?.trialEndDate ? (
+                      new Date(cfg.trialEndDate).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    ) : (
+                      <span className="text-[var(--color-text-faint)]">–</span>
+                    )}
+                  </td>
+
+                  {/* Sub. ends */}
+                  <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
+                    {cfg?.subscriptionEndDate ? (
+                      new Date(cfg.subscriptionEndDate).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    ) : (
+                      <span className="text-[var(--color-text-faint)]">–</span>
+                    )}
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-4 py-3 text-end">
+                    <Button intent="utility">Manage</Button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -173,7 +262,7 @@ function SubscriptionKpis({ items }: { items: typeof dummyCompaniesWithConfig })
   );
 
   return (
-    <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-5">
+    <div className="mb-5 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-5">
       {ALL_STATUSES.map((s) => {
         const cfg = STATUS_CONFIG[s];
         return (
@@ -265,7 +354,7 @@ export function AdminSubscriptionsPage() {
       <SubscriptionKpis items={dummyCompaniesWithConfig} />
 
       {/* Filter bar */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Status filter chips */}
         <Button
           variant="ghost"
@@ -288,7 +377,7 @@ export function AdminSubscriptionsPage() {
         ))}
 
         {/* Search */}
-        <div className="ms-auto relative max-w-xs flex-1">
+        <div className="relative w-full sm:ms-auto sm:max-w-xs">
           <Search
             size={14}
             className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
@@ -305,31 +394,39 @@ export function AdminSubscriptionsPage() {
       </div>
 
       {/* Table card */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
           <SubscriptionsTable items={visible} />
         </CardContent>
-        <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-3">
+        <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            Page {currentPage} of {totalPages} · {filtered.length} of{" "}
-            {dummyCompaniesWithConfig.length} companies
+            {filtered.length} of {dummyCompaniesWithConfig.length} companies
           </span>
           <div className="flex items-center gap-1">
             <Button
-              intent="action"
-              size="xs"
+              variant="nav"
+              size="iconXs"
+              className="btn-nav-prev"
               disabled={currentPage <= 1}
               onClick={() => setPage(currentPage - 1)}
+              aria-label="Previous page"
+              title="Previous page"
             >
-              Previous
+              <ChevronLeft size={14} />
             </Button>
+            <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
+              {currentPage} / {totalPages}
+            </span>
             <Button
-              intent="action"
-              size="xs"
+              variant="nav"
+              size="iconXs"
+              className="btn-nav-next"
               disabled={currentPage >= totalPages}
               onClick={() => setPage(currentPage + 1)}
+              aria-label="Next page"
+              title="Next page"
             >
-              Next
+              <ChevronRight size={14} />
             </Button>
           </div>
         </div>

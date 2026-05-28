@@ -38,11 +38,15 @@ export function CompanyDashboardPage() {
             Friday, 22 May 2026 · Q2 performance cycle active · Payroll closes in 3 days
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button intent="action" leadingIcon={<Plus size={15} />}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button intent="action" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
             Add employee
           </Button>
-          <Button intent="cta" leadingIcon={<Check size={15} strokeWidth={2.5} />}>
+          <Button
+            intent="cta"
+            leadingIcon={<Check size={15} strokeWidth={2.5} />}
+            className="w-full sm:w-auto"
+          >
             Review approvals
           </Button>
         </div>

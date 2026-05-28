@@ -34,11 +34,15 @@ export function AdminDashboardPage() {
             Welcome back, {user?.firstName ?? "Admin"} · All systems operational
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button intent="action" leadingIcon={<Building2 size={15} />}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button
+            intent="action"
+            leadingIcon={<Building2 size={15} />}
+            className="w-full sm:w-auto"
+          >
             View companies
           </Button>
-          <Button intent="cta" leadingIcon={<Plus size={15} />}>
+          <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
             Add company
           </Button>
         </div>
