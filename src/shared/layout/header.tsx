@@ -17,6 +17,7 @@ export function Header() {
         />
         <input
           type="search"
+          aria-label="Search"
           placeholder="Search people, docs, actions…"
           className="h-[34px] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] py-0 pe-[70px] ps-9 text-[13px] text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-faint)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10"
         />

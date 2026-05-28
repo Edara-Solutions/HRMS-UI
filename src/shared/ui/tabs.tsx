@@ -1,6 +1,6 @@
 import { cn } from "@/shared/lib/cn";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
-import { createContext, useContext, useId, useState } from "react";
+import { createContext, use, useId, useMemo, useState } from "react";
 
 interface TabsContextValue {
   activeTab: string;
@@ -11,7 +11,7 @@ interface TabsContextValue {
 const TabsContext = createContext<TabsContextValue | null>(null);
 
 function useTabsContext() {
-  const context = useContext(TabsContext);
+  const context = use(TabsContext);
   if (!context) {
     throw new Error("Tabs components must be used within a <Tabs> provider");
   }
@@ -37,13 +37,16 @@ export function Tabs({
   const [internalValue, setInternalValue] = useState(defaultValue);
   const activeTab = value ?? internalValue;
 
-  function setActiveTab(id: string) {
-    setInternalValue(id);
-    onValueChange?.(id);
-  }
+  const contextValue = useMemo(() => {
+    function setActiveTab(id: string) {
+      setInternalValue(id);
+      onValueChange?.(id);
+    }
+    return { activeTab, setActiveTab, baseId };
+  }, [activeTab, onValueChange, baseId]);
 
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab, baseId }}>
+    <TabsContext.Provider value={contextValue}>
       <div className={cn("space-y-4", className)} {...props}>
         {children}
       </div>

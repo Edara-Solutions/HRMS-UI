@@ -4,7 +4,7 @@ import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, Settings, User } from "lucide-react";
-import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface SidebarProps {
@@ -221,6 +221,8 @@ function UserMenu({
     );
   }, [triggerRef]);
 
+  const handleClose = useEffectEvent(onClose);
+
   useEffect(() => {
     function handlePointer(e: MouseEvent) {
       if (
@@ -228,10 +230,10 @@ function UserMenu({
         triggerRef.current?.contains(e.target as Node)
       )
         return;
-      onClose();
+      handleClose();
     }
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     }
     document.addEventListener("mousedown", handlePointer);
     document.addEventListener("keydown", handleKey);
@@ -239,7 +241,7 @@ function UserMenu({
       document.removeEventListener("mousedown", handlePointer);
       document.removeEventListener("keydown", handleKey);
     };
-  }, [onClose, triggerRef]);
+  }, [triggerRef]);
 
   function handleLogout() {
     clearSession();
@@ -275,7 +277,7 @@ function UserMenu({
         <Settings size={14} className="shrink-0 opacity-70" />
         <span>Settings</span>
       </Link>
-      <div className="my-1 h-px bg-[var(--color-border)]" role="separator" />
+      <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />
       <button type="button" className={cn(itemClass, "text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]")} onClick={handleLogout} role="menuitem">
         <LogOut size={14} className="shrink-0" />
         <span>Sign out</span>

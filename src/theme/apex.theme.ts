@@ -1,6 +1,18 @@
 import type { ApexOptions } from "apexcharts";
 import { themeTokens } from "./tokens";
 
+const enFormatter = new Intl.NumberFormat("en");
+const arFormatter = new Intl.NumberFormat("ar");
+
+const numberFormatters: Record<string, Intl.NumberFormat> = {
+  en: enFormatter,
+  ar: arFormatter,
+};
+
+function getNumberFormatter(locale: string): Intl.NumberFormat {
+  return numberFormatters[locale] ?? numberFormatters.en;
+}
+
 export function createApexTheme(locale: string): ApexOptions {
   return {
     chart: {
@@ -23,7 +35,7 @@ export function createApexTheme(locale: string): ApexOptions {
     },
     tooltip: {
       y: {
-        formatter: (value) => new Intl.NumberFormat(locale).format(value),
+        formatter: (value) => getNumberFormatter(locale).format(value),
       },
     },
     xaxis: {

@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { ApexOptions } from "apexcharts";
-import { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import type { headcountTrend } from "./fixtures";
 
@@ -9,20 +8,6 @@ interface HeadcountChartProps {
 }
 
 export function HeadcountChart({ data }: HeadcountChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [chartWidth, setChartWidth] = useState<number | string>("100%");
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const w = entries[0].contentRect.width;
-      if (w > 0) setChartWidth(Math.round(w));
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   const chartOptions: ApexOptions = {
     chart: {
       type: "area",
@@ -110,7 +95,7 @@ export function HeadcountChart({ data }: HeadcountChartProps) {
         <div>
           <CardTitle>Headcount trend</CardTitle>
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            Rolling 12 months — Jan 2025 through Dec 2025
+            Rolling 12 months: Jan 2025 through Dec 2025
           </p>
         </div>
         <div className="flex items-center gap-3.5 text-xs text-[var(--color-text-muted)]">
@@ -125,8 +110,8 @@ export function HeadcountChart({ data }: HeadcountChartProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <div ref={containerRef} className="min-w-0 w-full overflow-hidden">
-          <Chart options={chartOptions} series={chartSeries} type="area" height={200} width={chartWidth} />
+        <div className="min-w-0 w-full overflow-hidden">
+          <Chart options={chartOptions} series={chartSeries} type="area" height={200} />
         </div>
       </CardContent>
     </Card>

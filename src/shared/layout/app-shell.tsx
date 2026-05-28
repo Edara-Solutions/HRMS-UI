@@ -79,7 +79,7 @@ export function AppShell({ portal, children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
         <main className="scrollbar-calm scrollbar-stable flex-1 overflow-x-clip overflow-y-auto [overflow-anchor:none]">
-          <div className="px-7 py-7">{children}</div>
+          <div className="p-7">{children}</div>
         </main>
       </div>
     </div>
