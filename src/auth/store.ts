@@ -6,7 +6,7 @@ import type { AuthSession, AuthStatus } from "./types";
 interface AuthState {
   session: AuthSession | null;
   status: AuthStatus;
-  signInWithDummySession: () => void;
+  signInWithDummySession: (session?: AuthSession) => void;
   requirePasswordChange: () => void;
   clearSession: () => void;
 }
@@ -16,9 +16,9 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       session: null,
       status: "anonymous",
-      signInWithDummySession: () =>
+      signInWithDummySession: (session = dummyAuthenticatedSession) =>
         set({
-          session: dummyAuthenticatedSession,
+          session,
           status: "authenticated",
         }),
       requirePasswordChange: () =>

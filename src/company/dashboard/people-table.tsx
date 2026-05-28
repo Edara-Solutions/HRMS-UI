@@ -18,9 +18,7 @@ export function PeopleTable({ items }: PeopleTableProps) {
             Employees with upcoming actions or open items
           </p>
         </div>
-        <Button variant="secondary" className="h-7.5 px-2.5 text-xs">
-          View all
-        </Button>
+        <Button intent="utility">View all</Button>
       </CardHeader>
       <CardContent className="p-0">
         <div className="scrollbar-calm scrollbar-horizontal overflow-x-auto">

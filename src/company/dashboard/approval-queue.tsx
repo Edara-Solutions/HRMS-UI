@@ -37,14 +37,24 @@ export function ApprovalQueue({ items, totalCount }: ApprovalQueueProps) {
                   {item.description}
                 </p>
               </div>
-              <Button variant="secondary" className="h-6.5 shrink-0 px-2 text-xs">
+              <Button
+                variant={
+                  item.action === "Approve"
+                    ? "primary"
+                    : item.action === "Review"
+                      ? "secondary"
+                      : "ghost"
+                }
+                size="xs"
+                className="shrink-0"
+              >
                 {item.action}
               </Button>
             </li>
           ))}
         </ul>
         <div className="border-t border-[var(--color-border)] px-4 py-3">
-          <Button variant="secondary" className="h-8 w-full justify-center text-xs">
+          <Button intent="action" size="block">
             View all {totalCount} items
           </Button>
         </div>

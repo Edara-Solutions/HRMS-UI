@@ -18,7 +18,7 @@ import { ModuleShortcuts } from "@/company/dashboard/module-shortcuts";
 import { PeopleTable } from "@/company/dashboard/people-table";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { CheckCircle, Plus } from "lucide-react";
+import { Check, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function CompanyDashboardPage() {
@@ -39,10 +39,12 @@ export function CompanyDashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" leadingIcon={<Plus size={14} />}>
+          <Button intent="action" leadingIcon={<Plus size={15} />}>
             Add employee
           </Button>
-          <Button leadingIcon={<CheckCircle size={14} />}>Review approvals</Button>
+          <Button intent="cta" leadingIcon={<Check size={15} strokeWidth={2.5} />}>
+            Review approvals
+          </Button>
         </div>
       </div>
 
@@ -76,14 +78,17 @@ export function CompanyDashboardPage() {
         </div>
 
         {/* Toggle button for aside on xl+ */}
-        <button
-          type="button"
-          onClick={() => setAsideCollapsed((prev) => !prev)}
-          className="hidden xl:block"
-          aria-label={asideCollapsed ? "Show aside panel" : "Hide aside panel"}
-        >
-          {asideCollapsed ? "Show panels" : "Hide panels"}
-        </button>
+        <div className="hidden xl:flex xl:justify-end">
+          <Button
+            intent="toggle"
+            size="iconSm"
+            pressed={asideCollapsed}
+            onClick={() => setAsideCollapsed((prev) => !prev)}
+            aria-label={asideCollapsed ? "Show aside panel" : "Hide aside panel"}
+            leadingIcon={<PanelRight size={15} strokeWidth={1.9} />}
+            iconOnly
+          />
+        </div>
       </div>
     </div>
   );

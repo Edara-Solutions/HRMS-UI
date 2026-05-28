@@ -18,8 +18,13 @@ import { Route as AcceptInvitationRouteImport } from "./app/accept-invitation"
 import { Route as IndexRouteImport } from "./app/index"
 import { Route as AdminIndexRouteImport } from "./app/admin.index"
 import { Route as CompanyDashboardRouteImport } from "./app/company.dashboard"
-import { Route as AdminLoginRouteImport } from "./app/admin.login"
+import { Route as AdminLoginRouteImport } from "./app/admin_.login"
+import { Route as AdminSubscriptionsRouteImport } from "./app/admin.subscriptions"
+import { Route as AdminPlansRouteImport } from "./app/admin.plans"
+import { Route as AdminLeadsRouteImport } from "./app/admin.leads"
 import { Route as AdminDashboardRouteImport } from "./app/admin.dashboard"
+import { Route as AdminCompaniesRouteImport } from "./app/admin.companies"
+import { Route as AdminAuditRouteImport } from "./app/admin.audit"
 
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
@@ -67,13 +72,38 @@ const CompanyDashboardRoute = CompanyDashboardRouteImport.update({
   getParentRoute: () => CompanyRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: "/admin_/login",
+  path: "/admin/login",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: "/subscriptions",
+  path: "/subscriptions",
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: "/plans",
+  path: "/plans",
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: "/leads",
+  path: "/leads",
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: "/dashboard",
   path: "/dashboard",
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCompaniesRoute = AdminCompaniesRouteImport.update({
+  id: "/companies",
+  path: "/companies",
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: "/audit",
+  path: "/audit",
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -85,7 +115,12 @@ export interface FileRoutesByFullPath {
   "/company": typeof CompanyRouteWithChildren
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
+  "/admin/audit": typeof AdminAuditRoute
+  "/admin/companies": typeof AdminCompaniesRoute
   "/admin/dashboard": typeof AdminDashboardRoute
+  "/admin/leads": typeof AdminLeadsRoute
+  "/admin/plans": typeof AdminPlansRoute
+  "/admin/subscriptions": typeof AdminSubscriptionsRoute
   "/admin/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin/": typeof AdminIndexRoute
@@ -97,7 +132,12 @@ export interface FileRoutesByTo {
   "/company": typeof CompanyRouteWithChildren
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
+  "/admin/audit": typeof AdminAuditRoute
+  "/admin/companies": typeof AdminCompaniesRoute
   "/admin/dashboard": typeof AdminDashboardRoute
+  "/admin/leads": typeof AdminLeadsRoute
+  "/admin/plans": typeof AdminPlansRoute
+  "/admin/subscriptions": typeof AdminSubscriptionsRoute
   "/admin/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin": typeof AdminIndexRoute
@@ -111,8 +151,13 @@ export interface FileRoutesById {
   "/company": typeof CompanyRouteWithChildren
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
+  "/admin/audit": typeof AdminAuditRoute
+  "/admin/companies": typeof AdminCompaniesRoute
   "/admin/dashboard": typeof AdminDashboardRoute
-  "/admin/login": typeof AdminLoginRoute
+  "/admin/leads": typeof AdminLeadsRoute
+  "/admin/plans": typeof AdminPlansRoute
+  "/admin/subscriptions": typeof AdminSubscriptionsRoute
+  "/admin_/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin/": typeof AdminIndexRoute
 }
@@ -126,7 +171,12 @@ export interface FileRouteTypes {
     | "/company"
     | "/forbidden"
     | "/login"
+    | "/admin/audit"
+    | "/admin/companies"
     | "/admin/dashboard"
+    | "/admin/leads"
+    | "/admin/plans"
+    | "/admin/subscriptions"
     | "/admin/login"
     | "/company/dashboard"
     | "/admin/"
@@ -138,7 +188,12 @@ export interface FileRouteTypes {
     | "/company"
     | "/forbidden"
     | "/login"
+    | "/admin/audit"
+    | "/admin/companies"
     | "/admin/dashboard"
+    | "/admin/leads"
+    | "/admin/plans"
+    | "/admin/subscriptions"
     | "/admin/login"
     | "/company/dashboard"
     | "/admin"
@@ -151,8 +206,13 @@ export interface FileRouteTypes {
     | "/company"
     | "/forbidden"
     | "/login"
+    | "/admin/audit"
+    | "/admin/companies"
     | "/admin/dashboard"
-    | "/admin/login"
+    | "/admin/leads"
+    | "/admin/plans"
+    | "/admin/subscriptions"
+    | "/admin_/login"
     | "/company/dashboard"
     | "/admin/"
   fileRoutesById: FileRoutesById
@@ -165,6 +225,7 @@ export interface RootRouteChildren {
   CompanyRoute: typeof CompanyRouteWithChildren
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
+  AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -232,11 +293,32 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyDashboardRouteImport
       parentRoute: typeof CompanyRoute
     }
-    "/admin/login": {
-      id: "/admin/login"
-      path: "/login"
+    "/admin_/login": {
+      id: "/admin_/login"
+      path: "/admin/login"
       fullPath: "/admin/login"
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/admin/subscriptions": {
+      id: "/admin/subscriptions"
+      path: "/subscriptions"
+      fullPath: "/admin/subscriptions"
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    "/admin/plans": {
+      id: "/admin/plans"
+      path: "/plans"
+      fullPath: "/admin/plans"
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    "/admin/leads": {
+      id: "/admin/leads"
+      path: "/leads"
+      fullPath: "/admin/leads"
+      preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
     "/admin/dashboard": {
@@ -246,18 +328,40 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    "/admin/companies": {
+      id: "/admin/companies"
+      path: "/companies"
+      fullPath: "/admin/companies"
+      preLoaderRoute: typeof AdminCompaniesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    "/admin/audit": {
+      id: "/admin/audit"
+      path: "/audit"
+      fullPath: "/admin/audit"
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminCompaniesRoute: typeof AdminCompaniesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminLoginRoute: typeof AdminLoginRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminPlansRoute: typeof AdminPlansRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminCompaniesRoute: AdminCompaniesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
-  AdminLoginRoute: AdminLoginRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminPlansRoute: AdminPlansRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -282,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyRoute: CompanyRouteWithChildren,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
+  AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

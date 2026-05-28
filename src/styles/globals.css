@@ -15,6 +15,10 @@
   --color-primary-hover: #0e2f5a;
   --color-primary-soft: #dde8f5;
   --color-on-primary: #fbfbf8;
+  /* Button fill: slightly lighter than brand primary so filled CTAs feel approachable, not heavy.
+     Hover reverts to full primary so pressing the button "deepens" visually. */
+  --color-primary-fill: color-mix(in srgb, var(--color-primary) 82%, white);
+  --color-primary-fill-hover: var(--color-primary);
   --color-success: #3e7b4e;
   --color-success-soft: #e4f0e6;
   --color-warning: #a56a16;
@@ -54,6 +58,8 @@
   --color-primary-hover: #a5c8f0;
   --color-primary-soft: #1f2f43;
   --color-on-primary: #101820;
+  --color-primary-fill: var(--color-primary);
+  --color-primary-fill-hover: var(--color-primary-hover);
   --color-success: #79ab86;
   --color-success-soft: #1e3425;
   --color-warning: #d0a15c;

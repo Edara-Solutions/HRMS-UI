@@ -5,7 +5,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { KeyRound, Loader2 } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -135,12 +135,9 @@ export function LoginPage() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <button
-                  type="button"
-                  className="text-xs font-medium text-[var(--color-primary)] hover:underline"
-                >
+                <Button variant="link" type="button" className="text-xs font-medium">
                   Forgot password?
-                </button>
+                </Button>
               </div>
               <Input
                 id="password"
@@ -155,13 +152,14 @@ export function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Signing in…
-                </>
-              ) : (
+            <Button
+              intent="cta"
+              type="submit"
+              size="block"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+            >
+              {!isSubmitting && (
                 <>
                   <KeyRound size={16} />
                   Sign in

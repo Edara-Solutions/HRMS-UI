@@ -14,7 +14,7 @@ import { useCurrentSession } from "@/auth/guards";
 import { KpiCard } from "@/company/dashboard/kpi-card";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { Building2, Plus } from "lucide-react";
+import { Building2, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AdminDashboardPage() {
@@ -35,10 +35,12 @@ export function AdminDashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" leadingIcon={<Building2 size={14} />}>
+          <Button intent="action" leadingIcon={<Building2 size={15} />}>
             View companies
           </Button>
-          <Button leadingIcon={<Plus size={14} />}>Add company</Button>
+          <Button intent="cta" leadingIcon={<Plus size={15} />}>
+            Add company
+          </Button>
         </div>
       </div>
 
@@ -70,14 +72,17 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Toggle button for aside on xl+ */}
-        <button
-          type="button"
-          onClick={() => setAsideCollapsed((prev) => !prev)}
-          className="hidden xl:block"
-          aria-label={asideCollapsed ? "Show aside panel" : "Hide aside panel"}
-        >
-          {asideCollapsed ? "Show panels" : "Hide panels"}
-        </button>
+        <div className="hidden xl:flex xl:justify-end">
+          <Button
+            intent="toggle"
+            size="iconSm"
+            pressed={asideCollapsed}
+            onClick={() => setAsideCollapsed((prev) => !prev)}
+            aria-label={asideCollapsed ? "Show aside panel" : "Hide aside panel"}
+            leadingIcon={<PanelRight size={15} strokeWidth={1.9} />}
+            iconOnly
+          />
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ export default defineConfig({
       routesDirectory: "src/app",
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
+      routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$",
     }),
     react(),
     tailwindcss(),

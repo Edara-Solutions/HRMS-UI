@@ -17,9 +17,7 @@ export function RecentSignups({ items }: RecentSignupsProps) {
             Companies that joined this month
           </p>
         </div>
-        <Button variant="secondary" className="h-7.5 px-2.5 text-xs">
-          View all
-        </Button>
+        <Button intent="utility">View all</Button>
       </CardHeader>
       <CardContent className="p-0">
         <div className="scrollbar-calm scrollbar-horizontal overflow-x-auto">

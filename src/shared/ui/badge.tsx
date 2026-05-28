@@ -16,13 +16,14 @@ type BadgeVariant =
 const variantClassName: Record<BadgeVariant, string> = {
   default:
     "bg-[var(--color-surface-2)] text-[var(--color-text-muted)] border border-[var(--color-border)]",
-  primary: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-transparent",
+  primary:
+    "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-[color-mix(in_srgb,var(--color-primary)_22%,transparent)]",
   success: "bg-[var(--color-success-soft)] text-[var(--color-success)] border border-transparent",
   warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)] border border-transparent",
   danger: "bg-[var(--color-danger-soft)] text-[var(--color-danger)] border border-transparent",
   info: "bg-[var(--color-info-soft)] text-[var(--color-info)] border border-transparent",
   warn: "bg-[var(--color-warning-soft)] text-[var(--color-warning)] border border-[color-mix(in_srgb,var(--color-warning)_22%,transparent)]",
-  teal: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-transparent",
+  teal: "bg-[var(--color-primary-soft)] text-[var(--color-primary)] border border-[color-mix(in_srgb,var(--color-primary)_22%,transparent)]",
   risk: "bg-[var(--color-danger-soft)] text-[var(--color-danger)] border border-[color-mix(in_srgb,var(--color-danger)_22%,transparent)]",
   done: "bg-[var(--color-success-soft)] text-[var(--color-success)] border border-[color-mix(in_srgb,var(--color-success)_22%,transparent)]",
 };

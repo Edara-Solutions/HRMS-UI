@@ -1,5 +1,6 @@
 import { type SupportedLocale, supportedLocales } from "@/i18n/config";
 import { usePreferencesStore } from "@/preferences/store";
+import { Button } from "@/shared/ui/button";
 
 const localeLabel: Record<SupportedLocale, string> = {
   en: "EN",
@@ -17,13 +18,13 @@ export function LocaleSwitcher() {
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      intent="toggle"
+      size="iconSm"
       onClick={toggleLocale}
-      className="inline-flex size-[34px] items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
       aria-label={`Switch language (current: ${locale === "en" ? "English" : "العربية"})`}
     >
       <span className="text-xs font-semibold">{localeLabel[locale]}</span>
-    </button>
+    </Button>
   );
 }

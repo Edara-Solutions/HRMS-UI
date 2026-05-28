@@ -2,6 +2,7 @@ import { useAuthStore } from "@/auth/store";
 import { LocaleSwitcher } from "@/shared/components/locale-switcher";
 import { ThemeToggle } from "@/shared/components/theme-toggle";
 import { Avatar } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
 import { Bell, HelpCircle, Search } from "lucide-react";
 
 export function Header() {
@@ -31,22 +32,24 @@ export function Header() {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <button
-          type="button"
-          className="relative inline-flex size-[34px] items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
-          aria-label="Notifications"
-        >
-          <Bell size={16} />
-          <span className="absolute end-1.5 top-1.5 size-1.5 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-bg)]" />
-        </button>
+        <div className="relative">
+          <Button
+            intent="toggle"
+            size="iconSm"
+            aria-label="Notifications"
+            leadingIcon={<Bell size={16} />}
+            iconOnly
+          />
+          <span className="pointer-events-none absolute end-1.5 top-1.5 size-1.5 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-bg)]" />
+        </div>
 
-        <button
-          type="button"
-          className="inline-flex size-[34px] items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
+        <Button
+          intent="toggle"
+          size="iconSm"
           aria-label="Help"
-        >
-          <HelpCircle size={16} />
-        </button>
+          leadingIcon={<HelpCircle size={16} />}
+          iconOnly
+        />
 
         <div className="mx-1 h-5 w-px bg-[var(--color-border)]" />
 

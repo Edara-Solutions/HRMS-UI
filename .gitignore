@@ -14,4 +14,7 @@ test-results/
 hrms_v1.html
 .claude
 .agents
+.tanstack/
 ./ref/**
+screen-shots/**
+*.log

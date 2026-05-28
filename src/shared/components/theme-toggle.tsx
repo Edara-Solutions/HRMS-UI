@@ -1,4 +1,5 @@
 import { usePreferencesStore } from "@/preferences/store";
+import { Button } from "@/shared/ui/button";
 import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
@@ -6,13 +7,14 @@ export function ThemeToggle() {
   const toggleTheme = usePreferencesStore((state) => state.toggleTheme);
 
   return (
-    <button
-      type="button"
+    <Button
+      intent="toggle"
+      size="iconSm"
       onClick={toggleTheme}
-      className="inline-flex size-[34px] items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
+      pressed={theme === "dark"}
       aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-    >
-      {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-    </button>
+      leadingIcon={theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+      iconOnly
+    />
   );
 }
