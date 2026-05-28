@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { ApexOptions } from "apexcharts";
+import { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import type { revenueTrend } from "./fixtures";
 
@@ -8,6 +9,20 @@ interface RevenueChartProps {
 }
 
 export function RevenueChart({ data }: RevenueChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState<number | string>("100%");
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0].contentRect.width;
+      if (w > 0) setChartWidth(Math.round(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const chartOptions: ApexOptions = {
     chart: {
       type: "area",
@@ -111,7 +126,9 @@ export function RevenueChart({ data }: RevenueChartProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <Chart options={chartOptions} series={chartSeries} type="area" height={200} />
+        <div ref={containerRef} className="min-w-0 w-full overflow-hidden">
+          <Chart options={chartOptions} series={chartSeries} type="area" height={200} width={chartWidth} />
+        </div>
       </CardContent>
     </Card>
   );

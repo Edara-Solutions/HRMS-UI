@@ -55,7 +55,7 @@ function AdminDashboardPage() {
       </div>
 
       {/* Dashboard body - two column */}
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_292px]">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_292px]">
         {/* Main column */}
         <div className="flex flex-col gap-4">
           <RevenueChart data={revenueTrend} />

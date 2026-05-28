@@ -22,7 +22,7 @@ export function RecentSignups({ items }: RecentSignupsProps) {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="scrollbar-calm scrollbar-horizontal overflow-x-auto">
           <table className="w-full min-w-[560px]">
             <thead>
               <tr className="border-b border-[var(--color-border)]">

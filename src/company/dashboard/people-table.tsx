@@ -23,7 +23,7 @@ export function PeopleTable({ items }: PeopleTableProps) {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="scrollbar-calm scrollbar-horizontal overflow-x-auto">
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-[var(--color-border)]">

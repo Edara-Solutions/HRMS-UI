@@ -55,7 +55,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "People",
         href: "/company/people",
         icon: <Users size={ICON_SIZE} />,
-        indicator: { label: "248", tone: "info" },
+        indicator: { label: "248", tone: "info", effect: "pulse" },
       },
       {
         label: "Org Chart",
@@ -81,7 +81,7 @@ export const companyNavGroups: NavGroup[] = [
         label: "Payroll",
         href: "/company/payroll",
         icon: <CreditCard size={ICON_SIZE} />,
-        indicator: { label: "May", tone: "primary" },
+        indicator: { label: "May", tone: "primary", effect: "pulse" },
       },
     ],
   },
@@ -147,7 +147,7 @@ export const adminNavGroups: NavGroup[] = [
         label: "Companies",
         href: "/admin/companies",
         icon: <Building2 size={ICON_SIZE} />,
-        indicator: { label: "142", tone: "info" },
+        indicator: { label: "142", tone: "info", effect: "pulse" },
       },
       {
         label: "Subscriptions",
