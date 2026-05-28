@@ -12,6 +12,7 @@ export default defineConfig({
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
       routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$",
+      autoCodeSplitting: true,
     }),
     react(),
     tailwindcss(),
@@ -19,6 +20,20 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+  build: {
+    // ApexCharts is an intentional core dashboard dependency. Keep it out of
+    // the app shell, then budget the known chart vendor chunk explicitly.
+    chunkSizeWarningLimit: 650,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("apexcharts") || id.includes("react-apexcharts")) {
+            return "charts";
+          }
+        },
+      },
     },
   },
   server: {
