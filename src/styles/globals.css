@@ -153,16 +153,6 @@ body::-webkit-scrollbar-corner,
   scrollbar-gutter: stable;
 }
 
-/* Sidebar toggle: position tracks sidebar at --motion-base; hover colours respond at --motion-fast */
-.sidebar-toggle {
-  transition:
-    inset-inline-start var(--motion-base) var(--motion-easing),
-    border-color       var(--motion-fast) var(--motion-easing),
-    background-color   var(--motion-fast) var(--motion-easing),
-    box-shadow         var(--motion-fast) var(--motion-easing),
-    transform          var(--motion-fast) var(--motion-easing);
-}
-
 .scrollbar-horizontal {
   scrollbar-gutter: stable;
 }

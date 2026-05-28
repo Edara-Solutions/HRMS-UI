@@ -3,8 +3,15 @@ import type { NavGroup, NavIndicator, NavItem } from "@/shared/layout/nav-items"
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronUp, LogOut, Settings, User } from "lucide-react";
-import { type ReactNode, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
+import {
+  type ReactNode,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 interface SidebarProps {
@@ -13,6 +20,7 @@ interface SidebarProps {
   portalSubtitle: string;
   portalIcon: ReactNode;
   collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
 export function Sidebar({
@@ -21,6 +29,7 @@ export function Sidebar({
   portalSubtitle,
   portalIcon,
   collapsed,
+  onToggleCollapsed,
 }: SidebarProps) {
   return (
     <aside
@@ -37,9 +46,12 @@ export function Sidebar({
           collapsed ? "justify-center px-0" : "px-4",
         )}
       >
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-text)] text-[13px] font-bold leading-none text-[var(--color-surface)]">
-          {portalIcon}
-        </div>
+        <SidebarBrandToggle
+          collapsed={collapsed}
+          icon={portalIcon}
+          label={portalLabel}
+          onToggle={onToggleCollapsed}
+        />
         {!collapsed && (
           <div className="min-w-0">
             <p className="truncate text-[15px] font-semibold tracking-tight text-[var(--color-text)]">
@@ -47,6 +59,16 @@ export function Sidebar({
             </p>
             <span className="text-[11px] text-[var(--color-text-faint)]">{portalSubtitle}</span>
           </div>
+        )}
+        {!collapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className="ms-auto flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-faint)] transition-[background-color,color,transform] duration-[var(--motion-fast)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)] active:scale-95"
+            aria-label="Collapse sidebar"
+          >
+            <PanelLeft size={17} strokeWidth={1.9} className="shrink-0 rtl:-scale-x-100" />
+          </button>
         )}
       </div>
 
@@ -74,6 +96,52 @@ export function Sidebar({
   );
 }
 
+function SidebarBrandToggle({
+  collapsed,
+  icon,
+  label,
+  onToggle,
+}: {
+  collapsed: boolean;
+  icon: ReactNode;
+  label: string;
+  onToggle: () => void;
+}) {
+  if (!collapsed) {
+    return (
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-text)] text-[13px] font-bold leading-none text-[var(--color-surface)]">
+        {icon}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={cn(
+        "group relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-md)]",
+        "text-[13px] font-bold leading-none text-[var(--color-surface)]",
+        "transition-[background-color,color,transform] duration-[var(--motion-fast)]",
+        "hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)] active:scale-95",
+        "focus-visible:bg-[var(--color-surface-2)] focus-visible:text-[var(--color-text)]",
+      )}
+      aria-label={`Expand ${label} sidebar`}
+      title={`Expand ${label} sidebar`}
+    >
+      <span className="absolute inset-0 rounded-[var(--radius-md)] bg-[var(--color-text)] transition-opacity duration-[var(--motion-fast)] group-hover:opacity-0 group-focus-visible:opacity-0" />
+      <span className="relative transition-opacity duration-[var(--motion-fast)] group-hover:opacity-0 group-focus-visible:opacity-0">
+        {icon}
+      </span>
+      <PanelLeft
+        size={17}
+        strokeWidth={1.9}
+        className="absolute shrink-0 opacity-0 transition-opacity duration-[var(--motion-fast)] group-hover:opacity-100 group-focus-visible:opacity-100 rtl:-scale-x-100"
+      />
+    </button>
+  );
+}
+
 interface SidebarLinkProps {
   item: NavItem;
   collapsed: boolean;
@@ -82,11 +150,15 @@ interface SidebarLinkProps {
 // Expanded badge: color-mixed background gives more saturation than pure -soft while staying readable
 const indicatorClassName: Record<NavIndicator["tone"], string> = {
   neutral: "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
-  primary: "bg-[color-mix(in_srgb,var(--color-primary)_30%,var(--color-primary-soft))] text-[var(--color-primary)]",
-  info:    "bg-[color-mix(in_srgb,var(--color-info)_30%,var(--color-info-soft))] text-[var(--color-info)]",
-  success: "bg-[color-mix(in_srgb,var(--color-success)_30%,var(--color-success-soft))] text-[var(--color-success)]",
-  warning: "bg-[color-mix(in_srgb,var(--color-warning)_30%,var(--color-warning-soft))] text-[var(--color-warning)]",
-  danger:  "bg-[color-mix(in_srgb,var(--color-danger)_30%,var(--color-danger-soft))] text-[var(--color-danger)]",
+  primary:
+    "bg-[color-mix(in_srgb,var(--color-primary)_30%,var(--color-primary-soft))] text-[var(--color-primary)]",
+  info: "bg-[color-mix(in_srgb,var(--color-info)_30%,var(--color-info-soft))] text-[var(--color-info)]",
+  success:
+    "bg-[color-mix(in_srgb,var(--color-success)_30%,var(--color-success-soft))] text-[var(--color-success)]",
+  warning:
+    "bg-[color-mix(in_srgb,var(--color-warning)_30%,var(--color-warning-soft))] text-[var(--color-warning)]",
+  danger:
+    "bg-[color-mix(in_srgb,var(--color-danger)_30%,var(--color-danger-soft))] text-[var(--color-danger)]",
 };
 
 // Collapsed dot: solid semantic colour so the dot is vivid in both light and dark themes.
@@ -94,10 +166,10 @@ const indicatorClassName: Record<NavIndicator["tone"], string> = {
 const dotClassName: Record<NavIndicator["tone"], string> = {
   neutral: "bg-[var(--color-text-faint)] text-[var(--color-text-faint)]",
   primary: "bg-[var(--color-primary)] text-[var(--color-primary)]",
-  info:    "bg-[var(--color-info)] text-[var(--color-info)]",
+  info: "bg-[var(--color-info)] text-[var(--color-info)]",
   success: "bg-[var(--color-success)] text-[var(--color-success)]",
   warning: "bg-[var(--color-warning)] text-[var(--color-warning)]",
-  danger:  "bg-[var(--color-danger)] text-[var(--color-danger)]",
+  danger: "bg-[var(--color-danger)] text-[var(--color-danger)]",
 };
 
 function SidebarLink({ item, collapsed }: SidebarLinkProps) {
@@ -151,7 +223,8 @@ function SidebarIndicator({
         "transition-[transform,box-shadow] duration-[var(--motion-fast)]",
         indicatorClassName[indicator.tone],
         // Active: badge swells slightly and gains a soft outer ring
-        isActive && "scale-[1.04] shadow-[0_0_0_2px_color-mix(in_srgb,currentColor_28%,transparent)]",
+        isActive &&
+          "scale-[1.04] shadow-[0_0_0_2px_color-mix(in_srgb,currentColor_28%,transparent)]",
         indicator.effect === "pulse" && "motion-safe:animate-pulse",
       )}
     >
@@ -196,7 +269,10 @@ function UserMenu({
   const clearSession = useAuthStore((s) => s.clearSession);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [style, setStyle] = useState<React.CSSProperties>({ position: "fixed", visibility: "hidden" });
+  const [style, setStyle] = useState<React.CSSProperties>({
+    position: "fixed",
+    visibility: "hidden",
+  });
 
   useLayoutEffect(() => {
     if (!triggerRef.current) return;
@@ -241,7 +317,7 @@ function UserMenu({
       document.removeEventListener("mousedown", handlePointer);
       document.removeEventListener("keydown", handleKey);
     };
-  }, [triggerRef]);
+  }, [handleClose, triggerRef]);
 
   function handleLogout() {
     clearSession();
@@ -259,26 +335,24 @@ function UserMenu({
       className="z-50 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
       role="menu"
     >
-      <Link
-        to="/company/dashboard"
-        className={itemClass}
-        onClick={onClose}
-        role="menuitem"
-      >
+      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
         <User size={14} className="shrink-0 opacity-70" />
         <span>Profile</span>
       </Link>
-      <Link
-        to="/company/dashboard"
-        className={itemClass}
-        onClick={onClose}
-        role="menuitem"
-      >
+      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
         <Settings size={14} className="shrink-0 opacity-70" />
         <span>Settings</span>
       </Link>
       <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />
-      <button type="button" className={cn(itemClass, "text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]")} onClick={handleLogout} role="menuitem">
+      <button
+        type="button"
+        className={cn(
+          itemClass,
+          "text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]",
+        )}
+        onClick={handleLogout}
+        role="menuitem"
+      >
         <LogOut size={14} className="shrink-0" />
         <span>Sign out</span>
       </button>
@@ -294,9 +368,7 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
 
   return (
     <div className="border-t border-[var(--color-border)] px-2.5 py-3">
-      {menuOpen && (
-        <UserMenu onClose={() => setMenuOpen(false)} triggerRef={triggerRef} />
-      )}
+      {menuOpen && <UserMenu onClose={() => setMenuOpen(false)} triggerRef={triggerRef} />}
       <button
         ref={triggerRef}
         type="button"
