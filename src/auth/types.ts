@@ -39,6 +39,12 @@ export interface LoginCredentials {
   clientType: "web";
 }
 
+export interface AdminLoginCredentials {
+  email: string;
+  password: string;
+  clientType: "web";
+}
+
 export interface ChangePasswordInput {
   currentPassword: string;
   newPassword: string;

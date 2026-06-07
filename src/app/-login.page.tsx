@@ -1,5 +1,6 @@
 import { mapHttpStatusToAppError } from "@/api/error-mapper";
 import { useLogin } from "@/auth/api";
+import { isAdminConsoleEnabled } from "@/auth/guards";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -184,15 +185,17 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
-            Admin access?{" "}
-            <Link
-              to="/admin/login"
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Sign in to Admin Portal
-            </Link>
-          </p>
+          {isAdminConsoleEnabled() && (
+            <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
+              Admin access?{" "}
+              <Link
+                to="/admin/login"
+                className="font-medium text-[var(--color-primary)] hover:underline"
+              >
+                Sign in to Admin Portal
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

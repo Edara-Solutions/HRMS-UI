@@ -4,7 +4,13 @@ import { refreshTokensOnce } from "./auth-interceptor";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api/v1";
 
-const publicPaths = new Set(["auth/login", "auth/refresh", "auth/accept-invitation", "health"]);
+const publicPaths = new Set([
+  "auth/login",
+  "auth/admin/login",
+  "auth/refresh",
+  "auth/accept-invitation",
+  "health",
+]);
 
 const retriedHeader = "X-Retried-After-Refresh";
 

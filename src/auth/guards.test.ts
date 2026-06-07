@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from "vitest";
-import { requireAuthenticated } from "./guards";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { isAdminConsoleEnabled, requireAdminConsoleEnabled, requireAuthenticated } from "./guards";
 import { useAuthStore } from "./store";
 import type { AuthSession, SessionUser } from "./types";
 
@@ -65,5 +65,60 @@ describe("requireAuthenticated", () => {
     useAuthStore.setState({ session, status: "authenticated" });
 
     expect(requireAuthenticated()).toEqual(session);
+  });
+
+  it("bounces a non-platform-admin to /company/dashboard from a platformAdminOnly route", () => {
+    useAuthStore.setState({
+      session: buildSession({ isPlatformAdmin: false }),
+      status: "authenticated",
+    });
+
+    expect(redirectTarget(() => requireAuthenticated({ platformAdminOnly: true }))).toMatchObject({
+      options: { to: "/company/dashboard" },
+    });
+  });
+
+  it("bounces a tenant owner (isOwner) from a platformAdminOnly route — owner is company-scoped, not global", () => {
+    useAuthStore.setState({
+      session: buildSession({ isOwner: true, isPlatformAdmin: false }),
+      status: "authenticated",
+    });
+
+    expect(redirectTarget(() => requireAuthenticated({ platformAdminOnly: true }))).toMatchObject({
+      options: { to: "/company/dashboard" },
+    });
+  });
+
+  it("admits a platform admin to a platformAdminOnly route", () => {
+    const session = buildSession({ isPlatformAdmin: true });
+    useAuthStore.setState({ session, status: "authenticated" });
+
+    expect(requireAuthenticated({ platformAdminOnly: true })).toEqual(session);
+  });
+});
+
+describe("admin console build flag", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("isAdminConsoleEnabled reflects VITE_ENABLE_ADMIN", () => {
+    vi.stubEnv("VITE_ENABLE_ADMIN", "true");
+    expect(isAdminConsoleEnabled()).toBe(true);
+
+    vi.stubEnv("VITE_ENABLE_ADMIN", "false");
+    expect(isAdminConsoleEnabled()).toBe(false);
+  });
+
+  it("requireAdminConsoleEnabled throws notFound when the flag is off", () => {
+    vi.stubEnv("VITE_ENABLE_ADMIN", "false");
+
+    expect(() => requireAdminConsoleEnabled()).toThrow();
+  });
+
+  it("requireAdminConsoleEnabled does not throw when the flag is on", () => {
+    vi.stubEnv("VITE_ENABLE_ADMIN", "true");
+
+    expect(() => requireAdminConsoleEnabled()).not.toThrow();
   });
 });

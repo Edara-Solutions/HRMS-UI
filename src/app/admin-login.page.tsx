@@ -1,14 +1,31 @@
-import { dummyAdminAuthenticatedSession, dummyAdminLoginCredentials } from "@/auth/fixtures";
-import { useAuthStore } from "@/auth/store";
+import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { useAdminLogin } from "@/auth/api";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { HTTPError } from "ky";
 import { Shield } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+function adminLoginErrorMessage(error: unknown): string {
+  if (error instanceof HTTPError) {
+    const appError = mapHttpStatusToAppError(error.response.status);
+
+    if (appError.kind === "validation" || appError.kind === "unauthorized") {
+      return "Invalid email or password.";
+    }
+
+    if (appError.kind === "rate_limited") {
+      return "Too many attempts. Please wait a moment and try again.";
+    }
+  }
+
+  return "Something went wrong. Please try again.";
+}
 
 const adminLoginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -22,8 +39,7 @@ type AdminLoginFormData = z.infer<typeof adminLoginSchema>;
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
-  const setSession = useAuthStore((state) => state.setSession);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const adminLogin = useAdminLogin();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const {
@@ -33,26 +49,28 @@ export function AdminLoginPage() {
   } = useForm<AdminLoginFormData>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      email: dummyAdminLoginCredentials.email,
-      password: dummyAdminLoginCredentials.password,
+      email: "",
+      password: "",
     },
   });
 
-  async function onSubmit(_data: AdminLoginFormData) {
-    setIsSubmitting(true);
+  async function onSubmit(data: AdminLoginFormData) {
     setApiError(null);
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const session = await adminLogin.mutateAsync({ ...data, clientType: "web" });
 
-      // Use dummy admin session for now
-      setSession(dummyAdminAuthenticatedSession);
-      void navigate({ to: "/admin/dashboard" });
-    } catch {
-      setApiError("Invalid credentials. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      // Redirect target is driven by the capability flag, not by which form
+      // was used — bounces a non-operator session to the company portal.
+      if (session.user.mustChangePassword) {
+        void navigate({ to: "/change-password" });
+      } else if (session.user.isPlatformAdmin) {
+        void navigate({ to: "/admin/dashboard" });
+      } else {
+        void navigate({ to: "/company/dashboard" });
+      }
+    } catch (error) {
+      setApiError(adminLoginErrorMessage(error));
     }
   }
 
@@ -135,10 +153,10 @@ export function AdminLoginPage() {
               intent="cta"
               type="submit"
               size="block"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
+              disabled={adminLogin.isPending}
+              isLoading={adminLogin.isPending}
             >
-              {!isSubmitting && (
+              {!adminLogin.isPending && (
                 <>
                   <Shield size={16} />
                   Sign in to Admin
@@ -152,10 +170,6 @@ export function AdminLoginPage() {
             <Link to="/login" className="font-medium text-[var(--color-primary)] hover:underline">
               Sign in to Company Portal
             </Link>
-          </p>
-
-          <p className="mt-8 text-center text-xs text-[var(--color-text-faint)]">
-            Dummy credentials are pre-filled for development.
           </p>
         </div>
       </div>
