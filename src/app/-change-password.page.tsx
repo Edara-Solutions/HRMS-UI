@@ -1,3 +1,4 @@
+import { dummyAuthenticatedSession } from "@/auth/fixtures";
 import { useAuthStore } from "@/auth/store";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
@@ -7,11 +8,11 @@ import { useNavigate } from "@tanstack/react-router";
 
 export function ChangePasswordPage() {
   const navigate = useNavigate();
-  const signInWithDummySession = useAuthStore((state) => state.signInWithDummySession);
+  const setSession = useAuthStore((state) => state.setSession);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    signInWithDummySession();
+    setSession(dummyAuthenticatedSession);
     void navigate({ to: "/company/dashboard" });
   }
 

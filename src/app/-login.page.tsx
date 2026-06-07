@@ -1,14 +1,31 @@
-import { dummyLoginCredentials } from "@/auth/fixtures";
-import { useAuthStore } from "@/auth/store";
+import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { useLogin } from "@/auth/api";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { HTTPError } from "ky";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+function loginErrorMessage(error: unknown): string {
+  if (error instanceof HTTPError) {
+    const appError = mapHttpStatusToAppError(error.response.status);
+
+    if (appError.kind === "validation" || appError.kind === "unauthorized") {
+      return "Invalid company code, employee code, or password.";
+    }
+
+    if (appError.kind === "rate_limited") {
+      return "Too many attempts. Please wait a moment and try again.";
+    }
+  }
+
+  return "Something went wrong. Please try again.";
+}
 
 const loginSchema = z.object({
   companyCode: z
@@ -29,8 +46,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const signInWithDummySession = useAuthStore((state) => state.signInWithDummySession);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const login = useLogin();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const {
@@ -40,27 +56,27 @@ export function LoginPage() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      companyCode: dummyLoginCredentials.companyCode,
-      employeeCode: dummyLoginCredentials.employeeCode,
-      password: dummyLoginCredentials.password,
+      companyCode: "",
+      employeeCode: "",
+      password: "",
     },
   });
 
-  async function onSubmit(_data: LoginFormData) {
-    setIsSubmitting(true);
+  async function onSubmit(data: LoginFormData) {
     setApiError(null);
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const session = await login.mutateAsync({ ...data, clientType: "web" });
 
-      // Use dummy session for now
-      signInWithDummySession();
-      void navigate({ to: "/company/dashboard" });
-    } catch {
-      setApiError("Invalid credentials. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      if (session.user.mustChangePassword) {
+        void navigate({ to: "/change-password" });
+      } else if (session.user.isPlatformAdmin) {
+        void navigate({ to: "/admin/dashboard" });
+      } else {
+        void navigate({ to: "/company/dashboard" });
+      }
+    } catch (error) {
+      setApiError(loginErrorMessage(error));
     }
   }
 
@@ -156,10 +172,10 @@ export function LoginPage() {
               intent="cta"
               type="submit"
               size="block"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
+              disabled={login.isPending}
+              isLoading={login.isPending}
             >
-              {!isSubmitting && (
+              {!login.isPending && (
                 <>
                   <KeyRound size={16} />
                   Sign in
@@ -176,10 +192,6 @@ export function LoginPage() {
             >
               Sign in to Admin Portal
             </Link>
-          </p>
-
-          <p className="mt-8 text-center text-xs text-[var(--color-text-faint)]">
-            Dummy credentials are pre-filled for development.
           </p>
         </div>
       </div>

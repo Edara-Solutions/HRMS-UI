@@ -18,7 +18,7 @@ export const apiClient = ky.create({
   hooks: {
     beforeRequest: [
       (request) => {
-        if (isPublicPath(request.url)) {
+        if (isPublicPath(request.url) || request.headers.has("Authorization")) {
           return;
         }
 

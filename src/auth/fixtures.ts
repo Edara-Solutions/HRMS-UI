@@ -1,11 +1,4 @@
-import type { AuthSession, LoginCredentials } from "./types";
-
-export const dummyLoginCredentials: LoginCredentials = {
-  companyCode: "EDARA",
-  employeeCode: "EDA-001",
-  password: "MySecureP@ss1",
-  clientType: "web",
-};
+import type { AuthSession } from "./types";
 
 export const dummyAdminLoginCredentials = {
   email: "admin@edara.com",
@@ -34,6 +27,8 @@ export const dummyAuthenticatedSession: AuthSession = {
       "companies:read",
       "audit:read",
     ],
+    isOwner: true,
+    isPlatformAdmin: false,
   },
 };
 
@@ -52,5 +47,7 @@ export const dummyAdminAuthenticatedSession: AuthSession = {
     companyCode: "EDARA",
     mustChangePassword: false,
     permissions: ["companies:read", "companies:update", "audit:read"],
+    isOwner: false,
+    isPlatformAdmin: true,
   },
 };

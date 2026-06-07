@@ -1,13 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { dummyAuthenticatedSession } from "./fixtures";
 import type { AuthSession, AuthStatus } from "./types";
 
 interface AuthState {
   session: AuthSession | null;
   status: AuthStatus;
-  signInWithDummySession: (session?: AuthSession) => void;
-  requirePasswordChange: () => void;
+  setSession: (session: AuthSession) => void;
   clearSession: () => void;
 }
 
@@ -16,21 +14,10 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       session: null,
       status: "anonymous",
-      signInWithDummySession: (session = dummyAuthenticatedSession) =>
+      setSession: (session) =>
         set({
           session,
-          status: "authenticated",
-        }),
-      requirePasswordChange: () =>
-        set({
-          session: {
-            ...dummyAuthenticatedSession,
-            user: {
-              ...dummyAuthenticatedSession.user,
-              mustChangePassword: true,
-            },
-          },
-          status: "must_change_password",
+          status: session.user.mustChangePassword ? "must_change_password" : "authenticated",
         }),
       clearSession: () =>
         set({

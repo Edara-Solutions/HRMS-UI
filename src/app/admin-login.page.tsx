@@ -22,7 +22,7 @@ type AdminLoginFormData = z.infer<typeof adminLoginSchema>;
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
-  const signInWithDummySession = useAuthStore((state) => state.signInWithDummySession);
+  const setSession = useAuthStore((state) => state.setSession);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -47,7 +47,7 @@ export function AdminLoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Use dummy admin session for now
-      signInWithDummySession(dummyAdminAuthenticatedSession);
+      setSession(dummyAdminAuthenticatedSession);
       void navigate({ to: "/admin/dashboard" });
     } catch {
       setApiError("Invalid credentials. Please try again.");
