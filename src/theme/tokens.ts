@@ -21,6 +21,7 @@ export const themeTokens = {
       onDanger: "#FBFBF8",
       info: "#356FA8",
       infoSoft: "#DDEAF5",
+      overlay: "rgba(23, 22, 20, 0.45)",
     },
     dark: {
       bg: "#171614",
@@ -43,6 +44,7 @@ export const themeTokens = {
       onDanger: "#1F1114",
       info: "#82AEDD",
       infoSoft: "#1E3143",
+      overlay: "rgba(0, 0, 0, 0.6)",
     },
   },
   font: {

@@ -38,3 +38,8 @@ export interface LoginCredentials {
   password: string;
   clientType: "web";
 }
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+}

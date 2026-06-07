@@ -34,6 +34,7 @@
   --radius-xl: 16px;
   --shadow-sm: 0 1px 3px rgba(20, 20, 20, 0.06);
   --shadow-md: 0 6px 20px rgba(20, 20, 20, 0.08);
+  --color-overlay: rgba(23, 22, 20, 0.45);
   --scrollbar-size: 10px;
   --scrollbar-track: color-mix(in srgb, var(--color-surface-2) 42%, transparent);
   --scrollbar-thumb: color-mix(in srgb, var(--color-border) 72%, var(--color-primary));
@@ -71,6 +72,7 @@
   --color-info-soft: #1e3143;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --color-overlay: rgba(0, 0, 0, 0.6);
   --scrollbar-track: color-mix(in srgb, var(--color-surface-2) 48%, transparent);
   --scrollbar-thumb: color-mix(in srgb, var(--color-border) 68%, var(--color-primary));
   --scrollbar-thumb-hover: color-mix(in srgb, var(--color-border) 42%, var(--color-primary));
