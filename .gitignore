@@ -10,11 +10,13 @@ test-results/
 .env.production
 *.tsbuildinfo
 .vite-dev.*.log
-*.md
-hrms_v1.html
-.claude
-.agents
+
+
+.claude/*
+# !.claude/skills/
+.agents/*
+# !.agents/skills/
+.opencode/*
+# !.opencode/skills/
 .tanstack/
-./ref/**
-screen-shots/**
 *.log
