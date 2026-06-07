@@ -1,3 +1,4 @@
+import { redirectIfMustChangePassword } from "@/auth/guards";
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext } from "@tanstack/react-router";
 import { NotFoundPage, RootLayout } from "./-root-layout";
@@ -7,6 +8,10 @@ export interface RouterContext {
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  // Runs before any portal's `requireAuthenticated`, so an authenticated user
+  // who must change their password is sent straight to /change-password —
+  // never bounced through /login first.
+  beforeLoad: ({ location }) => redirectIfMustChangePassword(location.pathname),
   component: RootLayout,
   notFoundComponent: NotFoundPage,
 });

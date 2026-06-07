@@ -1,9 +1,23 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
 import { useAuthStore } from "./store";
 import type { AuthSession, SessionUser } from "./types";
+
+const navigateMock = vi.hoisted(() => vi.fn());
+const changePasswordPostMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  return { ...actual, useNavigate: () => navigateMock };
+});
+
+// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
+// rejects as cross-realm — stub the client boundary instead of the network.
+vi.mock("@/api/client", () => ({
+  apiClient: { post: changePasswordPostMock },
+}));
 
 function renderModal() {
   const queryClient = new QueryClient({
@@ -44,6 +58,8 @@ function buildSession(userOverrides: Partial<SessionUser> = {}): AuthSession {
 describe("ForcedPasswordChangeModal", () => {
   afterEach(() => {
     cleanup();
+    navigateMock.mockClear();
+    changePasswordPostMock.mockReset();
     useAuthStore.setState({ session: null, status: "anonymous" });
   });
 
@@ -96,6 +112,40 @@ describe("ForcedPasswordChangeModal", () => {
     if (backdrop) fireEvent.click(backdrop);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("clears the session and redirects to /login after a successful password change", async () => {
+    useAuthStore.setState({
+      session: buildSession({ mustChangePassword: true }),
+      status: "must_change_password",
+    });
+
+    changePasswordPostMock.mockReturnValue({ json: () => Promise.resolve({ ok: true }) });
+
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/current password/i), {
+      target: { value: "TempPass1!" },
+    });
+    fireEvent.change(screen.getByLabelText(/^new password/i), {
+      target: { value: "NewSecret1!" },
+    });
+    fireEvent.change(screen.getByLabelText(/confirm new password/i), {
+      target: { value: "NewSecret1!" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /change password/i }));
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().session).toBeNull();
+    });
+    expect(useAuthStore.getState().status).toBe("anonymous");
+    expect(changePasswordPostMock).toHaveBeenCalledWith(
+      "auth/change-password",
+      expect.objectContaining({
+        json: { currentPassword: "TempPass1!", newPassword: "NewSecret1!" },
+      }),
+    );
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/login" });
   });
 
   it("does not dismiss when Escape is pressed", () => {

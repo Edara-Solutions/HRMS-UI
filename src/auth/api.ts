@@ -36,21 +36,17 @@ export function useLogin() {
 }
 
 export function useChangePassword() {
-  const setSession = useAuthStore((state) => state.setSession);
+  const clearSession = useAuthStore((state) => state.clearSession);
 
   return useMutation({
-    mutationFn: async (input: ChangePasswordInput): Promise<AuthSession> => {
+    mutationFn: async (input: ChangePasswordInput): Promise<void> => {
       const session = useAuthStore.getState().session;
       if (!session) {
         throw new Error("No active session");
       }
 
       await changePassword(input);
-
-      const user = await fetchMe(session.accessToken);
-      const refreshed: AuthSession = { ...session, user };
-      setSession(refreshed);
-      return refreshed;
+      clearSession();
     },
   });
 }

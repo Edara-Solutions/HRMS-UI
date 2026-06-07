@@ -17,7 +17,7 @@ export function ForcedPasswordChangeModal() {
     >
       <DialogTitle id={titleId}>Update your password to continue</DialogTitle>
       <DialogDescription id={descriptionId}>
-        Your account was created with a temporary password. Set a new password before continuing —
+        Your account was created with a temporary password. Set a new password before continuing:
         you won't be able to use the rest of the app until this is done.
       </DialogDescription>
       <div className="mt-6">

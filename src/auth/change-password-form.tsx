@@ -4,6 +4,7 @@ import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "@tanstack/react-router";
 import { HTTPError } from "ky";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,12 +43,9 @@ const changePasswordSchema = z
 
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
-interface ChangePasswordFormProps {
-  onSuccess?: () => void;
-}
-
-export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
+export function ChangePasswordForm() {
   const changePassword = useChangePassword();
+  const navigate = useNavigate();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const {
@@ -71,7 +69,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      onSuccess?.();
+      void navigate({ to: "/login" });
     } catch (error) {
       setApiError(changePasswordErrorMessage(error));
     }
