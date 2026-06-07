@@ -1,5 +1,5 @@
 import { cn } from "@/shared/lib/cn";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useEffectEvent, useId, useRef } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -28,6 +28,11 @@ export function Dialog({
 }: DialogProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
+  const handleEscape = useEffectEvent(() => {
+    if (dismissible) onClose?.();
+  });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleEscape is a useEffectEvent — stable identity, always sees latest dismissible/onClose, intentionally omitted from deps
   useEffect(() => {
     if (!open) return;
 
@@ -35,7 +40,7 @@ export function Dialog({
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        if (dismissible) onClose?.();
+        handleEscape();
         return;
       }
 
@@ -64,7 +69,7 @@ export function Dialog({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, dismissible, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -96,18 +101,26 @@ export function Dialog({
   );
 }
 
-export function DialogTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+export function DialogTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h2
       className={cn("text-lg font-semibold tracking-tight text-[var(--color-text)]", className)}
       {...props}
-    />
+    >
+      {children}
+    </h2>
   );
 }
 
-export function DialogDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
+export function DialogDescription({
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("mt-1.5 text-sm text-[var(--color-text-muted)]", className)} {...props} />
+    <p className={cn("mt-1.5 text-sm text-[var(--color-text-muted)]", className)} {...props}>
+      {children}
+    </p>
   );
 }
 
