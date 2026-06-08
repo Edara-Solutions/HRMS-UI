@@ -1,31 +1,16 @@
-import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { mapLoginError } from "@/api/error-mapper";
 import { useAdminLogin } from "@/auth/api";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { HTTPError } from "ky";
 import { Shield } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-function adminLoginErrorMessage(error: unknown): string {
-  if (error instanceof HTTPError) {
-    const appError = mapHttpStatusToAppError(error.response.status);
-
-    if (appError.kind === "validation" || appError.kind === "unauthorized") {
-      return "Invalid email or password.";
-    }
-
-    if (appError.kind === "rate_limited") {
-      return "Too many attempts. Please wait a moment and try again.";
-    }
-  }
-
-  return "Something went wrong. Please try again.";
-}
+const ADMIN_CREDENTIAL_MISMATCH_MESSAGE = "Invalid email or password.";
 
 const adminLoginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
@@ -70,7 +55,10 @@ export function AdminLoginPage() {
         void navigate({ to: "/company/dashboard" });
       }
     } catch (error) {
-      setApiError(adminLoginErrorMessage(error));
+      const mapped = await mapLoginError(error, {
+        credentialMismatchMessage: ADMIN_CREDENTIAL_MISMATCH_MESSAGE,
+      });
+      setApiError(mapped.message);
     }
   }
 
@@ -166,6 +154,10 @@ export function AdminLoginPage() {
           </form>
 
           <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
+            Need help signing in? Contact your HR administrator.
+          </p>
+
+          <p className="mt-2 text-center text-sm text-[var(--color-text-muted)]">
             Company employee?{" "}
             <Link to="/login" className="font-medium text-[var(--color-primary)] hover:underline">
               Sign in to Company Portal

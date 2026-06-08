@@ -1,4 +1,4 @@
-import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { mapLoginError } from "@/api/error-mapper";
 import { useLogin } from "@/auth/api";
 import { isAdminConsoleEnabled } from "@/auth/guards";
 import { Button } from "@/shared/ui/button";
@@ -6,27 +6,10 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { HTTPError } from "ky";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-function loginErrorMessage(error: unknown): string {
-  if (error instanceof HTTPError) {
-    const appError = mapHttpStatusToAppError(error.response.status);
-
-    if (appError.kind === "validation" || appError.kind === "unauthorized") {
-      return "Invalid company code, employee code, or password.";
-    }
-
-    if (appError.kind === "rate_limited") {
-      return "Too many attempts. Please wait a moment and try again.";
-    }
-  }
-
-  return "Something went wrong. Please try again.";
-}
 
 const loginSchema = z.object({
   companyCode: z
@@ -77,7 +60,8 @@ export function LoginPage() {
         void navigate({ to: "/company/dashboard" });
       }
     } catch (error) {
-      setApiError(loginErrorMessage(error));
+      const mapped = await mapLoginError(error);
+      setApiError(mapped.message);
     }
   }
 
@@ -184,6 +168,10 @@ export function LoginPage() {
               )}
             </Button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
+            Need help signing in? Contact your HR administrator.
+          </p>
 
           {isAdminConsoleEnabled() && (
             <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
