@@ -1,4 +1,4 @@
-import { URL, fileURLToPath } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -11,7 +11,7 @@ export default defineConfig({
       routesDirectory: "src/app",
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
-      routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$",
+      routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$|.*\\.test\\.tsx$",
       autoCodeSplitting: true,
     }),
     react(),
