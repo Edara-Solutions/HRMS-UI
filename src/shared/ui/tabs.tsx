@@ -1,6 +1,6 @@
-import { cn } from "@/shared/lib/cn";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import { createContext, use, useId, useMemo, useState } from "react";
+import { cn } from "@/shared/lib/cn";
 
 interface TabsContextValue {
   activeTab: string;

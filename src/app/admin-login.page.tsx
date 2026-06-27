@@ -1,14 +1,14 @@
-import { mapLoginError } from "@/api/error-mapper";
-import { useAdminLogin } from "@/auth/api";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Shield } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { mapLoginError } from "@/api/error-mapper";
+import { useAdminLogin } from "@/auth/api";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 
 const ADMIN_CREDENTIAL_MISMATCH_MESSAGE = "Invalid email or password.";
 

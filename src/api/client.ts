@@ -1,5 +1,5 @@
-import { useAuthStore } from "@/auth/store";
 import ky from "ky";
+import { useAuthStore } from "@/auth/store";
 import { refreshTokensOnce } from "./auth-interceptor";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api/v1";

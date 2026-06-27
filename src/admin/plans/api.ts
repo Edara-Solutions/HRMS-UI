@@ -1,5 +1,5 @@
-import { apiClient } from "@/api/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/api/client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -214,8 +214,10 @@ export function useUpdatePlanPrice() {
     mutationFn: ({
       pricePublicId,
       input,
-    }: { pricePublicId: string; input: UpdatePlanPriceInput }) =>
-      updatePlanPrice(pricePublicId, input),
+    }: {
+      pricePublicId: string;
+      input: UpdatePlanPriceInput;
+    }) => updatePlanPrice(pricePublicId, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: plansKeys.all }),
   });
 }

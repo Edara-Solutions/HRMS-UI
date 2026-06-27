@@ -1,7 +1,7 @@
-import { cn } from "@/shared/lib/cn";
-import { useEffect, useEffectEvent, useId, useRef } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
+import { useEffect, useEffectEvent, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+import { cn } from "@/shared/lib/cn";
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';

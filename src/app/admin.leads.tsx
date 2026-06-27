@@ -1,6 +1,6 @@
-import type { LeadStatus } from "@/admin/leads/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import type { LeadStatus } from "@/admin/leads/api";
 import { AdminLeadsPage } from "./admin-leads.page";
 
 const leadStatuses = [

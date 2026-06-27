@@ -1,13 +1,15 @@
+import { Check, PanelRight, Plus } from "lucide-react";
+import { useState } from "react";
 import { useCurrentSession } from "@/auth/guards";
 import { ActivityFeed } from "@/company/dashboard/activity-feed";
 import { ApprovalQueue } from "@/company/dashboard/approval-queue";
 import { DepartmentMix } from "@/company/dashboard/department-mix";
 import { EventList } from "@/company/dashboard/event-list";
 import {
-  events,
   activities,
   approvals,
   departments,
+  events,
   headcountTrend,
   kpiData,
   peopleSpotlight,
@@ -18,8 +20,6 @@ import { ModuleShortcuts } from "@/company/dashboard/module-shortcuts";
 import { PeopleTable } from "@/company/dashboard/people-table";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { Check, PanelRight, Plus } from "lucide-react";
-import { useState } from "react";
 
 export function CompanyDashboardPage() {
   const session = useCurrentSession();

@@ -1,15 +1,15 @@
-import { mapLoginError } from "@/api/error-mapper";
-import { useLogin } from "@/auth/api";
-import { isAdminConsoleEnabled } from "@/auth/guards";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { mapLoginError } from "@/api/error-mapper";
+import { useLogin } from "@/auth/api";
+import { isAdminConsoleEnabled } from "@/auth/guards";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 
 const loginSchema = z.object({
   companyCode: z

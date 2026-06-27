@@ -1,7 +1,7 @@
-import { useAuthStore } from "@/auth/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { useAuthStore } from "@/auth/store";
 import { AdminLoginPage } from "./admin-login.page";
 
 const navigateMock = vi.hoisted(() => vi.fn());

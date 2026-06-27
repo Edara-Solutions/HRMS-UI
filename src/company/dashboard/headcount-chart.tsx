@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { headcountTrend } from "./fixtures";
 
 interface HeadcountChartProps {

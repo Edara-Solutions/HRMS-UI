@@ -185,9 +185,11 @@ select {
   border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
   background-color: var(--color-surface);
   color: var(--color-text-muted);
-  transition: background-color var(--motion-fast) var(--motion-easing), border-color
-    var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing), scale
-    var(--motion-fast) var(--motion-easing);
+  transition:
+    background-color var(--motion-fast) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing),
+    color var(--motion-fast) var(--motion-easing),
+    scale var(--motion-fast) var(--motion-easing);
 }
 
 .btn-nav:disabled {

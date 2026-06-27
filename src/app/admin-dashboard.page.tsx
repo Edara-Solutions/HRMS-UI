@@ -1,3 +1,5 @@
+import { Building2, PanelRight, Plus } from "lucide-react";
+import { useState } from "react";
 import { AdminActivityFeed } from "@/admin/dashboard/admin-activity-feed";
 import {
   adminActivities,
@@ -14,8 +16,6 @@ import { useCurrentSession } from "@/auth/guards";
 import { KpiCard } from "@/company/dashboard/kpi-card";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { Building2, PanelRight, Plus } from "lucide-react";
-import { useState } from "react";
 
 export function AdminDashboardPage() {
   const session = useCurrentSession();

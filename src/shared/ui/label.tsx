@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/cn";
 import type { LabelHTMLAttributes } from "react";
+import { cn } from "@/shared/lib/cn";
 
 interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   htmlFor: string;

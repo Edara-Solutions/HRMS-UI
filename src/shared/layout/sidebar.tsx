@@ -1,7 +1,3 @@
-import { useAuthStore } from "@/auth/store";
-import type { NavGroup, NavIndicator, NavItem } from "@/shared/layout/nav-items";
-import { cn } from "@/shared/lib/cn";
-import { Avatar } from "@/shared/ui/avatar";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
 import {
@@ -13,6 +9,10 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useAuthStore } from "@/auth/store";
+import type { NavGroup, NavIndicator, NavItem } from "@/shared/layout/nav-items";
+import { cn } from "@/shared/lib/cn";
+import { Avatar } from "@/shared/ui/avatar";
 
 interface SidebarProps {
   groups: NavGroup[];
@@ -206,13 +206,7 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
   );
 }
 
-function SidebarIndicator({
-  indicator,
-  isActive,
-}: {
-  indicator: NavIndicator;
-  isActive: boolean;
-}) {
+function SidebarIndicator({ indicator, isActive }: { indicator: NavIndicator; isActive: boolean }) {
   return (
     <span
       className={cn(
@@ -254,6 +248,7 @@ function SidebarIndicatorDot({
           : "shadow-[0_0_0_1.5px_var(--color-surface),0_0_5px_1px_color-mix(in_srgb,currentColor_50%,transparent)]",
         indicator.effect === "pulse" && "motion-safe:animate-pulse",
       )}
+      role="img"
       aria-label={indicator.label}
     />
   );

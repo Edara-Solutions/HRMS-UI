@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/cn";
 import type { HTMLAttributes, ImgHTMLAttributes } from "react";
+import { cn } from "@/shared/lib/cn";
 
 type AvatarSize = "sm" | "md" | "lg";
 

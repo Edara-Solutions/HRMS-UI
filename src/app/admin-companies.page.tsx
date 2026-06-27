@@ -1,11 +1,4 @@
-﻿import type { SubscriptionStatus } from "@/admin/companies/api";
-import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
-import type { CompanyWithConfig } from "@/admin/companies/fixtures";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+﻿import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   Building2,
   ChevronLeft,
@@ -15,6 +8,13 @@ import {
   Plus,
   Search,
 } from "lucide-react";
+import type { SubscriptionStatus } from "@/admin/companies/api";
+import type { CompanyWithConfig } from "@/admin/companies/fixtures";
+import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
 
 // â”€â”€â”€ Subscription status helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 

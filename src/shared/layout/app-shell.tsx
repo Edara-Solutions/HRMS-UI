@@ -1,8 +1,8 @@
+import { Shield } from "lucide-react";
+import { type ReactNode, useCallback, useState, useSyncExternalStore } from "react";
 import { Header } from "@/shared/layout/header";
 import { adminNavGroups, companyNavGroups } from "@/shared/layout/nav-items";
 import { Sidebar } from "@/shared/layout/sidebar";
-import { Shield } from "lucide-react";
-import { type ReactNode, useCallback, useState, useSyncExternalStore } from "react";
 
 // Hoist static icon JSX to avoid recreating on each render
 const COMPANY_ICON = <span className="text-[13px] font-bold">E</span>;

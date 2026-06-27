@@ -1,14 +1,14 @@
-import { mapHttpStatusToAppError } from "@/api/error-mapper";
-import { Button } from "@/shared/ui/button";
-import { Form } from "@/shared/ui/form";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { HTTPError } from "ky";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { Button } from "@/shared/ui/button";
+import { Form } from "@/shared/ui/form";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 import { useChangePassword } from "./api";
 
 function changePasswordErrorMessage(error: unknown): string {
