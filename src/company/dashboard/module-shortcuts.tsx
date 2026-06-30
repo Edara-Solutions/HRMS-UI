@@ -58,7 +58,7 @@ export function ModuleShortcuts() {
             <Link
               key={shortcut.name}
               to={shortcut.href}
-              className="group flex flex-col gap-1.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 transition-all duration-[var(--motion-fast)] hover:border-[var(--color-primary)] hover:shadow-[var(--shadow-sm)]"
+              className="group flex flex-col gap-1.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 transition-[border-color,box-shadow,transform] duration-[var(--motion-fast)] hover:border-[var(--color-primary)] hover:shadow-[var(--shadow-sm)] active:scale-[0.99]"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-faint)]">

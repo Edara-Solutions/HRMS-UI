@@ -21,7 +21,7 @@ const sparklineColor: Record<KpiData["trend"]["direction"], "primary" | "warning
 
 export function KpiCard({ data }: KpiCardProps) {
   return (
-    <Card className="transition-shadow duration-[var(--motion-base)] hover:shadow-[var(--shadow-md)]">
+    <Card className="transition-[shadow,border-color] duration-[var(--motion-base)] hover:border-[color-mix(in_srgb,var(--color-primary)_25%,var(--color-border))] hover:shadow-[var(--shadow-md)]">
       <CardContent className="flex flex-col gap-2.5 p-4">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-[var(--color-text-muted)]">{data.label}</span>

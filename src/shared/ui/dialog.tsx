@@ -6,6 +6,25 @@ import { cn } from "@/shared/lib/cn";
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+function trapTabFocus(panel: HTMLElement, event: KeyboardEvent) {
+  const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+  if (focusable.length === 0) {
+    event.preventDefault();
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 interface DialogProps {
   open: boolean;
   onClose?: () => void;
@@ -32,10 +51,10 @@ export function Dialog({
     if (dismissible) onClose?.();
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleEscape is a useEffectEvent — stable identity, always sees latest dismissible/onClose, intentionally omitted from deps
   useEffect(() => {
     if (!open) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     panelRef.current?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -44,38 +63,22 @@ export function Dialog({
         return;
       }
 
-      if (event.key !== "Tab") return;
-
       const panel = panelRef.current;
-      if (!panel) return;
-
-      const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
-      if (focusable.length === 0) {
-        event.preventDefault();
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      if (event.key === "Tab" && panel) trapTabFocus(panel, event);
     }
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
   }, [open]);
 
   if (!open) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: decorative aria-hidden scrim — keyboard users dismiss via Escape (handled on the panel) */}
+      {/* Decorative aria-hidden scrim; keyboard users dismiss via Escape (handled on the panel). */}
       <div
         className="fixed inset-0 bg-[var(--color-overlay)]"
         aria-hidden="true"
@@ -83,7 +86,7 @@ export function Dialog({
       />
       <div
         ref={panelRef}
-        // biome-ignore lint/a11y/useSemanticElements: native <dialog> owns its own backdrop/show-modal lifecycle, which conflicts with this portal's declarative open/focus-trap model
+        // Custom role over native <dialog>: native owns its own backdrop/show-modal lifecycle, which conflicts with this portal's declarative open/focus-trap model.
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

@@ -14,13 +14,16 @@ import { RevenueChart } from "@/admin/dashboard/revenue-chart";
 import { SubscriptionDistribution } from "@/admin/dashboard/subscription-distribution";
 import { useCurrentSession } from "@/auth/guards";
 import { KpiCard } from "@/company/dashboard/kpi-card";
+import { usePreferencesStore } from "@/preferences/store";
 import { cn } from "@/shared/lib/cn";
+import { formatTodayLong } from "@/shared/lib/format-date";
 import { Button } from "@/shared/ui/button";
 
 export function AdminDashboardPage() {
   const session = useCurrentSession();
   const user = session?.user;
   const [asideCollapsed, setAsideCollapsed] = useState(false);
+  const locale = usePreferencesStore((state) => state.locale);
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -31,7 +34,8 @@ export function AdminDashboardPage() {
             Platform overview
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Welcome back, {user?.firstName ?? "Admin"} · All systems operational
+            Welcome back, {user?.firstName ?? "Admin"} · {formatTodayLong(locale)} · All systems
+            operational
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -67,7 +71,7 @@ export function AdminDashboardPage() {
         {/* Aside column */}
         <div
           className={cn(
-            "flex flex-col gap-4 transition-all duration-[var(--motion-base)]",
+            "flex flex-col gap-4 transition-[width,opacity] duration-[var(--motion-base)]",
             asideCollapsed && "hidden xl:flex",
           )}
         >

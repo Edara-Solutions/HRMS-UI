@@ -1,11 +1,19 @@
+import ky from "ky";
 import type { LoginTokens } from "@/auth/types";
-import { apiClient } from "./client";
+import { apiBaseUrl } from "./config";
+
+const refreshClient = ky.create({
+  prefixUrl: apiBaseUrl,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 let refreshPromise: Promise<LoginTokens> | null = null;
 
 export async function refreshTokensOnce(refreshToken: string): Promise<LoginTokens> {
   if (!refreshPromise) {
-    refreshPromise = apiClient
+    refreshPromise = refreshClient
       .post("auth/refresh", {
         json: { refreshToken },
       })

@@ -132,7 +132,7 @@ export function Button({
     <button
       type="button"
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
         sizeClassName[size],
         variantClassName[variant],
         isDestructiveTrigger && destructiveTriggerClassName,

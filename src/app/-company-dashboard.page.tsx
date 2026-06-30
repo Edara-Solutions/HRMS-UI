@@ -18,13 +18,16 @@ import { HeadcountChart } from "@/company/dashboard/headcount-chart";
 import { KpiCard } from "@/company/dashboard/kpi-card";
 import { ModuleShortcuts } from "@/company/dashboard/module-shortcuts";
 import { PeopleTable } from "@/company/dashboard/people-table";
+import { usePreferencesStore } from "@/preferences/store";
 import { cn } from "@/shared/lib/cn";
+import { formatTodayLong } from "@/shared/lib/format-date";
 import { Button } from "@/shared/ui/button";
 
 export function CompanyDashboardPage() {
   const session = useCurrentSession();
   const user = session?.user;
   const [asideCollapsed, setAsideCollapsed] = useState(false);
+  const locale = usePreferencesStore((state) => state.locale);
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -35,7 +38,7 @@ export function CompanyDashboardPage() {
             Good morning, {user?.firstName ?? "there"}.
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Friday, 22 May 2026 · Q2 performance cycle active · Payroll closes in 3 days
+            {formatTodayLong(locale)} · Q2 performance cycle active · Payroll closes in 3 days
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -71,7 +74,7 @@ export function CompanyDashboardPage() {
         {/* Aside column */}
         <div
           className={cn(
-            "flex flex-col gap-4 transition-all duration-[var(--motion-base)]",
+            "flex flex-col gap-4 transition-[width,opacity] duration-[var(--motion-base)]",
             asideCollapsed && "hidden xl:flex",
           )}
         >

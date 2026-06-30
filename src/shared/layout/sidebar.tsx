@@ -312,7 +312,7 @@ function UserMenu({
       document.removeEventListener("mousedown", handlePointer);
       document.removeEventListener("keydown", handleKey);
     };
-  }, [handleClose, triggerRef]);
+  }, [triggerRef]);
 
   function handleLogout() {
     clearSession();

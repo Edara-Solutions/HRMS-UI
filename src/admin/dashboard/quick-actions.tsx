@@ -35,7 +35,7 @@ export function QuickActions() {
     <Card>
       <CardHeader className="border-b border-[var(--color-border)] pb-3">
         <div>
-          <CardTitle className="text-[13.5px]">Quick actions</CardTitle>
+          <CardTitle>Quick actions</CardTitle>
           <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">Common admin tasks</p>
         </div>
       </CardHeader>
@@ -45,7 +45,7 @@ export function QuickActions() {
             <Link
               key={action.name}
               to={action.href}
-              className="group flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 transition-all duration-[var(--motion-fast)] hover:border-[var(--color-primary)] hover:shadow-[var(--shadow-sm)]"
+              className="group flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 transition-[border-color,box-shadow,transform] duration-[var(--motion-fast)] hover:border-[var(--color-primary)] hover:shadow-[var(--shadow-sm)] active:scale-[0.99]"
             >
               <p className="text-sm font-semibold text-[var(--color-text)]">{action.name}</p>
               <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">

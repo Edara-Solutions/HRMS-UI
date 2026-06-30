@@ -1,5 +1,6 @@
 import type { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { useChartTheme } from "@/shared/charts/use-chart-theme";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { headcountTrend } from "./fixtures";
 
@@ -8,6 +9,7 @@ interface HeadcountChartProps {
 }
 
 export function HeadcountChart({ data }: HeadcountChartProps) {
+  const tooltipTheme = useChartTheme();
   const chartOptions: ApexOptions = {
     chart: {
       type: "area",
@@ -18,20 +20,24 @@ export function HeadcountChart({ data }: HeadcountChartProps) {
         speed: 700,
       },
     },
-    colors: ["var(--color-primary)"],
+    // First series = primary fill; target series styled via its own stroke below.
+    colors: ["var(--color-primary)", "var(--color-text-faint)"],
     stroke: {
-      width: 2,
+      width: [2, 1.5],
       curve: "smooth",
       lineCap: "round",
+      dashArray: [0, 4],
     },
     fill: {
-      type: "gradient",
+      // Only the active series carries a gradient; the target is a line only.
+      type: ["gradient", "solid"],
       gradient: {
         shadeIntensity: 1,
         opacityFrom: 0.12,
         opacityTo: 0,
         stops: [0, 100],
       },
+      colors: [undefined, "transparent"],
     },
     grid: {
       borderColor: "var(--color-border)",
@@ -73,7 +79,7 @@ export function HeadcountChart({ data }: HeadcountChartProps) {
         formatter: (val: number) => `${val} employees`,
       },
       marker: { show: false },
-      theme: "light",
+      theme: tooltipTheme,
     },
     dataLabels: { enabled: false },
     markers: {
@@ -86,6 +92,11 @@ export function HeadcountChart({ data }: HeadcountChartProps) {
     {
       name: "Active employees",
       data: data.data,
+    },
+    {
+      // Flat target line — plots the value the legend was already promising.
+      name: "Target",
+      data: data.months.map(() => data.target),
     },
   ];
 
