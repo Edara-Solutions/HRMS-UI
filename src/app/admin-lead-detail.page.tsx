@@ -1,0 +1,358 @@
+import { useNavigate, useParams } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
+import type { Lead, LeadActivityListResponse, LeadContact } from "@/admin/leads/api";
+import { useLead, useLeadActivities } from "@/admin/leads/api";
+import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "@/admin/leads/labels";
+import { Avatar } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { EmptyState } from "@/shared/ui/empty-state";
+import { Skeleton } from "@/shared/ui/skeleton";
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatDateTime(value: string): string {
+  return new Date(value).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// --- Profile ----------------------------------------------------------------
+
+function LeadProfileCard({ lead }: { lead: Lead }) {
+  const status = STATUS_BADGE[lead.status];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Profile</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 p-4">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Status</dt>
+            <dd className="mt-1">
+              <Badge variant={status.variant}>{status.label}</Badge>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Source</dt>
+            <dd className="mt-1 text-[var(--color-text)]">{SOURCE_LABEL[lead.source]}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Company size</dt>
+            <dd className="mt-1 text-[var(--color-text)]">{SIZE_LABEL[lead.companySizeRange]}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Attempts</dt>
+            <dd className="mt-1 tabular-nums text-[var(--color-text)]">{lead.numberOfAttempts}</dd>
+          </div>
+          {lead.website && (
+            <div className="col-span-2">
+              <dt className="text-[var(--color-text-faint)]">Website</dt>
+              <dd className="mt-1 flex items-center gap-1 text-[var(--color-text)]">
+                <Globe size={11} className="shrink-0 text-[var(--color-text-muted)]" />
+                <a
+                  href={lead.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate hover:text-[var(--color-primary)]"
+                >
+                  {lead.website.replace(/^https?:\/\//, "")}
+                </a>
+              </dd>
+            </div>
+          )}
+          {lead.lostReason && (
+            <div className="col-span-2">
+              <dt className="text-[var(--color-text-faint)]">Lost reason</dt>
+              <dd className="mt-1 text-[var(--color-text)]">
+                {lead.lostReason.toLowerCase().replace(/_/g, " ")}
+              </dd>
+            </div>
+          )}
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Created</dt>
+            <dd className="mt-1 tabular-nums text-[var(--color-text-muted)]">
+              {formatDate(lead.createdAt)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--color-text-faint)]">Updated</dt>
+            <dd className="mt-1 tabular-nums text-[var(--color-text-muted)]">
+              {formatDate(lead.updatedAt)}
+            </dd>
+          </div>
+        </dl>
+      </CardContent>
+    </Card>
+  );
+}
+
+// --- Contacts ----------------------------------------------------------------
+
+function LeadContactsCard({ contacts }: { contacts: LeadContact[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Contacts</CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        {contacts.length === 0 ? (
+          <p className="text-xs text-[var(--color-text-faint)]">No contacts recorded.</p>
+        ) : (
+          <ul className="space-y-3">
+            {contacts.map((contact) => (
+              <li key={contact.publicId} className="flex items-start gap-3">
+                <Avatar size="sm" alt={contact.name ?? "?"} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate text-[13px] font-medium text-[var(--color-text)]">
+                      {contact.name ?? "-"}
+                    </p>
+                    {contact.isPrimary && <Badge variant="primary">Primary</Badge>}
+                  </div>
+                  {contact.jobTitle && (
+                    <p className="text-xs text-[var(--color-text-muted)]">{contact.jobTitle}</p>
+                  )}
+                  {contact.email && (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
+                      <Mail size={11} className="shrink-0" />
+                      <span className="truncate">{contact.email}</span>
+                    </p>
+                  )}
+                  {contact.phone && (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
+                      <Phone size={11} className="shrink-0" />
+                      {contact.phone}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// --- Activity timeline --------------------------------------------------------
+
+function LeadActivityTimelineCard({
+  page,
+  onPageChange,
+  data,
+  isPending,
+  isError,
+}: {
+  page: number;
+  onPageChange: (page: number) => void;
+  data: LeadActivityListResponse | undefined;
+  isPending: boolean;
+  isError: boolean;
+}) {
+  const items = data?.items ?? [];
+  const totalItems = data?.meta.totalItems ?? 0;
+  const currentPage = data?.meta.page ?? page;
+  const totalPages = Math.max(1, data?.meta.totalPages ?? 1);
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle>Activity timeline</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        {isError ? (
+          <EmptyState
+            icon={MessageSquare}
+            title="Couldn't load activity"
+            description="Please try again shortly."
+          />
+        ) : isPending ? (
+          <div className="space-y-3 p-4">
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+          </div>
+        ) : items.length === 0 ? (
+          <EmptyState
+            icon={MessageSquare}
+            title="No activity yet"
+            description="Calls, emails, and notes logged on this lead will show up here."
+          />
+        ) : (
+          <ul className="divide-y divide-[var(--color-border)]">
+            {items.map((activity) => (
+              <li key={activity.publicId} className="p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                    {ACTIVITY_TYPE_LABEL[activity.type]}
+                  </span>
+                  <span className="shrink-0 text-[11px] tabular-nums text-[var(--color-text-faint)]">
+                    {formatDateTime(activity.createdAt)}
+                  </span>
+                </div>
+                {activity.note && (
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--color-text)]">
+                    {activity.note}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+      <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-3">
+        <span className="text-xs text-[var(--color-text-muted)]">
+          {items.length} of {totalItems} activities
+        </span>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="nav"
+            size="iconXs"
+            className="btn-nav-prev"
+            disabled={currentPage <= 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            aria-label="Previous page"
+            title="Previous page"
+          >
+            <ChevronLeft size={14} />
+          </Button>
+          <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
+            {currentPage} / {totalPages}
+          </span>
+          <Button
+            variant="nav"
+            size="iconXs"
+            className="btn-nav-next"
+            disabled={currentPage >= totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            aria-label="Next page"
+            title="Next page"
+          >
+            <ChevronRight size={14} />
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// --- Page ---------------------------------------------------------------------
+
+export function AdminLeadDetailPage() {
+  const { publicId } = useParams({ from: "/admin/leads/$publicId" });
+  const navigate = useNavigate();
+  const [activityPage, setActivityPage] = useState(1);
+
+  const { data, isPending, isError } = useLead(publicId);
+  const activities = useLeadActivities(publicId, activityPage);
+
+  function backToLeads() {
+    void navigate({ to: "/admin/leads", search: { page: 1, pageSize: 10 } });
+  }
+
+  if (isPending) {
+    return (
+      <div className="mx-auto max-w-[1200px] space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="mx-auto max-w-[1200px]">
+        <EmptyState
+          icon={Users}
+          title="Couldn't load this lead"
+          description="It may have been removed, or something went wrong. Please try again."
+          action={
+            <Button intent="navigation" leadingIcon={<ArrowLeft size={14} />} onClick={backToLeads}>
+              Back to leads
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  const { lead, contacts } = data;
+  const status = STATUS_BADGE[lead.status];
+
+  return (
+    <div className="mx-auto max-w-[1200px]">
+      {/* Header */}
+      <div className="mb-6">
+        <Button
+          intent="navigation"
+          leadingIcon={<ArrowLeft size={14} />}
+          onClick={backToLeads}
+          className="mb-3"
+        >
+          Back to leads
+        </Button>
+
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
+              {lead.companyName ?? "Untitled lead"}
+            </h1>
+            <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--color-text-muted)]">
+              {lead.industry && <span>{lead.industry}</span>}
+              {(lead.city ?? lead.country) && (
+                <span className="flex items-center gap-1">
+                  <MapPin size={12} />
+                  {[lead.city, lead.country].filter(Boolean).join(", ")}
+                </span>
+              )}
+            </p>
+          </div>
+          <Badge variant={status.variant} className="h-6 px-2 text-[12px]">
+            {status.label}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <LeadActivityTimelineCard
+            page={activityPage}
+            onPageChange={setActivityPage}
+            data={activities.data}
+            isPending={activities.isPending}
+            isError={activities.isError}
+          />
+        </div>
+
+        <div className="space-y-6">
+          <LeadProfileCard lead={lead} />
+          <LeadContactsCard contacts={contacts} />
+        </div>
+      </div>
+    </div>
+  );
+}

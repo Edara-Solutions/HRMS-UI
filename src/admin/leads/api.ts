@@ -132,7 +132,8 @@ export const leadsKeys = {
   all: ["leads"] as const,
   list: (params: LeadListParams) => ["leads", "list", params] as const,
   detail: (id: string) => ["leads", id] as const,
-  activities: (id: string) => ["leads", id, "activities"] as const,
+  activities: (id: string, page: number) => ["leads", id, "activities", page] as const,
+  activitiesAll: (id: string) => ["leads", id, "activities"] as const,
 };
 
 // ─── Params ───────────────────────────────────────────────────────────────────
@@ -275,7 +276,7 @@ export function useConvertLead() {
 
 export function useLeadActivities(publicId: string, page = 1) {
   return useQuery({
-    queryKey: leadsKeys.activities(publicId),
+    queryKey: leadsKeys.activities(publicId, page),
     queryFn: () => fetchLeadActivities(publicId, page),
     enabled: Boolean(publicId),
   });
@@ -292,7 +293,7 @@ export function useAddLeadActivity() {
       input: { type: LeadActivityType; note: string };
     }) => addLeadActivity(publicId, input),
     onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: leadsKeys.activities(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.activitiesAll(vars.publicId) });
     },
   });
 }

@@ -1,4 +1,4 @@
-﻿import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   ArrowRightLeft,
   ChevronLeft,
@@ -9,67 +9,23 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import type { CompanySizeRange, LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
+import type { LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
 import { useLeads } from "@/admin/leads/api";
 import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
+import {
+  ALL_SOURCES,
+  ALL_STATUSES,
+  SIZE_LABEL,
+  SOURCE_LABEL,
+  STATUS_BADGE,
+} from "@/admin/leads/labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { Select } from "@/shared/ui/select";
 
-// â”€â”€â”€ Status helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-const STATUS_BADGE: Record<
-  LeadStatus,
-  { variant: "success" | "primary" | "warning" | "danger" | "info" | "default"; label: string }
-> = {
-  NEW: { variant: "default", label: "New" },
-  NO_ANSWER: { variant: "default", label: "No answer" },
-  WRONG_NUMBER: { variant: "danger", label: "Wrong number" },
-  CONTACTED: { variant: "info", label: "Contacted" },
-  FOLLOWING_UP: { variant: "info", label: "Following up" },
-  QUALIFIED: { variant: "primary", label: "Qualified" },
-  NOT_QUALIFIED: { variant: "default", label: "Not qualified" },
-  NOT_INTERESTED: { variant: "default", label: "Not interested" },
-  DEMO_SCHEDULED: { variant: "primary", label: "Demo scheduled" },
-  WAITING_QUOTATION: { variant: "warning", label: "Waiting quote" },
-  QUOTATION_SENT: { variant: "warning", label: "Quote sent" },
-  TRIAL_STARTED: { variant: "primary", label: "Trial" },
-  NEGOTIATION: { variant: "warning", label: "Negotiation" },
-  WON_CONVERTED: { variant: "success", label: "Won" },
-  LOST: { variant: "danger", label: "Lost" },
-  REJOINED: { variant: "success", label: "Rejoined" },
-};
-
-const SOURCE_LABEL: Record<LeadSource, string> = {
-  CRM: "CRM",
-  LANDING_PAGE: "Landing page",
-  FACEBOOK: "Facebook",
-  GOOGLE: "Google",
-  LINKEDIN: "LinkedIn",
-  REFERRAL: "Referral",
-  PARTNER: "Partner",
-  OTHER: "Other",
-};
-
-const SIZE_LABEL: Record<CompanySizeRange, string> = {
-  "5_TO_20": "5â€“20",
-  "21_TO_50": "21â€“50",
-  "51_TO_100": "51â€“100",
-  MORE_THAN_100: "100+",
-};
-
-const ALL_STATUSES: LeadStatus[] = [
-  "NEW",
-  "CONTACTED",
-  "QUALIFIED",
-  "DEMO_SCHEDULED",
-  "NEGOTIATION",
-  "WON_CONVERTED",
-  "LOST",
-];
-
-// â”€â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Table --------------------------------------------------------------
 
 function isConvertible(lead: LeadWithContacts["lead"]): boolean {
   return lead.companyId === null && lead.status !== "WON_CONVERTED";
@@ -78,9 +34,11 @@ function isConvertible(lead: LeadWithContacts["lead"]): boolean {
 function LeadsTable({
   items,
   onConvert,
+  onView,
 }: {
   items: LeadWithContacts[];
   onConvert: (leadWithContacts: LeadWithContacts) => void;
+  onView: (publicId: string) => void;
 }) {
   return (
     <>
@@ -155,6 +113,7 @@ function LeadsTable({
                   intent="utility"
                   leadingIcon={<ExternalLink size={13} />}
                   className="w-full"
+                  onClick={() => onView(lead.publicId)}
                 >
                   View
                 </Button>
@@ -212,11 +171,11 @@ function LeadsTable({
                   <td className="px-4 py-3">
                     <p className="text-[13.5px] font-medium text-[var(--color-text)]">
                       {lead.companyName ?? (
-                        <span className="text-[var(--color-text-faint)]">â€“</span>
+                        <span className="text-[var(--color-text-faint)]">-</span>
                       )}
                     </p>
                     <p className="text-xs text-[var(--color-text-muted)]">
-                      {lead.city ?? lead.country ?? "â€“"}
+                      {lead.city ?? lead.country ?? "-"}
                     </p>
                   </td>
 
@@ -225,20 +184,20 @@ function LeadsTable({
                     {primary ? (
                       <>
                         <p className="text-[13px] text-[var(--color-text)]">
-                          {primary.name ?? "â€“"}
+                          {primary.name ?? "-"}
                         </p>
                         <p className="text-xs text-[var(--color-text-muted)]">
                           {primary.jobTitle ?? ""}
                         </p>
                       </>
                     ) : (
-                      <span className="text-[var(--color-text-faint)]">â€“</span>
+                      <span className="text-[var(--color-text-faint)]">-</span>
                     )}
                   </td>
 
                   {/* Industry / size */}
                   <td className="px-4 py-3">
-                    <p className="text-[13px] text-[var(--color-text)]">{lead.industry ?? "â€“"}</p>
+                    <p className="text-[13px] text-[var(--color-text)]">{lead.industry ?? "-"}</p>
                     <p className="text-xs text-[var(--color-text-muted)]">
                       {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
                     </p>
@@ -284,7 +243,11 @@ function LeadsTable({
                           Convert
                         </Button>
                       )}
-                      <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
+                      <Button
+                        intent="utility"
+                        leadingIcon={<ExternalLink size={13} />}
+                        onClick={() => onView(lead.publicId)}
+                      >
                         View
                       </Button>
                     </div>
@@ -299,49 +262,109 @@ function LeadsTable({
   );
 }
 
-// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function LeadsTableCardContent({
+  isError,
+  isPending,
+  items,
+  onConvert,
+  onView,
+}: {
+  isError: boolean;
+  isPending: boolean;
+  items: LeadWithContacts[];
+  onConvert: (leadWithContacts: LeadWithContacts) => void;
+  onView: (publicId: string) => void;
+}) {
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <Users size={32} className="text-[var(--color-text-faint)]" />
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">Couldn't load leads</p>
+        <p className="text-xs text-[var(--color-text-faint)]">Please try again shortly.</p>
+      </div>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading leads…</p>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <Users size={32} className="text-[var(--color-text-faint)]" />
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">No leads found</p>
+        <p className="text-xs text-[var(--color-text-faint)]">
+          Try adjusting filters or search query
+        </p>
+      </div>
+    );
+  }
+
+  return <LeadsTable items={items} onConvert={onConvert} onView={onView} />;
+}
+
+// --- Page -----------------------------------------------------------------
 
 export function AdminLeadsPage() {
-  const { page, pageSize, q, status } = useSearch({ from: "/admin/leads" });
-  const navigate = useNavigate({ from: "/admin/leads" });
+  const { page, pageSize, q, status, source, country, sort } = useSearch({ from: "/admin/leads/" });
+  const navigate = useNavigate({ from: "/admin/leads/" });
   const query = q ?? "";
   const statusFilter = status ?? "";
+  const sourceFilter = source ?? "";
+  const countryFilter = country ?? "";
   const [convertingLead, setConvertingLead] = useState<LeadWithContacts | null>(null);
 
   const { data, isPending, isError } = useLeads({
     search: query || undefined,
     status: statusFilter || undefined,
+    source: sourceFilter || undefined,
+    country: countryFilter || undefined,
+    sort,
     page,
     pageSize,
   });
 
   function setQuery(nextQuery: string) {
     void navigate({
-      search: (previous) => ({
-        ...previous,
-        q: nextQuery || undefined,
-        page: 1,
-      }),
+      search: (previous) => ({ ...previous, q: nextQuery || undefined, page: 1 }),
     });
   }
 
   function setStatusFilter(nextStatus: LeadStatus | "") {
     void navigate({
-      search: (previous) => ({
-        ...previous,
-        status: nextStatus || undefined,
-        page: 1,
-      }),
+      search: (previous) => ({ ...previous, status: nextStatus || undefined, page: 1 }),
+    });
+  }
+
+  function setSourceFilter(nextSource: LeadSource | "") {
+    void navigate({
+      search: (previous) => ({ ...previous, source: nextSource || undefined, page: 1 }),
+    });
+  }
+
+  function setCountryFilter(nextCountry: string) {
+    void navigate({
+      search: (previous) => ({ ...previous, country: nextCountry || undefined, page: 1 }),
+    });
+  }
+
+  function setSort(nextSort: "createdAtAsc" | "createdAtDesc" | undefined) {
+    void navigate({
+      search: (previous) => ({ ...previous, sort: nextSort, page: 1 }),
     });
   }
 
   function setPage(nextPage: number) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        page: nextPage,
-      }),
-    });
+    void navigate({ search: (previous) => ({ ...previous, page: nextPage }) });
+  }
+
+  function viewLead(publicId: string) {
+    void navigate({ to: "/admin/leads/$publicId", params: { publicId } });
   }
 
   const visible = data?.items ?? [];
@@ -356,7 +379,7 @@ export function AdminLeadsPage() {
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Leads</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {totalItems} total leads Â· CRM sales pipeline
+            {totalItems} total leads · CRM sales pipeline
           </p>
         </div>
         <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
@@ -364,32 +387,9 @@ export function AdminLeadsPage() {
         </Button>
       </div>
 
-      {/* Quick status chips */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          pressed={statusFilter === ""}
-          onClick={() => setStatusFilter("")}
-        >
-          All
-        </Button>
-        {ALL_STATUSES.map((s) => (
-          <Button
-            key={s}
-            variant="ghost"
-            size="sm"
-            pressed={statusFilter === s}
-            onClick={() => setStatusFilter(s)}
-          >
-            {STATUS_BADGE[s].label}
-          </Button>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative w-full sm:max-w-xs">
+      {/* Filters */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+        <div className="relative w-full lg:max-w-xs">
           <Search
             size={14}
             className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
@@ -397,43 +397,79 @@ export function AdminLeadsPage() {
           />
           <Input
             type="search"
-            placeholder="Search by company, city, industryâ€¦"
+            placeholder="Search by company, city, industry…"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             className="ps-8"
           />
         </div>
-        <span className="text-xs text-[var(--color-text-muted)] sm:ms-auto">
-          {totalItems} leads
-        </span>
+
+        <Select
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value as LeadStatus | "")}
+          className="lg:w-44"
+          aria-label="Filter by status"
+        >
+          <option value="">All statuses</option>
+          {ALL_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {STATUS_BADGE[s].label}
+            </option>
+          ))}
+        </Select>
+
+        <Select
+          value={sourceFilter}
+          onChange={(event) => setSourceFilter(event.target.value as LeadSource | "")}
+          className="lg:w-40"
+          aria-label="Filter by source"
+        >
+          <option value="">All sources</option>
+          {ALL_SOURCES.map((s) => (
+            <option key={s} value={s}>
+              {SOURCE_LABEL[s]}
+            </option>
+          ))}
+        </Select>
+
+        <Input
+          placeholder="Country"
+          value={countryFilter}
+          onChange={(event) => setCountryFilter(event.target.value)}
+          className="lg:w-36"
+          aria-label="Filter by country"
+        />
+
+        <div className="flex items-center gap-1 lg:ms-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            pressed={sort !== "createdAtAsc"}
+            onClick={() => setSort(undefined)}
+          >
+            Newest
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            pressed={sort === "createdAtAsc"}
+            onClick={() => setSort("createdAtAsc")}
+          >
+            Oldest
+          </Button>
+        </div>
       </div>
 
       {/* Table card */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
-          {isError ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-center">
-              <Users size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                Couldn't load leads
-              </p>
-              <p className="text-xs text-[var(--color-text-faint)]">Please try again shortly.</p>
-            </div>
-          ) : isPending ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-center">
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading leadsâ€¦</p>
-            </div>
-          ) : visible.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-center">
-              <Users size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">No leads found</p>
-              <p className="text-xs text-[var(--color-text-faint)]">
-                Try adjusting filters or search query
-              </p>
-            </div>
-          ) : (
-            <LeadsTable items={visible} onConvert={setConvertingLead} />
-          )}
+          <LeadsTableCardContent
+            isError={isError}
+            isPending={isPending}
+            items={visible}
+            onConvert={setConvertingLead}
+            onView={viewLead}
+          />
         </CardContent>
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
