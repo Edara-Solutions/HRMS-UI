@@ -1,43 +1,14 @@
-﻿import { useNavigate, useSearch } from "@tanstack/react-router";
-import {
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Globe,
-  Plus,
-  Search,
-} from "lucide-react";
-import type { SubscriptionStatus } from "@/admin/companies/api";
-import type { CompanyWithConfig } from "@/admin/companies/fixtures";
-import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Building2, ChevronLeft, ChevronRight, ExternalLink, Globe, Search } from "lucide-react";
+import type { Company, CompanyConfig } from "@/admin/companies/api";
+import { useCompanies, useCompanyConfigs } from "@/admin/companies/api";
+import { SUBSCRIPTION_STATUS_BADGE } from "@/admin/companies/labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 
-// â”€â”€â”€ Subscription status helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-const statusBadgeVariant: Record<
-  SubscriptionStatus,
-  "success" | "primary" | "warning" | "danger" | "default"
-> = {
-  ACTIVE: "success",
-  TRIAL: "primary",
-  FROZEN: "warning",
-  CANCELLED: "danger",
-  EXPIRED: "default",
-};
-
-const statusLabel: Record<SubscriptionStatus, string> = {
-  ACTIVE: "Active",
-  TRIAL: "Trial",
-  FROZEN: "Frozen",
-  CANCELLED: "Cancelled",
-  EXPIRED: "Expired",
-};
-
-// â”€â”€â”€ Company code square â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Company code square ───────────────────────────────────────────────────────
 
 function CompanySquare({ code }: { code: string }) {
   return (
@@ -50,13 +21,24 @@ function CompanySquare({ code }: { code: string }) {
   );
 }
 
-// â”€â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Table ──────────────────────────────────────────────────────────────────────
 
-function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
+interface CompanyRow {
+  company: Company;
+  config: CompanyConfig | undefined;
+}
+
+function CompaniesTable({
+  items,
+  onView,
+}: {
+  items: CompanyRow[];
+  onView: (publicId: string) => void;
+}) {
   return (
     <>
       <div className="divide-y divide-[var(--color-border)] lg:hidden">
-        {items.map((co) => (
+        {items.map(({ company: co, config }) => (
           <article key={co.publicId} className="p-4">
             <div className="flex items-start gap-3">
               <CompanySquare code={co.companyCode} />
@@ -79,9 +61,9 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {co.config ? (
-                      <Badge variant={statusBadgeVariant[co.config.subscriptionStatus]}>
-                        {statusLabel[co.config.subscriptionStatus]}
+                    {config ? (
+                      <Badge variant={SUBSCRIPTION_STATUS_BADGE[config.subscriptionStatus].variant}>
+                        {SUBSCRIPTION_STATUS_BADGE[config.subscriptionStatus].label}
                       </Badge>
                     ) : (
                       <Badge variant="default">-</Badge>
@@ -103,9 +85,7 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
                   </div>
                   <div>
                     <dt className="text-[var(--color-text-faint)]">Plan</dt>
-                    <dd className="mt-0.5 text-[var(--color-text)]">
-                      {co.config?.planName ?? "-"}
-                    </dd>
+                    <dd className="mt-0.5 text-[var(--color-text)]">{config?.plan?.name ?? "-"}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--color-text-faint)]">Created</dt>
@@ -123,6 +103,7 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
                   intent="utility"
                   leadingIcon={<ExternalLink size={13} />}
                   className="mt-4 w-full min-[520px]:w-auto"
+                  onClick={() => onView(co.publicId)}
                 >
                   View
                 </Button>
@@ -149,7 +130,7 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
             </tr>
           </thead>
           <tbody>
-            {items.map((co) => (
+            {items.map(({ company: co, config }) => (
               <tr
                 key={co.publicId}
                 className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
@@ -191,19 +172,17 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
 
                 {/* Plan */}
                 <td className="px-4 py-3 text-[13.5px] text-[var(--color-text)]">
-                  {co.config?.planName ?? (
-                    <span className="text-[var(--color-text-faint)]">â€“</span>
-                  )}
+                  {config?.plan?.name ?? <span className="text-[var(--color-text-faint)]">–</span>}
                 </td>
 
                 {/* Status */}
                 <td className="px-4 py-3">
-                  {co.config ? (
-                    <Badge variant={statusBadgeVariant[co.config.subscriptionStatus]}>
-                      {statusLabel[co.config.subscriptionStatus]}
+                  {config ? (
+                    <Badge variant={SUBSCRIPTION_STATUS_BADGE[config.subscriptionStatus].variant}>
+                      {SUBSCRIPTION_STATUS_BADGE[config.subscriptionStatus].label}
                     </Badge>
                   ) : (
-                    <Badge variant="default">â€“</Badge>
+                    <Badge variant="default">–</Badge>
                   )}
                   {!co.isActive && (
                     <Badge variant="danger" className="ms-1.5">
@@ -223,7 +202,11 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
 
                 {/* Actions */}
                 <td className="px-4 py-3 text-end">
-                  <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
+                  <Button
+                    intent="utility"
+                    leadingIcon={<ExternalLink size={13} />}
+                    onClick={() => onView(co.publicId)}
+                  >
                     View
                   </Button>
                 </td>
@@ -236,12 +219,59 @@ function CompaniesTable({ items }: { items: CompanyWithConfig[] }) {
   );
 }
 
-// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function CompaniesTableCardContent({
+  isError,
+  isPending,
+  items,
+  onView,
+}: {
+  isError: boolean;
+  isPending: boolean;
+  items: CompanyRow[];
+  onView: (publicId: string) => void;
+}) {
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <Building2 size={32} className="text-[var(--color-text-faint)]" />
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">
+          Couldn't load companies
+        </p>
+        <p className="text-xs text-[var(--color-text-faint)]">Please try again shortly.</p>
+      </div>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading companies…</p>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-16 text-center">
+        <Building2 size={32} className="text-[var(--color-text-faint)]" />
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">No companies found</p>
+        <p className="text-xs text-[var(--color-text-faint)]">Try adjusting your search query</p>
+      </div>
+    );
+  }
+
+  return <CompaniesTable items={items} onView={onView} />;
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export function AdminCompaniesPage() {
-  const { page, pageSize, q } = useSearch({ from: "/admin/companies" });
-  const navigate = useNavigate({ from: "/admin/companies" });
+  const { page, pageSize, q } = useSearch({ from: "/admin/companies/" });
+  const navigate = useNavigate({ from: "/admin/companies/" });
   const query = q ?? "";
+
+  const { data, isPending, isError } = useCompanies({ page, limit: pageSize });
+  const configsQuery = useCompanyConfigs();
 
   function setQuery(nextQuery: string) {
     void navigate({
@@ -262,16 +292,31 @@ export function AdminCompaniesPage() {
     });
   }
 
-  const filtered = dummyCompaniesWithConfig.filter(
-    (co) =>
+  function viewCompany(publicId: string) {
+    void navigate({ to: "/admin/companies/$publicId", params: { publicId } });
+  }
+
+  const configByCompanyPublicId = new Map<string, CompanyConfig>();
+  for (const config of configsQuery.data?.data ?? []) {
+    if (config.company) configByCompanyPublicId.set(config.company.publicId, config);
+  }
+
+  const lowerQuery = query.toLowerCase();
+  const rows: CompanyRow[] = [];
+  for (const company of data?.data ?? []) {
+    const matchesQuery =
       !query ||
-      co.name.toLowerCase().includes(query.toLowerCase()) ||
-      co.companyCode.toLowerCase().includes(query.toLowerCase()) ||
-      co.country.toLowerCase().includes(query.toLowerCase()),
-  );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      company.name.toLowerCase().includes(lowerQuery) ||
+      company.companyCode.toLowerCase().includes(lowerQuery) ||
+      company.country.toLowerCase().includes(lowerQuery);
+    if (matchesQuery) {
+      rows.push({ company, config: configByCompanyPublicId.get(company.publicId) });
+    }
+  }
+
+  const totalItems = data?.meta.total ?? 0;
+  const currentPage = data?.meta.page ?? page;
+  const totalPages = Math.max(1, data?.meta.totalPages ?? 1);
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -282,12 +327,9 @@ export function AdminCompaniesPage() {
             Companies
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {dummyCompaniesWithConfig.length} tenants Â· manage profiles and subscriptions
+            {totalItems} tenants · manage profiles and subscriptions
           </p>
         </div>
-        <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
-          Add company
-        </Button>
       </div>
 
       {/* Filter bar */}
@@ -300,41 +342,29 @@ export function AdminCompaniesPage() {
           />
           <Input
             type="search"
-            placeholder="Search by name, code or countryâ€¦"
+            placeholder="Search by name, code or country…"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             className="ps-8"
           />
-        </div>
-        <div className="flex items-center gap-2 sm:ms-auto">
-          <span className="text-xs text-[var(--color-text-muted)]">
-            {filtered.length} of {dummyCompaniesWithConfig.length}
-          </span>
         </div>
       </div>
 
       {/* Table card */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
-          {visible.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-center">
-              <Building2 size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                No companies found
-              </p>
-              <p className="text-xs text-[var(--color-text-faint)]">
-                Try adjusting your search query
-              </p>
-            </div>
-          ) : (
-            <CompaniesTable items={visible} />
-          )}
+          <CompaniesTableCardContent
+            isError={isError}
+            isPending={isPending}
+            items={rows}
+            onView={viewCompany}
+          />
         </CardContent>
 
         {/* Pagination footer */}
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            {visible.length} of {filtered.length} companies
+            {rows.length} of {totalItems} companies
           </span>
           <div className="flex items-center gap-1">
             <Button

@@ -63,14 +63,18 @@ const leadWithContacts: LeadWithContacts = {
   ],
 };
 
-function renderModal(onClose = vi.fn()) {
+function renderModal(onClose = vi.fn(), onConverted = vi.fn()) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <ConvertLeadModal leadWithContacts={leadWithContacts} onClose={onClose} />
+      <ConvertLeadModal
+        leadWithContacts={leadWithContacts}
+        onClose={onClose}
+        onConverted={onConverted}
+      />
     </QueryClientProvider>,
   );
 }
@@ -129,6 +133,26 @@ describe("ConvertLeadModal", () => {
     );
 
     expect(await screen.findByText(/ACME/)).toBeInTheDocument();
+  });
+
+  it("calls onConverted with the new company when Done is clicked", async () => {
+    convertPostMock.mockReturnValue(
+      jsonResponse({ publicId: "company-1", name: "Acme Corp", companyCode: "ACME" }),
+    );
+    const onConverted = vi.fn();
+
+    renderModal(vi.fn(), onConverted);
+
+    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
+    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
+
+    fireEvent.click(await screen.findByRole("button", { name: /^done$/i }));
+
+    expect(onConverted).toHaveBeenCalledWith({
+      publicId: "company-1",
+      name: "Acme Corp",
+      companyCode: "ACME",
+    });
   });
 
   it("surfaces a backend conflict error inline", async () => {

@@ -26,7 +26,9 @@ import { Route as AdminDashboardRouteImport } from "./app/admin.dashboard"
 import { Route as AdminCompaniesRouteImport } from "./app/admin.companies"
 import { Route as AdminAuditRouteImport } from "./app/admin.audit"
 import { Route as AdminLeadsIndexRouteImport } from "./app/admin.leads.index"
+import { Route as AdminCompaniesIndexRouteImport } from "./app/admin.companies.index"
 import { Route as AdminLeadsPublicIdRouteImport } from "./app/admin.leads.$publicId"
+import { Route as AdminCompaniesPublicIdRouteImport } from "./app/admin.companies.$publicId"
 
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
@@ -113,10 +115,20 @@ const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => AdminLeadsRoute,
 } as any)
+const AdminCompaniesIndexRoute = AdminCompaniesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminCompaniesRoute,
+} as any)
 const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
   id: "/$publicId",
   path: "/$publicId",
   getParentRoute: () => AdminLeadsRoute,
+} as any)
+const AdminCompaniesPublicIdRoute = AdminCompaniesPublicIdRouteImport.update({
+  id: "/$publicId",
+  path: "/$publicId",
+  getParentRoute: () => AdminCompaniesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -128,7 +140,7 @@ export interface FileRoutesByFullPath {
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
   "/admin/audit": typeof AdminAuditRoute
-  "/admin/companies": typeof AdminCompaniesRoute
+  "/admin/companies": typeof AdminCompaniesRouteWithChildren
   "/admin/dashboard": typeof AdminDashboardRoute
   "/admin/leads": typeof AdminLeadsRouteWithChildren
   "/admin/plans": typeof AdminPlansRoute
@@ -136,7 +148,9 @@ export interface FileRoutesByFullPath {
   "/admin/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin/": typeof AdminIndexRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -147,14 +161,15 @@ export interface FileRoutesByTo {
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
   "/admin/audit": typeof AdminAuditRoute
-  "/admin/companies": typeof AdminCompaniesRoute
   "/admin/dashboard": typeof AdminDashboardRoute
   "/admin/plans": typeof AdminPlansRoute
   "/admin/subscriptions": typeof AdminSubscriptionsRoute
   "/admin/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin": typeof AdminIndexRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/companies": typeof AdminCompaniesIndexRoute
   "/admin/leads": typeof AdminLeadsIndexRoute
 }
 export interface FileRoutesById {
@@ -167,7 +182,7 @@ export interface FileRoutesById {
   "/forbidden": typeof ForbiddenRoute
   "/login": typeof LoginRoute
   "/admin/audit": typeof AdminAuditRoute
-  "/admin/companies": typeof AdminCompaniesRoute
+  "/admin/companies": typeof AdminCompaniesRouteWithChildren
   "/admin/dashboard": typeof AdminDashboardRoute
   "/admin/leads": typeof AdminLeadsRouteWithChildren
   "/admin/plans": typeof AdminPlansRoute
@@ -175,7 +190,9 @@ export interface FileRoutesById {
   "/admin_/login": typeof AdminLoginRoute
   "/company/dashboard": typeof CompanyDashboardRoute
   "/admin/": typeof AdminIndexRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
 }
 export interface FileRouteTypes {
@@ -197,7 +214,9 @@ export interface FileRouteTypes {
     | "/admin/login"
     | "/company/dashboard"
     | "/admin/"
+    | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/companies/"
     | "/admin/leads/"
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -208,14 +227,15 @@ export interface FileRouteTypes {
     | "/forbidden"
     | "/login"
     | "/admin/audit"
-    | "/admin/companies"
     | "/admin/dashboard"
     | "/admin/plans"
     | "/admin/subscriptions"
     | "/admin/login"
     | "/company/dashboard"
     | "/admin"
+    | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/companies"
     | "/admin/leads"
   id:
     | "__root__"
@@ -235,7 +255,9 @@ export interface FileRouteTypes {
     | "/admin_/login"
     | "/company/dashboard"
     | "/admin/"
+    | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/companies/"
     | "/admin/leads/"
   fileRoutesById: FileRoutesById
 }
@@ -371,6 +393,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminLeadsIndexRouteImport
       parentRoute: typeof AdminLeadsRoute
     }
+    "/admin/companies/": {
+      id: "/admin/companies/"
+      path: "/"
+      fullPath: "/admin/companies/"
+      preLoaderRoute: typeof AdminCompaniesIndexRouteImport
+      parentRoute: typeof AdminCompaniesRoute
+    }
     "/admin/leads/$publicId": {
       id: "/admin/leads/$publicId"
       path: "/$publicId"
@@ -378,8 +407,29 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminLeadsPublicIdRouteImport
       parentRoute: typeof AdminLeadsRoute
     }
+    "/admin/companies/$publicId": {
+      id: "/admin/companies/$publicId"
+      path: "/$publicId"
+      fullPath: "/admin/companies/$publicId"
+      preLoaderRoute: typeof AdminCompaniesPublicIdRouteImport
+      parentRoute: typeof AdminCompaniesRoute
+    }
   }
 }
+
+interface AdminCompaniesRouteChildren {
+  AdminCompaniesPublicIdRoute: typeof AdminCompaniesPublicIdRoute
+  AdminCompaniesIndexRoute: typeof AdminCompaniesIndexRoute
+}
+
+const AdminCompaniesRouteChildren: AdminCompaniesRouteChildren = {
+  AdminCompaniesPublicIdRoute: AdminCompaniesPublicIdRoute,
+  AdminCompaniesIndexRoute: AdminCompaniesIndexRoute,
+}
+
+const AdminCompaniesRouteWithChildren = AdminCompaniesRoute._addFileChildren(
+  AdminCompaniesRouteChildren,
+)
 
 interface AdminLeadsRouteChildren {
   AdminLeadsPublicIdRoute: typeof AdminLeadsPublicIdRoute
@@ -397,7 +447,7 @@ const AdminLeadsRouteWithChildren = AdminLeadsRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
-  AdminCompaniesRoute: typeof AdminCompaniesRoute
+  AdminCompaniesRoute: typeof AdminCompaniesRouteWithChildren
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLeadsRoute: typeof AdminLeadsRouteWithChildren
   AdminPlansRoute: typeof AdminPlansRoute
@@ -407,7 +457,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
-  AdminCompaniesRoute: AdminCompaniesRoute,
+  AdminCompaniesRoute: AdminCompaniesRouteWithChildren,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLeadsRoute: AdminLeadsRouteWithChildren,
   AdminPlansRoute: AdminPlansRoute,

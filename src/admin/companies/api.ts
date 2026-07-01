@@ -86,7 +86,7 @@ export interface CreateCompanyInput {
 export interface UpdateCompanyInput extends Partial<Omit<CreateCompanyInput, "companyCode">> {}
 
 export interface UpdateCompanyConfigInput {
-  planId?: number;
+  planPublicId?: string;
   subscriptionStatus?: SubscriptionStatus;
   subscriptionStartDate?: string | null;
   subscriptionEndDate?: string | null;

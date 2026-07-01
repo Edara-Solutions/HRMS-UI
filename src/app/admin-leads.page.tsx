@@ -9,7 +9,12 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
+import type {
+  ConvertLeadResult,
+  LeadSource,
+  LeadStatus,
+  LeadWithContacts,
+} from "@/admin/leads/api";
 import { useLeads } from "@/admin/leads/api";
 import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
 import { CreateLeadModal } from "@/admin/leads/create-lead-modal";
@@ -406,6 +411,11 @@ export function AdminLeadsPage() {
     void navigate({ to: "/admin/leads/$publicId", params: { publicId } });
   }
 
+  function goToConvertedCompany(company: ConvertLeadResult) {
+    setConvertingLead(null);
+    void navigate({ to: "/admin/companies/$publicId", params: { publicId: company.publicId } });
+  }
+
   const visible = data?.items ?? [];
   const totalItems = data?.meta.totalItems ?? 0;
   const currentPage = data?.meta.page ?? page;
@@ -555,7 +565,11 @@ export function AdminLeadsPage() {
         </div>
       </Card>
 
-      <ConvertLeadModal leadWithContacts={convertingLead} onClose={() => setConvertingLead(null)} />
+      <ConvertLeadModal
+        leadWithContacts={convertingLead}
+        onClose={() => setConvertingLead(null)}
+        onConverted={goToConvertedCompany}
+      />
       <CreateLeadModal open={isCreatingLead} onClose={() => setIsCreatingLead(false)} />
     </div>
   );

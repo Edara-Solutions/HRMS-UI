@@ -6,6 +6,7 @@ import { AdminLeadsPage } from "./admin-leads.page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const leadsGetMock = vi.hoisted(() => vi.fn());
+const leadsPostMock = vi.hoisted(() => vi.fn());
 const searchState = vi.hoisted(
   () =>
     ({
@@ -33,6 +34,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("@/api/client", () => ({
   apiClient: {
     get: leadsGetMock,
+    post: leadsPostMock,
   },
 }));
 
@@ -94,6 +96,7 @@ describe("AdminLeadsPage", () => {
     cleanup();
     navigateMock.mockReset();
     leadsGetMock.mockReset();
+    leadsPostMock.mockReset();
     Object.assign(searchState, {
       page: 1,
       pageSize: 10,
@@ -212,5 +215,32 @@ describe("AdminLeadsPage", () => {
     await waitFor(() => expect(navigateMock).toHaveBeenCalled());
     const search = lastNavigateSearch();
     expect(search({ page: 2, pageSize: 10 })).toEqual(expect.objectContaining({ page: 3 }));
+  });
+
+  it("navigates to the converted company's detail page after Convert completes", async () => {
+    leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
+    leadsPostMock.mockReturnValue(
+      jsonResponse({ publicId: "company-9", name: "Acme Corp", companyCode: "ACME" }),
+    );
+    renderPage();
+    await screen.findByRole("heading", { name: "Acme Corp" });
+
+    fireEvent.click(screen.getAllByRole("button", { name: /^convert$/i })[0]);
+    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
+    fireEvent.change(screen.getByLabelText(/^first name$/i), { target: { value: "Sara" } });
+    fireEvent.change(screen.getByLabelText(/^last name$/i), { target: { value: "Youssef" } });
+    fireEvent.change(screen.getByLabelText(/^email$/i), {
+      target: { value: "sara@acme.example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
+
+    fireEvent.click(await screen.findByRole("button", { name: /^done$/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "/admin/companies/$publicId",
+        params: { publicId: "company-9" },
+      }),
+    );
   });
 });

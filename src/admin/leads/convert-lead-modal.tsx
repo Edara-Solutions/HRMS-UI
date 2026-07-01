@@ -49,9 +49,14 @@ type ConvertLeadFormData = z.infer<typeof convertLeadFormSchema>;
 interface ConvertLeadModalProps {
   leadWithContacts: LeadWithContacts | null;
   onClose: () => void;
+  onConverted: (company: ConvertLeadResult) => void;
 }
 
-export function ConvertLeadModal({ leadWithContacts, onClose }: ConvertLeadModalProps) {
+export function ConvertLeadModal({
+  leadWithContacts,
+  onClose,
+  onConverted,
+}: ConvertLeadModalProps) {
   const { titleId, descriptionId } = useDialogIds();
 
   return (
@@ -67,6 +72,7 @@ export function ConvertLeadModal({ leadWithContacts, onClose }: ConvertLeadModal
           key={leadWithContacts.lead.publicId}
           leadWithContacts={leadWithContacts}
           onClose={onClose}
+          onConverted={onConverted}
           titleId={titleId}
           descriptionId={descriptionId}
         />
@@ -78,6 +84,7 @@ export function ConvertLeadModal({ leadWithContacts, onClose }: ConvertLeadModal
 interface ConvertLeadModalContentProps {
   leadWithContacts: LeadWithContacts;
   onClose: () => void;
+  onConverted: (company: ConvertLeadResult) => void;
   titleId: string;
   descriptionId: string;
 }
@@ -85,6 +92,7 @@ interface ConvertLeadModalContentProps {
 function ConvertLeadModalContent({
   leadWithContacts,
   onClose,
+  onConverted,
   titleId,
   descriptionId,
 }: ConvertLeadModalContentProps) {
@@ -148,7 +156,12 @@ function ConvertLeadModalContent({
           <Badge variant="success">{result.company.companyCode}</Badge>
         </div>
 
-        <Button intent="cta" size="block" className="mt-6" onClick={onClose}>
+        <Button
+          intent="cta"
+          size="block"
+          className="mt-6"
+          onClick={() => onConverted(result.company)}
+        >
           Done
         </Button>
       </div>
