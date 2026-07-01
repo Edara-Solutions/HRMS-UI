@@ -8,7 +8,7 @@ import {
   Search,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
 import { useLeads } from "@/admin/leads/api";
 import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
@@ -20,11 +20,12 @@ import {
   SOURCE_LABEL,
   STATUS_BADGE,
 } from "@/admin/leads/labels";
+import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { Select } from "@/shared/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 
 // --- Table --------------------------------------------------------------
 
@@ -312,7 +313,9 @@ function LeadsTableCardContent({
 // --- Page -----------------------------------------------------------------
 
 export function AdminLeadsPage() {
-  const { page, pageSize, q, status, source, country, sort } = useSearch({ from: "/admin/leads/" });
+  const { page, pageSize, q, status, source, country, sort } = useSearch({
+    from: "/admin/leads/",
+  });
   const navigate = useNavigate({ from: "/admin/leads/" });
   const query = q ?? "";
   const statusFilter = status ?? "";
@@ -320,6 +323,24 @@ export function AdminLeadsPage() {
   const countryFilter = country ?? "";
   const [convertingLead, setConvertingLead] = useState<LeadWithContacts | null>(null);
   const [isCreatingLead, setIsCreatingLead] = useState(false);
+
+  // Typed freely, then debounced into the URL/query below — avoids a request per keystroke
+  // and avoids the URL's trim()-on-navigate snapping back a trailing space while typing.
+  const [queryInput, setQueryInput] = useState(query);
+  const [countryInput, setCountryInput] = useState(countryFilter);
+  const debouncedQuery = useDebouncedValue(queryInput, 400);
+  const debouncedCountry = useDebouncedValue(countryInput, 400);
+
+  useEffect(() => setQueryInput(query), [query]);
+  useEffect(() => setCountryInput(countryFilter), [countryFilter]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only commit on the debounced value settling, not on every `query`/`setQuery` (URL) change.
+  useEffect(() => {
+    if (debouncedQuery !== query) setQuery(debouncedQuery);
+  }, [debouncedQuery]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only commit on the debounced value settling, not on every `countryFilter`/`setCountryFilter` (URL) change.
+  useEffect(() => {
+    if (debouncedCountry !== countryFilter) setCountryFilter(debouncedCountry);
+  }, [debouncedCountry]);
 
   const { data, isPending, isError } = useLeads({
     search: query || undefined,
@@ -333,25 +354,41 @@ export function AdminLeadsPage() {
 
   function setQuery(nextQuery: string) {
     void navigate({
-      search: (previous) => ({ ...previous, q: nextQuery || undefined, page: 1 }),
+      search: (previous) => ({
+        ...previous,
+        q: nextQuery || undefined,
+        page: 1,
+      }),
     });
   }
 
   function setStatusFilter(nextStatus: LeadStatus | "") {
     void navigate({
-      search: (previous) => ({ ...previous, status: nextStatus || undefined, page: 1 }),
+      search: (previous) => ({
+        ...previous,
+        status: nextStatus || undefined,
+        page: 1,
+      }),
     });
   }
 
   function setSourceFilter(nextSource: LeadSource | "") {
     void navigate({
-      search: (previous) => ({ ...previous, source: nextSource || undefined, page: 1 }),
+      search: (previous) => ({
+        ...previous,
+        source: nextSource || undefined,
+        page: 1,
+      }),
     });
   }
 
   function setCountryFilter(nextCountry: string) {
     void navigate({
-      search: (previous) => ({ ...previous, country: nextCountry || undefined, page: 1 }),
+      search: (previous) => ({
+        ...previous,
+        country: nextCountry || undefined,
+        page: 1,
+      }),
     });
   }
 
@@ -405,44 +442,50 @@ export function AdminLeadsPage() {
           <Input
             type="search"
             placeholder="Search by company, city, industry…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            value={queryInput}
+            onChange={(event) => setQueryInput(event.target.value)}
             className="ps-8"
           />
         </div>
 
         <Select
           value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value as LeadStatus | "")}
-          className="lg:w-44"
-          aria-label="Filter by status"
+          onValueChange={(next) => setStatusFilter(next as LeadStatus | "")}
         >
-          <option value="">All statuses</option>
-          {ALL_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {STATUS_BADGE[s].label}
-            </option>
-          ))}
+          <SelectTrigger className="lg:w-44" aria-label="Filter by status">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All statuses</SelectItem>
+            {ALL_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {STATUS_BADGE[s].label}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <Select
           value={sourceFilter}
-          onChange={(event) => setSourceFilter(event.target.value as LeadSource | "")}
-          className="lg:w-40"
-          aria-label="Filter by source"
+          onValueChange={(next) => setSourceFilter(next as LeadSource | "")}
         >
-          <option value="">All sources</option>
-          {ALL_SOURCES.map((s) => (
-            <option key={s} value={s}>
-              {SOURCE_LABEL[s]}
-            </option>
-          ))}
+          <SelectTrigger className="lg:w-40" aria-label="Filter by source">
+            <SelectValue placeholder="All sources" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All sources</SelectItem>
+            {ALL_SOURCES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {SOURCE_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
         <Input
           placeholder="Country"
-          value={countryFilter}
-          onChange={(event) => setCountryFilter(event.target.value)}
+          value={countryInput}
+          onChange={(event) => setCountryInput(event.target.value)}
           className="lg:w-36"
           aria-label="Filter by country"
         />

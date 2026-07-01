@@ -60,13 +60,14 @@ describe("EditLeadModal", () => {
 
     expect(screen.getByLabelText(/company name/i)).toHaveValue("Acme Corp");
     expect(screen.getByLabelText(/country/i)).toHaveValue("Egypt");
-    expect(screen.getByLabelText(/status/i)).toHaveValue("QUALIFIED");
+    expect(screen.getByLabelText(/status/i)).toHaveTextContent("Qualified");
   });
 
   it("requires a lost reason when status changes to Lost", async () => {
     renderModal();
 
-    fireEvent.change(screen.getByLabelText(/status/i), { target: { value: "LOST" } });
+    fireEvent.click(screen.getByLabelText(/status/i));
+    fireEvent.click(screen.getByRole("option", { name: "Lost" }));
     fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
 
     expect(await screen.findByText(/lost reason is required/i)).toBeInTheDocument();
@@ -81,8 +82,10 @@ describe("EditLeadModal", () => {
 
     renderModal(onClose);
 
-    fireEvent.change(screen.getByLabelText(/status/i), { target: { value: "LOST" } });
-    fireEvent.change(screen.getByLabelText(/lost reason/i), { target: { value: "NO_BUDGET" } });
+    fireEvent.click(screen.getByLabelText(/status/i));
+    fireEvent.click(screen.getByRole("option", { name: "Lost" }));
+    fireEvent.click(screen.getByLabelText(/lost reason/i));
+    fireEvent.click(screen.getByRole("option", { name: "No budget" }));
     fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
 
     await waitFor(() =>

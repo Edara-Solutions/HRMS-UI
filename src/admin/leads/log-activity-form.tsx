@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/api/error-mapper";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
 import { Label } from "@/shared/ui/label";
-import { Select } from "@/shared/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Textarea } from "@/shared/ui/textarea";
 import { useAddLeadActivity } from "./api";
 import { ACTIVITY_TYPE_LABEL, LOGGABLE_ACTIVITY_TYPES } from "./labels";
@@ -37,6 +37,7 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -67,13 +68,24 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="space-y-1.5 sm:w-48 sm:shrink-0">
           <Label htmlFor="log-activity-type">Type</Label>
-          <Select id="log-activity-type" {...register("type")}>
-            {LOGGABLE_ACTIVITY_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {ACTIVITY_TYPE_LABEL[type]}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="log-activity-type" ref={field.ref} onBlur={field.onBlur}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LOGGABLE_ACTIVITY_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {ACTIVITY_TYPE_LABEL[type]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
         <div className="flex-1 space-y-1.5">

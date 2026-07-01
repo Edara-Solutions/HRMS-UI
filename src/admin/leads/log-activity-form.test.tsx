@@ -51,7 +51,8 @@ describe("LogActivityForm", () => {
 
     renderForm();
 
-    fireEvent.change(screen.getByLabelText(/type/i), { target: { value: "MEETING" } });
+    fireEvent.click(screen.getByLabelText(/type/i));
+    fireEvent.click(screen.getByRole("option", { name: "Meeting" }));
     fireEvent.change(screen.getByLabelText(/note/i), { target: { value: "Kickoff call" } });
     fireEvent.click(screen.getByRole("button", { name: /log activity/i }));
 

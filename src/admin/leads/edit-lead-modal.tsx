@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/api/error-mapper";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
@@ -9,7 +9,7 @@ import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/u
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { Select } from "@/shared/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import type { Lead } from "./api";
 import { useUpdateLead } from "./api";
 import {
@@ -98,6 +98,7 @@ function EditLeadModalContent({
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setError,
@@ -184,53 +185,97 @@ function EditLeadModalContent({
 
           <div className="space-y-1.5">
             <Label htmlFor="edit-lead-size">Company size</Label>
-            <Select id="edit-lead-size" {...register("companySizeRange")}>
-              {ALL_SIZES.map((size) => (
-                <option key={size} value={size}>
-                  {SIZE_LABEL[size]}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="companySizeRange"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="edit-lead-size" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALL_SIZES.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {SIZE_LABEL[size]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="edit-lead-source">Source</Label>
-            <Select id="edit-lead-source" {...register("source")}>
-              {ALL_SOURCES.map((source) => (
-                <option key={source} value={source}>
-                  {SOURCE_LABEL[source]}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="source"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="edit-lead-source" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALL_SOURCES.map((source) => (
+                      <SelectItem key={source} value={source}>
+                        {SOURCE_LABEL[source]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="edit-lead-status">Status</Label>
-            <Select id="edit-lead-status" {...register("status")}>
-              {EDITABLE_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {STATUS_BADGE[s].label}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="edit-lead-status" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EDITABLE_STATUSES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {STATUS_BADGE[s].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
         </div>
 
         {status === "LOST" && (
           <div className="space-y-1.5">
             <Label htmlFor="edit-lead-lost-reason">Lost reason</Label>
-            <Select
-              id="edit-lead-lost-reason"
-              aria-invalid={!!errors.lostReason}
-              {...register("lostReason")}
-            >
-              <option value="">Select a reason</option>
-              {ALL_LOST_REASONS.map((reason) => (
-                <option key={reason} value={reason}>
-                  {LOST_REASON_LABEL[reason]}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="lostReason"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    id="edit-lead-lost-reason"
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    aria-invalid={!!errors.lostReason}
+                  >
+                    <SelectValue placeholder="Select a reason" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALL_LOST_REASONS.map((reason) => (
+                      <SelectItem key={reason} value={reason}>
+                        {LOST_REASON_LABEL[reason]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.lostReason && (
               <p className="text-xs text-[var(--color-danger)]">{errors.lostReason.message}</p>
             )}

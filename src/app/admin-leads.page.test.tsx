@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LeadListResponse, LeadWithContacts } from "@/admin/leads/api";
 import { AdminLeadsPage } from "./admin-leads.page";
@@ -150,14 +150,42 @@ describe("AdminLeadsPage", () => {
     );
   });
 
+  it("debounces the search box instead of navigating per keystroke, and keeps a trailing space while typing", async () => {
+    vi.useFakeTimers();
+    try {
+      leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
+      renderPage();
+
+      const searchInput = screen.getByPlaceholderText(/search by company/i);
+
+      fireEvent.change(searchInput, { target: { value: "Acme" } });
+      fireEvent.change(searchInput, { target: { value: "Acme " } });
+
+      // Typing must not navigate immediately, and the trailing space must not be stripped mid-typing.
+      expect(navigateMock).not.toHaveBeenCalled();
+      expect(searchInput).toHaveValue("Acme ");
+
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+
+      expect(navigateMock).toHaveBeenCalledTimes(1);
+      const search = lastNavigateSearch();
+      expect(search({ page: 3, pageSize: 10 })).toEqual(
+        expect.objectContaining({ q: "Acme ", page: 1 }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("navigates with the selected status and resets to page 1", async () => {
     leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
     renderPage();
     await screen.findByRole("heading", { name: "Acme Corp" });
 
-    fireEvent.change(screen.getByLabelText(/filter by status/i), {
-      target: { value: "NEGOTIATION" },
-    });
+    fireEvent.click(screen.getByLabelText(/filter by status/i));
+    fireEvent.click(screen.getByRole("option", { name: "Negotiation" }));
 
     await waitFor(() => expect(navigateMock).toHaveBeenCalled());
     const search = lastNavigateSearch();

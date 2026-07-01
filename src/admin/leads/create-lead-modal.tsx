@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/api/error-mapper";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
@@ -9,7 +9,7 @@ import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/u
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { Select } from "@/shared/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { useCreateLead } from "./api";
 import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "./labels";
 
@@ -73,6 +73,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors },
@@ -155,24 +156,46 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-size">Company size</Label>
-            <Select id="create-lead-size" {...register("companySizeRange")}>
-              {ALL_SIZES.map((size) => (
-                <option key={size} value={size}>
-                  {SIZE_LABEL[size]}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="companySizeRange"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="create-lead-size" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALL_SIZES.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {SIZE_LABEL[size]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-source">Source</Label>
-            <Select id="create-lead-source" {...register("source")}>
-              {ALL_SOURCES.map((source) => (
-                <option key={source} value={source}>
-                  {SOURCE_LABEL[source]}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="source"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="create-lead-source" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ALL_SOURCES.map((source) => (
+                      <SelectItem key={source} value={source}>
+                        {SOURCE_LABEL[source]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
         </div>
 
