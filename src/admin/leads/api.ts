@@ -22,37 +22,40 @@ export type LeadStatus =
   | "REJOINED";
 
 export type LeadSource =
+  | "CRM"
+  | "LANDING_PAGE"
+  | "FACEBOOK"
+  | "GOOGLE"
   | "LINKEDIN"
   | "REFERRAL"
-  | "WEBSITE"
-  | "COLD_CALL"
-  | "EMAIL_CAMPAIGN"
-  | "EVENT"
+  | "PARTNER"
   | "OTHER";
 
 export type LostReason =
-  | "PRICE"
-  | "COMPETITOR"
+  | "TOO_EXPENSIVE"
+  | "MISSING_FEATURES"
+  | "NOT_FIT"
+  | "COMPETITOR_CHOSEN"
   | "NO_BUDGET"
-  | "NOT_A_FIT"
-  | "UNRESPONSIVE"
-  | "OTHER";
+  | "NO_DECISION"
+  | "NO_RESPONSE";
 
-export type CompanySizeRange =
-  | "1_TO_10"
-  | "11_TO_20"
-  | "21_TO_50"
-  | "51_TO_100"
-  | "101_TO_250"
-  | "251_TO_500"
-  | "ABOVE_500";
+export type CompanySizeRange = "5_TO_20" | "21_TO_50" | "51_TO_100" | "MORE_THAN_100";
 
 export type LeadActivityType =
   | "CALLING_ON_WHATSAPP"
-  | "PHONE_CALL"
-  | "EMAIL"
+  | "CALLING_ON_PHONE"
+  | "SENDING_EMAIL"
+  | "RECEIVING_EMAIL"
+  | "SENDING_SMS"
+  | "RECEIVING_SMS"
+  | "CHAT"
+  | "SENDING_QUOTATION"
+  | "REQUEST_QUOTATION"
   | "MEETING"
-  | "DEMO"
+  | "NOTE"
+  | "FORM_SUBMISSION"
+  | "SYSTEM_EVENT"
   | "OTHER";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

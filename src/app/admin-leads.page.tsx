@@ -1,6 +1,6 @@
 ﻿import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ExternalLink, Plus, Search, Users } from "lucide-react";
-import type { LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
+import type { CompanySizeRange, LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
 import { dummyLeads } from "@/admin/leads/fixtures";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -32,23 +32,21 @@ const STATUS_BADGE: Record<
 };
 
 const SOURCE_LABEL: Record<LeadSource, string> = {
+  CRM: "CRM",
+  LANDING_PAGE: "Landing page",
+  FACEBOOK: "Facebook",
+  GOOGLE: "Google",
   LINKEDIN: "LinkedIn",
   REFERRAL: "Referral",
-  WEBSITE: "Website",
-  COLD_CALL: "Cold call",
-  EMAIL_CAMPAIGN: "Email",
-  EVENT: "Event",
+  PARTNER: "Partner",
   OTHER: "Other",
 };
 
-const SIZE_LABEL: Record<string, string> = {
-  "1_TO_10": "1â€“10",
-  "11_TO_20": "11â€“20",
+const SIZE_LABEL: Record<CompanySizeRange, string> = {
+  "5_TO_20": "5â€“20",
   "21_TO_50": "21â€“50",
   "51_TO_100": "51â€“100",
-  "101_TO_250": "101â€“250",
-  "251_TO_500": "251â€“500",
-  ABOVE_500: "500+",
+  MORE_THAN_100: "100+",
 };
 
 const ALL_STATUSES: LeadStatus[] = [
