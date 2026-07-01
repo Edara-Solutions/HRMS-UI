@@ -182,17 +182,25 @@ async function deleteLead(publicId: string): Promise<void> {
   await apiClient.delete(`leads/${publicId}`);
 }
 
-async function convertLead(
-  publicId: string,
-  input: {
-    phoneNumber: string;
-    name?: string;
-    country?: string;
-    website?: string;
-    logo?: string;
-    addressLine?: string;
-  },
-): Promise<{ publicId: string; name: string; companyCode: string }> {
+export interface ConvertLeadInput {
+  phoneNumber: string;
+  name?: string;
+  country?: string;
+  website?: string;
+  logo?: string;
+  addressLine?: string;
+  ownerFirstName: string;
+  ownerLastName: string;
+  ownerEmail: string;
+}
+
+export interface ConvertLeadResult {
+  publicId: string;
+  name: string;
+  companyCode: string;
+}
+
+async function convertLead(publicId: string, input: ConvertLeadInput): Promise<ConvertLeadResult> {
   return apiClient.post(`leads/${publicId}/convert`, { json: input }).json();
 }
 
@@ -257,13 +265,8 @@ export function useDeleteLead() {
 export function useConvertLead() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      publicId,
-      input,
-    }: {
-      publicId: string;
-      input: { phoneNumber: string; name?: string; country?: string };
-    }) => convertLead(publicId, input),
+    mutationFn: ({ publicId, input }: { publicId: string; input: ConvertLeadInput }) =>
+      convertLead(publicId, input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: leadsKeys.all });
     },

@@ -19,7 +19,7 @@ const RATE_LIMITED_MESSAGE = "Too many attempts. Please wait a moment and try ag
 const SYSTEM_MESSAGE = "Something went wrong. Please try again.";
 const BACKEND_GENERIC_MESSAGE = "Invalid credentials";
 
-async function readBackendErrorMessage(response: Response): Promise<string | null> {
+export async function readBackendErrorMessage(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json();
     return body !== null &&

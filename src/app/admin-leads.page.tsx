@@ -1,7 +1,17 @@
 ﻿import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ExternalLink, Plus, Search, Users } from "lucide-react";
+import {
+  ArrowRightLeft,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Plus,
+  Search,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
 import type { CompanySizeRange, LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
-import { dummyLeads } from "@/admin/leads/fixtures";
+import { useLeads } from "@/admin/leads/api";
+import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
@@ -61,7 +71,17 @@ const ALL_STATUSES: LeadStatus[] = [
 
 // â”€â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-function LeadsTable({ items }: { items: LeadWithContacts[] }) {
+function isConvertible(lead: LeadWithContacts["lead"]): boolean {
+  return lead.companyId === null && lead.status !== "WON_CONVERTED";
+}
+
+function LeadsTable({
+  items,
+  onConvert,
+}: {
+  items: LeadWithContacts[];
+  onConvert: (leadWithContacts: LeadWithContacts) => void;
+}) {
   return (
     <>
       <div className="divide-y divide-[var(--color-border)] lg:hidden">
@@ -130,13 +150,25 @@ function LeadsTable({ items }: { items: LeadWithContacts[] }) {
                 )}
               </dl>
 
-              <Button
-                intent="utility"
-                leadingIcon={<ExternalLink size={13} />}
-                className="mt-4 w-full min-[520px]:w-auto"
-              >
-                View
-              </Button>
+              <div className="mt-4 flex flex-col gap-2 min-[520px]:flex-row">
+                <Button
+                  intent="utility"
+                  leadingIcon={<ExternalLink size={13} />}
+                  className="w-full"
+                >
+                  View
+                </Button>
+                {isConvertible(lead) && (
+                  <Button
+                    intent="action"
+                    leadingIcon={<ArrowRightLeft size={13} />}
+                    className="w-full"
+                    onClick={() => onConvert({ lead, contacts })}
+                  >
+                    Convert
+                  </Button>
+                )}
+              </div>
             </article>
           );
         })}
@@ -242,9 +274,20 @@ function LeadsTable({ items }: { items: LeadWithContacts[] }) {
 
                   {/* Actions */}
                   <td className="px-4 py-3 text-end">
-                    <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
-                      View
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      {isConvertible(lead) && (
+                        <Button
+                          intent="action"
+                          leadingIcon={<ArrowRightLeft size={13} />}
+                          onClick={() => onConvert({ lead, contacts })}
+                        >
+                          Convert
+                        </Button>
+                      )}
+                      <Button intent="utility" leadingIcon={<ExternalLink size={13} />}>
+                        View
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -263,6 +306,14 @@ export function AdminLeadsPage() {
   const navigate = useNavigate({ from: "/admin/leads" });
   const query = q ?? "";
   const statusFilter = status ?? "";
+  const [convertingLead, setConvertingLead] = useState<LeadWithContacts | null>(null);
+
+  const { data, isPending, isError } = useLeads({
+    search: query || undefined,
+    status: statusFilter || undefined,
+    page,
+    pageSize,
+  });
 
   function setQuery(nextQuery: string) {
     void navigate({
@@ -293,27 +344,10 @@ export function AdminLeadsPage() {
     });
   }
 
-  const filtered = dummyLeads.filter(({ lead }) => {
-    if (statusFilter && lead.status !== statusFilter) return false;
-    if (query) {
-      const loweredQuery = query.toLowerCase();
-      return (
-        lead.companyName?.toLowerCase().includes(loweredQuery) ||
-        lead.city?.toLowerCase().includes(loweredQuery) ||
-        lead.country?.toLowerCase().includes(loweredQuery) ||
-        lead.industry?.toLowerCase().includes(loweredQuery)
-      );
-    }
-    return true;
-  });
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-  const totalByStatus = dummyLeads.reduce<Record<string, number>>((acc, { lead }) => {
-    acc[lead.status] = (acc[lead.status] ?? 0) + 1;
-    return acc;
-  }, {});
+  const visible = data?.items ?? [];
+  const totalItems = data?.meta.totalItems ?? 0;
+  const currentPage = data?.meta.page ?? page;
+  const totalPages = Math.max(1, data?.meta.totalPages ?? 1);
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -322,7 +356,7 @@ export function AdminLeadsPage() {
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Leads</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {dummyLeads.length} total leads Â· CRM sales pipeline
+            {totalItems} total leads Â· CRM sales pipeline
           </p>
         </div>
         <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
@@ -338,7 +372,7 @@ export function AdminLeadsPage() {
           pressed={statusFilter === ""}
           onClick={() => setStatusFilter("")}
         >
-          All ({dummyLeads.length})
+          All
         </Button>
         {ALL_STATUSES.map((s) => (
           <Button
@@ -349,9 +383,6 @@ export function AdminLeadsPage() {
             onClick={() => setStatusFilter(s)}
           >
             {STATUS_BADGE[s].label}
-            {totalByStatus[s] ? (
-              <span className="ms-1.5 tabular-nums opacity-60">({totalByStatus[s]})</span>
-            ) : null}
           </Button>
         ))}
       </div>
@@ -373,14 +404,26 @@ export function AdminLeadsPage() {
           />
         </div>
         <span className="text-xs text-[var(--color-text-muted)] sm:ms-auto">
-          {filtered.length} of {dummyLeads.length}
+          {totalItems} leads
         </span>
       </div>
 
       {/* Table card */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
-          {visible.length === 0 ? (
+          {isError ? (
+            <div className="flex flex-col items-center gap-2 py-16 text-center">
+              <Users size={32} className="text-[var(--color-text-faint)]" />
+              <p className="text-sm font-medium text-[var(--color-text-muted)]">
+                Couldn't load leads
+              </p>
+              <p className="text-xs text-[var(--color-text-faint)]">Please try again shortly.</p>
+            </div>
+          ) : isPending ? (
+            <div className="flex flex-col items-center gap-2 py-16 text-center">
+              <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading leadsâ€¦</p>
+            </div>
+          ) : visible.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Users size={32} className="text-[var(--color-text-faint)]" />
               <p className="text-sm font-medium text-[var(--color-text-muted)]">No leads found</p>
@@ -389,12 +432,12 @@ export function AdminLeadsPage() {
               </p>
             </div>
           ) : (
-            <LeadsTable items={visible} />
+            <LeadsTable items={visible} onConvert={setConvertingLead} />
           )}
         </CardContent>
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            {visible.length} of {filtered.length} leads
+            {visible.length} of {totalItems} leads
           </span>
           <div className="flex items-center gap-1">
             <Button
@@ -425,6 +468,8 @@ export function AdminLeadsPage() {
           </div>
         </div>
       </Card>
+
+      <ConvertLeadModal leadWithContacts={convertingLead} onClose={() => setConvertingLead(null)} />
     </div>
   );
 }
