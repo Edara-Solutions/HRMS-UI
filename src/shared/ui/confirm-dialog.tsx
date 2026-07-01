@@ -27,6 +27,7 @@ export function ConfirmDialog({
     <Dialog
       open={open}
       onClose={onClose}
+      dismissible={!isLoading}
       titleId={titleId}
       descriptionId={descriptionId}
       className="max-w-sm"
@@ -39,7 +40,7 @@ export function ConfirmDialog({
           Cancel
         </Button>
         <Button intent="destructive" onClick={onConfirm} disabled={isLoading} isLoading={isLoading}>
-          {!isLoading && confirmLabel}
+          {confirmLabel}
         </Button>
       </div>
     </Dialog>

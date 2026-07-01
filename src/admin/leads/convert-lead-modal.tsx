@@ -162,7 +162,7 @@ function ConvertLeadModalContent({
           className="mt-6"
           onClick={() => onConverted(result.company)}
         >
-          Done
+          View company
         </Button>
       </div>
     );
@@ -172,7 +172,7 @@ function ConvertLeadModalContent({
     <div>
       <DialogTitle id={titleId}>Convert lead to company</DialogTitle>
       <DialogDescription id={descriptionId}>
-        This provisions a real, working tenant — the Owner below will receive an invitation email to
+        This provisions a real, working tenant: the Owner below will receive an invitation email to
         log into their Company Portal.
       </DialogDescription>
 
@@ -270,7 +270,7 @@ function ConvertLeadModalContent({
             disabled={convertLead.isPending}
             isLoading={convertLead.isPending}
           >
-            {!convertLead.isPending && "Convert to company"}
+            Convert to company
           </Button>
         </div>
       </Form>

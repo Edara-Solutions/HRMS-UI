@@ -97,13 +97,12 @@ export interface UpdateCompanyConfigInput {
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
-export const companiesKeys = {
+const companiesKeys = {
   all: ["companies"] as const,
   list: (params: CompanyListParams) => ["companies", "list", params] as const,
   detail: (id: string) => ["companies", id] as const,
   configs: ["company-configs"] as const,
   configList: () => ["company-configs", "list"] as const,
-  configDetail: (id: string) => ["company-configs", id] as const,
 };
 
 // ─── Params ───────────────────────────────────────────────────────────────────
@@ -143,10 +142,6 @@ async function deleteCompany(publicId: string): Promise<{ message: string }> {
 
 async function fetchCompanyConfigs(): Promise<CompanyConfigListResponse> {
   return apiClient.get("company-configs").json();
-}
-
-async function fetchCompanyConfig(publicId: string): Promise<CompanyConfig> {
-  return apiClient.get(`company-configs/${publicId}`).json();
 }
 
 async function updateCompanyConfig(
@@ -202,14 +197,6 @@ export function useCompanyConfigs() {
   return useQuery({
     queryKey: companiesKeys.configList(),
     queryFn: fetchCompanyConfigs,
-  });
-}
-
-export function useCompanyConfig(publicId: string) {
-  return useQuery({
-    queryKey: companiesKeys.configDetail(publicId),
-    queryFn: () => fetchCompanyConfig(publicId),
-    enabled: Boolean(publicId),
   });
 }
 

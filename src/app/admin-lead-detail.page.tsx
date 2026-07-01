@@ -185,6 +185,7 @@ function LeadContactsCard({
                         intent="utility"
                         leadingIcon={<Star size={12} />}
                         disabled={isMakingPrimary}
+                        isLoading={isMakingPrimary}
                         onClick={() => onMakePrimary(contact)}
                       >
                         Make primary

@@ -132,7 +132,7 @@ export function ChangePasswordForm() {
         disabled={changePassword.isPending}
         isLoading={changePassword.isPending}
       >
-        {!changePassword.isPending && "Change password"}
+        Change password
       </Button>
     </Form>
   );

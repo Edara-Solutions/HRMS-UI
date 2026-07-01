@@ -1,6 +1,6 @@
 import type { Company, SubscriptionStatus } from "./api";
 
-export const dummyCompanies: Company[] = [
+const dummyCompanies: Company[] = [
   {
     publicId: "co-001",
     logo: null,

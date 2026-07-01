@@ -292,7 +292,7 @@ function EditLeadModalContent({
             disabled={updateLead.isPending}
             isLoading={updateLead.isPending}
           >
-            {!updateLead.isPending && "Save changes"}
+            Save changes
           </Button>
         </div>
       </Form>

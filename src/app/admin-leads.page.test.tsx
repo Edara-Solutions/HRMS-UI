@@ -234,7 +234,7 @@ describe("AdminLeadsPage", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
 
-    fireEvent.click(await screen.findByRole("button", { name: /^done$/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /view company/i }));
 
     expect(navigateMock).toHaveBeenCalledWith(
       expect.objectContaining({

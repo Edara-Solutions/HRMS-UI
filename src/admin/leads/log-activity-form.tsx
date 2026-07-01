@@ -109,7 +109,7 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
           disabled={addActivity.isPending}
           isLoading={addActivity.isPending}
         >
-          {!addActivity.isPending && "Log activity"}
+          Log activity
         </Button>
       </div>
     </form>

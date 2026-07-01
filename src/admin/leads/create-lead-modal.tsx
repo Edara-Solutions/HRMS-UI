@@ -252,7 +252,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
             disabled={createLead.isPending}
             isLoading={createLead.isPending}
           >
-            {!createLead.isPending && "Add lead"}
+            Add lead
           </Button>
         </div>
       </Form>

@@ -171,7 +171,7 @@ function LeadContactFormModalContent({
             Cancel
           </Button>
           <Button intent="cta" type="submit" disabled={isPending} isLoading={isPending}>
-            {!isPending && (contact ? "Save changes" : "Add contact")}
+            {contact ? "Save changes" : "Add contact"}
           </Button>
         </div>
       </Form>

@@ -144,12 +144,8 @@ export function AdminLoginPage() {
               disabled={adminLogin.isPending}
               isLoading={adminLogin.isPending}
             >
-              {!adminLogin.isPending && (
-                <>
-                  <Shield size={16} />
-                  Sign in to Admin
-                </>
-              )}
+              <Shield size={16} />
+              Sign in to Admin
             </Button>
           </form>
 

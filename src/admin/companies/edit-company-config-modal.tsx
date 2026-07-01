@@ -285,7 +285,7 @@ function EditCompanyConfigModalContent({
             disabled={updateConfig.isPending}
             isLoading={updateConfig.isPending}
           >
-            {!updateConfig.isPending && "Save changes"}
+            Save changes
           </Button>
         </div>
       </Form>

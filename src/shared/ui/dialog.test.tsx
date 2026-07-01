@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { Dialog, DialogTitle, useDialogIds } from "./dialog";
@@ -22,7 +22,7 @@ function DialogHarness() {
 }
 
 describe("Dialog focus management", () => {
-  it("returns focus to the trigger when the dialog closes", () => {
+  it("returns focus to the trigger when the dialog closes", async () => {
     render(<DialogHarness />);
 
     const trigger = screen.getByRole("button", { name: "Open" });
@@ -33,7 +33,9 @@ describe("Dialog focus management", () => {
 
     fireEvent.keyDown(document, { key: "Escape" });
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    // Focus returns to the trigger immediately; the panel itself stays mounted
+    // briefly to play its exit transition before unmounting.
     expect(trigger).toHaveFocus();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });
 });

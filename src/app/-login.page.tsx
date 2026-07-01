@@ -160,12 +160,8 @@ export function LoginPage() {
               disabled={login.isPending}
               isLoading={login.isPending}
             >
-              {!login.isPending && (
-                <>
-                  <KeyRound size={16} />
-                  Sign in
-                </>
-              )}
+              <KeyRound size={16} />
+              Sign in
             </Button>
           </form>
 

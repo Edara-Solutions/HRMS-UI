@@ -185,7 +185,7 @@ function EditCompanyModalContent({
             disabled={updateCompany.isPending}
             isLoading={updateCompany.isPending}
           >
-            {!updateCompany.isPending && "Save changes"}
+            Save changes
           </Button>
         </div>
       </Form>

@@ -128,7 +128,7 @@ export interface LeadActivityListResponse {
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
-export const leadsKeys = {
+const leadsKeys = {
   all: ["leads"] as const,
   list: (params: LeadListParams) => ["leads", "list", params] as const,
   detail: (id: string) => ["leads", id] as const,
@@ -322,17 +322,15 @@ export function useAddLeadActivity() {
   });
 }
 
-function invalidateLeadAndList(qc: ReturnType<typeof useQueryClient>, publicId: string) {
-  qc.invalidateQueries({ queryKey: leadsKeys.detail(publicId) });
-  qc.invalidateQueries({ queryKey: leadsKeys.all });
-}
-
 export function useAddLeadContact() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: LeadContactInput }) =>
       addLeadContact(publicId, input),
-    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
+    },
   });
 }
 
@@ -348,7 +346,10 @@ export function useUpdateLeadContact() {
       contactPublicId: string;
       input: LeadContactInput;
     }) => updateLeadContact(publicId, contactPublicId, input),
-    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
+    },
   });
 }
 
@@ -357,6 +358,9 @@ export function useDeleteLeadContact() {
   return useMutation({
     mutationFn: ({ publicId, contactPublicId }: { publicId: string; contactPublicId: string }) =>
       deleteLeadContact(publicId, contactPublicId),
-    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
+    },
   });
 }

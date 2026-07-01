@@ -135,7 +135,7 @@ describe("ConvertLeadModal", () => {
     expect(await screen.findByText(/ACME/)).toBeInTheDocument();
   });
 
-  it("calls onConverted with the new company when Done is clicked", async () => {
+  it("calls onConverted with the new company when View company is clicked", async () => {
     convertPostMock.mockReturnValue(
       jsonResponse({ publicId: "company-1", name: "Acme Corp", companyCode: "ACME" }),
     );
@@ -146,7 +146,7 @@ describe("ConvertLeadModal", () => {
     fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
     fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
 
-    fireEvent.click(await screen.findByRole("button", { name: /^done$/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /view company/i }));
 
     expect(onConverted).toHaveBeenCalledWith({
       publicId: "company-1",

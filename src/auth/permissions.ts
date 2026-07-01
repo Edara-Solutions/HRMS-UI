@@ -1,6 +1,6 @@
 import type { SessionUser } from "./types";
 
-export const permissionActions = [
+const permissionActions = [
   "users:create",
   "users:read",
   "users:update",

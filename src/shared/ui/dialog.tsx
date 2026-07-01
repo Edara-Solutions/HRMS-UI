@@ -1,10 +1,24 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { useEffect, useEffectEvent, useId, useRef } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/shared/lib/cn";
 
+export { DialogDescription } from "./dialog-description";
+export { DialogTitle } from "./dialog-title";
+
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Matches --motion-base in globals.css: the exit runs snappier than the --motion-slow entry. */
+const EXIT_DURATION_MS = 180;
+
+type Phase = "closed" | "entering" | "open" | "closing";
+
+/** Pure transition table for the `open` prop flipping — kept outside the component to keep its cognitive complexity low. */
+function nextPhaseOnOpenChange(open: boolean, currentPhase: Phase): Phase {
+  if (open) return "entering";
+  return currentPhase === "closed" ? "closed" : "closing";
+}
 
 function trapTabFocus(panel: HTMLElement, event: KeyboardEvent) {
   const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
@@ -46,10 +60,36 @@ export function Dialog({
   className,
 }: DialogProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState<Phase>(open ? "open" : "closed");
+  // Keeps the last non-empty children on screen while the exit transition plays, since callers
+  // gate their content on the same `open` flag and would otherwise unmount it mid-fade.
+  const lastChildren = useRef(children);
+  if (children) lastChildren.current = children;
+
+  // Adjusted synchronously during render (not in an effect) so the very same commit that flips
+  // `open` also mounts the panel DOM node — otherwise the focus-management effect below would run
+  // one commit too early and find `panelRef.current` still null.
+  const prevOpenRef = useRef(open);
+  if (open !== prevOpenRef.current) {
+    prevOpenRef.current = open;
+    setPhase(nextPhaseOnOpenChange(open, phase));
+  }
 
   const handleEscape = useEffectEvent(() => {
     if (dismissible) onClose?.();
   });
+
+  useEffect(() => {
+    if (phase !== "entering") return;
+    const raf = requestAnimationFrame(() => setPhase("open"));
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "closing") return;
+    const timeout = setTimeout(() => setPhase("closed"), EXIT_DURATION_MS);
+    return () => clearTimeout(timeout);
+  }, [phase]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,13 +114,24 @@ export function Dialog({
     };
   }, [open]);
 
-  if (!open) return null;
+  if (phase === "closed") return null;
+
+  const visible = phase === "open";
+  const closing = phase === "closing";
+  // Entry grows in from 95% (never from scale(0)) so it reads as arriving, not popping in.
+  // Close is a plain, fast opacity fade with no shrink — a scale-down on exit reads as
+  // decorative flourish, out of place for a calm, HR-native business tool.
+  const panelScale = closing ? "scale-100" : visible ? "scale-100" : "scale-95";
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Decorative aria-hidden scrim; keyboard users dismiss via Escape (handled on the panel). */}
       <div
-        className="fixed inset-0 bg-[var(--color-overlay)]"
+        className={cn(
+          "fixed inset-0 bg-[var(--color-overlay)] transition-opacity ease-[var(--motion-easing)]",
+          closing ? "duration-[var(--motion-base)]" : "duration-[var(--motion-slow)]",
+          visible ? "opacity-100" : "opacity-0",
+        )}
         aria-hidden="true"
         onClick={dismissible ? onClose : undefined}
       />
@@ -93,37 +144,17 @@ export function Dialog({
         aria-describedby={descriptionId}
         tabIndex={-1}
         className={cn(
-          "relative w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-md)] outline-none",
+          "relative w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-md)] outline-none transition-[opacity,transform] ease-[var(--motion-easing)]",
+          closing ? "duration-[var(--motion-base)]" : "duration-[var(--motion-slow)]",
+          panelScale,
+          visible ? "opacity-100" : "opacity-0",
           className,
         )}
       >
-        {children}
+        {lastChildren.current}
       </div>
     </div>,
     document.body,
-  );
-}
-
-export function DialogTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h2
-      className={cn("text-lg font-semibold tracking-tight text-[var(--color-text)]", className)}
-      {...props}
-    >
-      {children}
-    </h2>
-  );
-}
-
-export function DialogDescription({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("mt-1.5 text-sm text-[var(--color-text-muted)]", className)} {...props}>
-      {children}
-    </p>
   );
 }
 
