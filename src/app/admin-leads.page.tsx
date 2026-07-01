@@ -12,6 +12,7 @@ import { useState } from "react";
 import type { LeadSource, LeadStatus, LeadWithContacts } from "@/admin/leads/api";
 import { useLeads } from "@/admin/leads/api";
 import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
+import { CreateLeadModal } from "@/admin/leads/create-lead-modal";
 import {
   ALL_SOURCES,
   ALL_STATUSES,
@@ -318,6 +319,7 @@ export function AdminLeadsPage() {
   const sourceFilter = source ?? "";
   const countryFilter = country ?? "";
   const [convertingLead, setConvertingLead] = useState<LeadWithContacts | null>(null);
+  const [isCreatingLead, setIsCreatingLead] = useState(false);
 
   const { data, isPending, isError } = useLeads({
     search: query || undefined,
@@ -382,7 +384,12 @@ export function AdminLeadsPage() {
             {totalItems} total leads · CRM sales pipeline
           </p>
         </div>
-        <Button intent="cta" leadingIcon={<Plus size={15} />} className="w-full sm:w-auto">
+        <Button
+          intent="cta"
+          leadingIcon={<Plus size={15} />}
+          className="w-full sm:w-auto"
+          onClick={() => setIsCreatingLead(true)}
+        >
           Add lead
         </Button>
       </div>
@@ -506,6 +513,7 @@ export function AdminLeadsPage() {
       </Card>
 
       <ConvertLeadModal leadWithContacts={convertingLead} onClose={() => setConvertingLead(null)} />
+      <CreateLeadModal open={isCreatingLead} onClose={() => setIsCreatingLead(false)} />
     </div>
   );
 }

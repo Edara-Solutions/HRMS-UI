@@ -216,6 +216,30 @@ async function addLeadActivity(
   return apiClient.post(`leads/${publicId}/activities`, { json: input }).json();
 }
 
+export interface LeadContactInput {
+  name?: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  isPrimary?: boolean;
+}
+
+async function addLeadContact(publicId: string, input: LeadContactInput): Promise<LeadContact> {
+  return apiClient.post(`leads/${publicId}/contacts`, { json: input }).json();
+}
+
+async function updateLeadContact(
+  publicId: string,
+  contactPublicId: string,
+  input: LeadContactInput,
+): Promise<LeadContact> {
+  return apiClient.patch(`leads/${publicId}/contacts/${contactPublicId}`, { json: input }).json();
+}
+
+async function deleteLeadContact(publicId: string, contactPublicId: string): Promise<void> {
+  await apiClient.delete(`leads/${publicId}/contacts/${contactPublicId}`);
+}
+
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
 export function useLeads(params: LeadListParams = {}) {
@@ -295,5 +319,44 @@ export function useAddLeadActivity() {
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.activitiesAll(vars.publicId) });
     },
+  });
+}
+
+function invalidateLeadAndList(qc: ReturnType<typeof useQueryClient>, publicId: string) {
+  qc.invalidateQueries({ queryKey: leadsKeys.detail(publicId) });
+  qc.invalidateQueries({ queryKey: leadsKeys.all });
+}
+
+export function useAddLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ publicId, input }: { publicId: string; input: LeadContactInput }) =>
+      addLeadContact(publicId, input),
+    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
+  });
+}
+
+export function useUpdateLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      publicId,
+      contactPublicId,
+      input,
+    }: {
+      publicId: string;
+      contactPublicId: string;
+      input: LeadContactInput;
+    }) => updateLeadContact(publicId, contactPublicId, input),
+    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
+  });
+}
+
+export function useDeleteLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ publicId, contactPublicId }: { publicId: string; contactPublicId: string }) =>
+      deleteLeadContact(publicId, contactPublicId),
+    onSuccess: (_data, vars) => invalidateLeadAndList(qc, vars.publicId),
   });
 }

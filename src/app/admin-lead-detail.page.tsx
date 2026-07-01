@@ -7,17 +7,31 @@ import {
   Mail,
   MapPin,
   MessageSquare,
+  Pencil,
   Phone,
+  Plus,
+  Star,
+  Trash2,
   Users,
 } from "lucide-react";
 import { useState } from "react";
 import type { Lead, LeadActivityListResponse, LeadContact } from "@/admin/leads/api";
-import { useLead, useLeadActivities } from "@/admin/leads/api";
+import {
+  useDeleteLead,
+  useDeleteLeadContact,
+  useLead,
+  useLeadActivities,
+  useUpdateLeadContact,
+} from "@/admin/leads/api";
+import { EditLeadModal } from "@/admin/leads/edit-lead-modal";
 import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "@/admin/leads/labels";
+import { LeadContactFormModal } from "@/admin/leads/lead-contact-form-modal";
+import { LogActivityForm } from "@/admin/leads/log-activity-form";
 import { Avatar } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Skeleton } from "@/shared/ui/skeleton";
 
@@ -112,11 +126,28 @@ function LeadProfileCard({ lead }: { lead: Lead }) {
 
 // --- Contacts ----------------------------------------------------------------
 
-function LeadContactsCard({ contacts }: { contacts: LeadContact[] }) {
+function LeadContactsCard({
+  contacts,
+  onAdd,
+  onEdit,
+  onDelete,
+  onMakePrimary,
+  isMakingPrimary,
+}: {
+  contacts: LeadContact[];
+  onAdd: () => void;
+  onEdit: (contact: LeadContact) => void;
+  onDelete: (contact: LeadContact) => void;
+  onMakePrimary: (contact: LeadContact) => void;
+  isMakingPrimary: boolean;
+}) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex items-center justify-between">
         <CardTitle>Contacts</CardTitle>
+        <Button intent="utility" leadingIcon={<Plus size={13} />} onClick={onAdd}>
+          Add
+        </Button>
       </CardHeader>
       <CardContent className="p-4">
         {contacts.length === 0 ? (
@@ -148,6 +179,33 @@ function LeadContactsCard({ contacts }: { contacts: LeadContact[] }) {
                       {contact.phone}
                     </p>
                   )}
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {!contact.isPrimary && (
+                      <Button
+                        intent="utility"
+                        leadingIcon={<Star size={12} />}
+                        disabled={isMakingPrimary}
+                        onClick={() => onMakePrimary(contact)}
+                      >
+                        Make primary
+                      </Button>
+                    )}
+                    <Button
+                      intent="utility"
+                      leadingIcon={<Pencil size={12} />}
+                      onClick={() => onEdit(contact)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      intent="utility"
+                      className="text-[var(--color-danger)] hover:text-[var(--color-danger)]"
+                      leadingIcon={<Trash2 size={12} />}
+                      onClick={() => onDelete(contact)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -161,12 +219,14 @@ function LeadContactsCard({ contacts }: { contacts: LeadContact[] }) {
 // --- Activity timeline --------------------------------------------------------
 
 function LeadActivityTimelineCard({
+  leadPublicId,
   page,
   onPageChange,
   data,
   isPending,
   isError,
 }: {
+  leadPublicId: string;
   page: number;
   onPageChange: (page: number) => void;
   data: LeadActivityListResponse | undefined;
@@ -183,6 +243,7 @@ function LeadActivityTimelineCard({
       <CardHeader>
         <CardTitle>Activity timeline</CardTitle>
       </CardHeader>
+      <LogActivityForm leadPublicId={leadPublicId} />
       <CardContent className="p-0">
         {isError ? (
           <EmptyState
@@ -261,16 +322,48 @@ function LeadActivityTimelineCard({
 
 // --- Page ---------------------------------------------------------------------
 
+/** Mutually exclusive: at most one edit/confirm surface is open at a time. */
+type LeadDetailPanel =
+  | { kind: "none" }
+  | { kind: "edit-lead" }
+  | { kind: "delete-lead" }
+  | { kind: "contact-form"; contact: LeadContact | null }
+  | { kind: "delete-contact"; contact: LeadContact };
+
 export function AdminLeadDetailPage() {
   const { publicId } = useParams({ from: "/admin/leads/$publicId" });
   const navigate = useNavigate();
   const [activityPage, setActivityPage] = useState(1);
+  const [panel, setPanel] = useState<LeadDetailPanel>({ kind: "none" });
+  const closePanel = () => setPanel({ kind: "none" });
 
   const { data, isPending, isError } = useLead(publicId);
   const activities = useLeadActivities(publicId, activityPage);
+  const deleteLead = useDeleteLead();
+  const deleteContact = useDeleteLeadContact();
+  const updateContact = useUpdateLeadContact();
 
   function backToLeads() {
     void navigate({ to: "/admin/leads", search: { page: 1, pageSize: 10 } });
+  }
+
+  async function confirmDeleteLead() {
+    await deleteLead.mutateAsync(publicId);
+    backToLeads();
+  }
+
+  async function confirmDeleteContact() {
+    if (panel.kind !== "delete-contact") return;
+    await deleteContact.mutateAsync({ publicId, contactPublicId: panel.contact.publicId });
+    closePanel();
+  }
+
+  function makeContactPrimary(contact: LeadContact) {
+    updateContact.mutate({
+      publicId,
+      contactPublicId: contact.publicId,
+      input: { isPrimary: true },
+    });
   }
 
   if (isPending) {
@@ -330,9 +423,26 @@ export function AdminLeadDetailPage() {
               )}
             </p>
           </div>
-          <Badge variant={status.variant} className="h-6 px-2 text-[12px]">
-            {status.label}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={status.variant} className="h-6 px-2 text-[12px]">
+              {status.label}
+            </Badge>
+            <Button
+              intent="utility"
+              leadingIcon={<Pencil size={13} />}
+              onClick={() => setPanel({ kind: "edit-lead" })}
+            >
+              Edit
+            </Button>
+            <Button
+              intent="utility"
+              className="text-[var(--color-danger)] hover:text-[var(--color-danger)]"
+              leadingIcon={<Trash2 size={13} />}
+              onClick={() => setPanel({ kind: "delete-lead" })}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -340,6 +450,7 @@ export function AdminLeadDetailPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <LeadActivityTimelineCard
+            leadPublicId={publicId}
             page={activityPage}
             onPageChange={setActivityPage}
             data={activities.data}
@@ -350,9 +461,44 @@ export function AdminLeadDetailPage() {
 
         <div className="space-y-6">
           <LeadProfileCard lead={lead} />
-          <LeadContactsCard contacts={contacts} />
+          <LeadContactsCard
+            contacts={contacts}
+            onAdd={() => setPanel({ kind: "contact-form", contact: null })}
+            onEdit={(contact) => setPanel({ kind: "contact-form", contact })}
+            onDelete={(contact) => setPanel({ kind: "delete-contact", contact })}
+            onMakePrimary={makeContactPrimary}
+            isMakingPrimary={updateContact.isPending}
+          />
         </div>
       </div>
+
+      <EditLeadModal lead={panel.kind === "edit-lead" ? lead : null} onClose={closePanel} />
+
+      <ConfirmDialog
+        open={panel.kind === "delete-lead"}
+        title="Delete this lead?"
+        description="This removes the lead from the pipeline. This cannot be undone."
+        confirmLabel="Delete lead"
+        isLoading={deleteLead.isPending}
+        onConfirm={confirmDeleteLead}
+        onClose={closePanel}
+      />
+
+      <LeadContactFormModal
+        leadPublicId={publicId}
+        state={panel.kind === "contact-form" ? { contact: panel.contact } : null}
+        onClose={closePanel}
+      />
+
+      <ConfirmDialog
+        open={panel.kind === "delete-contact"}
+        title="Remove this contact?"
+        description="This removes the contact from the lead. This cannot be undone."
+        confirmLabel="Remove contact"
+        isLoading={deleteContact.isPending}
+        onConfirm={confirmDeleteContact}
+        onClose={closePanel}
+      />
     </div>
   );
 }

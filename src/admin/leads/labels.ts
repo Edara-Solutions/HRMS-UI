@@ -23,6 +23,9 @@ export const STATUS_BADGE: Record<LeadStatus, { variant: StatusBadgeVariant; lab
 
 export const ALL_STATUSES = Object.keys(STATUS_BADGE) as LeadStatus[];
 
+/** REJOINED is a system-assigned status (a lost lead re-engaging) — never settable by hand. */
+export const EDITABLE_STATUSES = ALL_STATUSES.filter((status) => status !== "REJOINED");
+
 export const SOURCE_LABEL: Record<LeadSource, string> = {
   CRM: "CRM",
   LANDING_PAGE: "Landing page",
@@ -43,6 +46,8 @@ export const SIZE_LABEL: Record<CompanySizeRange, string> = {
   MORE_THAN_100: "100+",
 };
 
+export const ALL_SIZES = Object.keys(SIZE_LABEL) as CompanySizeRange[];
+
 export const LOST_REASON_LABEL: Record<LostReason, string> = {
   TOO_EXPENSIVE: "Too expensive",
   MISSING_FEATURES: "Missing features",
@@ -52,6 +57,8 @@ export const LOST_REASON_LABEL: Record<LostReason, string> = {
   NO_DECISION: "No decision",
   NO_RESPONSE: "No response",
 };
+
+export const ALL_LOST_REASONS = Object.keys(LOST_REASON_LABEL) as LostReason[];
 
 export const ACTIVITY_TYPE_LABEL: Record<LeadActivityType, string> = {
   CALLING_ON_WHATSAPP: "WhatsApp call",
@@ -69,3 +76,8 @@ export const ACTIVITY_TYPE_LABEL: Record<LeadActivityType, string> = {
   SYSTEM_EVENT: "System event",
   OTHER: "Other",
 };
+
+/** Excludes FORM_SUBMISSION and SYSTEM_EVENT — those are recorded by the backend, not logged by hand. */
+export const LOGGABLE_ACTIVITY_TYPES = (
+  Object.keys(ACTIVITY_TYPE_LABEL) as LeadActivityType[]
+).filter((type) => type !== "FORM_SUBMISSION" && type !== "SYSTEM_EVENT");
