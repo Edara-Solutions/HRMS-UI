@@ -1,4 +1,4 @@
-import { URL, fileURLToPath } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -11,6 +11,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include: ["src/**/*.test.{ts,tsx}"],
+    setupFiles: ["./src/test/setup.ts"],
     css: true,
   },
 });

@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/cn";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { cn } from "@/shared/lib/cn";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle" | "link" | "nav";
 
@@ -132,7 +132,7 @@ export function Button({
     <button
       type="button"
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
+        "relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
         sizeClassName[size],
         variantClassName[variant],
         isDestructiveTrigger && destructiveTriggerClassName,
@@ -144,9 +144,18 @@ export function Button({
       aria-pressed={isToggle ? pressed : undefined}
       {...props}
     >
-      {isLoading ? <LoadingIndicator /> : leadingIcon}
-      {children}
-      {!isLoading && trailingIcon}
+      {isLoading && (
+        <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+          <LoadingIndicator />
+        </span>
+      )}
+      {/* Content stays in the layout (just hidden) while loading, so the button keeps its
+          original width/height instead of shrinking down to the spinner alone. */}
+      <span className={cn("inline-flex items-center gap-1.5", isLoading && "invisible")}>
+        {leadingIcon}
+        {children}
+        {trailingIcon}
+      </span>
     </button>
   );
 }

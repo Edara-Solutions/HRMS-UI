@@ -1,9 +1,3 @@
-import type { SubscriptionStatus } from "@/admin/companies/api";
-import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -16,6 +10,12 @@ import {
   XCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import type { SubscriptionStatus } from "@/admin/companies/api";
+import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 

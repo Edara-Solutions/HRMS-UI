@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/cn";
 import type { HTMLAttributes } from "react";
+import { cn } from "@/shared/lib/cn";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   as?: "div" | "section" | "article";
@@ -42,24 +42,6 @@ export function CardTitle({ className, children, ...props }: HTMLAttributes<HTML
   );
 }
 
-export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("mt-0.5 text-xs text-[var(--color-text-muted)]", className)} {...props} />
-  );
-}
-
 export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("p-0", className)} {...props} />;
-}
-
-export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        "flex items-center border-t border-[var(--color-border)] px-[18px] py-3",
-        className,
-      )}
-      {...props}
-    />
-  );
 }

@@ -1,6 +1,6 @@
-import type { SupportedLocale } from "@/i18n/config";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { SupportedLocale } from "@/i18n/config";
 
 export type ThemeMode = "light" | "dark";
 

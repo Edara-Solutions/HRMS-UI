@@ -1,6 +1,6 @@
-import { cn } from "@/shared/lib/cn";
 import type { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { cn } from "@/shared/lib/cn";
 
 interface SparklineProps {
   data: number[];

@@ -17,13 +17,18 @@ export interface SessionUser {
   companyCode: string;
   mustChangePassword: boolean;
   permissions: string[];
+  isOwner: boolean;
+  isPlatformAdmin: boolean;
 }
 
-export interface AuthSession {
+export interface LoginTokens {
   accessToken: string;
   refreshToken: string;
   sessionId: string;
   expiresIn: number;
+}
+
+export interface AuthSession extends LoginTokens {
   user: SessionUser;
 }
 
@@ -32,4 +37,15 @@ export interface LoginCredentials {
   employeeCode: string;
   password: string;
   clientType: "web";
+}
+
+export interface AdminLoginCredentials {
+  email: string;
+  password: string;
+  clientType: "web";
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
 }

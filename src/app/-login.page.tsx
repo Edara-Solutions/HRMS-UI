@@ -1,14 +1,15 @@
-import { dummyLoginCredentials } from "@/auth/fixtures";
-import { useAuthStore } from "@/auth/store";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { mapLoginError } from "@/api/error-mapper";
+import { useLogin } from "@/auth/api";
+import { isAdminConsoleEnabled } from "@/auth/guards";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 
 const loginSchema = z.object({
   companyCode: z
@@ -29,8 +30,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const signInWithDummySession = useAuthStore((state) => state.signInWithDummySession);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const login = useLogin();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const {
@@ -40,27 +40,28 @@ export function LoginPage() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      companyCode: dummyLoginCredentials.companyCode,
-      employeeCode: dummyLoginCredentials.employeeCode,
-      password: dummyLoginCredentials.password,
+      companyCode: "",
+      employeeCode: "",
+      password: "",
     },
   });
 
-  async function onSubmit(_data: LoginFormData) {
-    setIsSubmitting(true);
+  async function onSubmit(data: LoginFormData) {
     setApiError(null);
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const session = await login.mutateAsync({ ...data, clientType: "web" });
 
-      // Use dummy session for now
-      signInWithDummySession();
-      void navigate({ to: "/company/dashboard" });
-    } catch {
-      setApiError("Invalid credentials. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      if (session.user.mustChangePassword) {
+        void navigate({ to: "/change-password" });
+      } else if (session.user.isPlatformAdmin) {
+        void navigate({ to: "/admin/dashboard" });
+      } else {
+        void navigate({ to: "/company/dashboard" });
+      }
+    } catch (error) {
+      const mapped = await mapLoginError(error);
+      setApiError(mapped.message);
     }
   }
 
@@ -156,31 +157,29 @@ export function LoginPage() {
               intent="cta"
               type="submit"
               size="block"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
+              disabled={login.isPending}
+              isLoading={login.isPending}
             >
-              {!isSubmitting && (
-                <>
-                  <KeyRound size={16} />
-                  Sign in
-                </>
-              )}
+              <KeyRound size={16} />
+              Sign in
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
-            Admin access?{" "}
-            <Link
-              to="/admin/login"
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Sign in to Admin Portal
-            </Link>
+            Need help signing in? Contact your HR administrator.
           </p>
 
-          <p className="mt-8 text-center text-xs text-[var(--color-text-faint)]">
-            Dummy credentials are pre-filled for development.
-          </p>
+          {isAdminConsoleEnabled() && (
+            <p className="mt-6 text-center text-sm text-[var(--color-text-muted)]">
+              Admin access?{" "}
+              <Link
+                to="/admin/login"
+                className="font-medium text-[var(--color-primary)] hover:underline"
+              >
+                Sign in to Admin Portal
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
+import { Moon, Sun } from "lucide-react";
 import { usePreferencesStore } from "@/preferences/store";
 import { Button } from "@/shared/ui/button";
-import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
   const theme = usePreferencesStore((state) => state.theme);

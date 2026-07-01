@@ -1,5 +1,5 @@
-import { apiClient } from "@/api/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/api/client";
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
@@ -22,37 +22,40 @@ export type LeadStatus =
   | "REJOINED";
 
 export type LeadSource =
+  | "CRM"
+  | "LANDING_PAGE"
+  | "FACEBOOK"
+  | "GOOGLE"
   | "LINKEDIN"
   | "REFERRAL"
-  | "WEBSITE"
-  | "COLD_CALL"
-  | "EMAIL_CAMPAIGN"
-  | "EVENT"
+  | "PARTNER"
   | "OTHER";
 
 export type LostReason =
-  | "PRICE"
-  | "COMPETITOR"
+  | "TOO_EXPENSIVE"
+  | "MISSING_FEATURES"
+  | "NOT_FIT"
+  | "COMPETITOR_CHOSEN"
   | "NO_BUDGET"
-  | "NOT_A_FIT"
-  | "UNRESPONSIVE"
-  | "OTHER";
+  | "NO_DECISION"
+  | "NO_RESPONSE";
 
-export type CompanySizeRange =
-  | "1_TO_10"
-  | "11_TO_20"
-  | "21_TO_50"
-  | "51_TO_100"
-  | "101_TO_250"
-  | "251_TO_500"
-  | "ABOVE_500";
+export type CompanySizeRange = "5_TO_20" | "21_TO_50" | "51_TO_100" | "MORE_THAN_100";
 
 export type LeadActivityType =
   | "CALLING_ON_WHATSAPP"
-  | "PHONE_CALL"
-  | "EMAIL"
+  | "CALLING_ON_PHONE"
+  | "SENDING_EMAIL"
+  | "RECEIVING_EMAIL"
+  | "SENDING_SMS"
+  | "RECEIVING_SMS"
+  | "CHAT"
+  | "SENDING_QUOTATION"
+  | "REQUEST_QUOTATION"
   | "MEETING"
-  | "DEMO"
+  | "NOTE"
+  | "FORM_SUBMISSION"
+  | "SYSTEM_EVENT"
   | "OTHER";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -125,11 +128,12 @@ export interface LeadActivityListResponse {
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
-export const leadsKeys = {
+const leadsKeys = {
   all: ["leads"] as const,
   list: (params: LeadListParams) => ["leads", "list", params] as const,
   detail: (id: string) => ["leads", id] as const,
-  activities: (id: string) => ["leads", id, "activities"] as const,
+  activities: (id: string, page: number) => ["leads", id, "activities", page] as const,
+  activitiesAll: (id: string) => ["leads", id, "activities"] as const,
 };
 
 // ─── Params ───────────────────────────────────────────────────────────────────
@@ -179,17 +183,25 @@ async function deleteLead(publicId: string): Promise<void> {
   await apiClient.delete(`leads/${publicId}`);
 }
 
-async function convertLead(
-  publicId: string,
-  input: {
-    phoneNumber: string;
-    name?: string;
-    country?: string;
-    website?: string;
-    logo?: string;
-    addressLine?: string;
-  },
-): Promise<{ publicId: string; name: string; companyCode: string }> {
+export interface ConvertLeadInput {
+  phoneNumber: string;
+  name?: string;
+  country?: string;
+  website?: string;
+  logo?: string;
+  addressLine?: string;
+  ownerFirstName: string;
+  ownerLastName: string;
+  ownerEmail: string;
+}
+
+export interface ConvertLeadResult {
+  publicId: string;
+  name: string;
+  companyCode: string;
+}
+
+async function convertLead(publicId: string, input: ConvertLeadInput): Promise<ConvertLeadResult> {
   return apiClient.post(`leads/${publicId}/convert`, { json: input }).json();
 }
 
@@ -202,6 +214,30 @@ async function addLeadActivity(
   input: { type: LeadActivityType; note: string },
 ): Promise<LeadActivity> {
   return apiClient.post(`leads/${publicId}/activities`, { json: input }).json();
+}
+
+export interface LeadContactInput {
+  name?: string;
+  email?: string;
+  phone?: string;
+  jobTitle?: string;
+  isPrimary?: boolean;
+}
+
+async function addLeadContact(publicId: string, input: LeadContactInput): Promise<LeadContact> {
+  return apiClient.post(`leads/${publicId}/contacts`, { json: input }).json();
+}
+
+async function updateLeadContact(
+  publicId: string,
+  contactPublicId: string,
+  input: LeadContactInput,
+): Promise<LeadContact> {
+  return apiClient.patch(`leads/${publicId}/contacts/${contactPublicId}`, { json: input }).json();
+}
+
+async function deleteLeadContact(publicId: string, contactPublicId: string): Promise<void> {
+  await apiClient.delete(`leads/${publicId}/contacts/${contactPublicId}`);
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -254,13 +290,8 @@ export function useDeleteLead() {
 export function useConvertLead() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      publicId,
-      input,
-    }: {
-      publicId: string;
-      input: { phoneNumber: string; name?: string; country?: string };
-    }) => convertLead(publicId, input),
+    mutationFn: ({ publicId, input }: { publicId: string; input: ConvertLeadInput }) =>
+      convertLead(publicId, input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: leadsKeys.all });
     },
@@ -269,7 +300,7 @@ export function useConvertLead() {
 
 export function useLeadActivities(publicId: string, page = 1) {
   return useQuery({
-    queryKey: leadsKeys.activities(publicId),
+    queryKey: leadsKeys.activities(publicId, page),
     queryFn: () => fetchLeadActivities(publicId, page),
     enabled: Boolean(publicId),
   });
@@ -286,7 +317,50 @@ export function useAddLeadActivity() {
       input: { type: LeadActivityType; note: string };
     }) => addLeadActivity(publicId, input),
     onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: leadsKeys.activities(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.activitiesAll(vars.publicId) });
+    },
+  });
+}
+
+export function useAddLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ publicId, input }: { publicId: string; input: LeadContactInput }) =>
+      addLeadContact(publicId, input),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
+    },
+  });
+}
+
+export function useUpdateLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      publicId,
+      contactPublicId,
+      input,
+    }: {
+      publicId: string;
+      contactPublicId: string;
+      input: LeadContactInput;
+    }) => updateLeadContact(publicId, contactPublicId, input),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
+    },
+  });
+}
+
+export function useDeleteLeadContact() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ publicId, contactPublicId }: { publicId: string; contactPublicId: string }) =>
+      deleteLeadContact(publicId, contactPublicId),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
+      qc.invalidateQueries({ queryKey: leadsKeys.all });
     },
   });
 }

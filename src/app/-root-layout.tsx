@@ -1,11 +1,13 @@
-import { LocaleRuntime } from "@/i18n/locale-runtime";
 import { Outlet } from "@tanstack/react-router";
+import { ForcedPasswordChangeModal } from "@/auth/forced-password-change-modal";
+import { LocaleRuntime } from "@/i18n/locale-runtime";
 
 export function RootLayout() {
   return (
     <main className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
       <LocaleRuntime />
       <Outlet />
+      <ForcedPasswordChangeModal />
     </main>
   );
 }

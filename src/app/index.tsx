@@ -1,5 +1,5 @@
-import { LocaleSwitcher } from "@/shared/components/locale-switcher";
 import { createFileRoute } from "@tanstack/react-router";
+import { LocaleSwitcher } from "@/shared/components/locale-switcher";
 
 export const Route = createFileRoute("/")({
   component: FoundationPage,

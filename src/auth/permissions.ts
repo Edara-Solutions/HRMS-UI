@@ -1,6 +1,6 @@
 import type { SessionUser } from "./types";
 
-export const permissionActions = [
+const permissionActions = [
   "users:create",
   "users:read",
   "users:update",
@@ -21,7 +21,11 @@ export const permissionActions = [
 export type PermissionAction = (typeof permissionActions)[number];
 
 export function hasPermission(user: SessionUser | null | undefined, action: PermissionAction) {
-  return Boolean(user?.permissions.includes(action));
+  if (!user) {
+    return false;
+  }
+
+  return user.isPlatformAdmin || user.isOwner || user.permissions.includes(action);
 }
 
 export function hasEveryPermission(
