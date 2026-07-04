@@ -180,7 +180,7 @@ export function SelectTrigger({
     setHighlightedValue(items[nextIndex].value);
   }
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: one flat switch over the combobox's keyboard contract (arrows/home/end/enter/escape/tab/typeahead) reads more clearly as a single dispatch than split across helpers.
+  // One flat switch over the combobox's keyboard contract reads more clearly as a single dispatch than split helpers.
   function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
     onKeyDown?.(event);
     if (event.defaultPrevented) return;
@@ -365,7 +365,7 @@ export function SelectContent({ children, className }: SelectContentProps) {
     // across open/close, so the effect must re-evaluate `open` and re-read the latest refs every render.
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run when the popup opens — keyboard/hover navigation owns highlightedValue afterwards.
+  // Only re-run when the popup opens; keyboard/hover navigation owns highlightedValue afterwards.
   useEffect(() => {
     if (!open) {
       setHighlightedValue(undefined);
