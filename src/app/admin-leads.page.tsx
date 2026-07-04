@@ -338,11 +338,11 @@ export function AdminLeadsPage() {
 
   useEffect(() => setQueryInput(query), [query]);
   useEffect(() => setCountryInput(countryFilter), [countryFilter]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only commit on the debounced value settling, not on every `query`/`setQuery` (URL) change.
+  // Only commit on the debounced value settling, not on every URL query state change.
   useEffect(() => {
     if (debouncedQuery !== query) setQuery(debouncedQuery);
   }, [debouncedQuery]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only commit on the debounced value settling, not on every `countryFilter`/`setCountryFilter` (URL) change.
+  // Only commit on the debounced value settling, not on every URL country state change.
   useEffect(() => {
     if (debouncedCountry !== countryFilter) setCountryFilter(debouncedCountry);
   }, [debouncedCountry]);
