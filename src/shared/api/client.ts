@@ -1,5 +1,5 @@
 import ky from "ky";
-import { useAuthStore } from "@/auth/store";
+import { useAuthStore } from "@/shared/auth";
 import { refreshTokensOnce } from "./auth-interceptor";
 import { apiBaseUrl } from "./config";
 

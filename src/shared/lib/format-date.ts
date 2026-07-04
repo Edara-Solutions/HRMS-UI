@@ -1,4 +1,4 @@
-import type { SupportedLocale } from "@/i18n/config";
+import type { SupportedLocale } from "@/shared/i18n";
 
 const longDateOptions: Intl.DateTimeFormatOptions = {
   weekday: "long",

@@ -1,4 +1,4 @@
-import type { SessionUser } from "./types";
+import type { SessionUser } from "./auth-session";
 
 const permissionActions = [
   "users:create",

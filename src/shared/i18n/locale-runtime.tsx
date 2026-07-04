@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { usePreferencesStore } from "@/preferences/store";
+import { usePreferencesStore } from "@/shared/config";
 import { i18next } from "./config";
 import { applyDocumentDirection } from "./direction";
 

@@ -14,7 +14,7 @@ import { RevenueChart } from "@/admin/dashboard/revenue-chart";
 import { SubscriptionDistribution } from "@/admin/dashboard/subscription-distribution";
 import { useCurrentSession } from "@/auth/guards";
 import { KpiCard } from "@/company/dashboard/kpi-card";
-import { usePreferencesStore } from "@/preferences/store";
+import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { formatTodayLong } from "@/shared/lib/format-date";
 import { Button } from "@/shared/ui/button";

@@ -1,5 +1,5 @@
 import ky from "ky";
-import type { LoginTokens } from "@/auth/types";
+import type { LoginTokens } from "@/shared/auth";
 import { apiBaseUrl } from "./config";
 
 const refreshClient = ky.create({

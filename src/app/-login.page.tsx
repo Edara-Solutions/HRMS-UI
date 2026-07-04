@@ -4,7 +4,7 @@ import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { mapLoginError } from "@/api/error-mapper";
+import { mapLoginError } from "@/shared/api";
 import { useLogin } from "@/auth/api";
 import { isAdminConsoleEnabled } from "@/auth/guards";
 import { Button } from "@/shared/ui/button";

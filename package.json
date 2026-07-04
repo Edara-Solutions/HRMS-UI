@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "openapi:types": "openapi-typescript http://localhost:3000/api/v1/openapi.json -o src/api/schema.d.ts",
+    "openapi:types": "openapi-typescript http://localhost:3000/api/v1/openapi.json -o src/shared/api/schema.d.ts",
     "doctor": "react-doctor ."
   },
   "dependencies": {

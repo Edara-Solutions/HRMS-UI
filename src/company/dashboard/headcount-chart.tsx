@@ -1,6 +1,6 @@
 import type { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
-import { useChartTheme } from "@/shared/charts/use-chart-theme";
+import { useChartTheme } from "@/shared/charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import type { headcountTrend } from "./fixtures";
 

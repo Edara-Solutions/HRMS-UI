@@ -3,7 +3,7 @@ import { HTTPError } from "ky";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { usePlans } from "@/admin/plans/api";
-import { readBackendErrorMessage } from "@/api/error-mapper";
+import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";

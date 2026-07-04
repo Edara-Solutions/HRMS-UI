@@ -1,4 +1,4 @@
-import { usePreferencesStore } from "@/preferences/store";
+import { usePreferencesStore } from "@/shared/config";
 
 /**
  * ApexCharts accepts only `"light" | "dark"` for `tooltip.theme`.

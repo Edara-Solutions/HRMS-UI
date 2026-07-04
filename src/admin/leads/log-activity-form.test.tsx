@@ -7,7 +7,8 @@ const postMock = vi.hoisted(() => vi.fn());
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
-vi.mock("@/api/client", () => ({
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
     post: postMock,
   },
