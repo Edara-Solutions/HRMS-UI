@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/api/client";
-import { useAuthStore } from "./store";
+import { apiClient } from "@/shared/api";
+import { useAuthStore } from "@/shared/auth";
 import type {
   AdminLoginCredentials,
   AuthSession,
@@ -8,7 +8,7 @@ import type {
   LoginCredentials,
   LoginTokens,
   SessionUser,
-} from "./types";
+} from "@/shared/auth";
 
 async function login(credentials: LoginCredentials): Promise<LoginTokens> {
   return apiClient.post("auth/login", { json: credentials }).json();

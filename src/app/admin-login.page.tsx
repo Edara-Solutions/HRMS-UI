@@ -4,7 +4,7 @@ import { Shield } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { mapLoginError } from "@/api/error-mapper";
+import { mapLoginError } from "@/shared/api";
 import { useAdminLogin } from "@/auth/api";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";

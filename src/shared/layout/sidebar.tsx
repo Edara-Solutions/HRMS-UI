@@ -9,8 +9,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useAuthStore } from "@/auth/store";
-import type { NavGroup, NavIndicator, NavItem } from "@/shared/layout/nav-items";
+import { useAuthStore } from "@/shared/auth";
+import type { NavGroup, NavIndicator, NavItem } from "./nav-items";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 

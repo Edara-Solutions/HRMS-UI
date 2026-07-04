@@ -2,11 +2,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { queryClient } from "@/api/query-client";
-import { applyDocumentDirection } from "@/i18n/direction";
+import { queryClient } from "@/shared/api";
+import { applyDocumentDirection } from "@/shared/i18n";
 import { routeTree } from "@/routeTree.gen";
 import "@/styles/globals.css";
-import "@/i18n/config";
+import "@/shared/i18n";
 
 applyDocumentDirection("en");
 

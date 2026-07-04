@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AuthSession, AuthStatus, LoginTokens } from "./types";
+import type { AuthSession, AuthStatus, LoginTokens } from "./auth-session";
 
 interface AuthState {
   session: AuthSession | null;

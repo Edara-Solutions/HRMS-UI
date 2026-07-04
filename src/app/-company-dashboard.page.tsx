@@ -18,7 +18,7 @@ import { HeadcountChart } from "@/company/dashboard/headcount-chart";
 import { KpiCard } from "@/company/dashboard/kpi-card";
 import { ModuleShortcuts } from "@/company/dashboard/module-shortcuts";
 import { PeopleTable } from "@/company/dashboard/people-table";
-import { usePreferencesStore } from "@/preferences/store";
+import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { formatTodayLong } from "@/shared/lib/format-date";
 import { Button } from "@/shared/ui/button";

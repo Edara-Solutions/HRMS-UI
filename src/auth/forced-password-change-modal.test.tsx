@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
-import { useAuthStore } from "./store";
-import type { AuthSession, SessionUser } from "./types";
+import { useAuthStore } from "@/shared/auth";
+import type { AuthSession, SessionUser } from "@/shared/auth";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const changePasswordPostMock = vi.hoisted(() => vi.fn());
@@ -15,7 +15,8 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
-vi.mock("@/api/client", () => ({
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: { post: changePasswordPostMock },
 }));
 

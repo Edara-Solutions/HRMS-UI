@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { isAdminConsoleEnabled, requireAdminConsoleEnabled, requireAuthenticated } from "./guards";
-import { useAuthStore } from "./store";
-import type { AuthSession, SessionUser } from "./types";
+import { useAuthStore } from "@/shared/auth";
+import type { AuthSession, SessionUser } from "@/shared/auth";
 
 const baseUser: SessionUser = {
   publicId: "user-1",

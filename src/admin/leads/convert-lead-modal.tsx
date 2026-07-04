@@ -4,7 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { readBackendErrorMessage } from "@/api/error-mapper";
+import { readBackendErrorMessage } from "@/shared/api";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";

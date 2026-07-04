@@ -4,7 +4,7 @@ import { HTTPError } from "ky";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { mapHttpStatusToAppError } from "@/api/error-mapper";
+import { mapHttpStatusToAppError } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";

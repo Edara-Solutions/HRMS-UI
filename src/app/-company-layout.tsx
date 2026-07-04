@@ -1,5 +1,5 @@
 import { Outlet } from "@tanstack/react-router";
-import { AppShell } from "@/shared/layout/app-shell";
+import { AppShell } from "@/shared/layout";
 
 export function CompanyLayout() {
   return (

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { hasPermission } from "./permissions";
-import type { SessionUser } from "./types";
+import { hasPermission } from "@/shared/auth";
+import type { SessionUser } from "./auth-session";
 
 const baseUser: SessionUser = {
   publicId: "user-1",
