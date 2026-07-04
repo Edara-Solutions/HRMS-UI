@@ -20,4 +20,3 @@ test-results/
 # !.opencode/skills/
 .tanstack/
 *.log
-docs/**
