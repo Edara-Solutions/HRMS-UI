@@ -19,6 +19,16 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
+      "@/app": ["./src/app"],
+      "@/app/*": ["./src/app/*"],
+      "@/features": ["./src/features"],
+      "@/features/*": ["./src/features/*"],
+      "@/pages": ["./src/pages"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/shared": ["./src/shared"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/widgets": ["./src/widgets"],
+      "@/widgets/*": ["./src/widgets/*"],
       "@/*": ["./src/*"]
     },
     "types": ["vite/client", "vitest/globals"]
