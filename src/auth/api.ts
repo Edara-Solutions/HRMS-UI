@@ -4,7 +4,6 @@ import { useAuthStore } from "@/shared/auth";
 import type {
   AdminLoginCredentials,
   AuthSession,
-  ChangePasswordInput,
   LoginCredentials,
   LoginTokens,
   SessionUser,
@@ -20,10 +19,6 @@ async function adminLogin(credentials: AdminLoginCredentials): Promise<LoginToke
 
 async function fetchMe(accessToken: string): Promise<SessionUser> {
   return apiClient.get("auth/me", { headers: { Authorization: `Bearer ${accessToken}` } }).json();
-}
-
-async function changePassword(input: ChangePasswordInput): Promise<void> {
-  await apiClient.post("auth/change-password", { json: input }).json();
 }
 
 export function useLogin() {
@@ -50,22 +45,6 @@ export function useAdminLogin() {
       const session: AuthSession = { ...tokens, user };
       setSession(session);
       return session;
-    },
-  });
-}
-
-export function useChangePassword() {
-  const clearSession = useAuthStore((state) => state.clearSession);
-
-  return useMutation({
-    mutationFn: async (input: ChangePasswordInput): Promise<void> => {
-      const session = useAuthStore.getState().session;
-      if (!session) {
-        throw new Error("No active session");
-      }
-
-      await changePassword(input);
-      clearSession();
     },
   });
 }
