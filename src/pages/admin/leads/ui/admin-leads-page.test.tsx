@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LeadListResponse, LeadWithContacts } from "@/admin/leads/api";
-import { AdminLeadsPage } from "./admin-leads.page";
+import type { LeadListResponse, LeadWithContacts } from "../api/leads";
+import { AdminLeadsPage } from "./admin-leads-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const leadsGetMock = vi.hoisted(() => vi.fn());
@@ -245,3 +245,4 @@ describe("AdminLeadsPage", () => {
     );
   });
 });
+

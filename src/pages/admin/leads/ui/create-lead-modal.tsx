@@ -10,8 +10,8 @@ import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import { useCreateLead } from "./api";
-import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "./labels";
+import { useCreateLead } from "../api/leads";
+import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -259,3 +259,4 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
     </div>
   );
 }
+

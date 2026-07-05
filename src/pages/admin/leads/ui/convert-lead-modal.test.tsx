@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LeadWithContacts } from "./api";
+import type { LeadWithContacts } from "../api/leads";
 import { ConvertLeadModal } from "./convert-lead-modal";
 
 const convertPostMock = vi.hoisted(() => vi.fn());
@@ -169,3 +169,4 @@ describe("ConvertLeadModal", () => {
     expect(await screen.findByText(/a user with this email already exists/i)).toBeInTheDocument();
   });
 });
+
