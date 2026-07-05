@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAuthStore } from "@/shared/auth";
-import { LoginPage } from "./-login.page";
+import { LoginPage } from "./login-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const loginPostMock = vi.hoisted(() => vi.fn());
@@ -19,8 +19,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
+vi.mock("@/shared/api/client", () => ({
   apiClient: {
     post: loginPostMock,
     get: meGetMock,
