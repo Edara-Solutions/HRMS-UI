@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import type { SubscriptionStatus } from "@/admin/companies/api";
-import { AdminSubscriptionsPage } from "@/app/admin-subscriptions.page";
+import type { SubscriptionStatus } from "@/pages/admin/subscriptions";
+import { AdminSubscriptionsPage } from "@/pages/admin/subscriptions";
 
 const subscriptionStatuses = [
   "TRIAL",

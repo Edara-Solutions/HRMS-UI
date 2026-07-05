@@ -10,8 +10,8 @@ import {
   XCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import type { SubscriptionStatus } from "@/admin/companies/api";
-import { dummyCompaniesWithConfig } from "@/admin/companies/fixtures";
+import type { SubscriptionStatus } from "../api/subscriptions";
+import { dummyCompaniesWithConfig } from "../api/subscription-fixtures";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";

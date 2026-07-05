@@ -1,4 +1,4 @@
-import type { Company, SubscriptionStatus } from "./api";
+import type { Company, SubscriptionStatus } from "./subscriptions";
 
 const dummyCompanies: Company[] = [
   {

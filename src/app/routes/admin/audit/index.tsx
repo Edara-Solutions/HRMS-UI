@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AdminAuditPage } from "@/app/admin-audit.page";
+import { AdminAuditPage } from "@/pages/admin/audit";
 
 const auditOutcomes = ["success", "failure"] as const;
 
