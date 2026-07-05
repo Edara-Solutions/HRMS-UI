@@ -12,7 +12,7 @@ import { QuickActions } from "@/admin/dashboard/quick-actions";
 import { RecentSignups } from "@/admin/dashboard/recent-signups";
 import { RevenueChart } from "@/admin/dashboard/revenue-chart";
 import { SubscriptionDistribution } from "@/admin/dashboard/subscription-distribution";
-import { useCurrentSession } from "@/auth/guards";
+import { useCurrentSession } from "@/app/guards/auth-guards";
 import { KpiCard } from "@/company/dashboard/kpi-card";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";

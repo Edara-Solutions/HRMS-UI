@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { mapLoginError } from "@/shared/api";
 import { useLogin } from "@/auth/api";
-import { isAdminConsoleEnabled } from "@/auth/guards";
+import { isAdminConsoleEnabled } from "@/app/guards/auth-guards";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
