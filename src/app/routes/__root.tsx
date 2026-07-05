@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext } from "@tanstack/react-router";
 import { redirectIfMustChangePassword } from "@/app/guards/auth-guards";
-import { NotFoundPage, RootLayout } from "@/app/-root-layout";
+import { NotFoundPage, RootLayout } from "@/app/root-shell";
 
 export interface RouterContext {
   queryClient: QueryClient;

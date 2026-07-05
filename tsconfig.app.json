@@ -25,11 +25,11 @@
       "@/features/*": ["./src/features/*"],
       "@/pages": ["./src/pages"],
       "@/pages/*": ["./src/pages/*"],
+      "@/routeTree.gen": ["./src/routeTree.gen.ts"],
       "@/shared": ["./src/shared"],
       "@/shared/*": ["./src/shared/*"],
       "@/widgets": ["./src/widgets"],
-      "@/widgets/*": ["./src/widgets/*"],
-      "@/*": ["./src/*"]
+      "@/widgets/*": ["./src/widgets/*"]
     },
     "types": ["vite/client", "vitest/globals"]
   },
