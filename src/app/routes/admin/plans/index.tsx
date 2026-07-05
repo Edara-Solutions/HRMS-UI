@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AdminPlansPage } from "@/app/admin-plans.page";
+import { AdminPlansPage } from "@/pages/admin/plans";
 
 const adminPlansSearchSchema = z.object({
   q: z
