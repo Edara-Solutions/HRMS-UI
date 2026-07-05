@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { usePlans } from "@/admin/plans/api";
+import { usePlans } from "@/shared/api";
 import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";

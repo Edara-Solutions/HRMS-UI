@@ -7,6 +7,7 @@ import { AdminCompanyDetailPage } from "./admin-company-detail-page";
 const navigateMock = vi.hoisted(() => vi.fn());
 const apiGetMock = vi.hoisted(() => vi.fn());
 const apiPatchMock = vi.hoisted(() => vi.fn());
+const usePlansMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
@@ -25,6 +26,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
     get: apiGetMock,
     patch: apiPatchMock,
   },
+  usePlans: usePlansMock,
 }));
 
 function jsonResponse<T>(value: T) {
@@ -124,6 +126,7 @@ function plansResponse() {
 }
 
 function mockApi() {
+  usePlansMock.mockReturnValue({ data: plansResponse() });
   apiGetMock.mockImplementation((path: string) => {
     if (path === "companies/company-1") return jsonResponse(company);
     if (path === "company-configs") return jsonResponse(configsResponse());
@@ -149,6 +152,7 @@ describe("AdminCompanyDetailPage", () => {
     navigateMock.mockReset();
     apiGetMock.mockReset();
     apiPatchMock.mockReset();
+    usePlansMock.mockReset();
   });
 
   it("renders the company profile and subscription from the real hooks", async () => {
