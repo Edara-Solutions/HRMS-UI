@@ -12,13 +12,13 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Textarea } from "@/shared/ui/textarea";
-import type { CompanyConfig } from "./api";
-import { useUpdateCompanyConfig } from "./api";
+import type { CompanyConfig } from "../api/company-detail";
+import { useUpdateCompanyConfig } from "../api/company-detail";
 import {
   ALL_SUBSCRIPTION_STATUSES,
   SITE_STATUS_FLAG_LABEL,
   SUBSCRIPTION_STATUS_BADGE,
-} from "./labels";
+} from "../api/company-labels";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -292,3 +292,4 @@ function EditCompanyConfigModalContent({
     </div>
   );
 }
+

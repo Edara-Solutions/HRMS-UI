@@ -1,4 +1,4 @@
-import type { SubscriptionStatus } from "./api";
+import type { SubscriptionStatus } from "./company-detail";
 
 type StatusBadgeVariant = "success" | "primary" | "warning" | "danger" | "default";
 
@@ -23,3 +23,4 @@ export const SITE_STATUS_FLAG_LABEL = {
   isBlocked: "Blocked",
   isUnderMaintenance: "Maintenance",
 } as const;
+

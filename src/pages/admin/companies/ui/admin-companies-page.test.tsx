@@ -5,8 +5,8 @@ import type {
   Company,
   CompanyConfigListResponse,
   CompanyListResponse,
-} from "@/admin/companies/api";
-import { AdminCompaniesPage } from "./admin-companies.page";
+} from "../api/companies";
+import { AdminCompaniesPage } from "./admin-companies-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const apiGetMock = vi.hoisted(() => vi.fn());
@@ -179,3 +179,4 @@ describe("AdminCompaniesPage", () => {
     );
   });
 });
+

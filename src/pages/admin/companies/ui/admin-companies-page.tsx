@@ -1,8 +1,8 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Building2, ChevronLeft, ChevronRight, ExternalLink, Globe, Search } from "lucide-react";
-import type { Company, CompanyConfig } from "@/admin/companies/api";
-import { useCompanies, useCompanyConfigs } from "@/admin/companies/api";
-import { SUBSCRIPTION_STATUS_BADGE } from "@/admin/companies/labels";
+import type { Company, CompanyConfig } from "../api/companies";
+import { useCompanies, useCompanyConfigs } from "../api/companies";
+import { SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
@@ -398,3 +398,4 @@ export function AdminCompaniesPage() {
     </div>
   );
 }
+

@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Building2, Globe, MapPin, Pencil, Phone } from "lucide-react";
 import { useState } from "react";
-import type { Company, CompanyConfig } from "@/admin/companies/api";
-import { useCompany, useCompanyConfigs } from "@/admin/companies/api";
-import { EditCompanyConfigModal } from "@/admin/companies/edit-company-config-modal";
-import { EditCompanyModal } from "@/admin/companies/edit-company-modal";
-import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "@/admin/companies/labels";
+import type { Company, CompanyConfig } from "../api/company-detail";
+import { useCompany, useCompanyConfigs } from "../api/company-detail";
+import { EditCompanyConfigModal } from "./edit-company-config-modal";
+import { EditCompanyModal } from "./edit-company-modal";
+import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
@@ -282,3 +282,4 @@ export function AdminCompanyDetailPage() {
     </div>
   );
 }
+
