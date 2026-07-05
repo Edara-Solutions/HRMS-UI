@@ -11,8 +11,8 @@ import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/u
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import type { ConvertLeadResult, LeadContact, LeadWithContacts } from "./api";
-import { useConvertLead } from "./api";
+import type { ConvertLeadResult, LeadContact, LeadWithContacts } from "../api/leads";
+import { useConvertLead } from "../api/leads";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -277,3 +277,4 @@ function ConvertLeadModalContent({
     </div>
   );
 }
+

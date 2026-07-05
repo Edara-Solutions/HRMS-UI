@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LeadContact } from "./api";
+import type { LeadContact } from "../api/lead-detail";
 import type { LeadContactModalState } from "./lead-contact-form-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 
@@ -88,3 +88,4 @@ describe("LeadContactFormModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });
+

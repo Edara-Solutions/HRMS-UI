@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import type { LeadSource, LeadStatus } from "@/admin/leads/api";
-import { AdminLeadsPage } from "@/app/admin-leads.page";
+import type { LeadSource, LeadStatus } from "@/pages/admin/leads";
+import { AdminLeadsPage } from "@/pages/admin/leads";
 
 const leadStatuses = [
   "NEW",

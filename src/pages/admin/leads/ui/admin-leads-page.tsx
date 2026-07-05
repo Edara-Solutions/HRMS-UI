@@ -14,17 +14,17 @@ import type {
   LeadSource,
   LeadStatus,
   LeadWithContacts,
-} from "@/admin/leads/api";
-import { useLeads } from "@/admin/leads/api";
-import { ConvertLeadModal } from "@/admin/leads/convert-lead-modal";
-import { CreateLeadModal } from "@/admin/leads/create-lead-modal";
+} from "../api/leads";
+import { useLeads } from "../api/leads";
+import { ConvertLeadModal } from "./convert-lead-modal";
+import { CreateLeadModal } from "./create-lead-modal";
 import {
   ALL_SOURCES,
   ALL_STATUSES,
   SIZE_LABEL,
   SOURCE_LABEL,
   STATUS_BADGE,
-} from "@/admin/leads/labels";
+} from "../api/lead-labels";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -574,3 +574,4 @@ export function AdminLeadsPage() {
     </div>
   );
 }
+
