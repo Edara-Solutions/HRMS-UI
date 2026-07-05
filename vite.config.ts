@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: "react",
-      routesDirectory: "src/app",
+      routesDirectory: "src/app/routes",
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
       routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$|.*\\.test\\.tsx$",

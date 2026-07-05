@@ -8,56 +8,36 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./app/__root"
-import { Route as LoginRouteImport } from "./app/login"
-import { Route as ForbiddenRouteImport } from "./app/forbidden"
-import { Route as CompanyRouteImport } from "./app/company"
-import { Route as ChangePasswordRouteImport } from "./app/change-password"
-import { Route as AdminRouteImport } from "./app/admin"
-import { Route as AcceptInvitationRouteImport } from "./app/accept-invitation"
-import { Route as IndexRouteImport } from "./app/index"
-import { Route as AdminIndexRouteImport } from "./app/admin.index"
-import { Route as CompanyDashboardRouteImport } from "./app/company.dashboard"
-import { Route as AdminLoginRouteImport } from "./app/admin_.login"
-import { Route as AdminSubscriptionsRouteImport } from "./app/admin.subscriptions"
-import { Route as AdminPlansRouteImport } from "./app/admin.plans"
-import { Route as AdminLeadsRouteImport } from "./app/admin.leads"
-import { Route as AdminDashboardRouteImport } from "./app/admin.dashboard"
-import { Route as AdminCompaniesRouteImport } from "./app/admin.companies"
-import { Route as AdminAuditRouteImport } from "./app/admin.audit"
-import { Route as AdminLeadsIndexRouteImport } from "./app/admin.leads.index"
-import { Route as AdminCompaniesIndexRouteImport } from "./app/admin.companies.index"
-import { Route as AdminLeadsPublicIdRouteImport } from "./app/admin.leads.$publicId"
-import { Route as AdminCompaniesPublicIdRouteImport } from "./app/admin.companies.$publicId"
+import { Route as rootRouteImport } from "./app/routes/__root"
+import { Route as CompanyRouteRouteImport } from "./app/routes/company/route"
+import { Route as AdminRouteRouteImport } from "./app/routes/admin/route"
+import { Route as IndexRouteImport } from "./app/routes/index"
+import { Route as LoginIndexRouteImport } from "./app/routes/login/index"
+import { Route as ForbiddenIndexRouteImport } from "./app/routes/forbidden/index"
+import { Route as ChangePasswordIndexRouteImport } from "./app/routes/change-password/index"
+import { Route as AdminIndexRouteImport } from "./app/routes/admin/index"
+import { Route as AcceptInvitationIndexRouteImport } from "./app/routes/accept-invitation/index"
+import { Route as AdminLoginRouteImport } from "./app/routes/admin_/login"
+import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
+import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
+import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
+import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
+import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
+import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
+import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dashboard/index"
+import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
+import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
+import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
+import { Route as AdminCompaniesPublicIdRouteImport } from "./app/routes/admin/companies/$publicId"
 
-const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForbiddenRoute = ForbiddenRouteImport.update({
-  id: "/forbidden",
-  path: "/forbidden",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanyRoute = CompanyRouteImport.update({
+const CompanyRouteRoute = CompanyRouteRouteImport.update({
   id: "/company",
   path: "/company",
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChangePasswordRoute = ChangePasswordRouteImport.update({
-  id: "/change-password",
-  path: "/change-password",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
   id: "/admin",
   path: "/admin",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
-  id: "/accept-invitation",
-  path: "/accept-invitation",
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -65,255 +45,247 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: "/login/",
+  path: "/login/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForbiddenIndexRoute = ForbiddenIndexRouteImport.update({
+  id: "/forbidden/",
+  path: "/forbidden/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangePasswordIndexRoute = ChangePasswordIndexRouteImport.update({
+  id: "/change-password/",
+  path: "/change-password/",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const CompanyDashboardRoute = CompanyDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
-  getParentRoute: () => CompanyRoute,
+const AcceptInvitationIndexRoute = AcceptInvitationIndexRouteImport.update({
+  id: "/accept-invitation/",
+  path: "/accept-invitation/",
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: "/admin_/login",
   path: "/admin/login",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
-  id: "/subscriptions",
-  path: "/subscriptions",
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPlansRoute = AdminPlansRouteImport.update({
-  id: "/plans",
-  path: "/plans",
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLeadsRoute = AdminLeadsRouteImport.update({
+const AdminLeadsRouteRoute = AdminLeadsRouteRouteImport.update({
   id: "/leads",
   path: "/leads",
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCompaniesRoute = AdminCompaniesRouteImport.update({
+const AdminCompaniesRouteRoute = AdminCompaniesRouteRouteImport.update({
   id: "/companies",
   path: "/companies",
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: "/audit",
-  path: "/audit",
-  getParentRoute: () => AdminRoute,
+const CompanyDashboardIndexRoute = CompanyDashboardIndexRouteImport.update({
+  id: "/dashboard/",
+  path: "/dashboard/",
+  getParentRoute: () => CompanyRouteRoute,
+} as any)
+const AdminSubscriptionsIndexRoute = AdminSubscriptionsIndexRouteImport.update({
+  id: "/subscriptions/",
+  path: "/subscriptions/",
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPlansIndexRoute = AdminPlansIndexRouteImport.update({
+  id: "/plans/",
+  path: "/plans/",
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => AdminLeadsRoute,
+  getParentRoute: () => AdminLeadsRouteRoute,
+} as any)
+const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
+  id: "/dashboard/",
+  path: "/dashboard/",
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminCompaniesIndexRoute = AdminCompaniesIndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => AdminCompaniesRoute,
+  getParentRoute: () => AdminCompaniesRouteRoute,
+} as any)
+const AdminAuditIndexRoute = AdminAuditIndexRouteImport.update({
+  id: "/audit/",
+  path: "/audit/",
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
   id: "/$publicId",
   path: "/$publicId",
-  getParentRoute: () => AdminLeadsRoute,
+  getParentRoute: () => AdminLeadsRouteRoute,
 } as any)
 const AdminCompaniesPublicIdRoute = AdminCompaniesPublicIdRouteImport.update({
   id: "/$publicId",
   path: "/$publicId",
-  getParentRoute: () => AdminCompaniesRoute,
+  getParentRoute: () => AdminCompaniesRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
-  "/accept-invitation": typeof AcceptInvitationRoute
-  "/admin": typeof AdminRouteWithChildren
-  "/change-password": typeof ChangePasswordRoute
-  "/company": typeof CompanyRouteWithChildren
-  "/forbidden": typeof ForbiddenRoute
-  "/login": typeof LoginRoute
-  "/admin/audit": typeof AdminAuditRoute
-  "/admin/companies": typeof AdminCompaniesRouteWithChildren
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/admin/leads": typeof AdminLeadsRouteWithChildren
-  "/admin/plans": typeof AdminPlansRoute
-  "/admin/subscriptions": typeof AdminSubscriptionsRoute
+  "/admin": typeof AdminRouteRouteWithChildren
+  "/company": typeof CompanyRouteRouteWithChildren
+  "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
+  "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/admin/login": typeof AdminLoginRoute
-  "/company/dashboard": typeof CompanyDashboardRoute
+  "/accept-invitation/": typeof AcceptInvitationIndexRoute
   "/admin/": typeof AdminIndexRoute
+  "/change-password/": typeof ChangePasswordIndexRoute
+  "/forbidden/": typeof ForbiddenIndexRoute
+  "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
+  "/admin/dashboard/": typeof AdminDashboardIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
+  "/admin/plans/": typeof AdminPlansIndexRoute
+  "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/company/dashboard/": typeof CompanyDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
-  "/accept-invitation": typeof AcceptInvitationRoute
-  "/change-password": typeof ChangePasswordRoute
-  "/company": typeof CompanyRouteWithChildren
-  "/forbidden": typeof ForbiddenRoute
-  "/login": typeof LoginRoute
-  "/admin/audit": typeof AdminAuditRoute
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/admin/plans": typeof AdminPlansRoute
-  "/admin/subscriptions": typeof AdminSubscriptionsRoute
+  "/company": typeof CompanyRouteRouteWithChildren
   "/admin/login": typeof AdminLoginRoute
-  "/company/dashboard": typeof CompanyDashboardRoute
+  "/accept-invitation": typeof AcceptInvitationIndexRoute
   "/admin": typeof AdminIndexRoute
+  "/change-password": typeof ChangePasswordIndexRoute
+  "/forbidden": typeof ForbiddenIndexRoute
+  "/login": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/audit": typeof AdminAuditIndexRoute
   "/admin/companies": typeof AdminCompaniesIndexRoute
+  "/admin/dashboard": typeof AdminDashboardIndexRoute
   "/admin/leads": typeof AdminLeadsIndexRoute
+  "/admin/plans": typeof AdminPlansIndexRoute
+  "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
+  "/company/dashboard": typeof CompanyDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
-  "/accept-invitation": typeof AcceptInvitationRoute
-  "/admin": typeof AdminRouteWithChildren
-  "/change-password": typeof ChangePasswordRoute
-  "/company": typeof CompanyRouteWithChildren
-  "/forbidden": typeof ForbiddenRoute
-  "/login": typeof LoginRoute
-  "/admin/audit": typeof AdminAuditRoute
-  "/admin/companies": typeof AdminCompaniesRouteWithChildren
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/admin/leads": typeof AdminLeadsRouteWithChildren
-  "/admin/plans": typeof AdminPlansRoute
-  "/admin/subscriptions": typeof AdminSubscriptionsRoute
+  "/admin": typeof AdminRouteRouteWithChildren
+  "/company": typeof CompanyRouteRouteWithChildren
+  "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
+  "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/admin_/login": typeof AdminLoginRoute
-  "/company/dashboard": typeof CompanyDashboardRoute
+  "/accept-invitation/": typeof AcceptInvitationIndexRoute
   "/admin/": typeof AdminIndexRoute
+  "/change-password/": typeof ChangePasswordIndexRoute
+  "/forbidden/": typeof ForbiddenIndexRoute
+  "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
+  "/admin/dashboard/": typeof AdminDashboardIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
+  "/admin/plans/": typeof AdminPlansIndexRoute
+  "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/company/dashboard/": typeof CompanyDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | "/"
-    | "/accept-invitation"
     | "/admin"
-    | "/change-password"
     | "/company"
-    | "/forbidden"
-    | "/login"
-    | "/admin/audit"
     | "/admin/companies"
-    | "/admin/dashboard"
     | "/admin/leads"
-    | "/admin/plans"
-    | "/admin/subscriptions"
     | "/admin/login"
-    | "/company/dashboard"
+    | "/accept-invitation/"
     | "/admin/"
+    | "/change-password/"
+    | "/forbidden/"
+    | "/login/"
     | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/audit/"
     | "/admin/companies/"
+    | "/admin/dashboard/"
     | "/admin/leads/"
+    | "/admin/plans/"
+    | "/admin/subscriptions/"
+    | "/company/dashboard/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
-    | "/accept-invitation"
-    | "/change-password"
     | "/company"
+    | "/admin/login"
+    | "/accept-invitation"
+    | "/admin"
+    | "/change-password"
     | "/forbidden"
     | "/login"
-    | "/admin/audit"
-    | "/admin/dashboard"
-    | "/admin/plans"
-    | "/admin/subscriptions"
-    | "/admin/login"
-    | "/company/dashboard"
-    | "/admin"
     | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/audit"
     | "/admin/companies"
+    | "/admin/dashboard"
     | "/admin/leads"
+    | "/admin/plans"
+    | "/admin/subscriptions"
+    | "/company/dashboard"
   id:
     | "__root__"
     | "/"
-    | "/accept-invitation"
     | "/admin"
-    | "/change-password"
     | "/company"
-    | "/forbidden"
-    | "/login"
-    | "/admin/audit"
     | "/admin/companies"
-    | "/admin/dashboard"
     | "/admin/leads"
-    | "/admin/plans"
-    | "/admin/subscriptions"
     | "/admin_/login"
-    | "/company/dashboard"
+    | "/accept-invitation/"
     | "/admin/"
+    | "/change-password/"
+    | "/forbidden/"
+    | "/login/"
     | "/admin/companies/$publicId"
     | "/admin/leads/$publicId"
+    | "/admin/audit/"
     | "/admin/companies/"
+    | "/admin/dashboard/"
     | "/admin/leads/"
+    | "/admin/plans/"
+    | "/admin/subscriptions/"
+    | "/company/dashboard/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AcceptInvitationRoute: typeof AcceptInvitationRoute
-  AdminRoute: typeof AdminRouteWithChildren
-  ChangePasswordRoute: typeof ChangePasswordRoute
-  CompanyRoute: typeof CompanyRouteWithChildren
-  ForbiddenRoute: typeof ForbiddenRoute
-  LoginRoute: typeof LoginRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  CompanyRouteRoute: typeof CompanyRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
+  AcceptInvitationIndexRoute: typeof AcceptInvitationIndexRoute
+  ChangePasswordIndexRoute: typeof ChangePasswordIndexRoute
+  ForbiddenIndexRoute: typeof ForbiddenIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    "/login": {
-      id: "/login"
-      path: "/login"
-      fullPath: "/login"
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/forbidden": {
-      id: "/forbidden"
-      path: "/forbidden"
-      fullPath: "/forbidden"
-      preLoaderRoute: typeof ForbiddenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     "/company": {
       id: "/company"
       path: "/company"
       fullPath: "/company"
-      preLoaderRoute: typeof CompanyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/change-password": {
-      id: "/change-password"
-      path: "/change-password"
-      fullPath: "/change-password"
-      preLoaderRoute: typeof ChangePasswordRouteImport
+      preLoaderRoute: typeof CompanyRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/admin": {
       id: "/admin"
       path: "/admin"
       fullPath: "/admin"
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/accept-invitation": {
-      id: "/accept-invitation"
-      path: "/accept-invitation"
-      fullPath: "/accept-invitation"
-      preLoaderRoute: typeof AcceptInvitationRouteImport
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/": {
@@ -323,19 +295,40 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/login/": {
+      id: "/login/"
+      path: "/login"
+      fullPath: "/login/"
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/forbidden/": {
+      id: "/forbidden/"
+      path: "/forbidden"
+      fullPath: "/forbidden/"
+      preLoaderRoute: typeof ForbiddenIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/change-password/": {
+      id: "/change-password/"
+      path: "/change-password"
+      fullPath: "/change-password/"
+      preLoaderRoute: typeof ChangePasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/admin/": {
       id: "/admin/"
       path: "/"
       fullPath: "/admin/"
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof AdminRouteRoute
     }
-    "/company/dashboard": {
-      id: "/company/dashboard"
-      path: "/dashboard"
-      fullPath: "/company/dashboard"
-      preLoaderRoute: typeof CompanyDashboardRouteImport
-      parentRoute: typeof CompanyRoute
+    "/accept-invitation/": {
+      id: "/accept-invitation/"
+      path: "/accept-invitation"
+      fullPath: "/accept-invitation/"
+      preLoaderRoute: typeof AcceptInvitationIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     "/admin_/login": {
       id: "/admin_/login"
@@ -344,149 +337,158 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/admin/subscriptions": {
-      id: "/admin/subscriptions"
-      path: "/subscriptions"
-      fullPath: "/admin/subscriptions"
-      preLoaderRoute: typeof AdminSubscriptionsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    "/admin/plans": {
-      id: "/admin/plans"
-      path: "/plans"
-      fullPath: "/admin/plans"
-      preLoaderRoute: typeof AdminPlansRouteImport
-      parentRoute: typeof AdminRoute
-    }
     "/admin/leads": {
       id: "/admin/leads"
       path: "/leads"
       fullPath: "/admin/leads"
-      preLoaderRoute: typeof AdminLeadsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    "/admin/dashboard": {
-      id: "/admin/dashboard"
-      path: "/dashboard"
-      fullPath: "/admin/dashboard"
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AdminLeadsRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     "/admin/companies": {
       id: "/admin/companies"
       path: "/companies"
       fullPath: "/admin/companies"
-      preLoaderRoute: typeof AdminCompaniesRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AdminCompaniesRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    "/admin/audit": {
-      id: "/admin/audit"
-      path: "/audit"
-      fullPath: "/admin/audit"
-      preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof AdminRoute
+    "/company/dashboard/": {
+      id: "/company/dashboard/"
+      path: "/dashboard"
+      fullPath: "/company/dashboard/"
+      preLoaderRoute: typeof CompanyDashboardIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
+    "/admin/subscriptions/": {
+      id: "/admin/subscriptions/"
+      path: "/subscriptions"
+      fullPath: "/admin/subscriptions/"
+      preLoaderRoute: typeof AdminSubscriptionsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    "/admin/plans/": {
+      id: "/admin/plans/"
+      path: "/plans"
+      fullPath: "/admin/plans/"
+      preLoaderRoute: typeof AdminPlansIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     "/admin/leads/": {
       id: "/admin/leads/"
       path: "/"
       fullPath: "/admin/leads/"
       preLoaderRoute: typeof AdminLeadsIndexRouteImport
-      parentRoute: typeof AdminLeadsRoute
+      parentRoute: typeof AdminLeadsRouteRoute
+    }
+    "/admin/dashboard/": {
+      id: "/admin/dashboard/"
+      path: "/dashboard"
+      fullPath: "/admin/dashboard/"
+      preLoaderRoute: typeof AdminDashboardIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     "/admin/companies/": {
       id: "/admin/companies/"
       path: "/"
       fullPath: "/admin/companies/"
       preLoaderRoute: typeof AdminCompaniesIndexRouteImport
-      parentRoute: typeof AdminCompaniesRoute
+      parentRoute: typeof AdminCompaniesRouteRoute
+    }
+    "/admin/audit/": {
+      id: "/admin/audit/"
+      path: "/audit"
+      fullPath: "/admin/audit/"
+      preLoaderRoute: typeof AdminAuditIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     "/admin/leads/$publicId": {
       id: "/admin/leads/$publicId"
       path: "/$publicId"
       fullPath: "/admin/leads/$publicId"
       preLoaderRoute: typeof AdminLeadsPublicIdRouteImport
-      parentRoute: typeof AdminLeadsRoute
+      parentRoute: typeof AdminLeadsRouteRoute
     }
     "/admin/companies/$publicId": {
       id: "/admin/companies/$publicId"
       path: "/$publicId"
       fullPath: "/admin/companies/$publicId"
       preLoaderRoute: typeof AdminCompaniesPublicIdRouteImport
-      parentRoute: typeof AdminCompaniesRoute
+      parentRoute: typeof AdminCompaniesRouteRoute
     }
   }
 }
 
-interface AdminCompaniesRouteChildren {
+interface AdminCompaniesRouteRouteChildren {
   AdminCompaniesPublicIdRoute: typeof AdminCompaniesPublicIdRoute
   AdminCompaniesIndexRoute: typeof AdminCompaniesIndexRoute
 }
 
-const AdminCompaniesRouteChildren: AdminCompaniesRouteChildren = {
+const AdminCompaniesRouteRouteChildren: AdminCompaniesRouteRouteChildren = {
   AdminCompaniesPublicIdRoute: AdminCompaniesPublicIdRoute,
   AdminCompaniesIndexRoute: AdminCompaniesIndexRoute,
 }
 
-const AdminCompaniesRouteWithChildren = AdminCompaniesRoute._addFileChildren(
-  AdminCompaniesRouteChildren,
-)
+const AdminCompaniesRouteRouteWithChildren =
+  AdminCompaniesRouteRoute._addFileChildren(AdminCompaniesRouteRouteChildren)
 
-interface AdminLeadsRouteChildren {
+interface AdminLeadsRouteRouteChildren {
   AdminLeadsPublicIdRoute: typeof AdminLeadsPublicIdRoute
   AdminLeadsIndexRoute: typeof AdminLeadsIndexRoute
 }
 
-const AdminLeadsRouteChildren: AdminLeadsRouteChildren = {
+const AdminLeadsRouteRouteChildren: AdminLeadsRouteRouteChildren = {
   AdminLeadsPublicIdRoute: AdminLeadsPublicIdRoute,
   AdminLeadsIndexRoute: AdminLeadsIndexRoute,
 }
 
-const AdminLeadsRouteWithChildren = AdminLeadsRoute._addFileChildren(
-  AdminLeadsRouteChildren,
+const AdminLeadsRouteRouteWithChildren = AdminLeadsRouteRoute._addFileChildren(
+  AdminLeadsRouteRouteChildren,
 )
 
-interface AdminRouteChildren {
-  AdminAuditRoute: typeof AdminAuditRoute
-  AdminCompaniesRoute: typeof AdminCompaniesRouteWithChildren
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminLeadsRoute: typeof AdminLeadsRouteWithChildren
-  AdminPlansRoute: typeof AdminPlansRoute
-  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
+interface AdminRouteRouteChildren {
+  AdminCompaniesRouteRoute: typeof AdminCompaniesRouteRouteWithChildren
+  AdminLeadsRouteRoute: typeof AdminLeadsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminAuditIndexRoute: typeof AdminAuditIndexRoute
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+  AdminPlansIndexRoute: typeof AdminPlansIndexRoute
+  AdminSubscriptionsIndexRoute: typeof AdminSubscriptionsIndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAuditRoute: AdminAuditRoute,
-  AdminCompaniesRoute: AdminCompaniesRouteWithChildren,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminLeadsRoute: AdminLeadsRouteWithChildren,
-  AdminPlansRoute: AdminPlansRoute,
-  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminCompaniesRouteRoute: AdminCompaniesRouteRouteWithChildren,
+  AdminLeadsRouteRoute: AdminLeadsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminAuditIndexRoute: AdminAuditIndexRoute,
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+  AdminPlansIndexRoute: AdminPlansIndexRoute,
+  AdminSubscriptionsIndexRoute: AdminSubscriptionsIndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
-interface CompanyRouteChildren {
-  CompanyDashboardRoute: typeof CompanyDashboardRoute
+interface CompanyRouteRouteChildren {
+  CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
 }
 
-const CompanyRouteChildren: CompanyRouteChildren = {
-  CompanyDashboardRoute: CompanyDashboardRoute,
+const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
+  CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
 }
 
-const CompanyRouteWithChildren =
-  CompanyRoute._addFileChildren(CompanyRouteChildren)
+const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
+  CompanyRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AcceptInvitationRoute: AcceptInvitationRoute,
-  AdminRoute: AdminRouteWithChildren,
-  ChangePasswordRoute: ChangePasswordRoute,
-  CompanyRoute: CompanyRouteWithChildren,
-  ForbiddenRoute: ForbiddenRoute,
-  LoginRoute: LoginRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  CompanyRouteRoute: CompanyRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
+  AcceptInvitationIndexRoute: AcceptInvitationIndexRoute,
+  ChangePasswordIndexRoute: ChangePasswordIndexRoute,
+  ForbiddenIndexRoute: ForbiddenIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
