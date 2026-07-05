@@ -9,7 +9,7 @@ import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { useChangePassword } from "./api";
+import { useChangePassword } from "../api/change-password";
 
 function changePasswordErrorMessage(error: unknown): string {
   if (error instanceof HTTPError) {
@@ -137,3 +137,4 @@ export function ChangePasswordForm() {
     </Form>
   );
 }
+

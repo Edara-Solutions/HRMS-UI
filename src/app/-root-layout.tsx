@@ -1,5 +1,5 @@
 import { Outlet } from "@tanstack/react-router";
-import { ForcedPasswordChangeModal } from "@/auth/forced-password-change-modal";
+import { ForcedPasswordChangeModal } from "@/features/auth";
 import { LocaleRuntime } from "@/shared/i18n";
 
 export function RootLayout() {
