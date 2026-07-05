@@ -1,16 +1,8 @@
 import { notFound, redirect } from "@tanstack/react-router";
-import type { PermissionAction } from "@/shared/auth";
-import { hasEveryPermission } from "@/shared/auth";
+import { hasEveryPermission, isAdminConsoleEnabled, type PermissionAction } from "@/shared/auth";
 import { useAuthStore } from "@/shared/auth";
 
-/**
- * Build-time seam (PRD: VITE_ENABLE_ADMIN) so the tenant build can exclude the
- * operator console entirely. The full separate-subdomain/deployment split is
- * deferred — for now this flag governs route reachability and UI affordances.
- */
-export function isAdminConsoleEnabled() {
-  return import.meta.env.VITE_ENABLE_ADMIN === "true";
-}
+export { isAdminConsoleEnabled };
 
 /** With the flag off, operator routes 404 as if they don't exist in this build. */
 export function requireAdminConsoleEnabled() {

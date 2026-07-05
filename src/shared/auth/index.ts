@@ -13,3 +13,5 @@ export {
   hasPermission,
   type PermissionAction,
 } from "./permissions";
+export { useAdminLogin, useLogin } from "./auth-login";
+export { isAdminConsoleEnabled } from "./admin-console";
