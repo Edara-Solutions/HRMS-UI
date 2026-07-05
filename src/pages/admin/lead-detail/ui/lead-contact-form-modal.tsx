@@ -8,8 +8,8 @@ import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/u
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import type { LeadContact } from "./api";
-import { useAddLeadContact, useUpdateLeadContact } from "./api";
+import type { LeadContact } from "../api/lead-detail";
+import { useAddLeadContact, useUpdateLeadContact } from "../api/lead-detail";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -178,3 +178,4 @@ function LeadContactFormModalContent({
     </div>
   );
 }
+

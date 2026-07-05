@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Lead } from "./api";
+import type { Lead } from "../api/lead-detail";
 import { EditLeadModal } from "./edit-lead-modal";
 
 const updatePatchMock = vi.hoisted(() => vi.fn());
@@ -105,3 +105,4 @@ describe("EditLeadModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });
+

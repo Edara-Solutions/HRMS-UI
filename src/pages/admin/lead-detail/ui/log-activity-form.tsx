@@ -8,8 +8,8 @@ import { Button } from "@/shared/ui/button";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Textarea } from "@/shared/ui/textarea";
-import { useAddLeadActivity } from "./api";
-import { ACTIVITY_TYPE_LABEL, LOGGABLE_ACTIVITY_TYPES } from "./labels";
+import { useAddLeadActivity } from "../api/lead-detail";
+import { ACTIVITY_TYPE_LABEL, LOGGABLE_ACTIVITY_TYPES } from "../api/lead-labels";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -115,3 +115,4 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
     </form>
   );
 }
+

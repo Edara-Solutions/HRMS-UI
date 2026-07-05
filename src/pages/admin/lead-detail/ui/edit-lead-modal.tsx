@@ -10,8 +10,8 @@ import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import type { Lead } from "./api";
-import { useUpdateLead } from "./api";
+import type { Lead } from "../api/lead-detail";
+import { useUpdateLead } from "../api/lead-detail";
 import {
   ALL_LOST_REASONS,
   ALL_SIZES,
@@ -21,7 +21,7 @@ import {
   SIZE_LABEL,
   SOURCE_LABEL,
   STATUS_BADGE,
-} from "./labels";
+} from "../api/lead-labels";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -299,3 +299,4 @@ function EditLeadModalContent({
     </div>
   );
 }
+
