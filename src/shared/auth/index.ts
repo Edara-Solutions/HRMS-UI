@@ -15,3 +15,4 @@ export {
 } from "./permissions";
 export { useAdminLogin, useLogin } from "./auth-login";
 export { isAdminConsoleEnabled } from "./admin-console";
+export { useCurrentSession } from "./current-session";

@@ -1,19 +1,19 @@
 import { Building2, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
-import { AdminActivityFeed } from "@/admin/dashboard/admin-activity-feed";
+import { AdminActivityFeed } from "./admin-activity-feed";
 import {
   adminActivities,
   adminKpiData,
   recentSignups,
   revenueTrend,
   subscriptionDistribution,
-} from "@/admin/dashboard/fixtures";
-import { QuickActions } from "@/admin/dashboard/quick-actions";
-import { RecentSignups } from "@/admin/dashboard/recent-signups";
-import { RevenueChart } from "@/admin/dashboard/revenue-chart";
-import { SubscriptionDistribution } from "@/admin/dashboard/subscription-distribution";
-import { useCurrentSession } from "@/app/guards/auth-guards";
-import { KpiCard } from "@/company/dashboard/kpi-card";
+} from "./fixtures";
+import { QuickActions } from "./quick-actions";
+import { RecentSignups } from "./recent-signups";
+import { RevenueChart } from "./revenue-chart";
+import { SubscriptionDistribution } from "./subscription-distribution";
+import { useCurrentSession } from "@/shared/auth";
+import { KpiCard } from "./kpi-card";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { formatTodayLong } from "@/shared/lib/format-date";

@@ -1,8 +1,8 @@
 import { notFound, redirect } from "@tanstack/react-router";
 import { hasEveryPermission, isAdminConsoleEnabled, type PermissionAction } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { useAuthStore, useCurrentSession } from "@/shared/auth";
 
-export { isAdminConsoleEnabled };
+export { isAdminConsoleEnabled, useCurrentSession };
 
 /** With the flag off, operator routes 404 as if they don't exist in this build. */
 export function requireAdminConsoleEnabled() {
@@ -60,8 +60,4 @@ export function requireAuthenticated(options: AuthGuardOptions = {}) {
   }
 
   return session;
-}
-
-export function useCurrentSession() {
-  return useAuthStore((state) => state.session);
 }
