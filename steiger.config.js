@@ -9,10 +9,6 @@ const recommendedRules = Object.assign(
     .filter((configItem) => "rules" in configItem)
     .map((configItem) => configItem.rules),
 );
-const warningRules = Object.fromEntries(
-  Object.keys(recommendedRules).map((ruleName) => [ruleName, "warn"]),
-);
-
 const findFolders = (folder, predicate) => {
   const matches = [];
 
@@ -133,9 +129,12 @@ export default defineConfig([
   },
   {
     rules: {
-      ...warningRules,
-      "edara/no-admin-company-cross-imports": "warn",
-      "edara/no-entities-layer": "warn",
+      ...recommendedRules,
+      // ADR-0001 intentionally keeps features/auth for the reused password-change interaction
+      // alongside shared/auth for session/token infrastructure.
+      "fsd/ambiguous-slice-names": "off",
+      "edara/no-admin-company-cross-imports": "error",
+      "edara/no-entities-layer": "error",
     },
   },
 ]);

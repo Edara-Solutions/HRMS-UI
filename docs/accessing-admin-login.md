@@ -8,7 +8,7 @@ The admin login is a separate entry point from the company user login. It target
 http://localhost:5173/admin/login
 ```
 
-The route is defined in `src/app/admin_.login.tsx:5`. The trailing underscore in the file name (`admin_.login.tsx`) is TanStack Router's convention for opting out of a parent layout — the URL has no `/admin` parent segment.
+The route is defined in `src/app/routes/admin_/login.tsx`. The trailing underscore in `admin_` is TanStack Router's convention for opting out of the `/admin` parent layout; the URL still renders as `/admin/login`.
 
 ## Steps
 
@@ -23,20 +23,20 @@ The route is defined in `src/app/admin_.login.tsx:5`. The trailing underscore in
    http://localhost:5173/admin/login
    ```
 
-   Or, from the regular login screen, click the admin entry link rendered at `src/app/-login.page.tsx:180` (`to="/admin/login"`).
+   Or, from the regular login screen, click the admin entry link rendered by `src/pages/login/ui/login-page.tsx` (`to="/admin/login"`).
 
-3. **Confirm the flag is enabled.** The route runs `requireAdminConsoleEnabled()` in `beforeLoad` (`src/app/admin_.login.tsx:6`). If the `adminConsole` feature flag is off, you will be redirected away. Check the flag source for your environment and enable it if needed.
+3. **Confirm the flag is enabled.** The route runs `requireAdminConsoleEnabled()` in `beforeLoad` (`src/app/routes/admin_/login.tsx`). If the `adminConsole` feature flag is off, the route is hidden.
 
-4. **Submit credentials.** The page calls `useAdminLogin()` from `@/auth/api`, which posts to `/auth/admin/login` on the backend. Use the admin credentials issued for the platform console — not a company user account.
+4. **Submit credentials.** The page calls `useAdminLogin()` from `@/shared/auth`, which posts to `/auth/admin/login` on the backend. Use the admin credentials issued for the platform console, not a company user account.
 
 ## Troubleshooting
 
-- **Redirected away from `/admin/login`** — the `adminConsole` feature flag is disabled for this build. Enable it in your environment config and reload.
-- **404 on the URL** — make sure the dev server is running on port `5173` (configured in `vite.config.ts:40`). Other ports will not serve the route.
-- **Build vs. dev** — in production (`bun run build` + static host), the same path is served by the SPA fallback. Configure your host to rewrite unknown paths to `/index.html`.
+- **Redirected away from `/admin/login`** - the `adminConsole` feature flag is disabled for this build. Enable it in your environment config and reload.
+- **404 on the URL** - make sure the dev server is running on port `5173` (configured in `vite.config.ts`). Other ports will not serve the route.
+- **Build vs. dev** - in production (`bun run build` + static host), the same path is served by the SPA fallback. Configure your host to rewrite unknown paths to `/index.html`.
 
 ## Related Files
 
-- `src/app/admin_.login.tsx` — route definition + guard
-- `src/app/admin-login.page.tsx` — page component, form, and submit handler
-- `src/app/-login.page.tsx:180` — link from the company login page
+- `src/app/routes/admin_/login.tsx` - route definition + guard
+- `src/pages/admin/login/ui/admin-login-page.tsx` - page component, form, and submit handler
+- `src/pages/login/ui/login-page.tsx` - link from the company login page

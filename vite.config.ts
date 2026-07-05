@@ -11,7 +11,6 @@ export default defineConfig({
       routesDirectory: "src/app/routes",
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
-      routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$|.*\\.test\\.tsx$",
       autoCodeSplitting: true,
     }),
     react(),
@@ -22,9 +21,9 @@ export default defineConfig({
       "@/app": fileURLToPath(new URL("./src/app", import.meta.url)),
       "@/features": fileURLToPath(new URL("./src/features", import.meta.url)),
       "@/pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
+      "@/routeTree.gen": fileURLToPath(new URL("./src/routeTree.gen.ts", import.meta.url)),
       "@/shared": fileURLToPath(new URL("./src/shared", import.meta.url)),
       "@/widgets": fileURLToPath(new URL("./src/widgets", import.meta.url)),
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   build: {
