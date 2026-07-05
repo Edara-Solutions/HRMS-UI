@@ -1,10 +1,10 @@
 import { Check, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
-import { useCurrentSession } from "@/app/guards/auth-guards";
-import { ActivityFeed } from "@/company/dashboard/activity-feed";
-import { ApprovalQueue } from "@/company/dashboard/approval-queue";
-import { DepartmentMix } from "@/company/dashboard/department-mix";
-import { EventList } from "@/company/dashboard/event-list";
+import { useCurrentSession } from "@/shared/auth";
+import { ActivityFeed } from "./activity-feed";
+import { ApprovalQueue } from "./approval-queue";
+import { DepartmentMix } from "./department-mix";
+import { EventList } from "./event-list";
 import {
   activities,
   approvals,
@@ -13,11 +13,11 @@ import {
   headcountTrend,
   kpiData,
   peopleSpotlight,
-} from "@/company/dashboard/fixtures";
-import { HeadcountChart } from "@/company/dashboard/headcount-chart";
-import { KpiCard } from "@/company/dashboard/kpi-card";
-import { ModuleShortcuts } from "@/company/dashboard/module-shortcuts";
-import { PeopleTable } from "@/company/dashboard/people-table";
+} from "./fixtures";
+import { HeadcountChart } from "./headcount-chart";
+import { KpiCard } from "./kpi-card";
+import { ModuleShortcuts } from "./module-shortcuts";
+import { PeopleTable } from "./people-table";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { formatTodayLong } from "@/shared/lib/format-date";
