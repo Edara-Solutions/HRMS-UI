@@ -1,6 +1,6 @@
 import { Check, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
-import { useCurrentSession } from "@/auth/guards";
+import { useCurrentSession } from "@/app/guards/auth-guards";
 import { ActivityFeed } from "@/company/dashboard/activity-feed";
 import { ApprovalQueue } from "@/company/dashboard/approval-queue";
 import { DepartmentMix } from "@/company/dashboard/department-mix";

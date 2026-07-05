@@ -150,8 +150,8 @@ function PlanCard({ plan }: { plan: Plan }) {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function AdminPlansPage() {
-  const { active, q, visibility } = useSearch({ from: "/admin/plans" });
-  const navigate = useNavigate({ from: "/admin/plans" });
+  const { active, q, visibility } = useSearch({ from: "/admin/plans/" });
+  const navigate = useNavigate({ from: "/admin/plans/" });
   const query = q ?? "";
 
   function setQuery(nextQuery: string) {

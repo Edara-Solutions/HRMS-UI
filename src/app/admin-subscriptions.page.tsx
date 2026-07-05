@@ -286,8 +286,8 @@ function SubscriptionKpis({ items }: { items: typeof dummyCompaniesWithConfig })
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function AdminSubscriptionsPage() {
-  const { page, pageSize, q, status } = useSearch({ from: "/admin/subscriptions" });
-  const navigate = useNavigate({ from: "/admin/subscriptions" });
+  const { page, pageSize, q, status } = useSearch({ from: "/admin/subscriptions/" });
+  const navigate = useNavigate({ from: "/admin/subscriptions/" });
   const query = q ?? "";
   const statusFilter = status ?? "";
 

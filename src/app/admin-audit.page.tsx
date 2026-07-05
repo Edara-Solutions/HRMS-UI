@@ -1,4 +1,4 @@
-﻿import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Search, Shield } from "lucide-react";
 import type { AuditEntry, AuditOutcome } from "@/admin/audit/api";
 import { dummyAuditEntries } from "@/admin/audit/fixtures";
@@ -7,7 +7,7 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 
-// â”€â”€â”€ Outcome badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Outcome badge ─────────────────────────────────────────────────────────────
 
 function OutcomeBadge({ outcome }: { outcome: AuditOutcome }) {
   return (
@@ -17,7 +17,7 @@ function OutcomeBadge({ outcome }: { outcome: AuditOutcome }) {
   );
 }
 
-// â”€â”€â”€ Module badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Module badge ──────────────────────────────────────────────────────────────
 
 const MODULE_VARIANT: Record<string, "primary" | "info" | "warning" | "default"> = {
   auth: "primary",
@@ -30,7 +30,7 @@ function ModuleBadge({ module }: { module: string }) {
   return <Badge variant={variant}>{module}</Badge>;
 }
 
-// â”€â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Table ─────────────────────────────────────────────────────────────────────
 
 function AuditTable({ items }: { items: AuditEntry[] }) {
   return (
@@ -119,13 +119,13 @@ function AuditTable({ items }: { items: AuditEntry[] }) {
 
                 {/* Target type */}
                 <td className="px-4 py-3 text-[12.5px] text-[var(--color-text-muted)]">
-                  {entry.targetType ?? <span className="text-[var(--color-text-faint)]">â€“</span>}
+                  {entry.targetType ?? <span className="text-[var(--color-text-faint)]">–</span>}
                 </td>
 
                 {/* Target ID */}
                 <td className="max-w-[140px] truncate px-4 py-3 text-[11.5px] font-mono text-[var(--color-text-muted)]">
                   {entry.targetPublicId ?? (
-                    <span className="text-[var(--color-text-faint)]">â€“</span>
+                    <span className="text-[var(--color-text-faint)]">–</span>
                   )}
                 </td>
 
@@ -159,11 +159,11 @@ function AuditTable({ items }: { items: AuditEntry[] }) {
   );
 }
 
-// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function AdminAuditPage() {
-  const { page, pageSize, q, outcome } = useSearch({ from: "/admin/audit" });
-  const navigate = useNavigate({ from: "/admin/audit" });
+  const { page, pageSize, q, outcome } = useSearch({ from: "/admin/audit/" });
+  const navigate = useNavigate({ from: "/admin/audit/" });
   const query = q ?? "";
   const outcomeFilter = outcome ?? "";
 
@@ -225,7 +225,7 @@ export function AdminAuditPage() {
             Audit log
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {successCount} successes Â· {failureCount} failures Â· platform event history
+            {successCount} successes · {failureCount} failures · platform event history
           </p>
         </div>
       </div>
@@ -254,7 +254,7 @@ export function AdminAuditPage() {
           />
           <Input
             type="search"
-            placeholder="Search action, module, targetâ€¦"
+            placeholder="Search action, module, target…"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             className="ps-8"
