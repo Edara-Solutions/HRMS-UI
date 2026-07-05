@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Company, CompanyConfigListResponse } from "@/admin/companies/api";
-import { AdminCompanyDetailPage } from "./admin-company-detail.page";
+import type { Company, CompanyConfigListResponse } from "../api/company-detail";
+import { AdminCompanyDetailPage } from "./admin-company-detail-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const apiGetMock = vi.hoisted(() => vi.fn());
@@ -207,3 +207,4 @@ describe("AdminCompanyDetailPage", () => {
     );
   });
 });
+
