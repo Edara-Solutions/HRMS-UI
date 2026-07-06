@@ -4,7 +4,15 @@
     "enabled": true
   },
   "files": {
-    "ignore": ["dist", "coverage", ".agents", ".claude", "src/routeTree.gen.ts"]
+    "ignore": [
+      "dist",
+      "coverage",
+      "playwright-report",
+      "test-results",
+      ".agents",
+      ".claude",
+      "src/routeTree.gen.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
