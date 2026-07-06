@@ -105,4 +105,3 @@ describe("EditLeadModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });
-

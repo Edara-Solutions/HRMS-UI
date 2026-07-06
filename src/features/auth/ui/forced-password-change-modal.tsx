@@ -1,6 +1,6 @@
+import { useAuthStore } from "@/shared/auth";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { ChangePasswordForm } from "./change-password-form";
-import { useAuthStore } from "@/shared/auth";
 
 export function ForcedPasswordChangeModal() {
   const mustChangePassword = useAuthStore(

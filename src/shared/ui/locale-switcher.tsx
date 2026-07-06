@@ -1,5 +1,5 @@
-import { type SupportedLocale, supportedLocales } from "@/shared/i18n";
 import { usePreferencesStore } from "@/shared/config";
+import { type SupportedLocale, supportedLocales } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 
 const localeLabel: Record<SupportedLocale, string> = {

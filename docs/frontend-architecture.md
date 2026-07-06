@@ -239,12 +239,39 @@ slice's `api/` segment and consume the generated types + the shared client.
 
 ## 8. Enforcement
 
+Three tools cooperate with **strictly disjoint ownership** — every concern has
+exactly one owner, so they never double-report or conflict:
+
+| Concern | Owner | Blocking? |
+| ------- | ----- | --------- |
+| Formatting | **Biome** | ✅ `bun run lint` |
+| Imports (unused, `import type`, ordering) | **Biome** | ✅ `bun run lint` |
+| General TS correctness (`noExplicitAny`, unused vars) | **Biome** | ✅ `bun run lint` |
+| FSD layers / public API / portal isolation | **Steiger** | ✅ `bun run lint` |
+| React hooks (deps, rules-of-hooks) | **react-doctor** | ⚪ advisory scan |
+| Accessibility | **react-doctor** | ⚪ advisory scan |
+| React perf / component health | **react-doctor** | ⚪ advisory scan |
+
+- **Biome** — formatter + general TS linter. **Owns zero React/a11y rules** so it
+  cannot overlap react-doctor: `domains.react: "none"` disables React-domain
+  rules and `a11y.recommended: false` disables the a11y group. Severity policy is
+  binary — every rule is `error` (blocks) or `off` (gone); there is no `warn`
+  tier (a non-blocking warning is just noise that never gets fixed).
 - **Steiger** — the FSD architecture linter. Checks import direction, public-API
-  violations, `insignificant-slice`, `excessive-slicing`. Runs in `bun run lint`.
-- **Biome** — formatter + general linter (unchanged). Complementary to Steiger,
-  not a substitute.
+  violations, `insignificant-slice`, `excessive-slicing`. Runs in `bun run lint`
+  after Biome.
+- **react-doctor** — the sole owner of React semantics (hooks, a11y, perf,
+  component health). Run as an advisory scan after frontend work
+  (`bun run doctor` / `react-doctor`), **not** in the blocking gate. Do not add a
+  React or a11y rule to Biome — it belongs here.
 - **TypeScript** — the generated schema makes backend-contract drift a compile
   error.
+
+> **Rule for agents:** if a lint concern is React-specific or accessibility,
+> it is react-doctor's — never re-add it to Biome. If it is formatting or plain
+> TypeScript, it is Biome's. If it is file placement or import direction, it is
+> Steiger's. This disjoint split is deliberate; keeping it is what makes the
+> three tools collaborate without conflict.
 
 ---
 

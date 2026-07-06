@@ -79,4 +79,3 @@ describe("CreateLeadModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });
-

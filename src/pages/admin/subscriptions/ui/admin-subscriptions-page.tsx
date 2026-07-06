@@ -10,12 +10,12 @@ import {
   XCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import type { SubscriptionStatus } from "../api/subscriptions";
-import { dummyCompaniesWithConfig } from "../api/subscription-fixtures";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { dummyCompaniesWithConfig } from "../api/subscription-fixtures";
+import type { SubscriptionStatus } from "../api/subscriptions";
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 

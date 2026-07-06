@@ -1,8 +1,8 @@
 // @vitest-environment node
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useAuthStore } from "@/shared/auth";
 import type { AuthSession, LoginTokens, SessionUser } from "@/shared/auth";
+import { useAuthStore } from "@/shared/auth";
 import { apiClient } from "./client";
 
 const baseUser: SessionUser = {

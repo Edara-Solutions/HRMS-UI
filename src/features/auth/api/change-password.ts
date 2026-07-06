@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api";
-import { useAuthStore } from "@/shared/auth";
 import type { ChangePasswordInput } from "@/shared/auth";
+import { useAuthStore } from "@/shared/auth";
 
 async function changePassword(input: ChangePasswordInput): Promise<void> {
   await apiClient.post("auth/change-password", { json: input }).json();

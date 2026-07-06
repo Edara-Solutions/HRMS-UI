@@ -1,7 +1,7 @@
 import { Shield } from "lucide-react";
 import { type ReactNode, useCallback, useState, useSyncExternalStore } from "react";
-import { Header } from "./header";
 import { adminNavGroups, companyNavGroups } from "../model/nav-items";
+import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
 // Hoist static icon JSX to avoid recreating on each render

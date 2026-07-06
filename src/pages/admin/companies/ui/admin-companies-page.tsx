@@ -1,12 +1,12 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Building2, ChevronLeft, ChevronRight, ExternalLink, Globe, Search } from "lucide-react";
-import type { Company, CompanyConfig } from "../api/companies";
-import { useCompanies, useCompanyConfigs } from "../api/companies";
-import { SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import type { Company, CompanyConfig } from "../api/companies";
+import { useCompanies, useCompanyConfigs } from "../api/companies";
+import { SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 
 // ─── Company code square ───────────────────────────────────────────────────────
 
@@ -398,4 +398,3 @@ export function AdminCompaniesPage() {
     </div>
   );
 }
-

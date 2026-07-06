@@ -200,6 +200,23 @@ start of Phase 1.
 of `bun run lint`; keep Biome as the formatter/general linter. Configure Steiger
 to the decisions above (minimal layers, public-API required, portal isolation).
 
+Three tools cooperate with **strictly disjoint ownership** — every concern has
+exactly one owner, so they never double-report or conflict (see the ownership
+table in `frontend-architecture.md` §8):
+- **Biome** owns formatting + general TypeScript lint only. It owns **zero
+  React or accessibility rules** (`domains.react: "none"`, `a11y.recommended:
+  false`) so it cannot overlap react-doctor. Severity is binary — every rule is
+  `error` or `off`, never `warn` (a non-blocking warning is noise that never
+  gets fixed). This tuned, calm config is what makes Biome viable here; a stray
+  commit once removed Biome entirely on the mistaken premise that Steiger
+  replaced it — it does not (Steiger is architecture-only), and Biome was
+  restored with this disjoint config.
+- **Steiger** owns FSD architecture (import direction, public API, portal
+  isolation). Blocking, in `bun run lint`.
+- **react-doctor** owns all React semantics (hooks, a11y, perf, component
+  health) as an advisory post-work scan — never in the blocking gate. No React
+  or a11y rule may be added to Biome; it belongs to react-doctor.
+
 **Sequencing.**
 - *Phase 1 — structural migration (this issue's core):* scaffold the layer
   folders, then move slices incrementally in this order: (a) `shared/` reorg and

@@ -1,1 +1,1 @@
-export { usePreferencesStore, type ThemeMode } from "./preferences-store";
+export { type ThemeMode, usePreferencesStore } from "./preferences-store";

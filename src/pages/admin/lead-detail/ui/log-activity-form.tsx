@@ -115,4 +115,3 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
     </form>
   );
 }
-

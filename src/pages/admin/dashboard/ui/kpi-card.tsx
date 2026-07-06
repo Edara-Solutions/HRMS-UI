@@ -7,17 +7,21 @@ interface KpiCardProps {
   data: AdminKpiData;
 }
 
-const trendBadgeVariant: Record<AdminKpiData["trend"]["direction"], "success" | "danger" | "default"> = {
+const trendBadgeVariant: Record<
+  AdminKpiData["trend"]["direction"],
+  "success" | "danger" | "default"
+> = {
   up: "success",
   down: "danger",
   flat: "default",
 };
 
-const sparklineColor: Record<AdminKpiData["trend"]["direction"], "primary" | "warning" | "danger"> = {
-  up: "primary",
-  down: "danger",
-  flat: "warning",
-};
+const sparklineColor: Record<AdminKpiData["trend"]["direction"], "primary" | "warning" | "danger"> =
+  {
+    up: "primary",
+    down: "danger",
+    flat: "warning",
+  };
 
 export function KpiCard({ data }: KpiCardProps) {
   return (

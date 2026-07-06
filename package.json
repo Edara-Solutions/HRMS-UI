@@ -8,8 +8,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty",
-    "lint": "steiger src",
-    "lint:fix": "steiger src --fix",
+    "lint": "biome check src && steiger src",
+    "lint:fix": "biome check --write src && steiger src --fix",
+    "format": "biome format --write src",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -36,6 +37,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.2",
     "@playwright/test": "^1.50.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/router-plugin": "^1.100.0",

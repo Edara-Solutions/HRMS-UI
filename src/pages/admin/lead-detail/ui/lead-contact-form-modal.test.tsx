@@ -88,4 +88,3 @@ describe("LeadContactFormModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });
-

@@ -67,4 +67,3 @@ describe("LogActivityForm", () => {
     await waitFor(() => expect(screen.getByLabelText(/note/i)).toHaveValue(""));
   });
 });
-
