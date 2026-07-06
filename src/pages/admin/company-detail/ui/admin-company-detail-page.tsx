@@ -1,16 +1,16 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Building2, Globe, MapPin, Pencil, Phone } from "lucide-react";
 import { useState } from "react";
-import type { Company, CompanyConfig } from "../api/company-detail";
-import { useCompany, useCompanyConfigs } from "../api/company-detail";
-import { EditCompanyConfigModal } from "./edit-company-config-modal";
-import { EditCompanyModal } from "./edit-company-modal";
-import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Skeleton } from "@/shared/ui/skeleton";
+import type { Company, CompanyConfig } from "../api/company-detail";
+import { useCompany, useCompanyConfigs } from "../api/company-detail";
+import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
+import { EditCompanyConfigModal } from "./edit-company-config-modal";
+import { EditCompanyModal } from "./edit-company-modal";
 
 function formatDate(value: string | null): string {
   if (!value) return "-";
@@ -282,4 +282,3 @@ export function AdminCompanyDetailPage() {
     </div>
   );
 }
-

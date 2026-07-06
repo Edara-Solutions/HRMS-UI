@@ -1,4 +1,10 @@
-import type { CompanySizeRange, LeadActivityType, LeadSource, LeadStatus, LostReason } from "./lead-detail";
+import type {
+  CompanySizeRange,
+  LeadActivityType,
+  LeadSource,
+  LeadStatus,
+  LostReason,
+} from "./lead-detail";
 
 type StatusBadgeVariant = "success" | "primary" | "warning" | "danger" | "info" | "default";
 
@@ -81,4 +87,3 @@ export const ACTIVITY_TYPE_LABEL: Record<LeadActivityType, string> = {
 export const LOGGABLE_ACTIVITY_TYPES = (
   Object.keys(ACTIVITY_TYPE_LABEL) as LeadActivityType[]
 ).filter((type) => type !== "FORM_SUBMISSION" && type !== "SYSTEM_EVENT");
-

@@ -1,9 +1,9 @@
 import { Bell, HelpCircle, Search } from "lucide-react";
 import { useAuthStore } from "@/shared/auth";
-import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
-import { ThemeToggle } from "@/shared/ui/theme-toggle";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
+import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 export function Header() {
   const user = useAuthStore((state) => state.session?.user);

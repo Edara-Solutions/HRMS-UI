@@ -10,9 +10,9 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useAuthStore } from "@/shared/auth";
-import type { NavGroup, NavIndicator, NavItem } from "../model/nav-items";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
+import type { NavGroup, NavIndicator, NavItem } from "../model/nav-items";
 
 interface SidebarProps {
   groups: NavGroup[];

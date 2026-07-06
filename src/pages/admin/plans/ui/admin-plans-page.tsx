@@ -1,11 +1,11 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Check, PackageSearch, Plus, Search } from "lucide-react";
 import type { Plan, PlanFeature } from "@/shared/api";
-import { dummyPlans } from "../api/plan-fixtures";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { dummyPlans } from "../api/plan-fixtures";
 
 // ─── Feature helpers ───────────────────────────────────────────────────────────
 

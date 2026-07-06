@@ -1,6 +1,11 @@
 import { notFound, redirect } from "@tanstack/react-router";
-import { hasEveryPermission, isAdminConsoleEnabled, type PermissionAction } from "@/shared/auth";
-import { useAuthStore, useCurrentSession } from "@/shared/auth";
+import {
+  hasEveryPermission,
+  isAdminConsoleEnabled,
+  type PermissionAction,
+  useAuthStore,
+  useCurrentSession,
+} from "@/shared/auth";
 
 export { isAdminConsoleEnabled, useCurrentSession };
 

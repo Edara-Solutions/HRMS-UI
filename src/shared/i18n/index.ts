@@ -1,8 +1,8 @@
 export {
   defaultLocale,
   i18next,
-  supportedLocales,
   type SupportedLocale,
+  supportedLocales,
 } from "./config";
 export { applyDocumentDirection, getDirection } from "./direction";
 export { LocaleRuntime } from "./locale-runtime";

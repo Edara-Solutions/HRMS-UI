@@ -23,4 +23,3 @@ export const SITE_STATUS_FLAG_LABEL = {
   isBlocked: "Blocked",
   isUnderMaintenance: "Maintenance",
 } as const;
-

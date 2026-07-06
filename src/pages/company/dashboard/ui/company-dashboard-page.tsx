@@ -1,6 +1,10 @@
 import { Check, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useCurrentSession } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
+import { cn } from "@/shared/lib/cn";
+import { formatTodayLong } from "@/shared/lib/format-date";
+import { Button } from "@/shared/ui/button";
 import { ActivityFeed } from "./activity-feed";
 import { ApprovalQueue } from "./approval-queue";
 import { DepartmentMix } from "./department-mix";
@@ -18,10 +22,6 @@ import { HeadcountChart } from "./headcount-chart";
 import { KpiCard } from "./kpi-card";
 import { ModuleShortcuts } from "./module-shortcuts";
 import { PeopleTable } from "./people-table";
-import { usePreferencesStore } from "@/shared/config";
-import { cn } from "@/shared/lib/cn";
-import { formatTodayLong } from "@/shared/lib/format-date";
-import { Button } from "@/shared/ui/button";
 
 export function CompanyDashboardPage() {
   const session = useCurrentSession();

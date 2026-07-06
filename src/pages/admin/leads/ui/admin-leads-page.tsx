@@ -9,15 +9,12 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type {
-  ConvertLeadResult,
-  LeadSource,
-  LeadStatus,
-  LeadWithContacts,
-} from "../api/leads";
-import { useLeads } from "../api/leads";
-import { ConvertLeadModal } from "./convert-lead-modal";
-import { CreateLeadModal } from "./create-lead-modal";
+import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import {
   ALL_SOURCES,
   ALL_STATUSES,
@@ -25,12 +22,10 @@ import {
   SOURCE_LABEL,
   STATUS_BADGE,
 } from "../api/lead-labels";
-import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import type { ConvertLeadResult, LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
+import { useLeads } from "../api/leads";
+import { ConvertLeadModal } from "./convert-lead-modal";
+import { CreateLeadModal } from "./create-lead-modal";
 
 // --- Table --------------------------------------------------------------
 
@@ -574,4 +569,3 @@ export function AdminLeadsPage() {
     </div>
   );
 }
-

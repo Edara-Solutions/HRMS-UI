@@ -1,5 +1,10 @@
 import { Building2, PanelRight, Plus } from "lucide-react";
 import { useState } from "react";
+import { useCurrentSession } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
+import { cn } from "@/shared/lib/cn";
+import { formatTodayLong } from "@/shared/lib/format-date";
+import { Button } from "@/shared/ui/button";
 import { AdminActivityFeed } from "./admin-activity-feed";
 import {
   adminActivities,
@@ -8,16 +13,11 @@ import {
   revenueTrend,
   subscriptionDistribution,
 } from "./fixtures";
+import { KpiCard } from "./kpi-card";
 import { QuickActions } from "./quick-actions";
 import { RecentSignups } from "./recent-signups";
 import { RevenueChart } from "./revenue-chart";
 import { SubscriptionDistribution } from "./subscription-distribution";
-import { useCurrentSession } from "@/shared/auth";
-import { KpiCard } from "./kpi-card";
-import { usePreferencesStore } from "@/shared/config";
-import { cn } from "@/shared/lib/cn";
-import { formatTodayLong } from "@/shared/lib/format-date";
-import { Button } from "@/shared/ui/button";
 
 export function AdminDashboardPage() {
   const session = useCurrentSession();

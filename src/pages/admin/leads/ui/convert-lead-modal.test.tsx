@@ -169,4 +169,3 @@ describe("ConvertLeadModal", () => {
     expect(await screen.findByText(/a user with this email already exists/i)).toBeInTheDocument();
   });
 });
-

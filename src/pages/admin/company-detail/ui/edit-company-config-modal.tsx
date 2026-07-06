@@ -2,8 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { usePlans } from "@/shared/api";
-import { readBackendErrorMessage } from "@/shared/api";
+import { readBackendErrorMessage, usePlans } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
@@ -292,4 +291,3 @@ function EditCompanyConfigModalContent({
     </div>
   );
 }
-

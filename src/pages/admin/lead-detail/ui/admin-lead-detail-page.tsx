@@ -15,6 +15,13 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { Avatar } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { EmptyState } from "@/shared/ui/empty-state";
+import { Skeleton } from "@/shared/ui/skeleton";
 import type { Lead, LeadActivityListResponse, LeadContact } from "../api/lead-detail";
 import {
   useDeleteLead,
@@ -23,17 +30,10 @@ import {
   useLeadActivities,
   useUpdateLeadContact,
 } from "../api/lead-detail";
-import { EditLeadModal } from "./edit-lead-modal";
 import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "../api/lead-labels";
+import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
-import { Avatar } from "@/shared/ui/avatar";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { EmptyState } from "@/shared/ui/empty-state";
-import { Skeleton } from "@/shared/ui/skeleton";
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleDateString("en-GB", {
@@ -503,4 +503,3 @@ export function AdminLeadDetailPage() {
     </div>
   );
 }
-

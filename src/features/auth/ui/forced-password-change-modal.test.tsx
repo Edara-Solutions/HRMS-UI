@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
-import { useAuthStore } from "@/shared/auth";
 import type { AuthSession, SessionUser } from "@/shared/auth";
+import { useAuthStore } from "@/shared/auth";
+import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const changePasswordPostMock = vi.hoisted(() => vi.fn());
