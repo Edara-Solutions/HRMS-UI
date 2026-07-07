@@ -1,6 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
+import { type ReactNode, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { GetCountries, GetState } from "react-country-state-city/dist/cjs/index.js";
+import type { Country, State } from "react-country-state-city/dist/cjs/types/index";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
@@ -29,7 +32,7 @@ const createLeadFormSchema = z.object({
   industry: z.string().optional(),
   companySizeRange: z.enum(asZodEnumValues(ALL_SIZES)),
   country: z.string().optional(),
-  city: z.string().optional(),
+  state: z.string().optional(),
   source: z.enum(asZodEnumValues(ALL_SOURCES)),
   contactName: z.string().min(1, "Primary contact name is required"),
   contactEmail: z.string().email("Enter a valid email address").optional().or(z.literal("")),
@@ -38,6 +41,60 @@ const createLeadFormSchema = z.object({
 });
 
 type CreateLeadFormData = z.infer<typeof createLeadFormSchema>;
+
+interface SearchableSelectOption {
+  value: string;
+  label: ReactNode;
+  searchText: string;
+}
+
+interface SearchableSelectContentProps {
+  options: SearchableSelectOption[];
+  searchPlaceholder: string;
+  emptyMessage: string;
+}
+
+function normalizeSearchValue(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function SearchableSelectContent({
+  options,
+  searchPlaceholder,
+  emptyMessage,
+}: SearchableSelectContentProps) {
+  const [query, setQuery] = useState("");
+  const normalizedQuery = normalizeSearchValue(query);
+  const filteredOptions = normalizedQuery
+    ? options.filter((option) => normalizeSearchValue(option.searchText).includes(normalizedQuery))
+    : options;
+
+  return (
+    <SelectContent>
+      <div className="sticky top-0 z-10 bg-[var(--color-surface)] p-1">
+        <Input
+          aria-label={searchPlaceholder}
+          className="h-8"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          placeholder={searchPlaceholder}
+        />
+      </div>
+
+      {filteredOptions.length > 0 ? (
+        filteredOptions.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))
+      ) : (
+        <div className="px-2.5 py-2 text-[13px] text-[var(--color-text-muted)]">{emptyMessage}</div>
+      )}
+    </SelectContent>
+  );
+}
 
 interface CreateLeadModalProps {
   open: boolean;
@@ -70,12 +127,18 @@ interface CreateLeadModalContentProps {
 
 function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadModalContentProps) {
   const createLead = useCreateLead();
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [states, setStates] = useState<State[]>([]);
+  const [isCountryLoading, setIsCountryLoading] = useState(true);
+  const [isStateLoading, setIsStateLoading] = useState(false);
 
   const {
     register,
     control,
     handleSubmit,
     setError,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateLeadFormData>({
     resolver: zodResolver(createLeadFormSchema),
@@ -85,7 +148,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
       industry: "",
       companySizeRange: ALL_SIZES[0],
       country: "",
-      city: "",
+      state: "",
       source: ALL_SOURCES[0],
       contactName: "",
       contactEmail: "",
@@ -93,6 +156,54 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
       contactJobTitle: "",
     },
   });
+
+  const selectedCountry = watch("country");
+  useEffect(() => {
+    let isActive = true;
+
+    setIsCountryLoading(true);
+    GetCountries()
+      .then((nextCountries) => {
+        if (isActive) setCountries(nextCountries);
+      })
+      .catch(() => {
+        if (isActive) setCountries([]);
+      })
+      .finally(() => {
+        if (isActive) setIsCountryLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const country = countries.find((item) => item.name === selectedCountry);
+    if (!country) {
+      setStates([]);
+      return;
+    }
+
+    let isActive = true;
+
+    setIsStateLoading(true);
+    GetState(country.id)
+      .then((nextStates) => {
+        if (isActive) setStates(nextStates);
+      })
+      .catch(() => {
+        if (isActive) setStates([]);
+      })
+      .finally(() => {
+        if (isActive) setIsStateLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [countries, selectedCountry]);
+
 
   async function onSubmit(data: CreateLeadFormData) {
     try {
@@ -102,7 +213,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
         industry: data.industry || undefined,
         companySizeRange: data.companySizeRange,
         country: data.country || undefined,
-        city: data.city || undefined,
+        city: data.state || undefined,
         source: data.source,
         status: "NEW",
         primaryContact: {
@@ -141,13 +252,76 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-country">Country</Label>
-            <Input id="create-lead-country" {...register("country")} />
+            <Controller
+              control={control}
+              name="country"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(nextCountry) => {
+                    field.onChange(nextCountry);
+                    setValue("state", "");
+                  }}
+                  disabled={isCountryLoading || countries.length === 0}
+                >
+                  <SelectTrigger id="create-lead-country" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue
+                      placeholder={isCountryLoading ? "Loading countries" : "Select country"}
+                    />
+                  </SelectTrigger>
+                  <SearchableSelectContent
+                    searchPlaceholder="Search countries"
+                    emptyMessage="No countries found"
+                    options={countries.map((country) => ({
+                      value: country.name,
+                      searchText: country.name,
+                      label: (
+                        <span className="flex min-w-0 items-center gap-2">
+                          {country.emoji && (
+                            <span className="stdropdown-flag shrink-0" aria-hidden="true">
+                              {country.emoji}
+                            </span>
+                          )}
+                          <span className="truncate">{country.name}</span>
+                        </span>
+                      ),
+                    }))}
+                  />
+                </Select>
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="create-lead-city">City</Label>
-            <Input id="create-lead-city" {...register("city")} />
+            <Label htmlFor="create-lead-state">State</Label>
+            <Controller
+              control={control}
+              name="state"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(nextState) => {
+                    field.onChange(nextState);
+                  }}
+                  disabled={!selectedCountry || isStateLoading || states.length === 0}
+                >
+                  <SelectTrigger id="create-lead-state" ref={field.ref} onBlur={field.onBlur}>
+                    <SelectValue placeholder={isStateLoading ? "Loading states" : "Select state"} />
+                  </SelectTrigger>
+                  <SearchableSelectContent
+                    searchPlaceholder="Search states"
+                    emptyMessage="No states found"
+                    options={states.map((state) => ({
+                      value: state.name,
+                      searchText: state.name,
+                      label: state.name,
+                    }))}
+                  />
+                </Select>
+              )}
+            />
           </div>
+
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-industry">Industry</Label>
