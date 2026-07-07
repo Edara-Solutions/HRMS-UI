@@ -1,17 +1,16 @@
-import { URL, fileURLToPath } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
-    TanStackRouterVite({
+    tanstackRouter({
       target: "react",
-      routesDirectory: "src/app",
+      routesDirectory: "src/app/routes",
       generatedRouteTree: "src/routeTree.gen.ts",
       quoteStyle: "double",
-      routeFileIgnorePattern: ".*\\.page\\.tsx$|.*-layout\\.tsx$",
       autoCodeSplitting: true,
     }),
     react(),
@@ -19,7 +18,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@/app": fileURLToPath(new URL("./src/app", import.meta.url)),
+      "@/features": fileURLToPath(new URL("./src/features", import.meta.url)),
+      "@/pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
+      "@/routeTree.gen": fileURLToPath(new URL("./src/routeTree.gen.ts", import.meta.url)),
+      "@/shared": fileURLToPath(new URL("./src/shared", import.meta.url)),
+      "@/widgets": fileURLToPath(new URL("./src/widgets", import.meta.url)),
     },
   },
   build: {

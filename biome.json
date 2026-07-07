@@ -1,17 +1,20 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   },
   "files": {
-    "ignore": [
-      "dist",
-      "coverage",
-      "playwright-report",
-      "test-results",
-      ".agents",
-      ".claude",
-      "src/routeTree.gen.ts"
+    "includes": [
+      "**",
+      "!dist",
+      "!coverage",
+      "!playwright-report",
+      "!test-results",
+      "!.agents",
+      "!.claude",
+      "!src/routeTree.gen.ts"
     ]
   },
   "formatter": {
@@ -24,14 +27,28 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "a11y": {
+        "recommended": false
+      },
       "correctness": {
-        "noUnusedImports": "error",
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": "off"
       },
       "style": {
         "useImportType": "error",
-        "useTemplate": "warn"
+        "useTemplate": "off"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "off",
+        "noImportantStyles": "off"
       }
+    },
+    "domains": {
+      "react": "none"
     }
   },
   "javascript": {
@@ -39,6 +56,14 @@
       "quoteStyle": "double",
       "semicolons": "always",
       "trailingCommas": "all"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
     }
   }
 }

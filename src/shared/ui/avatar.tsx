@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/cn";
 import type { HTMLAttributes, ImgHTMLAttributes } from "react";
+import { cn } from "@/shared/lib/cn";
 
 type AvatarSize = "sm" | "md" | "lg";
 
@@ -47,7 +47,6 @@ interface AvatarImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 }
 
 function AvatarImage({ className, alt, ...props }: AvatarImageProps) {
-  // biome-ignore lint/a11y/useAltText: alt is required by AvatarImageProps interface
   return (
     <img alt={alt} className={cn("aspect-square size-full object-cover", className)} {...props} />
   );
