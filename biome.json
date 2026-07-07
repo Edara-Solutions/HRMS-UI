@@ -6,7 +6,15 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!dist", "!coverage", "!.agents", "!.claude", "!src/routeTree.gen.ts"]
+    "includes": [
+      "**",
+      "!dist",
+      "!coverage",
+      "!.agents",
+      "!.claude",
+      "!src/routeTree.gen.ts",
+      "!src/shared/api/schema.d.ts"
+    ]
   },
   "formatter": {
     "enabled": true,

@@ -29,6 +29,9 @@ const contact: LeadContact = {
   phone: "0100000000",
   jobTitle: "COO",
   isPrimary: false,
+  createdAt: "2026-05-01T00:00:00.000Z",
+  updatedAt: "2026-05-01T00:00:00.000Z",
+  deletedAt: null,
 };
 
 function renderModal(state: LeadContactModalState, onClose = vi.fn()) {

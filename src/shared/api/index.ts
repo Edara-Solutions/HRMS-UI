@@ -32,3 +32,4 @@ export {
   useUpdatePlanPrice,
 } from "./plans";
 export { queryClient } from "./query-client";
+export type { components, paths } from "./schema";

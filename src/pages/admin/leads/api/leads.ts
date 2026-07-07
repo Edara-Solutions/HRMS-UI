@@ -1,130 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/shared/api";
+import { apiClient, type components, type paths } from "@/shared/api";
 
-// ─── Enums ────────────────────────────────────────────────────────────────────
+// ─── Types (generated from the backend OpenAPI contract) ──────────────────────
 
-export type LeadStatus =
-  | "NEW"
-  | "NO_ANSWER"
-  | "WRONG_NUMBER"
-  | "CONTACTED"
-  | "FOLLOWING_UP"
-  | "QUALIFIED"
-  | "NOT_QUALIFIED"
-  | "NOT_INTERESTED"
-  | "DEMO_SCHEDULED"
-  | "WAITING_QUOTATION"
-  | "QUOTATION_SENT"
-  | "TRIAL_STARTED"
-  | "NEGOTIATION"
-  | "WON_CONVERTED"
-  | "LOST"
-  | "REJOINED";
+export type LeadStatus = components["schemas"]["LeadStatus"];
+export type LeadSource = components["schemas"]["LeadSource"];
+export type LostReason = components["schemas"]["LostReason"];
+export type CompanySizeRange = components["schemas"]["CompanySizeRange"];
+export type LeadActivityType = components["schemas"]["LeadActivityType"];
 
-export type LeadSource =
-  | "CRM"
-  | "LANDING_PAGE"
-  | "FACEBOOK"
-  | "GOOGLE"
-  | "LINKEDIN"
-  | "REFERRAL"
-  | "PARTNER"
-  | "OTHER";
+export type Lead = components["schemas"]["Lead"];
+export type LeadContact = components["schemas"]["LeadContact"];
+export type LeadWithContacts = components["schemas"]["LeadWithContacts"];
+export type LeadDetails = components["schemas"]["LeadDetails"];
+export type LeadActivity = components["schemas"]["LeadActivity"];
+export type LeadCreateResult = components["schemas"]["LeadCreateResult"];
+export type LeadListMeta = components["schemas"]["PageMeta"];
+export type LeadListResponse = components["schemas"]["LeadListResponse"];
+export type LeadActivityListResponse = components["schemas"]["LeadActivityListResponse"];
+export type ConvertLeadResult = components["schemas"]["ConvertedCompany"];
 
-export type LostReason =
-  | "TOO_EXPENSIVE"
-  | "MISSING_FEATURES"
-  | "NOT_FIT"
-  | "COMPETITOR_CHOSEN"
-  | "NO_BUDGET"
-  | "NO_DECISION"
-  | "NO_RESPONSE";
+type LeadsPaths = paths["/api/v1/leads"];
+type LeadPaths = paths["/api/v1/leads/{publicId}"];
+type LeadContactsPaths = paths["/api/v1/leads/{publicId}/contacts"];
+type LeadContactPaths = paths["/api/v1/leads/{publicId}/contacts/{contactPublicId}"];
+type LeadActivitiesPaths = paths["/api/v1/leads/{publicId}/activities"];
+type ConvertLeadPaths = paths["/api/v1/leads/{publicId}/convert"];
 
-export type CompanySizeRange = "5_TO_20" | "21_TO_50" | "51_TO_100" | "MORE_THAN_100";
-
-export type LeadActivityType =
-  | "CALLING_ON_WHATSAPP"
-  | "CALLING_ON_PHONE"
-  | "SENDING_EMAIL"
-  | "RECEIVING_EMAIL"
-  | "SENDING_SMS"
-  | "RECEIVING_SMS"
-  | "CHAT"
-  | "SENDING_QUOTATION"
-  | "REQUEST_QUOTATION"
-  | "MEETING"
-  | "NOTE"
-  | "FORM_SUBMISSION"
-  | "SYSTEM_EVENT"
-  | "OTHER";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface Lead {
-  id?: number;
-  publicId: string;
-  companyName: string | null;
-  website: string | null;
-  industry: string | null;
-  companySizeRange: CompanySizeRange;
-  country: string | null;
-  city: string | null;
-  source: LeadSource;
-  status: LeadStatus;
-  lostReason: LostReason | null;
-  ownerUserId: number | null;
-  numberOfAttempts: number;
-  companyId: number | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-
-export interface LeadContact {
-  publicId: string;
-  leadId?: number;
-  name: string | null;
-  email: string | null;
-  phone: string | null;
-  jobTitle: string | null;
-  isPrimary: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string | null;
-}
-
-export interface LeadWithContacts {
-  lead: Lead;
-  contacts: LeadContact[];
-}
-
-export interface LeadActivity {
-  publicId: string;
-  leadId: number;
-  type: LeadActivityType;
-  note: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-
-export interface LeadListMeta {
-  mode: "page";
-  page: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
-}
-
-export interface LeadListResponse {
-  items: LeadWithContacts[];
-  meta: LeadListMeta;
-}
-
-export interface LeadActivityListResponse {
-  items: LeadActivity[];
-  meta: LeadListMeta;
-}
+export type LeadListParams = NonNullable<LeadsPaths["get"]["parameters"]["query"]>;
+export type CreateLeadInput = LeadsPaths["post"]["requestBody"]["content"]["application/json"];
+export type UpdateLeadInput = LeadPaths["patch"]["requestBody"]["content"]["application/json"];
+export type AddContactInput =
+  LeadContactsPaths["post"]["requestBody"]["content"]["application/json"];
+export type UpdateContactInput =
+  LeadContactPaths["patch"]["requestBody"]["content"]["application/json"];
+export type AddActivityInput =
+  LeadActivitiesPaths["post"]["requestBody"]["content"]["application/json"];
+export type ConvertLeadInput =
+  ConvertLeadPaths["post"]["requestBody"]["content"]["application/json"];
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
@@ -135,18 +48,6 @@ const leadsKeys = {
   activities: (id: string, page: number) => ["leads", id, "activities", page] as const,
   activitiesAll: (id: string) => ["leads", id, "activities"] as const,
 };
-
-// ─── Params ───────────────────────────────────────────────────────────────────
-
-export interface LeadListParams {
-  status?: LeadStatus;
-  source?: LeadSource;
-  country?: string;
-  search?: string;
-  page?: number;
-  pageSize?: number;
-  sort?: "createdAtAsc" | "createdAtDesc";
-}
 
 // ─── API Fns ──────────────────────────────────────────────────────────────────
 
@@ -162,43 +63,20 @@ async function fetchLeads(params: LeadListParams): Promise<LeadListResponse> {
   return apiClient.get("leads", { searchParams }).json();
 }
 
-async function fetchLead(publicId: string): Promise<LeadWithContacts> {
+async function fetchLead(publicId: string): Promise<LeadDetails> {
   return apiClient.get(`leads/${publicId}`).json();
 }
 
-async function createLead(
-  input: Partial<Lead> & { primaryContact?: Partial<LeadContact> },
-): Promise<LeadWithContacts> {
+async function createLead(input: CreateLeadInput): Promise<LeadCreateResult> {
   return apiClient.post("leads", { json: input }).json();
 }
 
-async function updateLead(
-  publicId: string,
-  input: Partial<Lead> & { allowStatusOverride?: boolean },
-): Promise<LeadWithContacts> {
+async function updateLead(publicId: string, input: UpdateLeadInput): Promise<LeadWithContacts> {
   return apiClient.patch(`leads/${publicId}`, { json: input }).json();
 }
 
 async function deleteLead(publicId: string): Promise<void> {
   await apiClient.delete(`leads/${publicId}`);
-}
-
-export interface ConvertLeadInput {
-  phoneNumber: string;
-  name?: string;
-  country?: string;
-  website?: string;
-  logo?: string;
-  addressLine?: string;
-  ownerFirstName: string;
-  ownerLastName: string;
-  ownerEmail: string;
-}
-
-export interface ConvertLeadResult {
-  publicId: string;
-  name: string;
-  companyCode: string;
 }
 
 async function convertLead(publicId: string, input: ConvertLeadInput): Promise<ConvertLeadResult> {
@@ -209,29 +87,18 @@ async function fetchLeadActivities(publicId: string, page = 1): Promise<LeadActi
   return apiClient.get(`leads/${publicId}/activities`, { searchParams: { page } }).json();
 }
 
-async function addLeadActivity(
-  publicId: string,
-  input: { type: LeadActivityType; note: string },
-): Promise<LeadActivity> {
+async function addLeadActivity(publicId: string, input: AddActivityInput): Promise<LeadActivity> {
   return apiClient.post(`leads/${publicId}/activities`, { json: input }).json();
 }
 
-export interface LeadContactInput {
-  name?: string;
-  email?: string;
-  phone?: string;
-  jobTitle?: string;
-  isPrimary?: boolean;
-}
-
-async function addLeadContact(publicId: string, input: LeadContactInput): Promise<LeadContact> {
+async function addLeadContact(publicId: string, input: AddContactInput): Promise<LeadContact> {
   return apiClient.post(`leads/${publicId}/contacts`, { json: input }).json();
 }
 
 async function updateLeadContact(
   publicId: string,
   contactPublicId: string,
-  input: LeadContactInput,
+  input: UpdateContactInput,
 ): Promise<LeadContact> {
   return apiClient.patch(`leads/${publicId}/contacts/${contactPublicId}`, { json: input }).json();
 }
@@ -268,13 +135,8 @@ export function useCreateLead() {
 export function useUpdateLead() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      publicId,
-      input,
-    }: {
-      publicId: string;
-      input: Partial<Lead> & { allowStatusOverride?: boolean };
-    }) => updateLead(publicId, input),
+    mutationFn: ({ publicId, input }: { publicId: string; input: UpdateLeadInput }) =>
+      updateLead(publicId, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: leadsKeys.all }),
   });
 }
@@ -309,13 +171,8 @@ export function useLeadActivities(publicId: string, page = 1) {
 export function useAddLeadActivity() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      publicId,
-      input,
-    }: {
-      publicId: string;
-      input: { type: LeadActivityType; note: string };
-    }) => addLeadActivity(publicId, input),
+    mutationFn: ({ publicId, input }: { publicId: string; input: AddActivityInput }) =>
+      addLeadActivity(publicId, input),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.activitiesAll(vars.publicId) });
     },
@@ -325,7 +182,7 @@ export function useAddLeadActivity() {
 export function useAddLeadContact() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ publicId, input }: { publicId: string; input: LeadContactInput }) =>
+    mutationFn: ({ publicId, input }: { publicId: string; input: AddContactInput }) =>
       addLeadContact(publicId, input),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
@@ -344,7 +201,7 @@ export function useUpdateLeadContact() {
     }: {
       publicId: string;
       contactPublicId: string;
-      input: LeadContactInput;
+      input: UpdateContactInput;
     }) => updateLeadContact(publicId, contactPublicId, input),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });

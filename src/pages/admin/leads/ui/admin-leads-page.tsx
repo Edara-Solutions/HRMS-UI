@@ -30,7 +30,7 @@ import { CreateLeadModal } from "./create-lead-modal";
 // --- Table --------------------------------------------------------------
 
 function isConvertible(lead: LeadWithContacts["lead"]): boolean {
-  return lead.companyId === null && lead.status !== "WON_CONVERTED";
+  return !lead.isConverted && lead.status !== "WON_CONVERTED";
 }
 
 function LeadsTable({

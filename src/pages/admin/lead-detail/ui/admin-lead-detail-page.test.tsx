@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LeadActivityListResponse, LeadWithContacts } from "../api/lead-detail";
+import type { LeadActivityListResponse, LeadDetails } from "../api/lead-detail";
 import { AdminLeadDetailPage } from "./admin-lead-detail-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -33,7 +33,7 @@ function jsonResponse<T>(value: T) {
   return { json: () => Promise.resolve(value) };
 }
 
-const leadWithContacts: LeadWithContacts = {
+const leadWithContacts: LeadDetails = {
   lead: {
     publicId: "lead-1",
     companyName: "Acme Corp",
@@ -45,9 +45,8 @@ const leadWithContacts: LeadWithContacts = {
     source: "REFERRAL",
     status: "NEGOTIATION",
     lostReason: null,
-    ownerUserId: null,
+    isConverted: false,
     numberOfAttempts: 3,
-    companyId: null,
     createdAt: "2026-05-01T00:00:00.000Z",
     updatedAt: "2026-06-10T00:00:00.000Z",
     deletedAt: null,
@@ -60,6 +59,9 @@ const leadWithContacts: LeadWithContacts = {
       phone: "0100000000",
       jobTitle: "COO",
       isPrimary: true,
+      createdAt: "2026-05-01T00:00:00.000Z",
+      updatedAt: "2026-05-01T00:00:00.000Z",
+      deletedAt: null,
     },
     {
       publicId: "contact-2",
@@ -68,8 +70,12 @@ const leadWithContacts: LeadWithContacts = {
       phone: "0111111111",
       jobTitle: "CFO",
       isPrimary: false,
+      createdAt: "2026-05-01T00:00:00.000Z",
+      updatedAt: "2026-05-01T00:00:00.000Z",
+      deletedAt: null,
     },
   ],
+  activities: [],
 };
 
 function activitiesResponse(): LeadActivityListResponse {
@@ -77,7 +83,6 @@ function activitiesResponse(): LeadActivityListResponse {
     items: [
       {
         publicId: "activity-1",
-        leadId: 1,
         type: "MEETING",
         note: "Kickoff call with the COO",
         createdAt: "2026-06-09T09:00:00.000Z",
