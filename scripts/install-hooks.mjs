@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { constants, accessSync, existsSync } from "node:fs";
+import { accessSync, constants, existsSync } from "node:fs";
 import { delimiter, join } from "node:path";
 
 if (process.env.CI === "true") {
