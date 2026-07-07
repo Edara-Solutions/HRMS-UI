@@ -65,7 +65,7 @@ export function LogActivityForm({ leadPublicId }: LogActivityFormProps) {
         <p className="text-xs text-[var(--color-danger)]">{errors.root.message}</p>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3">
         <div className="space-y-1.5 sm:w-48 sm:shrink-0">
           <Label htmlFor="log-activity-type">Type</Label>
           <Controller
