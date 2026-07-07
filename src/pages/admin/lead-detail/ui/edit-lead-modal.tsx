@@ -10,7 +10,7 @@ import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import type { Lead } from "../api/lead-detail";
+import type { Lead, LeadStatus } from "../api/lead-detail";
 import { useUpdateLead } from "../api/lead-detail";
 import {
   ALL_LOST_REASONS,
@@ -24,6 +24,38 @@ import {
 } from "../api/lead-labels";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
+
+const statusTransitions: Record<LeadStatus, LeadStatus[]> = {
+  NEW: ["CONTACTED", "WRONG_NUMBER", "NO_ANSWER", "FOLLOWING_UP"],
+  REJOINED: ["CONTACTED", "WRONG_NUMBER", "NO_ANSWER", "FOLLOWING_UP"],
+  WRONG_NUMBER: ["CONTACTED", "LOST"],
+  NO_ANSWER: ["FOLLOWING_UP", "LOST"],
+  FOLLOWING_UP: ["CONTACTED", "LOST"],
+  CONTACTED: ["QUALIFIED", "NOT_QUALIFIED", "NOT_INTERESTED", "DEMO_SCHEDULED", "LOST"],
+  QUALIFIED: ["DEMO_SCHEDULED", "TRIAL_STARTED", "NEGOTIATION", "LOST"],
+  NOT_QUALIFIED: ["LOST"],
+  NOT_INTERESTED: ["LOST"],
+  DEMO_SCHEDULED: ["WAITING_QUOTATION", "TRIAL_STARTED", "LOST"],
+  WAITING_QUOTATION: ["QUOTATION_SENT", "NEGOTIATION", "LOST"],
+  QUOTATION_SENT: ["NEGOTIATION", "WON_CONVERTED", "LOST"],
+  TRIAL_STARTED: ["NEGOTIATION", "WON_CONVERTED", "LOST"],
+  NEGOTIATION: ["WON_CONVERTED", "LOST"],
+  WON_CONVERTED: [],
+  LOST: [],
+};
+
+function isLeadStatusOverrideAllowed(): boolean {
+  return import.meta.env.ALLOW_LEAD_STATUS_OVERRIDE === "true";
+}
+
+function getEditableStatusOptions(leadStatus: LeadStatus, allowStatusOverride: boolean): LeadStatus[] {
+  if (allowStatusOverride) return EDITABLE_STATUSES;
+
+  const currentStatus = leadStatus === "REJOINED" ? "NEW" : leadStatus;
+  const allowedStatuses = statusTransitions[leadStatus].filter((status) => status !== "REJOINED");
+
+  return Array.from(new Set([currentStatus, ...allowedStatuses]));
+}
 
 async function readUpdateErrorMessage(error: unknown): Promise<string> {
   if (error instanceof HTTPError) {
@@ -95,6 +127,8 @@ function EditLeadModalContent({
   descriptionId,
 }: EditLeadModalContentProps) {
   const updateLead = useUpdateLead();
+  const allowStatusOverride = isLeadStatusOverrideAllowed();
+  const editableStatusOptions = getEditableStatusOptions(lead.status, allowStatusOverride);
 
   const {
     register,
@@ -134,7 +168,7 @@ function EditLeadModalContent({
           source: data.source,
           status: data.status,
           lostReason: data.status === "LOST" ? data.lostReason || undefined : undefined,
-          allowStatusOverride: true,
+          allowStatusOverride,
         },
       });
       onClose();
@@ -238,7 +272,7 @@ function EditLeadModalContent({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {EDITABLE_STATUSES.map((s) => (
+                    {editableStatusOptions.map((s) => (
                       <SelectItem key={s} value={s}>
                         {STATUS_BADGE[s].label}
                       </SelectItem>

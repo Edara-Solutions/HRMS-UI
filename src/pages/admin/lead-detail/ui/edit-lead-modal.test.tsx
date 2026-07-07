@@ -1,13 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Lead } from "../api/lead-detail";
 import { EditLeadModal } from "./edit-lead-modal";
 
 const updatePatchMock = vi.hoisted(() => vi.fn());
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm — stub the client boundary instead of the network.
+// rejects as cross-realm - stub the client boundary instead of the network.
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
@@ -50,9 +50,14 @@ function renderModal(onClose = vi.fn()) {
 }
 
 describe("EditLeadModal", () => {
+  beforeEach(() => {
+    vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "false");
+  });
+
   afterEach(() => {
     cleanup();
     updatePatchMock.mockReset();
+    vi.unstubAllEnvs();
   });
 
   it("pre-fills the current lead fields", () => {
@@ -72,6 +77,53 @@ describe("EditLeadModal", () => {
 
     expect(await screen.findByText(/lost reason is required/i)).toBeInTheDocument();
     expect(updatePatchMock).not.toHaveBeenCalled();
+  });
+
+  it("limits status options to valid transitions when override is disabled", () => {
+    renderModal();
+
+    fireEvent.click(screen.getByLabelText(/status/i));
+
+    expect(screen.getByRole("option", { name: "Qualified" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Demo scheduled" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Trial" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Negotiation" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Lost" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Contacted" })).not.toBeInTheDocument();
+  });
+
+  it("shows every editable status when override is enabled", () => {
+    vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "true");
+
+    renderModal();
+
+    fireEvent.click(screen.getByLabelText(/status/i));
+
+    expect(screen.getByRole("option", { name: "Contacted" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Rejoined" })).not.toBeInTheDocument();
+  });
+
+  it("submits allowStatusOverride when override is enabled", async () => {
+    vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "true");
+    updatePatchMock.mockReturnValue(jsonResponse({ lead: { ...lead, status: "CONTACTED" }, contacts: [] }));
+
+    renderModal();
+
+    fireEvent.click(screen.getByLabelText(/status/i));
+    fireEvent.click(screen.getByRole("option", { name: "Contacted" }));
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+    await waitFor(() =>
+      expect(updatePatchMock).toHaveBeenCalledWith(
+        "leads/lead-1",
+        expect.objectContaining({
+          json: expect.objectContaining({
+            status: "CONTACTED",
+            allowStatusOverride: true,
+          }),
+        }),
+      ),
+    );
   });
 
   it("submits the status change with the selected lost reason", async () => {
@@ -95,7 +147,7 @@ describe("EditLeadModal", () => {
           json: expect.objectContaining({
             status: "LOST",
             lostReason: "NO_BUDGET",
-            allowStatusOverride: true,
+            allowStatusOverride: false,
           }),
         }),
       ),
