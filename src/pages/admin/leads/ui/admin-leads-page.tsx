@@ -26,6 +26,7 @@ import type { ConvertLeadResult, LeadSource, LeadStatus, LeadWithContacts } from
 import { useLeads } from "../api/leads";
 import { ConvertLeadModal } from "./convert-lead-modal";
 import { CreateLeadModal } from "./create-lead-modal";
+import { CountrySelect } from "@/shared/ui/country-select";
 
 // --- Table --------------------------------------------------------------
 
@@ -487,13 +488,27 @@ export function AdminLeadsPage() {
           </SelectContent>
         </Select>
 
-        <Input
-          placeholder="Country"
-          value={countryInput}
-          onChange={(event) => setCountryInput(event.target.value)}
+        <CountrySelect
+          value={countryFilter}
+          onValueChange={(next) => setCountryFilter(next)}
+          id="admin-leads-country"
           className="lg:w-36"
-          aria-label="Filter by country"
         />
+
+        {/* reset button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setQueryInput("");
+            setStatusFilter("");
+            setSourceFilter("");
+            setCountryFilter("");
+            setSort(undefined);
+          }}
+        >
+          Reset
+        </Button>
 
         <div className="flex items-center gap-1 lg:ms-auto">
           <Button
