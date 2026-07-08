@@ -5,11 +5,13 @@ import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { StateSelect } from "@/shared/ui/state-select";
 import type { Lead, LeadStatus } from "../api/lead-detail";
 import { useUpdateLead } from "../api/lead-detail";
 import {
@@ -136,6 +138,7 @@ function EditLeadModalContent({
     handleSubmit,
     watch,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<EditLeadFormData>({
     resolver: zodResolver(editLeadFormSchema),
@@ -153,6 +156,7 @@ function EditLeadModalContent({
   });
 
   const status = watch("status");
+  const selectedCountry = watch("country");
 
   async function onSubmit(data: EditLeadFormData) {
     try {
@@ -199,12 +203,40 @@ function EditLeadModalContent({
 
           <div className="space-y-1.5">
             <Label htmlFor="edit-lead-country">Country</Label>
-            <Input id="edit-lead-country" {...register("country")} />
+            <Controller
+              control={control}
+              name="country"
+              render={({ field }) => (
+                <CountrySelect
+                  value={field.value ?? ""}
+                  onValueChange={(nextCountry) => {
+                    field.onChange(nextCountry);
+                    setValue("city", "");
+                  }}
+                  id="edit-lead-country"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="edit-lead-city">City</Label>
-            <Input id="edit-lead-city" {...register("city")} />
+            <Label htmlFor="edit-lead-city">State</Label>
+            <Controller
+              control={control}
+              name="city"
+              render={({ field }) => (
+                <StateSelect
+                  country={selectedCountry ?? ""}
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  id="edit-lead-city"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">

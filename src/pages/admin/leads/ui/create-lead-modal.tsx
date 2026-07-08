@@ -1,18 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
-import { type ReactNode, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { GetCountries, GetState } from "react-country-state-city/dist/cjs/index.js";
-import type { Country, State } from "react-country-state-city/dist/cjs/types/index";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { StateSelect } from "@/shared/ui/state-select";
 import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 import { useCreateLead } from "../api/leads";
 
@@ -41,60 +40,6 @@ const createLeadFormSchema = z.object({
 });
 
 type CreateLeadFormData = z.infer<typeof createLeadFormSchema>;
-
-interface SearchableSelectOption {
-  value: string;
-  label: ReactNode;
-  searchText: string;
-}
-
-interface SearchableSelectContentProps {
-  options: SearchableSelectOption[];
-  searchPlaceholder: string;
-  emptyMessage: string;
-}
-
-function normalizeSearchValue(value: string): string {
-  return value.trim().toLowerCase();
-}
-
-function SearchableSelectContent({
-  options,
-  searchPlaceholder,
-  emptyMessage,
-}: SearchableSelectContentProps) {
-  const [query, setQuery] = useState("");
-  const normalizedQuery = normalizeSearchValue(query);
-  const filteredOptions = normalizedQuery
-    ? options.filter((option) => normalizeSearchValue(option.searchText).includes(normalizedQuery))
-    : options;
-
-  return (
-    <SelectContent>
-      <div className="sticky top-0 z-10 bg-[var(--color-surface)] p-1">
-        <Input
-          aria-label={searchPlaceholder}
-          className="h-8"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => event.stopPropagation()}
-          placeholder={searchPlaceholder}
-        />
-      </div>
-
-      {filteredOptions.length > 0 ? (
-        filteredOptions.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))
-      ) : (
-        <div className="px-2.5 py-2 text-[13px] text-[var(--color-text-muted)]">{emptyMessage}</div>
-      )}
-    </SelectContent>
-  );
-}
 
 interface CreateLeadModalProps {
   open: boolean;
@@ -127,10 +72,6 @@ interface CreateLeadModalContentProps {
 
 function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadModalContentProps) {
   const createLead = useCreateLead();
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [states, setStates] = useState<State[]>([]);
-  const [isCountryLoading, setIsCountryLoading] = useState(true);
-  const [isStateLoading, setIsStateLoading] = useState(false);
 
   const {
     register,
@@ -158,52 +99,6 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
   });
 
   const selectedCountry = watch("country");
-  useEffect(() => {
-    let isActive = true;
-
-    setIsCountryLoading(true);
-    GetCountries()
-      .then((nextCountries) => {
-        if (isActive) setCountries(nextCountries);
-      })
-      .catch(() => {
-        if (isActive) setCountries([]);
-      })
-      .finally(() => {
-        if (isActive) setIsCountryLoading(false);
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const country = countries.find((item) => item.name === selectedCountry);
-    if (!country) {
-      setStates([]);
-      return;
-    }
-
-    let isActive = true;
-
-    setIsStateLoading(true);
-    GetState(country.id)
-      .then((nextStates) => {
-        if (isActive) setStates(nextStates);
-      })
-      .catch(() => {
-        if (isActive) setStates([]);
-      })
-      .finally(() => {
-        if (isActive) setIsStateLoading(false);
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [countries, selectedCountry]);
-
 
   async function onSubmit(data: CreateLeadFormData) {
     try {
@@ -256,38 +151,16 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
               control={control}
               name="country"
               render={({ field }) => (
-                <Select
-                  value={field.value}
+                <CountrySelect
+                  value={field.value ?? ""}
                   onValueChange={(nextCountry) => {
                     field.onChange(nextCountry);
                     setValue("state", "");
                   }}
-                  disabled={isCountryLoading || countries.length === 0}
-                >
-                  <SelectTrigger id="create-lead-country" ref={field.ref} onBlur={field.onBlur}>
-                    <SelectValue
-                      placeholder={isCountryLoading ? "Loading countries" : "Select country"}
-                    />
-                  </SelectTrigger>
-                  <SearchableSelectContent
-                    searchPlaceholder="Search countries"
-                    emptyMessage="No countries found"
-                    options={countries.map((country) => ({
-                      value: country.name,
-                      searchText: country.name,
-                      label: (
-                        <span className="flex min-w-0 items-center gap-2">
-                          {country.emoji && (
-                            <span className="stdropdown-flag shrink-0" aria-hidden="true">
-                              {country.emoji}
-                            </span>
-                          )}
-                          <span className="truncate">{country.name}</span>
-                        </span>
-                      ),
-                    }))}
-                  />
-                </Select>
+                  id="create-lead-country"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
               )}
             />
           </div>
@@ -298,30 +171,17 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
               control={control}
               name="state"
               render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(nextState) => {
-                    field.onChange(nextState);
-                  }}
-                  disabled={!selectedCountry || isStateLoading || states.length === 0}
-                >
-                  <SelectTrigger id="create-lead-state" ref={field.ref} onBlur={field.onBlur}>
-                    <SelectValue placeholder={isStateLoading ? "Loading states" : "Select state"} />
-                  </SelectTrigger>
-                  <SearchableSelectContent
-                    searchPlaceholder="Search states"
-                    emptyMessage="No states found"
-                    options={states.map((state) => ({
-                      value: state.name,
-                      searchText: state.name,
-                      label: state.name,
-                    }))}
-                  />
-                </Select>
+                <StateSelect
+                  country={selectedCountry ?? ""}
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  id="create-lead-state"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
               )}
             />
           </div>
-
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-industry">Industry</Label>
