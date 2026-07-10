@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  ArrowRightLeft,
   ChevronLeft,
   ChevronRight,
   Globe,
@@ -22,7 +23,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type { Lead, LeadActivityListResponse, LeadContact } from "../api/lead-detail";
+import type {
+  ConvertLeadResult,
+  Lead,
+  LeadActivityListResponse,
+  LeadContact,
+  LeadStatus,
+} from "../api/lead-detail";
 import {
   useDeleteLead,
   useDeleteLeadContact,
@@ -31,6 +38,7 @@ import {
   useUpdateLeadContact,
 } from "../api/lead-detail";
 import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "../api/lead-labels";
+import { ConvertLeadModal } from "./convert-lead-modal";
 import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
@@ -50,6 +58,25 @@ function formatDateTime(value: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+const CONVERTIBLE_LEAD_STATUSES = new Set<LeadStatus>([
+  "QUALIFIED",
+  "DEMO_SCHEDULED",
+  "WAITING_QUOTATION",
+  "QUOTATION_SENT",
+  "TRIAL_STARTED",
+  "NEGOTIATION",
+]);
+
+function isLeadConversionFromAnyStateAllowed(): boolean {
+  return import.meta.env.ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE === "true";
+}
+
+function canConvertLead(lead: Lead, allowConvertFromAnyState: boolean): boolean {
+  if (lead.isConverted || lead.status === "WON_CONVERTED") return false;
+  if (allowConvertFromAnyState) return true;
+  return CONVERTIBLE_LEAD_STATUSES.has(lead.status);
 }
 
 // --- Profile ----------------------------------------------------------------
@@ -327,6 +354,7 @@ function LeadActivityTimelineCard({
 type LeadDetailPanel =
   | { kind: "none" }
   | { kind: "edit-lead" }
+  | { kind: "convert-lead" }
   | { kind: "delete-lead" }
   | { kind: "contact-form"; contact: LeadContact | null }
   | { kind: "delete-contact"; contact: LeadContact };
@@ -343,6 +371,7 @@ export function AdminLeadDetailPage() {
   const deleteLead = useDeleteLead();
   const deleteContact = useDeleteLeadContact();
   const updateContact = useUpdateLeadContact();
+  const allowConvertFromAnyState = isLeadConversionFromAnyStateAllowed();
 
   function backToLeads() {
     void navigate({ to: "/admin/leads", search: { page: 1, pageSize: 10 } });
@@ -357,6 +386,11 @@ export function AdminLeadDetailPage() {
     if (panel.kind !== "delete-contact") return;
     await deleteContact.mutateAsync({ publicId, contactPublicId: panel.contact.publicId });
     closePanel();
+  }
+
+  function goToConvertedCompany(company: ConvertLeadResult) {
+    closePanel();
+    void navigate({ to: "/admin/companies/$publicId", params: { publicId: company.publicId } });
   }
 
   function makeContactPrimary(contact: LeadContact) {
@@ -395,6 +429,7 @@ export function AdminLeadDetailPage() {
 
   const { lead, contacts } = data;
   const status = STATUS_BADGE[lead.status];
+  const canConvert = canConvertLead(lead, allowConvertFromAnyState);
 
   return (
     <div className="mx-auto max-w-[1200px]">
@@ -425,9 +460,15 @@ export function AdminLeadDetailPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={status.variant} className="h-6 px-2 text-[12px]">
-              {status.label}
-            </Badge>
+            {canConvert && (
+              <Button
+                intent="utility"
+                leadingIcon={<ArrowRightLeft size={13} />}
+                onClick={() => setPanel({ kind: "convert-lead" })}
+              >
+                Convert
+              </Button>
+            )}
             <Button
               intent="utility"
               leadingIcon={<Pencil size={13} />}
@@ -472,6 +513,12 @@ export function AdminLeadDetailPage() {
           />
         </div>
       </div>
+
+      <ConvertLeadModal
+        leadWithContacts={panel.kind === "convert-lead" ? { lead, contacts } : null}
+        onClose={closePanel}
+        onConverted={goToConvertedCompany}
+      />
 
       <EditLeadModal lead={panel.kind === "edit-lead" ? lead : null} onClose={closePanel} />
 

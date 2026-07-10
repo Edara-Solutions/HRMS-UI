@@ -2,17 +2,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import type { ConvertLeadResult, LeadContact, LeadWithContacts } from "../api/leads";
-import { useConvertLead } from "../api/leads";
+import type { ConvertLeadResult, LeadContact, LeadWithContacts } from "../api/lead-detail";
+import { useConvertLead } from "../api/lead-detail";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -108,6 +109,7 @@ function ConvertLeadModalContent({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<ConvertLeadFormData>({
@@ -115,7 +117,7 @@ function ConvertLeadModalContent({
     defaultValues: {
       name: lead.companyName ?? "",
       country: lead.country ?? "",
-      phoneNumber: "",
+      phoneNumber: primaryContact?.phone ?? "",
       ownerFirstName: firstName,
       ownerLastName: lastName,
       ownerEmail: primaryContact?.email ?? "",
@@ -194,7 +196,19 @@ function ConvertLeadModalContent({
 
           <div className="space-y-1.5">
             <Label htmlFor="convert-country">Country</Label>
-            <Input id="convert-country" aria-invalid={!!errors.country} {...register("country")} />
+            <Controller
+              control={control}
+              name="country"
+              render={({ field }) => (
+                <CountrySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  id="convert-country"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
             {errors.country && (
               <p className="text-xs text-[var(--color-danger)]">{errors.country.message}</p>
             )}
