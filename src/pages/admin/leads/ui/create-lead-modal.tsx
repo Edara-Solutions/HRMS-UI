@@ -5,11 +5,13 @@ import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { asZodEnumValues } from "@/shared/lib/zod-enum";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { StateSelect } from "@/shared/ui/state-select";
 import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 import { useCreateLead } from "../api/leads";
 
@@ -29,7 +31,7 @@ const createLeadFormSchema = z.object({
   industry: z.string().optional(),
   companySizeRange: z.enum(asZodEnumValues(ALL_SIZES)),
   country: z.string().optional(),
-  city: z.string().optional(),
+  state: z.string().optional(),
   source: z.enum(asZodEnumValues(ALL_SOURCES)),
   contactName: z.string().min(1, "Primary contact name is required"),
   contactEmail: z.string().email("Enter a valid email address").optional().or(z.literal("")),
@@ -76,6 +78,8 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
     control,
     handleSubmit,
     setError,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateLeadFormData>({
     resolver: zodResolver(createLeadFormSchema),
@@ -85,7 +89,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
       industry: "",
       companySizeRange: ALL_SIZES[0],
       country: "",
-      city: "",
+      state: "",
       source: ALL_SOURCES[0],
       contactName: "",
       contactEmail: "",
@@ -93,6 +97,8 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
       contactJobTitle: "",
     },
   });
+
+  const selectedCountry = watch("country");
 
   async function onSubmit(data: CreateLeadFormData) {
     try {
@@ -102,7 +108,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
         industry: data.industry || undefined,
         companySizeRange: data.companySizeRange,
         country: data.country || undefined,
-        city: data.city || undefined,
+        city: data.state || undefined,
         source: data.source,
         status: "NEW",
         primaryContact: {
@@ -141,12 +147,40 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
 
           <div className="space-y-1.5">
             <Label htmlFor="create-lead-country">Country</Label>
-            <Input id="create-lead-country" {...register("country")} />
+            <Controller
+              control={control}
+              name="country"
+              render={({ field }) => (
+                <CountrySelect
+                  value={field.value ?? ""}
+                  onValueChange={(nextCountry) => {
+                    field.onChange(nextCountry);
+                    setValue("state", "");
+                  }}
+                  id="create-lead-country"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="create-lead-city">City</Label>
-            <Input id="create-lead-city" {...register("city")} />
+            <Label htmlFor="create-lead-state">State</Label>
+            <Controller
+              control={control}
+              name="state"
+              render={({ field }) => (
+                <StateSelect
+                  country={selectedCountry ?? ""}
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                  id="create-lead-state"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
           </div>
 
           <div className="space-y-1.5">

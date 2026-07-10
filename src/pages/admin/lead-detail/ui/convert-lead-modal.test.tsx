@@ -1,13 +1,31 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LeadWithContacts } from "../api/leads";
+import type { LeadWithContacts } from "../api/lead-detail";
 import { ConvertLeadModal } from "./convert-lead-modal";
+
+vi.mock("@/shared/ui/country-select", () => ({
+  CountrySelect: ({
+    id,
+    value,
+    onValueChange,
+    onBlur,
+  }: {
+    id?: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    onBlur?: () => void;
+  }) => (
+    <button id={id} type="button" onBlur={onBlur} onClick={() => onValueChange("United States")}>
+      {value || "Select country"}
+    </button>
+  ),
+}));
 
 const convertPostMock = vi.hoisted(() => vi.fn());
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm — stub the client boundary instead of the network.
+// rejects as cross-realm â€” stub the client boundary instead of the network.
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
@@ -45,9 +63,8 @@ const leadWithContacts: LeadWithContacts = {
     source: "CRM",
     status: "QUALIFIED",
     lostReason: null,
-    ownerUserId: null,
+    isConverted: false,
     numberOfAttempts: 0,
-    companyId: null,
     createdAt: "2026-06-01T00:00:00.000Z",
     updatedAt: "2026-06-01T00:00:00.000Z",
     deletedAt: null,
@@ -60,6 +77,9 @@ const leadWithContacts: LeadWithContacts = {
       phone: "0100000000",
       jobTitle: "CEO",
       isPrimary: true,
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-01T00:00:00.000Z",
+      deletedAt: null,
     },
   ],
 };
@@ -90,7 +110,7 @@ describe("ConvertLeadModal", () => {
     renderModal();
 
     expect(screen.getByLabelText(/company name/i)).toHaveValue("Acme Corp");
-    expect(screen.getByLabelText(/country/i)).toHaveValue("Egypt");
+    expect(screen.getByLabelText(/country/i)).toHaveTextContent("Egypt");
     expect(screen.getByLabelText(/^first name$/i)).toHaveValue("Ahmad");
     expect(screen.getByLabelText(/^last name$/i)).toHaveValue("Al-Ghamdi");
     expect(screen.getByLabelText(/^email$/i)).toHaveValue("ahmad@acme.com");

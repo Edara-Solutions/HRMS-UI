@@ -1,6 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
-  ArrowRightLeft,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -22,24 +21,18 @@ import {
   SOURCE_LABEL,
   STATUS_BADGE,
 } from "../api/lead-labels";
-import type { ConvertLeadResult, LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
+import type { LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
 import { useLeads } from "../api/leads";
-import { ConvertLeadModal } from "./convert-lead-modal";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { CreateLeadModal } from "./create-lead-modal";
 
 // --- Table --------------------------------------------------------------
 
-function isConvertible(lead: LeadWithContacts["lead"]): boolean {
-  return lead.companyId === null && lead.status !== "WON_CONVERTED";
-}
-
 function LeadsTable({
   items,
-  onConvert,
   onView,
 }: {
   items: LeadWithContacts[];
-  onConvert: (leadWithContacts: LeadWithContacts) => void;
   onView: (publicId: string) => void;
 }) {
   return (
@@ -119,16 +112,6 @@ function LeadsTable({
                 >
                   View
                 </Button>
-                {isConvertible(lead) && (
-                  <Button
-                    intent="action"
-                    leadingIcon={<ArrowRightLeft size={13} />}
-                    className="w-full"
-                    onClick={() => onConvert({ lead, contacts })}
-                  >
-                    Convert
-                  </Button>
-                )}
               </div>
             </article>
           );
@@ -236,15 +219,6 @@ function LeadsTable({
                   {/* Actions */}
                   <td className="px-4 py-3 text-end">
                     <div className="flex justify-end gap-2">
-                      {isConvertible(lead) && (
-                        <Button
-                          intent="action"
-                          leadingIcon={<ArrowRightLeft size={13} />}
-                          onClick={() => onConvert({ lead, contacts })}
-                        >
-                          Convert
-                        </Button>
-                      )}
                       <Button
                         intent="utility"
                         leadingIcon={<ExternalLink size={13} />}
@@ -268,13 +242,11 @@ function LeadsTableCardContent({
   isError,
   isPending,
   items,
-  onConvert,
   onView,
 }: {
   isError: boolean;
   isPending: boolean;
   items: LeadWithContacts[];
-  onConvert: (leadWithContacts: LeadWithContacts) => void;
   onView: (publicId: string) => void;
 }) {
   if (isError) {
@@ -290,7 +262,7 @@ function LeadsTableCardContent({
   if (isPending) {
     return (
       <div className="flex flex-col items-center gap-2 py-16 text-center">
-        <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading leads…</p>
+        <p className="text-sm font-medium text-[var(--color-text-muted)]">Loading leads...</p>
       </div>
     );
   }
@@ -307,7 +279,7 @@ function LeadsTableCardContent({
     );
   }
 
-  return <LeadsTable items={items} onConvert={onConvert} onView={onView} />;
+  return <LeadsTable items={items} onView={onView} />;
 }
 
 // --- Page -----------------------------------------------------------------
@@ -321,10 +293,9 @@ export function AdminLeadsPage() {
   const statusFilter = status ?? "";
   const sourceFilter = source ?? "";
   const countryFilter = country ?? "";
-  const [convertingLead, setConvertingLead] = useState<LeadWithContacts | null>(null);
   const [isCreatingLead, setIsCreatingLead] = useState(false);
 
-  // Typed freely, then debounced into the URL/query below — avoids a request per keystroke
+  // Typed freely, then debounced into the URL/query below - avoids a request per keystroke
   // and avoids the URL's trim()-on-navigate snapping back a trailing space while typing.
   const [queryInput, setQueryInput] = useState(query);
   const [countryInput, setCountryInput] = useState(countryFilter);
@@ -406,11 +377,6 @@ export function AdminLeadsPage() {
     void navigate({ to: "/admin/leads/$publicId", params: { publicId } });
   }
 
-  function goToConvertedCompany(company: ConvertLeadResult) {
-    setConvertingLead(null);
-    void navigate({ to: "/admin/companies/$publicId", params: { publicId: company.publicId } });
-  }
-
   const visible = data?.items ?? [];
   const totalItems = data?.meta.totalItems ?? 0;
   const currentPage = data?.meta.page ?? page;
@@ -423,7 +389,7 @@ export function AdminLeadsPage() {
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Leads</h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {totalItems} total leads · CRM sales pipeline
+            {totalItems} total leads - CRM sales pipeline
           </p>
         </div>
         <Button
@@ -438,7 +404,7 @@ export function AdminLeadsPage() {
 
       {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-        <div className="relative w-full lg:max-w-xs">
+        <div className="relative w-full lg:max-w-52">
           <Search
             size={14}
             className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
@@ -446,7 +412,7 @@ export function AdminLeadsPage() {
           />
           <Input
             type="search"
-            placeholder="Search by company, city, industry…"
+            placeholder="Search by company"
             value={queryInput}
             onChange={(event) => setQueryInput(event.target.value)}
             className="ps-8"
@@ -487,13 +453,27 @@ export function AdminLeadsPage() {
           </SelectContent>
         </Select>
 
-        <Input
-          placeholder="Country"
-          value={countryInput}
-          onChange={(event) => setCountryInput(event.target.value)}
-          className="lg:w-36"
-          aria-label="Filter by country"
+        <CountrySelect
+          value={countryFilter}
+          onValueChange={(next) => setCountryFilter(next)}
+          id="admin-leads-country"
+          className="lg:w-38"
         />
+
+        {/* reset button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setQueryInput("");
+            setStatusFilter("");
+            setSourceFilter("");
+            setCountryFilter("");
+            setSort(undefined);
+          }}
+        >
+          Reset
+        </Button>
 
         <div className="flex items-center gap-1 lg:ms-auto">
           <Button
@@ -522,7 +502,6 @@ export function AdminLeadsPage() {
             isError={isError}
             isPending={isPending}
             items={visible}
-            onConvert={setConvertingLead}
             onView={viewLead}
           />
         </CardContent>
@@ -559,12 +538,6 @@ export function AdminLeadsPage() {
           </div>
         </div>
       </Card>
-
-      <ConvertLeadModal
-        leadWithContacts={convertingLead}
-        onClose={() => setConvertingLead(null)}
-        onConverted={goToConvertedCompany}
-      />
       <CreateLeadModal open={isCreatingLead} onClose={() => setIsCreatingLead(false)} />
     </div>
   );

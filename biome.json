@@ -14,7 +14,8 @@
       "!test-results",
       "!.agents",
       "!.claude",
-      "!src/routeTree.gen.ts"
+      "!src/routeTree.gen.ts",
+      "!src/shared/api/schema.d.ts"
     ]
   },
   "formatter": {

@@ -6,7 +6,6 @@ import { AdminLeadsPage } from "./admin-leads-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const leadsGetMock = vi.hoisted(() => vi.fn());
-const leadsPostMock = vi.hoisted(() => vi.fn());
 const searchState = vi.hoisted(
   () =>
     ({
@@ -31,11 +30,18 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
+
+vi.mock("@/shared/ui/country-select", () => ({
+  CountrySelect: ({ id, value }: { id?: string; value: string }) => (
+    <button id={id} type="button">
+      {value || "Select country"}
+    </button>
+  ),
+}));
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
     get: leadsGetMock,
-    post: leadsPostMock,
   },
 }));
 
@@ -56,9 +62,8 @@ function makeLead(): LeadWithContacts {
       source: "CRM",
       status: "QUALIFIED",
       lostReason: null,
-      ownerUserId: null,
+      isConverted: false,
       numberOfAttempts: 2,
-      companyId: null,
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-02T00:00:00.000Z",
       deletedAt: null,
@@ -97,7 +102,6 @@ describe("AdminLeadsPage", () => {
     cleanup();
     navigateMock.mockReset();
     leadsGetMock.mockReset();
-    leadsPostMock.mockReset();
     Object.assign(searchState, {
       page: 1,
       pageSize: 10,
@@ -218,30 +222,11 @@ describe("AdminLeadsPage", () => {
     expect(search({ page: 2, pageSize: 10 })).toEqual(expect.objectContaining({ page: 3 }));
   });
 
-  it("navigates to the converted company's detail page after Convert completes", async () => {
+  it("does not render Convert actions in the leads list", async () => {
     leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
-    leadsPostMock.mockReturnValue(
-      jsonResponse({ publicId: "company-9", name: "Acme Corp", companyCode: "ACME" }),
-    );
     renderPage();
     await screen.findByRole("heading", { name: "Acme Corp" });
 
-    fireEvent.click(screen.getAllByRole("button", { name: /^convert$/i })[0]);
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
-    fireEvent.change(screen.getByLabelText(/^first name$/i), { target: { value: "Sara" } });
-    fireEvent.change(screen.getByLabelText(/^last name$/i), { target: { value: "Youssef" } });
-    fireEvent.change(screen.getByLabelText(/^email$/i), {
-      target: { value: "sara@acme.example.com" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
-
-    fireEvent.click(await screen.findByRole("button", { name: /view company/i }));
-
-    expect(navigateMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: "/admin/companies/$publicId",
-        params: { publicId: "company-9" },
-      }),
-    );
+    expect(screen.queryByRole("button", { name: /^convert$/i })).not.toBeInTheDocument();
   });
 });
