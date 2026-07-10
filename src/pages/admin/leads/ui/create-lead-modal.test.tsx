@@ -79,7 +79,9 @@ describe("CreateLeadModal", () => {
     fireEvent.click(screen.getByLabelText(/^state$/i));
     fireEvent.change(screen.getByLabelText(/search states/i), { target: { value: "alex" } });
 
-    expect(await screen.findByRole("option", { name: "Alexandria Governorate" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("option", { name: "Alexandria Governorate" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Cairo Governorate" })).not.toBeInTheDocument();
   });
 

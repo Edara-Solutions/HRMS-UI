@@ -136,7 +136,9 @@ describe("EditLeadModal", () => {
 
   it("submits allowStatusOverride when override is enabled", async () => {
     vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "true");
-    updatePatchMock.mockReturnValue(jsonResponse({ lead: { ...lead, status: "CONTACTED" }, contacts: [] }));
+    updatePatchMock.mockReturnValue(
+      jsonResponse({ lead: { ...lead, status: "CONTACTED" }, contacts: [] }),
+    );
 
     renderModal();
 
@@ -159,7 +161,10 @@ describe("EditLeadModal", () => {
 
   it("submits the selected country and state as city", async () => {
     updatePatchMock.mockReturnValue(
-      jsonResponse({ lead: { ...lead, country: "United States", city: "California" }, contacts: [] }),
+      jsonResponse({
+        lead: { ...lead, country: "United States", city: "California" },
+        contacts: [],
+      }),
     );
 
     renderModal();

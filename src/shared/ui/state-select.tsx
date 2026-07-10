@@ -1,7 +1,7 @@
 import { type Ref, useEffect, useState } from "react";
 import type { State } from "react-country-state-city/dist/cjs/types/index";
-import { loadCountries, loadStates } from "@/shared/ui/location-select-data";
 import { LocationSelectContent } from "@/shared/ui/location-select-content";
+import { loadCountries, loadStates } from "@/shared/ui/location-select-data";
 import { Select, SelectTrigger, SelectValue } from "@/shared/ui/select";
 
 interface StateSelectProps {
