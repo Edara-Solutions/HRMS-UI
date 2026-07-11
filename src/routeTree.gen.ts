@@ -24,6 +24,7 @@ import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/
 import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
 import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
 import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
+import { Route as AdminEmailIndexRouteImport } from "./app/routes/admin/email/index"
 import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dashboard/index"
 import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
 import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
@@ -105,6 +106,11 @@ const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => AdminLeadsRouteRoute,
 } as any)
+const AdminEmailIndexRoute = AdminEmailIndexRouteImport.update({
+  id: "/email/",
+  path: "/email/",
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: "/dashboard/",
   path: "/dashboard/",
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/dashboard/": typeof AdminDashboardIndexRoute
+  "/admin/email/": typeof AdminEmailIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   "/admin/audit": typeof AdminAuditIndexRoute
   "/admin/companies": typeof AdminCompaniesIndexRoute
   "/admin/dashboard": typeof AdminDashboardIndexRoute
+  "/admin/email": typeof AdminEmailIndexRoute
   "/admin/leads": typeof AdminLeadsIndexRoute
   "/admin/plans": typeof AdminPlansIndexRoute
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/dashboard/": typeof AdminDashboardIndexRoute
+  "/admin/email/": typeof AdminEmailIndexRoute
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/dashboard/"
+    | "/admin/email/"
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | "/admin/audit"
     | "/admin/companies"
     | "/admin/dashboard"
+    | "/admin/email"
     | "/admin/leads"
     | "/admin/plans"
     | "/admin/subscriptions"
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/dashboard/"
+    | "/admin/email/"
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
@@ -379,6 +391,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminLeadsIndexRouteImport
       parentRoute: typeof AdminLeadsRouteRoute
     }
+    "/admin/email/": {
+      id: "/admin/email/"
+      path: "/email"
+      fullPath: "/admin/email/"
+      preLoaderRoute: typeof AdminEmailIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     "/admin/dashboard/": {
       id: "/admin/dashboard/"
       path: "/dashboard"
@@ -450,6 +469,7 @@ interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAuditIndexRoute: typeof AdminAuditIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+  AdminEmailIndexRoute: typeof AdminEmailIndexRoute
   AdminPlansIndexRoute: typeof AdminPlansIndexRoute
   AdminSubscriptionsIndexRoute: typeof AdminSubscriptionsIndexRoute
 }
@@ -460,6 +480,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminAuditIndexRoute: AdminAuditIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+  AdminEmailIndexRoute: AdminEmailIndexRoute,
   AdminPlansIndexRoute: AdminPlansIndexRoute,
   AdminSubscriptionsIndexRoute: AdminSubscriptionsIndexRoute,
 }

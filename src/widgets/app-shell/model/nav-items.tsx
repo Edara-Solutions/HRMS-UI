@@ -7,6 +7,7 @@ import {
   CreditCard,
   FileText,
   LayoutDashboard,
+  Mail,
   Network,
   PackageSearch,
   Receipt,
@@ -17,9 +18,12 @@ import {
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import type { SupportedLocale } from "@/shared/i18n";
 
 export interface NavItem {
   label: string;
+  /** Optional translated labels keyed by the application's active locale. */
+  localizedLabels?: Partial<Record<SupportedLocale, string>>;
   href: string;
   icon: ReactNode;
   indicator?: NavIndicator;
@@ -184,6 +188,12 @@ export const adminNavGroups: NavGroup[] = [
         label: "Settings",
         href: "/admin/settings",
         icon: <Settings size={ICON_SIZE} />,
+      },
+      {
+        label: "Email",
+        localizedLabels: { ar: "البريد" },
+        href: "/admin/email",
+        icon: <Mail size={ICON_SIZE} />,
       },
       {
         label: "Audit Log",

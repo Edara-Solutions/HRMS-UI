@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useAuthStore } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import type { NavGroup, NavIndicator, NavItem } from "../model/nav-items";
@@ -174,8 +175,10 @@ const dotClassName: Record<NavIndicator["tone"], string> = {
 
 function SidebarLink({ item, collapsed }: SidebarLinkProps) {
   const matchRoute = useMatchRoute();
+  const locale = usePreferencesStore((state) => state.locale);
   const isActive = matchRoute({ to: item.href, fuzzy: true });
   const indicator = item.indicator;
+  const label = item.localizedLabels?.[locale] ?? item.label;
 
   return (
     <li>
@@ -189,12 +192,12 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
           collapsed && "justify-center px-0",
         )}
         aria-current={isActive ? "page" : undefined}
-        title={collapsed ? item.label : undefined}
+        title={collapsed ? label : undefined}
       >
         <span className={cn("shrink-0 opacity-70", isActive && "opacity-100")}>{item.icon}</span>
         {!collapsed && (
           <>
-            <span className="truncate">{item.label}</span>
+            <span className="truncate">{label}</span>
             {indicator && <SidebarIndicator indicator={indicator} isActive={Boolean(isActive)} />}
           </>
         )}
