@@ -8,13 +8,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty",
-    "lint": "biome check src && steiger src",
-    "lint:fix": "biome check --write src && steiger src --fix",
-    "format": "biome format --write src",
+    "lint": "biome check . && steiger src",
+    "lint:ci": "biome ci . && steiger src",
+    "lint:fix": "biome check --write . && steiger src --fix",
+    "lint:staged": "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
+    "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
-    "openapi:types": "bun run scripts/openapi-types.ts",
+    "test:e2e": "bun scripts/run-e2e.mjs",
+    "quality": "bun run typecheck && bun run lint && bun run test && bun run build",
+    "prepare": "bun scripts/install-hooks.mjs",
+    "openapi:types": "openapi-typescript http://localhost:3000/api/v1/openapi.json -o src/shared/api/schema.d.ts",
     "doctor": "react-doctor ."
   },
   "dependencies": {
@@ -49,6 +53,7 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^26.0.0",
+    "lefthook": "^2.1.9",
     "openapi-typescript": "^7.6.0",
     "react-doctor": "^0.5.8",
     "steiger": "^0.5.13",
@@ -57,5 +62,10 @@
     "vite": "^5.4.14",
     "vitest": "^3.2.6"
   },
-  "trustedDependencies": ["esbuild", "msgpackr-extract"]
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "esbuild",
+    "lefthook",
+    "msgpackr-extract"
+  ]
 }

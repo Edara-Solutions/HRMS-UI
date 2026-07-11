@@ -50,9 +50,7 @@ export function LocationSelectContent({
           </SelectItem>
         ))
       ) : (
-        <div className="px-2.5 py-2 text-[13px] text-[var(--color-text-muted)]">
-          {emptyMessage}
-        </div>
+        <div className="px-2.5 py-2 text-[13px] text-[var(--color-text-muted)]">{emptyMessage}</div>
       )}
     </SelectContent>
   );

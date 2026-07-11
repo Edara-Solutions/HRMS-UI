@@ -10,6 +10,8 @@
       "**",
       "!dist",
       "!coverage",
+      "!playwright-report",
+      "!test-results",
       "!.agents",
       "!.claude",
       "!src/routeTree.gen.ts",

@@ -50,7 +50,10 @@ function isLeadStatusOverrideAllowed(): boolean {
   return import.meta.env.ALLOW_LEAD_STATUS_OVERRIDE === "true";
 }
 
-function getEditableStatusOptions(leadStatus: LeadStatus, allowStatusOverride: boolean): LeadStatus[] {
+function getEditableStatusOptions(
+  leadStatus: LeadStatus,
+  allowStatusOverride: boolean,
+): LeadStatus[] {
   if (allowStatusOverride) return EDITABLE_STATUSES;
 
   const currentStatus = leadStatus === "REJOINED" ? "NEW" : leadStatus;

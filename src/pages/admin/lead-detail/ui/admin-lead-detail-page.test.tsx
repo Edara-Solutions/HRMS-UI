@@ -265,7 +265,9 @@ describe("AdminLeadDetailPage", () => {
 
   it("makes a non-primary contact primary with a single action", async () => {
     mockApiForLead();
-    apiPatchMock.mockReturnValue(jsonResponse({ ...buildLeadDetails().contacts[1], isPrimary: true }));
+    apiPatchMock.mockReturnValue(
+      jsonResponse({ ...buildLeadDetails().contacts[1], isPrimary: true }),
+    );
     renderPage();
     await screen.findByRole("heading", { name: "Acme Corp" });
 

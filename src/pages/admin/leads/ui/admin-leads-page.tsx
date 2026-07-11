@@ -1,17 +1,11 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Plus,
-  Search,
-  Users,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Plus, Search, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Input } from "@/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import {
@@ -23,7 +17,6 @@ import {
 } from "../api/lead-labels";
 import type { LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
 import { useLeads } from "../api/leads";
-import { CountrySelect } from "@/shared/ui/country-select";
 import { CreateLeadModal } from "./create-lead-modal";
 
 // --- Table --------------------------------------------------------------

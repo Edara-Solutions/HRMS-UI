@@ -13,4 +13,7 @@ bun run test
 bun run build
 ```
 
+Quality gates, hooks, and CI policy are documented in
+[`docs/automation-workflow.md`](docs/automation-workflow.md).
+
 The OpenAPI type generation script currently targets `http://localhost:3000/api/v1/openapi.json`.

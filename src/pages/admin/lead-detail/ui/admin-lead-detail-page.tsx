@@ -428,7 +428,6 @@ export function AdminLeadDetailPage() {
   }
 
   const { lead, contacts } = data;
-  const status = STATUS_BADGE[lead.status];
   const canConvert = canConvertLead(lead, allowConvertFromAnyState);
 
   return (
