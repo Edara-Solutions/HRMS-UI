@@ -20,9 +20,6 @@ function isPublicPath(input: RequestInfo | URL) {
 
 export const apiClient = ky.create({
   prefixUrl: apiBaseUrl,
-  headers: {
-    "Content-Type": "application/json",
-  },
   hooks: {
     beforeRequest: [
       (request) => {

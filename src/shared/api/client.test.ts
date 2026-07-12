@@ -209,4 +209,18 @@ describe("apiClient refresh-on-401", () => {
     );
     expect(protectedCalls).toHaveLength(2);
   });
+  it("does not send a JSON content type for bodyless delete requests", async () => {
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
+      jsonResponse({ message: "deleted" }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiClient.delete("plans/plan-1").json();
+
+    const [input, init] = fetchMock.mock.calls[0];
+    const request = input instanceof Request ? input : new Request(input, init);
+
+    expect(request.method).toBe("DELETE");
+    expect(request.headers.has("Content-Type")).toBe(false);
+  });
 });
