@@ -1,7 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LeadActivityListResponse, LeadDetails, LeadStatus } from "../api/lead-detail";
+import type { SendingDomain, SendingDomainReadiness } from "../api/sending-domain";
 import { AdminLeadDetailPage } from "./admin-lead-detail-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -33,6 +35,28 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 
 function jsonResponse<T>(value: T) {
   return { json: () => Promise.resolve(value) };
+}
+
+function errorResponse(status: number, body: unknown) {
+  const options: ConstructorParameters<typeof HTTPError>[2] = {
+    method: "GET",
+    retry: { limit: 0 },
+    prefixUrl: "",
+    onDownloadProgress: undefined,
+    onUploadProgress: undefined,
+    context: {},
+  };
+
+  return {
+    json: () =>
+      Promise.reject(
+        new HTTPError(
+          new Response(JSON.stringify(body), { status }),
+          new Request("http://localhost/leads/lead-1/sending-domain"),
+          options,
+        ),
+      ),
+  };
 }
 
 function buildLeadDetails(overrides: Partial<LeadDetails["lead"]> = {}): LeadDetails {
@@ -83,6 +107,33 @@ function buildLeadDetails(overrides: Partial<LeadDetails["lead"]> = {}): LeadDet
   };
 }
 
+function buildSendingDomain(overrides: Partial<SendingDomain> = {}): SendingDomain {
+  return {
+    publicId: "domain-1",
+    owner: "LEAD",
+    ownerPublicId: "lead-1",
+    domain: "mail.acme.example.com",
+    status: "VERIFIED",
+    health: "HEALTHY",
+    dnsRecords: [
+      {
+        kind: "OWNERSHIP_TXT",
+        host: "_edara.mail.acme.example.com",
+        recordType: "TXT",
+        value: "edara-verification=abc123",
+        description: "Proves that Edara can send for this domain.",
+      },
+    ],
+    checkResults: [{ kind: "OWNERSHIP_TXT", status: "VERIFIED", failureDetail: null }],
+    verifiedAt: "2026-06-10T00:00:00.000Z",
+    providerReference: null,
+    lastFailure: null,
+    createdAt: "2026-06-01T00:00:00.000Z",
+    updatedAt: "2026-06-10T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
 function activitiesResponse(): LeadActivityListResponse {
   return {
     items: [
@@ -99,10 +150,16 @@ function activitiesResponse(): LeadActivityListResponse {
   };
 }
 
-function mockApiForLead(details = buildLeadDetails()) {
+function mockApiForLead(
+  details = buildLeadDetails(),
+  readiness: SendingDomainReadiness = { ready: true },
+  sendingDomain = buildSendingDomain(),
+) {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "leads/lead-1") return jsonResponse(details);
     if (path === "leads/lead-1/activities") return jsonResponse(activitiesResponse());
+    if (path === "leads/lead-1/sending-domain") return jsonResponse(sendingDomain);
+    if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse(readiness);
     throw new Error(`Unexpected path: ${path}`);
   });
 }
@@ -146,6 +203,101 @@ describe("AdminLeadDetailPage", () => {
     expect(screen.getByText("Meeting", { selector: "span" })).toBeInTheDocument();
   });
 
+  it("renders DNS instructions and copies a host value", async () => {
+    mockApiForLead();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    renderPage();
+
+    expect(await screen.findByText("mail.acme.example.com")).toBeInTheDocument();
+    expect(screen.getByText("Domain ownership")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy host" }));
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith("_edara.mail.acme.example.com"));
+  });
+
+  it("provisions an unconfigured sending domain from the lead detail card", async () => {
+    apiGetMock.mockImplementation((path: string) => {
+      if (path === "leads/lead-1") return jsonResponse(buildLeadDetails());
+      if (path === "leads/lead-1/activities") return jsonResponse(activitiesResponse());
+      if (path === "leads/lead-1/sending-domain") {
+        return errorResponse(404, { error: "No sending domain provisioned for this lead" });
+      }
+      if (path === "leads/lead-1/sending-domain/readiness") {
+        return jsonResponse({ ready: false, reason: "NOT_PROVISIONED" });
+      }
+      throw new Error(`Unexpected path: ${path}`);
+    });
+    apiPostMock.mockReturnValue(jsonResponse(buildSendingDomain()));
+    renderPage();
+
+    const domainInput = await screen.findByLabelText("Company sending domain");
+    expect(domainInput).toHaveValue("acme.example.com");
+    fireEvent.click(screen.getByRole("button", { name: /provision domain/i }));
+
+    await waitFor(() =>
+      expect(apiPostMock).toHaveBeenCalledWith(
+        "leads/lead-1/sending-domain",
+        expect.objectContaining({ json: { domain: "acme.example.com" } }),
+      ),
+    );
+  });
+
+  it("lets the operator verify and refresh DNS without leaving the lead", async () => {
+    mockApiForLead();
+    apiPostMock.mockReturnValue(jsonResponse(buildSendingDomain()));
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Acme Corp" });
+    fireEvent.click(screen.getByRole("button", { name: /recheck dns/i }));
+
+    await waitFor(() =>
+      expect(apiPostMock).toHaveBeenCalledWith("leads/lead-1/sending-domain/verify"),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /refresh sending-domain status/i }));
+
+    expect(screen.getByRole("heading", { name: "Acme Corp" })).toBeInTheDocument();
+  });
+
+  it("shows pending and failed states for individual DNS checks", async () => {
+    mockApiForLead(
+      buildLeadDetails({ status: "QUALIFIED" }),
+      { ready: false, reason: "UNHEALTHY" },
+      buildSendingDomain({
+        status: "FAILED",
+        health: "UNHEALTHY",
+        dnsRecords: [
+          {
+            kind: "OWNERSHIP_TXT",
+            host: "_edara.mail.acme.example.com",
+            recordType: "TXT",
+            value: "edara-verification=abc123",
+            description: "Proves that Edara can send for this domain.",
+          },
+          {
+            kind: "DKIM",
+            host: "selector._domainkey.mail.acme.example.com",
+            recordType: "CNAME",
+            value: "selector.dkim.edara.example.com",
+            description: "Authorizes Edara to sign messages for this domain.",
+          },
+        ],
+        checkResults: [
+          { kind: "OWNERSHIP_TXT", status: "PENDING", failureDetail: null },
+          { kind: "DKIM", status: "FAILED", failureDetail: "CNAME not found" },
+        ],
+      }),
+    );
+    renderPage();
+
+    expect(await screen.findByText("pending")).toBeInTheDocument();
+    expect(screen.getByText("CNAME not found")).toBeInTheDocument();
+  });
+
   it("shows an empty state when the lead has no logged activity", async () => {
     apiGetMock.mockImplementation((path: string) => {
       if (path === "leads/lead-1") return jsonResponse(buildLeadDetails());
@@ -155,6 +307,8 @@ describe("AdminLeadDetailPage", () => {
           meta: { mode: "page", page: 1, pageSize: 20, totalItems: 0, totalPages: 1 },
         });
       }
+      if (path === "leads/lead-1/sending-domain") return jsonResponse(buildSendingDomain());
+      if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse({ ready: true });
       throw new Error(`Unexpected path: ${path}`);
     });
 
@@ -179,7 +333,22 @@ describe("AdminLeadDetailPage", () => {
 
     await screen.findByRole("heading", { name: "Acme Corp" });
 
-    expect(screen.getByRole("button", { name: /^convert$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^convert$/i })).toBeEnabled();
+  });
+
+  it.each<[SendingDomainReadiness, RegExp]>([
+    [{ ready: false, reason: "NOT_PROVISIONED" }, /provision a company sending domain/i],
+    [{ ready: false, reason: "NOT_VERIFIED" }, /verify the company sending domain/i],
+    [{ ready: false, reason: "UNHEALTHY" }, /fix the failed dns checks/i],
+    [{ ready: false, reason: "STALE" }, /refresh dns verification/i],
+  ])("disables Convert with an actionable %s readiness reason", async (readiness, message) => {
+    mockApiForLead(buildLeadDetails({ status: "QUALIFIED" }), readiness);
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Acme Corp" });
+
+    expect(screen.getByRole("button", { name: /^convert$/i })).toBeDisabled();
+    expect(screen.getByText(message)).toBeInTheDocument();
   });
 
   it("hides Convert for non-sales-ready statuses when any-state conversion is disabled", async () => {
