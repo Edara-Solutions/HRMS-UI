@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LeadWithContacts } from "../api/lead-detail";
+import type { SendingDomainReadiness } from "../api/sending-domain";
 import { ConvertLeadModal } from "./convert-lead-modal";
 
 vi.mock("@/shared/ui/country-select", () => ({
@@ -23,6 +24,7 @@ vi.mock("@/shared/ui/country-select", () => ({
 }));
 
 const convertPostMock = vi.hoisted(() => vi.fn());
+const readinessGetMock = vi.hoisted(() => vi.fn());
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm â€” stub the client boundary instead of the network.
@@ -30,6 +32,13 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
     post: convertPostMock,
+    get: readinessGetMock,
+  },
+}));
+
+vi.mock("@/shared/api/client", () => ({
+  apiClient: {
+    get: readinessGetMock,
   },
 }));
 
@@ -39,13 +48,22 @@ function jsonResponse<T>(value: T) {
 
 async function rejectedWith(status: number, body: unknown) {
   const { HTTPError } = await import("ky");
+  const options: ConstructorParameters<typeof HTTPError>[2] = {
+    method: "POST",
+    retry: { limit: 0 },
+    prefixUrl: "",
+    onDownloadProgress: undefined,
+    onUploadProgress: undefined,
+    context: {},
+  };
+
   return {
     json: () =>
       Promise.reject(
         new HTTPError(
           new Response(JSON.stringify(body), { status }),
           new Request("http://localhost/leads/lead-1/convert"),
-          { credentials: "same-origin" } as never,
+          options,
         ),
       ),
   };
@@ -84,7 +102,12 @@ const leadWithContacts: LeadWithContacts = {
   ],
 };
 
-function renderModal(onClose = vi.fn(), onConverted = vi.fn()) {
+function renderModal(
+  onClose = vi.fn(),
+  onConverted = vi.fn(),
+  readiness: SendingDomainReadiness = { ready: true },
+) {
+  readinessGetMock.mockReturnValue(jsonResponse(readiness));
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
@@ -104,6 +127,7 @@ describe("ConvertLeadModal", () => {
   afterEach(() => {
     cleanup();
     convertPostMock.mockReset();
+    readinessGetMock.mockReset();
   });
 
   it("pre-fills company and owner fields from the lead and its primary contact", () => {
@@ -154,6 +178,7 @@ describe("ConvertLeadModal", () => {
     );
 
     expect(await screen.findByText(/ACME/)).toBeInTheDocument();
+    expect(screen.getByText(/Edara Owner Invitation was accepted and queued/i)).toBeInTheDocument();
   });
 
   it("calls onConverted with the new company when View company is clicked", async () => {
@@ -187,5 +212,35 @@ describe("ConvertLeadModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
 
     expect(await screen.findByText(/a user with this email already exists/i)).toBeInTheDocument();
+  });
+
+  it("revalidates readiness before submitting and blocks stale conversion", async () => {
+    renderModal(vi.fn(), vi.fn(), { ready: false, reason: "STALE" });
+
+    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
+    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
+
+    expect(
+      await screen.findByText(
+        /conversion is blocked because the company sending-domain check is stale/i,
+      ),
+    ).toBeInTheDocument();
+    expect(convertPostMock).not.toHaveBeenCalled();
+  });
+
+  it("turns a readiness race from the API into an actionable message", async () => {
+    convertPostMock.mockReturnValue(
+      await rejectedWith(409, { error: "Convert blocked: sending domain is not ready (STALE)" }),
+    );
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
+    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
+
+    expect(
+      await screen.findByText(
+        /sending-domain readiness changed. refresh the status and try again/i,
+      ),
+    ).toBeInTheDocument();
   });
 });

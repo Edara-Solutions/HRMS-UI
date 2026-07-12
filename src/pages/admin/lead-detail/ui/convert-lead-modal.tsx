@@ -14,6 +14,8 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import type { ConvertLeadResult, LeadContact, LeadWithContacts } from "../api/lead-detail";
 import { useConvertLead } from "../api/lead-detail";
+import type { ReadinessReason } from "../api/sending-domain";
+import { useLeadSendingDomainReadiness } from "../api/sending-domain";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -23,6 +25,28 @@ async function readConvertErrorMessage(error: unknown): Promise<string> {
     if (backendMessage) return backendMessage;
   }
   return GENERIC_ERROR_MESSAGE;
+}
+
+function readinessBlockMessage(reason: ReadinessReason | undefined): string {
+  switch (reason) {
+    case "NOT_PROVISIONED":
+      return "Conversion is blocked because this lead has no Company sending domain. Set one up and try again.";
+    case "NOT_VERIFIED":
+      return "Conversion is blocked because the Company sending domain is not verified yet.";
+    case "UNHEALTHY":
+      return "Conversion is blocked because the Company sending domain has failed DNS checks.";
+    case "STALE":
+      return "Conversion is blocked because the Company sending-domain check is stale.";
+    default:
+      return "The Company sending-domain readiness could not be confirmed. Refresh the status and try again.";
+  }
+}
+
+function isSendingDomainRaceMessage(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("convert blocked") || normalized.includes("sending domain is not ready")
+  );
 }
 
 function primaryContactOf(contacts: LeadContact[]): LeadContact | null {
@@ -102,6 +126,7 @@ function ConvertLeadModalContent({
   const { firstName, lastName } = splitContactName(primaryContact?.name ?? null);
 
   const convertLead = useConvertLead();
+  const readiness = useLeadSendingDomainReadiness(lead.publicId);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<{ company: ConvertLeadResult; ownerEmail: string } | null>(
     null,
@@ -128,13 +153,28 @@ function ConvertLeadModalContent({
     setSubmitError(null);
 
     try {
+      const latestReadiness = await readiness.refetch();
+      if (latestReadiness.error) {
+        setSubmitError(await readConvertErrorMessage(latestReadiness.error));
+        return;
+      }
+      if (latestReadiness.data?.ready !== true) {
+        setSubmitError(readinessBlockMessage(latestReadiness.data?.reason));
+        return;
+      }
+
       const company = await convertLead.mutateAsync({
         publicId: lead.publicId,
         input: data,
       });
       setResult({ company, ownerEmail: data.ownerEmail });
     } catch (error) {
-      setSubmitError(await readConvertErrorMessage(error));
+      const message = await readConvertErrorMessage(error);
+      setSubmitError(
+        isSendingDomainRaceMessage(message)
+          ? "Conversion was blocked because sending-domain readiness changed. Refresh the status and try again."
+          : message,
+      );
     }
   }
 
@@ -146,9 +186,9 @@ function ConvertLeadModalContent({
           <div>
             <DialogTitle id={titleId}>{result.company.name} is now a company</DialogTitle>
             <DialogDescription id={descriptionId}>
-              An invitation was sent to the Owner at{" "}
+              An Edara Owner Invitation was accepted and queued for{" "}
               <span className="font-medium text-[var(--color-text)]">{result.ownerEmail}</span> to
-              set a password and log in.
+              set a password and log in. Delivery happens asynchronously after conversion.
             </DialogDescription>
           </div>
         </div>
