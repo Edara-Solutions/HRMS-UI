@@ -24,6 +24,7 @@ import { EmptyState } from "@/shared/ui/empty-state";
 import { Form } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { SearchableSelect } from "@/shared/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import {
   BILLING_INTERVAL_LABEL,
@@ -31,6 +32,11 @@ import {
   getPlanPriceMarketLabel,
   KNOWN_BILLING_INTERVALS,
 } from "../api/plan-labels";
+import {
+  PLAN_COUNTRY_OPTIONS,
+  PLAN_CURRENCY_OPTIONS,
+  PLAN_REGION_OPTIONS,
+} from "../model/plan-market-options";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -139,7 +145,10 @@ function PlanPricesDialogContent({
     defaultValues: toCreateDefaults(),
   });
 
+  const createCurrencyCode = watch("currencyCode");
   const createBillingInterval = watch("billingInterval");
+  const createCountryCode = watch("countryCode");
+  const createRegionCode = watch("regionCode");
   const createIsActive = watch("isActive");
   const prices = pricesQuery.data?.data ?? [];
   const pricePending = createPrice.isPending;
@@ -195,11 +204,19 @@ function PlanPricesDialogContent({
             <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 xl:grid-cols-4">
               <div className="space-y-1.5">
                 <Label htmlFor="price-currency">Currency</Label>
-                <Input
+                <SearchableSelect
                   id="price-currency"
-                  maxLength={3}
-                  placeholder="EGP"
-                  {...register("currencyCode")}
+                  value={createCurrencyCode}
+                  options={PLAN_CURRENCY_OPTIONS}
+                  placeholder="Select currency"
+                  searchPlaceholder="Search currency..."
+                  emptyText="No currencies found."
+                  onValueChange={(value) =>
+                    setValue("currencyCode", value ?? "", {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
                 />
                 {errors.currencyCode && (
                   <p className="text-xs text-[var(--color-danger)]">
@@ -264,11 +281,20 @@ function PlanPricesDialogContent({
 
               <div className="space-y-1.5">
                 <Label htmlFor="price-country">Country code</Label>
-                <Input
+                <SearchableSelect
                   id="price-country"
-                  maxLength={2}
-                  placeholder="EG"
-                  {...register("countryCode")}
+                  value={createCountryCode}
+                  options={PLAN_COUNTRY_OPTIONS}
+                  placeholder="Select country"
+                  searchPlaceholder="Search country..."
+                  emptyText="No countries found."
+                  onValueChange={(value) =>
+                    setValue("countryCode", value ?? "", {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  allowClear
                 />
                 {errors.countryCode && (
                   <p className="text-xs text-[var(--color-danger)]">{errors.countryCode.message}</p>
@@ -277,7 +303,21 @@ function PlanPricesDialogContent({
 
               <div className="space-y-1.5">
                 <Label htmlFor="price-region">Region code</Label>
-                <Input id="price-region" placeholder="MENA" {...register("regionCode")} />
+                <SearchableSelect
+                  id="price-region"
+                  value={createRegionCode}
+                  options={PLAN_REGION_OPTIONS}
+                  placeholder="Select region"
+                  searchPlaceholder="Search region..."
+                  emptyText="No regions found."
+                  onValueChange={(value) =>
+                    setValue("regionCode", value ?? "", {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  allowClear
+                />
                 {errors.regionCode && (
                   <p className="text-xs text-[var(--color-danger)]">{errors.regionCode.message}</p>
                 )}
