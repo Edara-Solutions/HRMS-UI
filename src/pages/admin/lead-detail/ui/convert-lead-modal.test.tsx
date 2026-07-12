@@ -36,12 +36,6 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   },
 }));
 
-vi.mock("@/shared/api/client", () => ({
-  apiClient: {
-    get: readinessGetMock,
-  },
-}));
-
 function jsonResponse<T>(value: T) {
   return { json: () => Promise.resolve(value) };
 }

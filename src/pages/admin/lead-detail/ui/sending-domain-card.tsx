@@ -1,7 +1,7 @@
 import { HTTPError } from "ky";
 import { Check, Clipboard, Copy, Globe2, RefreshCw, ShieldAlert } from "lucide-react";
 import { useState } from "react";
-import { readBackendErrorMessage } from "@/shared/api/error-mapper";
+import { readBackendErrorMessage } from "@/shared/api";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";

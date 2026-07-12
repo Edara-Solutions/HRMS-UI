@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { apiClient } from "@/shared/api/client";
-import type { components, paths } from "@/shared/api/schema";
+import { apiClient, type components, type paths } from "@/shared/api";
 
 export type DnsRecordKind = components["schemas"]["DnsRecordKind"];
 export type ReadinessReason = components["schemas"]["ReadinessReason"];
