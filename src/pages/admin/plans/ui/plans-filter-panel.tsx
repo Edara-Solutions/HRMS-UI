@@ -4,11 +4,37 @@ import { isBillingInterval } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { SearchableSelect } from "@/shared/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { BILLING_INTERVAL_LABEL, KNOWN_BILLING_INTERVALS } from "../api/plan-labels";
+import {
+  PLAN_COUNTRY_OPTIONS,
+  PLAN_CURRENCY_OPTIONS,
+  PLAN_REGION_OPTIONS,
+} from "../model/plan-market-options";
 
 export type PlanStatusFilter = "all" | "active" | "inactive";
 export type PlanVisibilityFilter = "all" | "public" | "private";
+
+const statusOptions: Array<{ value: PlanStatusFilter; label: string }> = [
+  { value: "all", label: "All statuses" },
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+];
+
+const visibilityOptions: Array<{ value: PlanVisibilityFilter; label: string }> = [
+  { value: "all", label: "All visibility" },
+  { value: "public", label: "Public" },
+  { value: "private", label: "Private" },
+];
+
+function isPlanStatusFilter(value: string): value is PlanStatusFilter {
+  return statusOptions.some((option) => option.value === value);
+}
+
+function isPlanVisibilityFilter(value: string): value is PlanVisibilityFilter {
+  return visibilityOptions.some((option) => option.value === value);
+}
 
 interface PlansFilterPanelProps {
   query: string;
@@ -69,29 +95,41 @@ export function PlansFilterPanel({
               className="ps-8"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(["all", "active", "inactive"] as const).map((option) => (
-              <Button
-                key={option}
-                variant="ghost"
-                size="sm"
-                pressed={active === option}
-                onClick={() => onActiveChange(option)}
-              >
-                {option === "all" ? "All statuses" : option === "active" ? "Active" : "Inactive"}
-              </Button>
-            ))}
-            {(["all", "public", "private"] as const).map((option) => (
-              <Button
-                key={option}
-                variant="ghost"
-                size="sm"
-                pressed={visibility === option}
-                onClick={() => onVisibilityChange(option)}
-              >
-                {option === "all" ? "All visibility" : option === "public" ? "Public" : "Private"}
-              </Button>
-            ))}
+          <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-2">
+            <Select
+              value={active}
+              onValueChange={(value) => {
+                if (isPlanStatusFilter(value)) onActiveChange(value);
+              }}
+            >
+              <SelectTrigger aria-label="Plan status filter">
+                <SelectValue placeholder="All statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={visibility}
+              onValueChange={(value) => {
+                if (isPlanVisibilityFilter(value)) onVisibilityChange(value);
+              }}
+            >
+              <SelectTrigger aria-label="Plan visibility filter">
+                <SelectValue placeholder="All visibility" />
+              </SelectTrigger>
+              <SelectContent>
+                {visibilityOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -117,14 +155,15 @@ export function PlansFilterPanel({
               >
                 Currency
               </label>
-              <Input
+              <SearchableSelect
                 id="plans-currency"
-                value={currencyCode ?? ""}
-                maxLength={3}
-                placeholder="EGP"
-                onChange={(event) =>
-                  onCurrencyCodeChange(event.target.value.toUpperCase() || undefined)
-                }
+                value={currencyCode}
+                options={PLAN_CURRENCY_OPTIONS}
+                placeholder="Select currency"
+                searchPlaceholder="Search currency..."
+                emptyText="No currencies found."
+                onValueChange={onCurrencyCodeChange}
+                allowClear
               />
             </div>
             <div className="space-y-1.5">
@@ -159,14 +198,15 @@ export function PlansFilterPanel({
               >
                 Country code
               </label>
-              <Input
+              <SearchableSelect
                 id="plans-country"
-                value={countryCode ?? ""}
-                maxLength={2}
-                placeholder="EG"
-                onChange={(event) =>
-                  onCountryCodeChange(event.target.value.toUpperCase() || undefined)
-                }
+                value={countryCode}
+                options={PLAN_COUNTRY_OPTIONS}
+                placeholder="Select country"
+                searchPlaceholder="Search country..."
+                emptyText="No countries found."
+                onValueChange={onCountryCodeChange}
+                allowClear
               />
             </div>
             <div className="space-y-1.5">
@@ -176,11 +216,15 @@ export function PlansFilterPanel({
               >
                 Region code
               </label>
-              <Input
+              <SearchableSelect
                 id="plans-region"
-                value={regionCode ?? ""}
-                placeholder="MENA"
-                onChange={(event) => onRegionCodeChange(event.target.value || undefined)}
+                value={regionCode}
+                options={PLAN_REGION_OPTIONS}
+                placeholder="Select region"
+                searchPlaceholder="Search region..."
+                emptyText="No regions found."
+                onValueChange={onRegionCodeChange}
+                allowClear
               />
             </div>
             <div className="space-y-1.5 min-[560px]:col-span-2">
