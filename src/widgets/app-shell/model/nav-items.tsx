@@ -196,6 +196,12 @@ export const adminNavGroups: NavGroup[] = [
         icon: <Mail size={ICON_SIZE} />,
       },
       {
+        label: "Email Deliveries",
+        localizedLabels: { ar: "عمليات تسليم البريد" },
+        href: "/admin/email/deliveries",
+        icon: <Mail size={ICON_SIZE} />,
+      },
+      {
         label: "Audit Log",
         href: "/admin/audit",
         icon: <Shield size={ICON_SIZE} />,

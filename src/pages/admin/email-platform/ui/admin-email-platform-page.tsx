@@ -1,11 +1,23 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Building2, Info, Mail, MailX, RefreshCw, Send, ShieldCheck } from "lucide-react";
+import {
+  Building2,
+  Info,
+  Mail,
+  MailX,
+  Maximize2,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  X,
+} from "lucide-react";
+import { useState } from "react";
 import { usePreferencesStore } from "@/shared/config";
 import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -168,6 +180,31 @@ interface PreviewPanelProps {
   onViewChange: (view: PreviewView) => void;
 }
 
+const MAILBOX_SCROLLBAR_STYLES = `<style>
+  html, body { min-height: 100%; margin: 0; background: #f1eee8; }
+  @supports not selector(::-webkit-scrollbar) {
+    body { scrollbar-color: #8a98aa #f1eee8; scrollbar-width: thin; }
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar { width: 10px; height: 10px; }
+  html::-webkit-scrollbar-track, body::-webkit-scrollbar-track { background: #f1eee8; }
+  html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb { min-height: 44px; border: 2px solid #f1eee8; border-radius: 8px; background: #8a98aa; background-clip: padding-box; }
+  html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover { background-color: #607994; }
+  html::-webkit-scrollbar-button, body::-webkit-scrollbar-button { display: none !important; width: 0 !important; height: 0 !important; }
+  html::-webkit-scrollbar-corner, body::-webkit-scrollbar-corner { background: #f1eee8; }
+</style>`;
+
+/** Styles the sandboxed document as a mailbox canvas without changing the approved email markup. */
+function mailboxPreviewDocument(html: string, darkTheme: boolean): string {
+  const themedStyles = darkTheme
+    ? MAILBOX_SCROLLBAR_STYLES.replaceAll("#f1eee8", "#252320")
+        .replaceAll("#8a98aa", "#657b96")
+        .replaceAll("#607994", "#8fb8e8")
+    : MAILBOX_SCROLLBAR_STYLES;
+  return html.includes("</head>")
+    ? html.replace("</head>", `${themedStyles}</head>`)
+    : `${themedStyles}${html}`;
+}
+
 function PreviewPanel({
   emailType,
   displayLocale,
@@ -179,6 +216,9 @@ function PreviewPanel({
 }: PreviewPanelProps) {
   const localeSupported = emailType.supportedLocales.includes(locale);
   const preview = useEmailPreview(localeSupported ? emailType : undefined, locale);
+  const [fullScreenPreviewOpen, setFullScreenPreviewOpen] = useState(false);
+  const { titleId, descriptionId } = useDialogIds();
+  const darkTheme = document.documentElement.dataset.theme === "dark";
   const title = emailTypeTitle(emailType, displayLocale);
   const hasCompanyIdentityViolation =
     preview.data !== undefined &&
@@ -347,7 +387,7 @@ function PreviewPanel({
                   title={`${title} ${copy.emailPreview}`}
                   sandbox=""
                   referrerPolicy="no-referrer"
-                  srcDoc={safePreview.html}
+                  srcDoc={mailboxPreviewDocument(safePreview.html, darkTheme)}
                 />
               ) : (
                 <pre
@@ -358,7 +398,65 @@ function PreviewPanel({
                   {safePreview.text}
                 </pre>
               )}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-3"
+                leadingIcon={<Maximize2 size={14} aria-hidden="true" />}
+                onClick={() => setFullScreenPreviewOpen(true)}
+              >
+                {copy.fullScreenPreview}
+              </Button>
             </div>
+            <Dialog
+              open={fullScreenPreviewOpen}
+              onClose={() => setFullScreenPreviewOpen(false)}
+              titleId={titleId}
+              descriptionId={descriptionId}
+              className="flex h-[calc(100dvh-2rem)] max-w-none flex-col overflow-hidden p-4 sm:p-6"
+            >
+              <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[var(--color-border)] pb-4">
+                <div className="min-w-0">
+                  <DialogTitle id={titleId}>{safePreview.subject}</DialogTitle>
+                  <DialogDescription id={descriptionId}>
+                    {copy.fullScreenPreviewDescription}
+                  </DialogDescription>
+                  <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+                    <bdi dir="auto">{safePreview.senderIdentity?.name ?? copy.edaraEmail}</bdi>
+                    <span aria-hidden="true"> · </span>
+                    <bdi dir="ltr">{safePreview.senderIdentity?.address}</bdi>
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="iconXs"
+                  className="shrink-0"
+                  aria-label={copy.closePreview}
+                  title={copy.closePreview}
+                  onClick={() => setFullScreenPreviewOpen(false)}
+                >
+                  <X size={16} aria-hidden="true" />
+                </Button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-hidden rounded-b-[var(--radius-md)] border-x border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
+                {view === "html" ? (
+                  <iframe
+                    className="block h-full w-full border-0 bg-[var(--color-surface-2)]"
+                    title={`${title} ${copy.emailPreview}`}
+                    sandbox=""
+                    referrerPolicy="no-referrer"
+                    srcDoc={mailboxPreviewDocument(safePreview.html, darkTheme)}
+                  />
+                ) : (
+                  <pre
+                    className="scrollbar-calm h-full overflow-auto whitespace-pre-wrap bg-[var(--color-surface)] p-4 text-start text-sm leading-relaxed text-[var(--color-text)]"
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    {safePreview.text}
+                  </pre>
+                )}
+              </div>
+            </Dialog>
           </div>
         ) : null}
       </CardContent>

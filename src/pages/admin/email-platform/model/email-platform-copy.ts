@@ -41,6 +41,9 @@ const ENGLISH_EMAIL_PLATFORM_COPY = {
   resolvedCompanySender: "Resolved Company sender",
   replyTo: "Reply to",
   emailPreview: "email preview",
+  fullScreenPreview: "Open full-screen preview",
+  fullScreenPreviewDescription: "Mailbox-style preview with approved sample data only.",
+  closePreview: "Close preview",
   testSend: "Test send",
   testSendDescription:
     "Test messages require an explicit recipient and are queued separately from production communication.",
@@ -118,6 +121,9 @@ const ARABIC_EMAIL_PLATFORM_COPY = {
   resolvedCompanySender: "مرسل الشركة المحدد",
   replyTo: "الرد إلى",
   emailPreview: "معاينة البريد",
+  fullScreenPreview: "فتح المعاينة بملء الشاشة",
+  fullScreenPreviewDescription: "معاينة بأسلوب البريد الوارد ببيانات نموذجية معتمدة فقط.",
+  closePreview: "إغلاق المعاينة",
   testSend: "إرسال تجريبي",
   testSendDescription:
     "تتطلب الرسائل التجريبية مستلمًا محددًا وتوضع في طابور منفصل عن رسائل الإنتاج.",

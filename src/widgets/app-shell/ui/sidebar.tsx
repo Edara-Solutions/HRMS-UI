@@ -1,4 +1,4 @@
-import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
 import {
   type ReactNode,
@@ -32,6 +32,12 @@ export function Sidebar({
   collapsed,
   onToggleCollapsed,
 }: SidebarProps) {
+  const { pathname } = useLocation();
+  const activeHref = groups
+    .flatMap((group) => group.items)
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+    .sort((left, right) => right.href.length - left.href.length)[0]?.href;
+
   return (
     <aside
       className={cn(
@@ -84,7 +90,12 @@ export function Sidebar({
             )}
             <ul className="flex flex-col gap-px">
               {group.items.map((item) => (
-                <SidebarLink key={item.href} item={item} collapsed={collapsed} />
+                <SidebarLink
+                  key={item.href}
+                  item={item}
+                  collapsed={collapsed}
+                  isActive={item.href === activeHref}
+                />
               ))}
             </ul>
           </div>
@@ -146,6 +157,7 @@ function SidebarBrandToggle({
 interface SidebarLinkProps {
   item: NavItem;
   collapsed: boolean;
+  isActive: boolean;
 }
 
 // Expanded badge: color-mixed background gives more saturation than pure -soft while staying readable
@@ -173,10 +185,8 @@ const dotClassName: Record<NavIndicator["tone"], string> = {
   danger: "bg-[var(--color-danger)] text-[var(--color-danger)]",
 };
 
-function SidebarLink({ item, collapsed }: SidebarLinkProps) {
-  const matchRoute = useMatchRoute();
+function SidebarLink({ item, collapsed, isActive }: SidebarLinkProps) {
   const locale = usePreferencesStore((state) => state.locale);
-  const isActive = matchRoute({ to: item.href, fuzzy: true });
   const indicator = item.indicator;
   const label = item.localizedLabels?.[locale] ?? item.label;
 

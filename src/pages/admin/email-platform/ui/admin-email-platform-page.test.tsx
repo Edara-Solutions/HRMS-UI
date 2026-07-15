@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { usePreferencesStore } from "@/shared/config";
 import type { EmailPreview, EmailTypeListResponse } from "../api/email-platform";
@@ -144,7 +144,19 @@ describe("AdminEmailPlatformPage", () => {
 
     const frame = await screen.findByTitle("Owner Invitation email preview");
     expect(frame).toHaveAttribute("sandbox", "");
-    expect(frame).toHaveAttribute("srcdoc", OWNER_PREVIEW.html);
+    expect(frame.getAttribute("srcdoc") ?? "").toContain(OWNER_PREVIEW.html);
+  });
+
+  it("opens the safe template in a full-screen mailbox-style preview and closes it explicitly", async () => {
+    mockCatalogAndPreview();
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Open full-screen preview" }));
+    expect(await screen.findByRole("dialog")).toHaveTextContent(OWNER_PREVIEW.subject);
+    expect(screen.getAllByTitle("Owner Invitation email preview")).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole("button", { name: "Close preview" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });
 
   it("renders the Company default preview with only its resolved white-label identity", async () => {
@@ -168,10 +180,9 @@ describe("AdminEmailPlatformPage", () => {
     mockCatalogAndPreview(COMPANY_PREVIEW);
     renderPage();
 
-    expect(await screen.findByTitle("Employee Invitation email preview")).toHaveAttribute(
-      "srcdoc",
-      COMPANY_PREVIEW.html,
-    );
+    expect(
+      (await screen.findByTitle("Employee Invitation email preview")).getAttribute("srcdoc") ?? "",
+    ).toContain(COMPANY_PREVIEW.html);
     expect(API_GET_MOCK).not.toHaveBeenCalledWith(
       "email-types/company-digest/preview",
       expect.anything(),
