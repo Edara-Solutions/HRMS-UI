@@ -30,7 +30,9 @@ import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/comp
 import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
 import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
 import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
-import { Route as AdminCompaniesPublicIdRouteImport } from "./app/routes/admin/companies/$publicId"
+import { Route as AdminCompaniesPublicIdRouteRouteImport } from "./app/routes/admin/companies/$publicId/route"
+import { Route as AdminCompaniesPublicIdIndexRouteImport } from "./app/routes/admin/companies/$publicId/index"
+import { Route as AdminCompaniesPublicIdEmailSettingsRouteImport } from "./app/routes/admin/companies/$publicId/email-settings"
 
 const CompanyRouteRoute = CompanyRouteRouteImport.update({
   id: "/company",
@@ -137,11 +139,24 @@ const AdminEmailDeliveriesRoute = AdminEmailDeliveriesRouteImport.update({
   path: "/email/deliveries",
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminCompaniesPublicIdRoute = AdminCompaniesPublicIdRouteImport.update({
-  id: "/$publicId",
-  path: "/$publicId",
-  getParentRoute: () => AdminCompaniesRouteRoute,
-} as any)
+const AdminCompaniesPublicIdRouteRoute =
+  AdminCompaniesPublicIdRouteRouteImport.update({
+    id: "/$publicId",
+    path: "/$publicId",
+    getParentRoute: () => AdminCompaniesRouteRoute,
+  } as any)
+const AdminCompaniesPublicIdIndexRoute =
+  AdminCompaniesPublicIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AdminCompaniesPublicIdRouteRoute,
+  } as any)
+const AdminCompaniesPublicIdEmailSettingsRoute =
+  AdminCompaniesPublicIdEmailSettingsRouteImport.update({
+    id: "/email-settings",
+    path: "/email-settings",
+    getParentRoute: () => AdminCompaniesPublicIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -155,7 +170,7 @@ export interface FileRoutesByFullPath {
   "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
@@ -166,6 +181,8 @@ export interface FileRoutesByFullPath {
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
+  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
+  "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -176,7 +193,6 @@ export interface FileRoutesByTo {
   "/change-password": typeof ChangePasswordIndexRoute
   "/forbidden": typeof ForbiddenIndexRoute
   "/login": typeof LoginIndexRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit": typeof AdminAuditIndexRoute
@@ -187,6 +203,8 @@ export interface FileRoutesByTo {
   "/admin/plans": typeof AdminPlansIndexRoute
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
+  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -201,7 +219,7 @@ export interface FileRoutesById {
   "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
+  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
@@ -212,6 +230,8 @@ export interface FileRoutesById {
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
+  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
+  "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -238,6 +258,8 @@ export interface FileRouteTypes {
     | "/admin/plans/"
     | "/admin/subscriptions/"
     | "/company/dashboard/"
+    | "/admin/companies/$publicId/email-settings"
+    | "/admin/companies/$publicId/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -248,7 +270,6 @@ export interface FileRouteTypes {
     | "/change-password"
     | "/forbidden"
     | "/login"
-    | "/admin/companies/$publicId"
     | "/admin/email/deliveries"
     | "/admin/leads/$publicId"
     | "/admin/audit"
@@ -259,6 +280,8 @@ export interface FileRouteTypes {
     | "/admin/plans"
     | "/admin/subscriptions"
     | "/company/dashboard"
+    | "/admin/companies/$publicId/email-settings"
+    | "/admin/companies/$publicId"
   id:
     | "__root__"
     | "/"
@@ -283,6 +306,8 @@ export interface FileRouteTypes {
     | "/admin/plans/"
     | "/admin/subscriptions/"
     | "/company/dashboard/"
+    | "/admin/companies/$publicId/email-settings"
+    | "/admin/companies/$publicId/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -449,19 +474,51 @@ declare module "@tanstack/react-router" {
       id: "/admin/companies/$publicId"
       path: "/$publicId"
       fullPath: "/admin/companies/$publicId"
-      preLoaderRoute: typeof AdminCompaniesPublicIdRouteImport
+      preLoaderRoute: typeof AdminCompaniesPublicIdRouteRouteImport
       parentRoute: typeof AdminCompaniesRouteRoute
+    }
+    "/admin/companies/$publicId/": {
+      id: "/admin/companies/$publicId/"
+      path: "/"
+      fullPath: "/admin/companies/$publicId/"
+      preLoaderRoute: typeof AdminCompaniesPublicIdIndexRouteImport
+      parentRoute: typeof AdminCompaniesPublicIdRouteRoute
+    }
+    "/admin/companies/$publicId/email-settings": {
+      id: "/admin/companies/$publicId/email-settings"
+      path: "/email-settings"
+      fullPath: "/admin/companies/$publicId/email-settings"
+      preLoaderRoute: typeof AdminCompaniesPublicIdEmailSettingsRouteImport
+      parentRoute: typeof AdminCompaniesPublicIdRouteRoute
     }
   }
 }
 
+interface AdminCompaniesPublicIdRouteRouteChildren {
+  AdminCompaniesPublicIdEmailSettingsRoute: typeof AdminCompaniesPublicIdEmailSettingsRoute
+  AdminCompaniesPublicIdIndexRoute: typeof AdminCompaniesPublicIdIndexRoute
+}
+
+const AdminCompaniesPublicIdRouteRouteChildren: AdminCompaniesPublicIdRouteRouteChildren =
+  {
+    AdminCompaniesPublicIdEmailSettingsRoute:
+      AdminCompaniesPublicIdEmailSettingsRoute,
+    AdminCompaniesPublicIdIndexRoute: AdminCompaniesPublicIdIndexRoute,
+  }
+
+const AdminCompaniesPublicIdRouteRouteWithChildren =
+  AdminCompaniesPublicIdRouteRoute._addFileChildren(
+    AdminCompaniesPublicIdRouteRouteChildren,
+  )
+
 interface AdminCompaniesRouteRouteChildren {
-  AdminCompaniesPublicIdRoute: typeof AdminCompaniesPublicIdRoute
+  AdminCompaniesPublicIdRouteRoute: typeof AdminCompaniesPublicIdRouteRouteWithChildren
   AdminCompaniesIndexRoute: typeof AdminCompaniesIndexRoute
 }
 
 const AdminCompaniesRouteRouteChildren: AdminCompaniesRouteRouteChildren = {
-  AdminCompaniesPublicIdRoute: AdminCompaniesPublicIdRoute,
+  AdminCompaniesPublicIdRouteRoute:
+    AdminCompaniesPublicIdRouteRouteWithChildren,
   AdminCompaniesIndexRoute: AdminCompaniesIndexRoute,
 }
 

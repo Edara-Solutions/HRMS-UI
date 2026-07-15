@@ -131,6 +131,26 @@ function mockApi() {
     if (path === "companies/company-1") return jsonResponse(company);
     if (path === "company-configs") return jsonResponse(configsResponse());
     if (path === "plans") return jsonResponse(plansResponse());
+    if (path === "email-types") {
+      return jsonResponse({
+        items: [
+          {
+            key: "employee-invitation",
+            context: "COMPANY",
+            supportedLocales: ["en", "ar"],
+          },
+        ],
+      });
+    }
+    if (path === "email-types/employee-invitation/preview") {
+      return jsonResponse({
+        senderIdentity: {
+          name: "Nexus Technologies",
+          address: "people@nexus.example",
+          replyTo: "support@nexus.example",
+        },
+      });
+    }
     throw new Error(`Unexpected path: ${path}`);
   });
 }
@@ -163,6 +183,8 @@ describe("AdminCompanyDetailPage", () => {
     expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
     expect(screen.getByText("Trial")).toBeInTheDocument();
     expect(screen.getByText("Full Access")).toBeInTheDocument();
+    expect(await screen.findByText("Sender identity available")).toBeInTheDocument();
+    expect(screen.getByText("Nexus Technologies <people@nexus.example>")).toBeInTheDocument();
   });
 
   it("edits the company profile without exposing the company code as editable", async () => {

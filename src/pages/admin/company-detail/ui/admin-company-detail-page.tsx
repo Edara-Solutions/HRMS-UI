@@ -1,13 +1,18 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, Building2, Globe, MapPin, Pencil, Phone } from "lucide-react";
+import { ArrowLeft, Building2, Globe, Mail, MapPin, Pencil, Phone } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type { Company, CompanyConfig } from "../api/company-detail";
-import { useCompany, useCompanyConfigs } from "../api/company-detail";
+import {
+  type Company,
+  type CompanyConfig,
+  useCompany,
+  useCompanyConfigs,
+} from "../api/company-detail";
+import { useCompanyEmailReadiness } from "../api/company-email-readiness";
 import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { EditCompanyConfigModal } from "./edit-company-config-modal";
 import { EditCompanyModal } from "./edit-company-modal";
@@ -193,6 +198,54 @@ function CompanyConfigCard({
   );
 }
 
+interface CompanyEmailReadinessCardProps {
+  companyPublicId: string;
+  onOpenSettings: () => void;
+}
+
+function CompanyEmailReadinessCard({
+  companyPublicId,
+  onOpenSettings,
+}: CompanyEmailReadinessCardProps) {
+  const readinessQuery = useCompanyEmailReadiness(companyPublicId);
+  const readiness = readinessQuery.data;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Email readiness</CardTitle>
+        <Button intent="utility" leadingIcon={<Mail size={13} />} onClick={onOpenSettings}>
+          Email settings
+        </Button>
+      </CardHeader>
+      <CardContent className="p-4">
+        {readinessQuery.isPending ? (
+          <Skeleton className="h-12 w-full" />
+        ) : readinessQuery.isError || readiness?.status === "unavailable" ? (
+          <div className="space-y-2 text-sm">
+            <Badge variant="warning">Needs review</Badge>
+            <p className="text-[var(--color-text-muted)]">
+              Company sender readiness is not available. Open Email settings to review it.
+            </p>
+          </div>
+        ) : readiness?.status === "ready" ? (
+          <div className="space-y-2 text-sm">
+            <Badge variant="success">Sender identity available</Badge>
+            <p className="text-[var(--color-text-muted)]">{readiness.sender}</p>
+          </div>
+        ) : (
+          <div className="space-y-2 text-sm">
+            <Badge variant="warning">Sender needs attention</Badge>
+            <p className="text-[var(--color-text-muted)]">
+              A Company sender identity could not be resolved for this Company.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // --- Page ---------------------------------------------------------------------
 
 type CompanyDetailPanel = "none" | "edit-company" | "edit-config";
@@ -206,6 +259,13 @@ export function AdminCompanyDetailPage() {
   const { data: company, isPending, isError } = useCompany(publicId);
   const configsQuery = useCompanyConfigs();
   const config = configsQuery.data?.data.find((item) => item.company?.publicId === publicId);
+
+  function openEmailSettings() {
+    void navigate({
+      to: "/admin/companies/$publicId/email-settings",
+      params: { publicId },
+    });
+  }
 
   function backToCompanies() {
     void navigate({ to: "/admin/companies", search: { page: 1, pageSize: 10 } });
@@ -264,6 +324,9 @@ export function AdminCompanyDetailPage() {
               <span>{company.country}</span>
             </p>
           </div>
+          <Button intent="action" leadingIcon={<Mail size={14} />} onClick={openEmailSettings}>
+            Email settings
+          </Button>
         </div>
       </div>
 
@@ -271,6 +334,7 @@ export function AdminCompanyDetailPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <CompanyProfileCard company={company} onEdit={() => setPanel("edit-company")} />
         <CompanyConfigCard config={config} onEdit={() => setPanel("edit-config")} />
+        <CompanyEmailReadinessCard companyPublicId={publicId} onOpenSettings={openEmailSettings} />
       </div>
 
       <EditCompanyModal company={panel === "edit-company" ? company : null} onClose={closePanel} />
