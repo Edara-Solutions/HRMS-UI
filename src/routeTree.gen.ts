@@ -29,6 +29,7 @@ import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dash
 import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
 import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
 import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
+import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
 import { Route as AdminCompaniesPublicIdRouteImport } from "./app/routes/admin/companies/$publicId"
 
 const CompanyRouteRoute = CompanyRouteRouteImport.update({
@@ -131,6 +132,11 @@ const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
   path: "/$publicId",
   getParentRoute: () => AdminLeadsRouteRoute,
 } as any)
+const AdminEmailDeliveriesRoute = AdminEmailDeliveriesRouteImport.update({
+  id: "/email/deliveries",
+  path: "/email/deliveries",
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCompaniesPublicIdRoute = AdminCompaniesPublicIdRouteImport.update({
   id: "/$publicId",
   path: "/$publicId",
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
+  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   "/forbidden": typeof ForbiddenIndexRoute
   "/login": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
+  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit": typeof AdminAuditIndexRoute
   "/admin/companies": typeof AdminCompaniesIndexRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRoute
+  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/login/"
     | "/admin/companies/$publicId"
+    | "/admin/email/deliveries"
     | "/admin/leads/$publicId"
     | "/admin/audit/"
     | "/admin/companies/"
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | "/forbidden"
     | "/login"
     | "/admin/companies/$publicId"
+    | "/admin/email/deliveries"
     | "/admin/leads/$publicId"
     | "/admin/audit"
     | "/admin/companies"
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/login/"
     | "/admin/companies/$publicId"
+    | "/admin/email/deliveries"
     | "/admin/leads/$publicId"
     | "/admin/audit/"
     | "/admin/companies/"
@@ -426,6 +438,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminLeadsPublicIdRouteImport
       parentRoute: typeof AdminLeadsRouteRoute
     }
+    "/admin/email/deliveries": {
+      id: "/admin/email/deliveries"
+      path: "/email/deliveries"
+      fullPath: "/admin/email/deliveries"
+      preLoaderRoute: typeof AdminEmailDeliveriesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     "/admin/companies/$publicId": {
       id: "/admin/companies/$publicId"
       path: "/$publicId"
@@ -467,6 +486,7 @@ interface AdminRouteRouteChildren {
   AdminCompaniesRouteRoute: typeof AdminCompaniesRouteRouteWithChildren
   AdminLeadsRouteRoute: typeof AdminLeadsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminEmailDeliveriesRoute: typeof AdminEmailDeliveriesRoute
   AdminAuditIndexRoute: typeof AdminAuditIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
   AdminEmailIndexRoute: typeof AdminEmailIndexRoute
@@ -478,6 +498,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCompaniesRouteRoute: AdminCompaniesRouteRouteWithChildren,
   AdminLeadsRouteRoute: AdminLeadsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminEmailDeliveriesRoute: AdminEmailDeliveriesRoute,
   AdminAuditIndexRoute: AdminAuditIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
   AdminEmailIndexRoute: AdminEmailIndexRoute,

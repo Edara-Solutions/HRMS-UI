@@ -608,6 +608,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/platform-admins/{publicId}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/platform-admins/{publicId}/force-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/leads": {
         parameters: {
             query?: never;
@@ -1112,6 +1182,7 @@ export interface paths {
                         ownerLastName: string;
                         /** Format: email */
                         ownerEmail: string;
+                        ownerLocale?: "en" | "ar";
                     };
                 };
             };
@@ -3164,6 +3235,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/email-types/{key}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateVariantListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/email-types/{key}/preview": {
         parameters: {
             query?: never;
@@ -3175,6 +3305,7 @@ export interface paths {
             parameters: {
                 query?: {
                     locale?: components["schemas"]["EmailLocale"];
+                    companyPublicId?: string;
                 };
                 header?: never;
                 path: {
@@ -3191,6 +3322,65 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["EmailPreview"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/email-template-variants/{key}/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateAssignmentListResponse"];
                     };
                 };
                 /** @description Default Response */
@@ -3248,6 +3438,8 @@ export interface paths {
                         /** Format: email */
                         recipientEmail: string;
                         locale?: components["schemas"]["EmailLocale"];
+                        /** Format: uuid */
+                        companyPublicId?: string;
                     };
                 };
             };
@@ -3285,6 +3477,301 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{companyPublicId}/email-template-assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    companyPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EmailTemplateAssignmentListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    companyPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        emailTypeKey: string;
+                        templateRevisionKey: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": Record<string, never>;
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{companyPublicId}/email-template-assignments/{emailTypeKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    companyPublicId: string;
+                    emailTypeKey: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{companyPublicId}/email-template-assignments/{emailTypeKey}/effective": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    companyPublicId: string;
+                    emailTypeKey: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EffectiveTemplate"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    companyPublicId?: string;
+                    context?: components["schemas"]["EmailContext"];
+                    emailTypeKey?: string;
+                    businessReference?: string;
+                    status?: components["schemas"]["DeliveryStatus"];
+                    recipientEmail?: string;
+                    createdFrom?: string;
+                    createdTo?: string;
+                    page?: number;
+                    pageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3371,7 +3858,72 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        reason?: string;
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryRecordResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/deliveries/{publicId}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
                     };
                 };
             };
@@ -3530,6 +4082,19 @@ export interface components {
         EmailLocale: "en" | "ar";
         EmailCriticality: "CRITICAL" | "OPERATIONAL";
         DeliveryStatus: "QUEUED" | "PROCESSING" | "RETRY_SCHEDULED" | "SENT" | "FAILED" | "CANCELLED";
+        LocaleSource: "EVENT" | "RECIPIENT" | "CONTEXT_DEFAULT" | "SYSTEM_FALLBACK";
+        TimeZoneSource: "RECIPIENT" | "CONTEXT_DEFAULT" | "SYSTEM_FALLBACK";
+        DeliveryTimelineStage: "ENQUEUED" | "SENT" | "RETRY_SCHEDULED" | "FAILED" | "RETRY_REQUESTED" | "CANCELLED";
+        DeliveryTimelineEntry: {
+            stage: components["schemas"]["DeliveryTimelineStage"];
+            /** Format: date-time */
+            occurredAt: string;
+            attemptNumber?: number;
+            failureKind?: string;
+            reason?: string;
+            providerMessageId?: string;
+            actorUserId?: number | null;
+        };
         EmailType: {
             key: string;
             description: string;
@@ -3541,6 +4106,16 @@ export interface components {
         };
         EmailTypeListResponse: {
             items: components["schemas"]["EmailType"][];
+        };
+        EmailTemplateVariant: {
+            key: string;
+            emailTypeKey: string;
+            context: components["schemas"]["EmailContext"];
+            payloadVersion: number;
+            supportedLocales: components["schemas"]["EmailLocale"][];
+        };
+        EmailTemplateVariantListResponse: {
+            items: components["schemas"]["EmailTemplateVariant"][];
         };
         EmailSenderIdentity: {
             name: string;
@@ -3558,6 +4133,22 @@ export interface components {
             text: string;
             senderIdentity?: components["schemas"]["EmailSenderIdentity"];
         };
+        EmailTemplateAssignment: {
+            companyId: number;
+            emailTypeKey: string;
+            templateRevisionKey: string;
+            assignedBy: number | null;
+        };
+        EmailTemplateAssignmentListResponse: {
+            items: components["schemas"]["EmailTemplateAssignment"][];
+        };
+        EffectiveTemplate: {
+            emailTypeKey: string;
+            templateKey: string;
+            context: components["schemas"]["EmailContext"];
+            payloadVersion: number;
+            supportedLocales: components["schemas"]["EmailLocale"][];
+        };
         TestSendResponse: {
             /** Format: uuid */
             publicId: string;
@@ -3573,6 +4164,11 @@ export interface components {
             emailTypeKey: string;
             context: components["schemas"]["EmailContext"];
             locale: components["schemas"]["EmailLocale"];
+            localeSource: components["schemas"]["LocaleSource"];
+            localeFallbackApplied: boolean;
+            timeZone: string;
+            timeZoneSource: components["schemas"]["TimeZoneSource"];
+            timeZoneFallbackApplied: boolean;
             status: components["schemas"]["DeliveryStatus"];
             isTest: boolean;
             maskedRecipient: string;
@@ -3587,6 +4183,11 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             sentAt: string | null;
+            timeline?: components["schemas"]["DeliveryTimelineEntry"][];
+        };
+        DeliveryListResponse: {
+            items: components["schemas"]["DeliveryRecordResponse"][];
+            meta: components["schemas"]["PageMeta"];
         };
         DnsRecordKind: "OWNERSHIP_TXT" | "DKIM" | "RETURN_PATH";
         DnsCheckStatus: "PENDING" | "VERIFIED" | "FAILED";
