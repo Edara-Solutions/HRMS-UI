@@ -129,6 +129,19 @@ describe("AdminEmailDeliveriesPage", () => {
     expect(query.get("context")).toBe("COMPANY");
   });
 
+  it("renders deliveries without a resolved company sender", async () => {
+    API_GET_MOCK.mockReturnValue(
+      jsonResponse({
+        ...DELIVERY_LIST,
+        items: [{ ...FAILED_DELIVERY, senderName: null, senderAddress: null }],
+      }),
+    );
+    renderPage();
+
+    expect((await screen.findAllByText("Failed")).length).toBeGreaterThan(0);
+    expect(screen.queryByText("Delivery history unavailable")).not.toBeInTheDocument();
+  });
+
   it("requires a reason before retrying a failed delivery and posts only the operator reason", async () => {
     Object.assign(SEARCH_STATE, { deliveryId: FAILED_DELIVERY.publicId });
     API_GET_MOCK.mockImplementation((path: string) => {

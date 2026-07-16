@@ -2,7 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiClient, type components } from "@/shared/api";
 
-export type DeliveryRecord = components["schemas"]["DeliveryRecordResponse"];
+export type DeliveryRecord = Omit<
+  components["schemas"]["DeliveryRecordResponse"],
+  "senderName" | "senderAddress"
+> & {
+  senderName: string | null;
+  senderAddress: string | null;
+};
 export type DeliveryListResponse = components["schemas"]["DeliveryListResponse"];
 export type DeliveryStatus = components["schemas"]["DeliveryStatus"];
 export type EmailContext = components["schemas"]["EmailContext"];
@@ -67,8 +73,8 @@ const DELIVERY_RECORD_SCHEMA: z.ZodType<DeliveryRecord> = z.object({
   status: z.enum(DELIVERY_STATUSES),
   isTest: z.boolean(),
   maskedRecipient: z.string().min(1),
-  senderName: z.string().min(1),
-  senderAddress: z.string().email(),
+  senderName: z.string().min(1).nullable(),
+  senderAddress: z.string().email().nullable(),
   templateRevisionKey: z.string().min(1),
   attempts: z.number().int().nonnegative(),
   lastFailureKind: z.string().nullable(),
