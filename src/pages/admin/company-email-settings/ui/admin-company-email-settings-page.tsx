@@ -1,11 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HTTPError } from "ky";
-import { ArrowLeft, CheckCircle2, Mail, Palette, Send, ShieldAlert, XCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Mail,
+  Palette,
+  Send,
+  ShieldAlert,
+  XCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
+import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -35,6 +45,11 @@ type Confirmation =
   | { kind: "remove" }
   | undefined;
 
+interface Notice {
+  tone: "success" | "danger";
+  message: string;
+}
+
 const testEmailFormSchema = z.object({
   recipientEmail: z.string().trim().email("Enter a valid recipient email address"),
 });
@@ -43,6 +58,7 @@ type TestEmailFormData = z.infer<typeof testEmailFormSchema>;
 
 async function readCompanyEmailError(error: unknown, fallback: string): Promise<string> {
   if (error instanceof HTTPError) {
+    if (error.response.status >= 500) return fallback;
     const backendMessage = await readBackendErrorMessage(error.response);
     if (backendMessage) return backendMessage;
   }
@@ -70,7 +86,7 @@ export function AdminCompanyEmailSettingsPage() {
   const [locale, setLocale] = useState<EmailLocale>("en");
   const [selectedVariantKey, setSelectedVariantKey] = useState<string>();
   const [confirmation, setConfirmation] = useState<Confirmation>();
-  const [notice, setNotice] = useState<string>();
+  const [notice, setNotice] = useState<Notice>();
   const {
     register,
     handleSubmit,
@@ -159,27 +175,32 @@ export function AdminCompanyEmailSettingsPage() {
           templateRevisionKey: confirmation.templateRevisionKey,
         });
         setSelectedVariantKey(confirmation.templateRevisionKey);
-        setNotice(
-          "Template Variant assigned. The effective Company email template has been refreshed.",
-        );
+        setNotice({
+          tone: "success",
+          message:
+            "Template Variant assigned. The effective Company email template has been refreshed.",
+        });
       } else {
         await removeTemplate.mutateAsync({
           companyPublicId: publicId,
           emailTypeKey: activeEmailTypeKey,
         });
         setSelectedVariantKey(undefined);
-        setNotice(
-          "Template Assignment removed. This email now resolves to the Company Default Template.",
-        );
+        setNotice({
+          tone: "success",
+          message:
+            "Template Assignment removed. This email now resolves to the Company Default Template.",
+        });
       }
       setConfirmation(undefined);
     } catch (error) {
-      setNotice(
-        await readCompanyEmailError(
+      setNotice({
+        tone: "danger",
+        message: await readCompanyEmailError(
           error,
           "The template change was not applied. It may have become unavailable or the assignment changed; refresh and try again.",
         ),
-      );
+      });
       setConfirmation(undefined);
     }
   }
@@ -194,14 +215,18 @@ export function AdminCompanyEmailSettingsPage() {
         locale: activeLocale,
         recipientEmail,
       });
-      setNotice("Test email queued. Delivery proceeds through the transactional outbox.");
+      setNotice({
+        tone: "success",
+        message: "Test email queued. Delivery proceeds through the transactional outbox.",
+      });
     } catch (error) {
-      setNotice(
-        await readCompanyEmailError(
+      setNotice({
+        tone: "danger",
+        message: await readCompanyEmailError(
           error,
           "The test email could not be queued. Confirm the recipient and try again.",
         ),
-      );
+      });
     }
   }
 
@@ -335,9 +360,22 @@ export function AdminCompanyEmailSettingsPage() {
       </div>
 
       {notice && (
-        <output className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)]">
-          {notice}
-        </output>
+        <div
+          className={cn(
+            "flex w-full items-start gap-2 rounded-[var(--radius-md)] border px-3 py-2.5 text-sm",
+            notice.tone === "danger"
+              ? "border-[color-mix(in_srgb,var(--color-danger)_55%,var(--color-border))] bg-[var(--color-danger-soft)] text-[var(--color-danger)]"
+              : "border-[color-mix(in_srgb,var(--color-success)_55%,var(--color-border))] bg-[var(--color-success-soft)] text-[var(--color-success)]",
+          )}
+          role={notice.tone === "danger" ? "alert" : "status"}
+        >
+          {notice.tone === "danger" ? (
+            <AlertCircle aria-hidden="true" className="mt-0.5 shrink-0" size={16} />
+          ) : (
+            <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0" size={16} />
+          )}
+          <p>{notice.message}</p>
+        </div>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">

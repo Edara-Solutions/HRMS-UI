@@ -45,7 +45,8 @@ export function SearchableFilterSelect({
   useEffect(() => {
     if (!open) return;
     function onPointerDown(event: MouseEvent) {
-      if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
+      if (event.target instanceof Node && !containerRef.current?.contains(event.target))
+        setOpen(false);
     }
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);

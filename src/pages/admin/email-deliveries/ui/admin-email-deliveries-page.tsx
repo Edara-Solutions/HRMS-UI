@@ -4,12 +4,15 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CircleCheck,
+  Clock3,
   Filter,
   Mail,
   RefreshCw,
   RotateCcw,
   Search,
   ShieldAlert,
+  X,
 } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Badge } from "@/shared/ui/badge";
@@ -163,6 +166,22 @@ interface StatusBadgeProps {
 
 function StatusBadge({ status }: StatusBadgeProps) {
   return <Badge variant={STATUS_BADGE_VARIANTS[status]}>{humanize(status)}</Badge>;
+}
+
+function TimelineStageIcon({ stage }: { stage: string }) {
+  if (stage === "SENT") {
+    return <CircleCheck size={16} className="text-[var(--color-success)]" aria-hidden="true" />;
+  }
+  if (stage === "FAILED") {
+    return <ShieldAlert size={14} className="text-[var(--color-danger)]" aria-hidden="true" />;
+  }
+  if (stage === "RETRY_SCHEDULED" || stage === "RETRY_REQUESTED") {
+    return <RotateCcw size={14} className="text-[var(--color-warning)]" aria-hidden="true" />;
+  }
+  if (stage === "CANCELLED") {
+    return <X size={14} className="text-[var(--color-text-muted)]" aria-hidden="true" />;
+  }
+  return <Clock3 size={14} className="text-[var(--color-primary)]" aria-hidden="true" />;
 }
 
 interface DateTimePickerProps {
@@ -463,23 +482,37 @@ function DeliveryDetail({ publicId, onClose }: DeliveryDetailProps) {
       onClose={onClose}
       titleId={titleId}
       descriptionId={descriptionId}
-      className="max-w-3xl"
+      className="max-h-[calc(100vh-2rem)] max-w-5xl overflow-y-auto p-0"
     >
-      <DialogTitle id={titleId}>Delivery detail</DialogTitle>
-      <DialogDescription id={descriptionId}>
-        Safe operational metadata only. Message content, subjects, and recipient addresses remain
-        redacted.
-      </DialogDescription>
+      <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4 sm:px-6">
+        <div className="min-w-0">
+          <DialogTitle id={titleId}>Delivery detail</DialogTitle>
+          <DialogDescription id={descriptionId} className="mt-1 max-w-3xl">
+            Safe operational metadata only. “Sent” means the SMTP provider accepted the message; it
+            does not confirm inbox delivery. Message content, subjects, and recipient addresses
+            remain redacted.
+          </DialogDescription>
+        </div>
+        <Button
+          variant="ghost"
+          size="iconXs"
+          aria-label="Close delivery detail"
+          title="Close delivery detail"
+          onClick={onClose}
+        >
+          <X size={15} aria-hidden="true" />
+        </Button>
+      </div>
 
       {delivery.isPending ? (
-        <div className="mt-6 space-y-3" role="status" aria-label="Loading delivery detail">
+        <div className="m-5 space-y-3 sm:m-6" role="status" aria-label="Loading delivery detail">
           <Skeleton className="h-8 w-1/3" />
           <Skeleton className="h-32 w-full" />
         </div>
       ) : null}
       {delivery.isError ? (
         <div
-          className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4"
+          className="m-5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 sm:m-6"
           role="alert"
         >
           <p className="text-sm font-semibold text-[var(--color-text)]">
@@ -491,24 +524,46 @@ function DeliveryDetail({ publicId, onClose }: DeliveryDetailProps) {
         </div>
       ) : null}
       {selectedDelivery ? (
-        <div className="mt-6 space-y-6">
-          <dl className="grid gap-4 border-y border-[var(--color-border)] py-4 text-sm sm:grid-cols-2">
+        <div className="space-y-6 px-5 py-5 sm:px-6 sm:py-6">
+          <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-sm sm:grid-cols-3">
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
-                Status
-              </dt>
-              <dd className="mt-1">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Delivery status
+              </p>
+              <div className="mt-2">
                 <StatusBadge status={selectedDelivery.status} />
-              </dd>
+              </div>
             </div>
             <div>
-              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
                 Recipient
-              </dt>
-              <dd className="mt-1 text-[var(--color-text)]">
+              </p>
+              <p className="mt-2 text-[var(--color-text)]">
                 <bdi dir="ltr">{selectedDelivery.maskedRecipient}</bdi>
-              </dd>
+              </p>
             </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Company
+              </p>
+              <div className="mt-2 text-[var(--color-text)]">
+                {selectedDelivery.company ? (
+                  <>
+                    <p>{selectedDelivery.company.name}</p>
+                    <p className="mt-0.5 font-mono text-xs text-[var(--color-text-muted)]">
+                      {selectedDelivery.company.code}
+                    </p>
+                  </>
+                ) : selectedDelivery.context === "COMPANY" ? (
+                  "Company record unavailable"
+                ) : (
+                  "Edara"
+                )}
+              </div>
+            </div>
+          </div>
+
+          <dl className="grid gap-x-8 gap-y-5 border-y border-[var(--color-border)] py-5 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
                 Email type
@@ -527,6 +582,49 @@ function DeliveryDetail({ publicId, onClose }: DeliveryDetailProps) {
             </div>
             <div>
               <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Context
+              </dt>
+              <dd className="mt-1 text-[var(--color-text)]">
+                {humanize(selectedDelivery.context)} email ·{" "}
+                {selectedDelivery.isTest ? "Test" : "Production"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Sender identity
+              </dt>
+              <dd className="mt-1 text-[var(--color-text)]">
+                {selectedDelivery.senderAddress ? (
+                  <bdi dir="ltr">
+                    {selectedDelivery.senderName ? `${selectedDelivery.senderName} ` : ""}
+                    &lt;{selectedDelivery.senderAddress}&gt;
+                  </bdi>
+                ) : (
+                  "Not resolved"
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Locale
+              </dt>
+              <dd className="mt-1 text-[var(--color-text)]">
+                {selectedDelivery.locale.toUpperCase()} · {humanize(selectedDelivery.localeSource)}
+                {selectedDelivery.localeFallbackApplied ? " fallback" : ""}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Time zone
+              </dt>
+              <dd className="mt-1 text-[var(--color-text)]">
+                <bdi dir="ltr">{selectedDelivery.timeZone}</bdi> ·{" "}
+                {humanize(selectedDelivery.timeZoneSource)}
+                {selectedDelivery.timeZoneFallbackApplied ? " fallback" : ""}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
                 Business reference
               </dt>
               <dd className="mt-1 break-all font-mono text-xs text-[var(--color-text)]">
@@ -535,12 +633,44 @@ function DeliveryDetail({ publicId, onClose }: DeliveryDetailProps) {
             </div>
             <div>
               <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
-                Safe failure classification
+                Delivery ID
+              </dt>
+              <dd className="mt-1 break-all font-mono text-xs text-[var(--color-text)]">
+                {selectedDelivery.publicId}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Created
+              </dt>
+              <dd className="mt-1 tabular-nums text-[var(--color-text)]">
+                {formatDate(selectedDelivery.createdAt)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                SMTP accepted at
+              </dt>
+              <dd className="mt-1 tabular-nums text-[var(--color-text)]">
+                {formatDate(selectedDelivery.sentAt)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Provider acceptance ID
+              </dt>
+              <dd className="mt-1 break-all font-mono text-xs text-[var(--color-text)]">
+                {selectedDelivery.providerMessageId ?? "–"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
+                Latest failure classification
               </dt>
               <dd className="mt-1 text-[var(--color-text)]">
                 {selectedDelivery.lastFailureKind
                   ? humanize(selectedDelivery.lastFailureKind)
-                  : "–"}
+                  : "No failure recorded"}
               </dd>
             </div>
           </dl>
@@ -596,28 +726,69 @@ function DeliveryDetail({ publicId, onClose }: DeliveryDetailProps) {
             </section>
           ) : null}
 
-          <section aria-labelledby="delivery-timeline-title">
-            <h2
-              id="delivery-timeline-title"
-              className="text-sm font-semibold text-[var(--color-text)]"
-            >
-              Attempt timeline
-            </h2>
-            <ol className="mt-3 space-y-3 border-s border-[var(--color-border)] ps-4">
+          <section
+            className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]"
+            aria-labelledby="delivery-timeline-title"
+          >
+            <div className="flex items-baseline justify-between gap-3 border-b border-[var(--color-border)] p-4">
+              <div>
+                <h2
+                  id="delivery-timeline-title"
+                  className="text-sm font-semibold text-[var(--color-text)]"
+                >
+                  Attempt timeline
+                </h2>
+                <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                  Recorded worker outcomes and operator actions.
+                </p>
+              </div>
+              <span className="shrink-0 text-xs tabular-nums text-[var(--color-text-muted)]">
+                {(selectedDelivery.timeline ?? []).length} events
+              </span>
+            </div>
+            <ol className="relative px-4 py-1">
+              <span
+                className="absolute bottom-5 start-7 top-5 w-px bg-[var(--color-border)]"
+                aria-hidden="true"
+              />
               {(selectedDelivery.timeline ?? []).map((entry, index) => (
-                <li key={`${entry.stage}-${entry.occurredAt}-${index}`} className="relative">
+                <li
+                  key={`${entry.stage}-${entry.occurredAt}-${index}`}
+                  className="relative grid grid-cols-[24px_minmax(0,1fr)] gap-3 border-b border-[var(--color-border)] py-3 last:border-b-0"
+                >
                   <span
-                    className="absolute -start-[21px] top-1.5 size-2 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface)]"
+                    className="relative z-10 flex size-6 items-center justify-center bg-[var(--color-surface)]"
                     aria-hidden="true"
-                  />
-                  <p className="text-sm font-medium text-[var(--color-text)]">
-                    {humanize(entry.stage)}
-                  </p>
-                  <p className="mt-0.5 text-xs tabular-nums text-[var(--color-text-muted)]">
-                    {formatDate(entry.occurredAt)}
-                    {entry.attemptNumber ? ` · attempt ${entry.attemptNumber}` : ""}
-                    {entry.failureKind ? ` · ${humanize(entry.failureKind)}` : ""}
-                  </p>
+                  >
+                    <TimelineStageIcon stage={entry.stage} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+                      <p className="text-sm font-semibold text-[var(--color-text)]">
+                        {humanize(entry.stage)}
+                      </p>
+                      <p className="text-xs tabular-nums text-[var(--color-text-muted)]">
+                        {formatDate(entry.occurredAt)}
+                      </p>
+                    </div>
+                    {entry.attemptNumber || entry.failureKind ? (
+                      <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                        {entry.attemptNumber ? `Attempt ${entry.attemptNumber}` : ""}
+                        {entry.attemptNumber && entry.failureKind ? " · " : ""}
+                        {entry.failureKind ? humanize(entry.failureKind) : ""}
+                      </p>
+                    ) : null}
+                    {entry.reason ? (
+                      <p className="mt-2 border-s border-[var(--color-border)] ps-3 text-xs leading-5 text-[var(--color-text-muted)]">
+                        {entry.reason}
+                      </p>
+                    ) : null}
+                    {entry.providerMessageId ? (
+                      <p className="mt-1 break-all font-mono text-xs text-[var(--color-text-muted)]">
+                        Provider ID: <bdi dir="ltr">{entry.providerMessageId}</bdi>
+                      </p>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ol>
@@ -691,7 +862,7 @@ function DeliveryTable({ deliveries, onSelect }: DeliveryTableProps) {
                 (label) => (
                   <th
                     key={label}
-                    className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)] ${label === "" ? "text-end" : "text-start"}`}
+                    className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)] ${label === "" || label === "Attempts" ? "text-end" : "text-start"}`}
                   >
                     {label}
                   </th>

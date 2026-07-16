@@ -2,14 +2,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiClient, type components } from "@/shared/api";
 
+export type DeliveryCompanySummary = {
+  publicId: string;
+  name: string;
+  code: string;
+};
+
 export type DeliveryRecord = Omit<
   components["schemas"]["DeliveryRecordResponse"],
-  "senderName" | "senderAddress"
+  "senderName" | "senderAddress" | "company"
 > & {
   senderName: string | null;
   senderAddress: string | null;
+  company: DeliveryCompanySummary | null;
 };
-export type DeliveryListResponse = components["schemas"]["DeliveryListResponse"];
+export type DeliveryListResponse = Omit<components["schemas"]["DeliveryListResponse"], "items"> & {
+  items: DeliveryRecord[];
+};
 export type DeliveryStatus = components["schemas"]["DeliveryStatus"];
 export type EmailContext = components["schemas"]["EmailContext"];
 
@@ -41,6 +50,11 @@ const DELIVERY_STATUSES = [
 const EMAIL_CONTEXTS = ["EDARA", "COMPANY"] as const satisfies readonly EmailContext[];
 const LOCALE_SOURCES = ["EVENT", "RECIPIENT", "CONTEXT_DEFAULT", "SYSTEM_FALLBACK"] as const;
 const TIME_ZONE_SOURCES = ["RECIPIENT", "CONTEXT_DEFAULT", "SYSTEM_FALLBACK"] as const;
+const ACTIVE_DELIVERY_STATUSES = new Set<DeliveryStatus>([
+  "QUEUED",
+  "PROCESSING",
+  "RETRY_SCHEDULED",
+]);
 const TIMELINE_STAGES = [
   "ENQUEUED",
   "SENT",
@@ -80,6 +94,13 @@ const DELIVERY_RECORD_SCHEMA: z.ZodType<DeliveryRecord> = z.object({
   lastFailureKind: z.string().nullable(),
   providerMessageId: z.string().nullable(),
   companyId: z.number().int().nullable(),
+  company: z
+    .object({
+      publicId: z.string().uuid(),
+      name: z.string().min(1),
+      code: z.string().min(1),
+    })
+    .nullable(),
   businessReference: z.string().min(1),
   createdAt: z.string().datetime(),
   sentAt: z.string().datetime().nullable(),
@@ -101,6 +122,10 @@ const DELIVERY_QUERY_KEYS = {
   list: (params: DeliveryListParams) => ["email-deliveries", "list", params] as const,
   detail: (publicId: string) => ["email-deliveries", "detail", publicId] as const,
 };
+
+function isAwaitingWorker(status: DeliveryStatus): boolean {
+  return ACTIVE_DELIVERY_STATUSES.has(status);
+}
 
 function deliverySearchParams(params: DeliveryListParams): URLSearchParams {
   const searchParams = new URLSearchParams({
@@ -146,6 +171,8 @@ export function useEmailDeliveries(params: DeliveryListParams) {
     retryOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
+    refetchInterval: (query) =>
+      query.state.data?.items.some((delivery) => isAwaitingWorker(delivery.status)) ? 2_000 : false,
   });
 }
 
@@ -158,6 +185,8 @@ export function useEmailDelivery(publicId: string | undefined) {
       return fetchDelivery(publicId);
     },
     enabled: publicId !== undefined,
+    refetchInterval: (query) =>
+      query.state.data && isAwaitingWorker(query.state.data.status) ? 2_000 : false,
   });
 }
 

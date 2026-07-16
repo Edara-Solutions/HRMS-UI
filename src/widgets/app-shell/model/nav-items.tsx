@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import type { PermissionAction } from "@/shared/auth";
 import type { SupportedLocale } from "@/shared/i18n";
 
 export interface NavItem {
@@ -27,6 +28,7 @@ export interface NavItem {
   href: string;
   icon: ReactNode;
   indicator?: NavIndicator;
+  permission?: PermissionAction;
 }
 
 export interface NavIndicator {
@@ -114,6 +116,12 @@ export const companyNavGroups: NavGroup[] = [
   {
     title: "Operations",
     items: [
+      {
+        label: "Email settings",
+        href: "/company/email-settings",
+        icon: <Mail size={ICON_SIZE} />,
+        permission: "companies:email-settings:read",
+      },
       {
         label: "Documents",
         href: "/company/documents",
