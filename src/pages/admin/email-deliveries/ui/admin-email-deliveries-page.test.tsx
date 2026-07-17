@@ -17,7 +17,7 @@ const SEARCH_STATE = vi.hoisted(() => ({
   createdTo: undefined,
   deliveryId: undefined,
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
@@ -71,7 +71,7 @@ const FAILED_DELIVERY: DeliveryRecord = {
 
 const DELIVERY_LIST: DeliveryListResponse = {
   items: [FAILED_DELIVERY],
-  meta: { mode: "page", page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
+  meta: { mode: "page", page: 1, pageSize: 10, totalItems: 1, totalPages: 1 },
 };
 
 function jsonResponse<T>(value: T) {
@@ -116,7 +116,7 @@ describe("AdminEmailDeliveriesPage", () => {
       createdTo: undefined,
       deliveryId: undefined,
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     });
   });
 

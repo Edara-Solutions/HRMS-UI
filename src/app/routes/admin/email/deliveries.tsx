@@ -23,7 +23,7 @@ const ADMIN_EMAIL_DELIVERIES_SEARCH_SCHEMA = z.object({
   createdTo: z.string().datetime().optional().catch(undefined),
   deliveryId: z.string().uuid().optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
-  pageSize: z.coerce.number().int().min(1).max(100).catch(20),
+  pageSize: z.coerce.number().int().min(1).max(10).catch(10),
 });
 
 /** Platform Admin delivery operations with URL-owned filters and pagination. */

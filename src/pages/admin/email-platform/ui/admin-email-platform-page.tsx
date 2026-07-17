@@ -415,15 +415,28 @@ function PreviewPanel({
                   {safePreview.text}
                 </pre>
               )}
-              <Button
-                variant="secondary"
-                size="md"
-                className="mt-3"
-                leadingIcon={<Maximize2 size={15} aria-hidden="true" />}
-                onClick={() => setFullScreenPreviewOpen(true)}
-              >
-                {copy.fullScreenPreview}
-              </Button>
+              <div className="mt-3 flex items-center justify-start border-t border-[var(--color-border)] pt-3">
+                <div className="group relative">
+                  <Button
+                    variant="secondary"
+                    size="iconSm"
+                    iconOnly
+                    className="size-[34px] rounded-[var(--radius-md)]"
+                    aria-label={copy.fullScreenPreview}
+                    aria-describedby="email-preview-tooltip"
+                    onClick={() => setFullScreenPreviewOpen(true)}
+                  >
+                    <Maximize2 size={17} strokeWidth={1.8} aria-hidden="true" />
+                  </Button>
+                  <span
+                    id="email-preview-tooltip"
+                    role="tooltip"
+                    className="pointer-events-none absolute bottom-full start-0 z-10 mb-2 translate-y-1 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-[11px] font-medium text-[var(--color-text)] opacity-0 shadow-[var(--shadow-sm)] transition-[opacity,transform] duration-[var(--motion-fast)] ease-[var(--motion-easing)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                  >
+                    {copy.previewAction}
+                  </span>
+                </div>
+              </div>
             </div>
             <Dialog
               open={fullScreenPreviewOpen}
@@ -510,15 +523,19 @@ function TestSendPanel({ copy, emailType, requestedLocale, effectiveLocale }: Te
   }
 
   return (
-    <Card as="section" aria-labelledby="test-send-title">
+    <Card
+      as="section"
+      aria-labelledby="test-send-title"
+      className="overflow-hidden border-[color-mix(in_srgb,var(--color-primary)_24%,var(--color-border))]"
+    >
       <CardHeader>
         <CardTitle id="test-send-title">{copy.testSend}</CardTitle>
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">{copy.testSendDescription}</p>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-4 sm:p-5">
         <form
           noValidate
-          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          className="flex flex-col gap-4 sm:flex-row sm:items-end"
           onSubmit={handleSubmit((data) => void submitTestEmail(data))}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -548,13 +565,14 @@ function TestSendPanel({ copy, emailType, requestedLocale, effectiveLocale }: Te
           <Button
             type="submit"
             leadingIcon={<Send size={16} aria-hidden="true" />}
+            className="sm:shrink-0"
             disabled={!canQueue || queueTestSend.isPending}
             isLoading={queueTestSend.isPending}
           >
             {copy.queueTestEmail}
           </Button>
         </form>
-        <output className="mt-3 block rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3">
+        <output className="mt-4 block border-s-2 border-[var(--color-primary)] bg-[var(--color-surface-2)] px-3 py-2.5">
           <p className="text-xs font-semibold text-[var(--color-text)]">
             {queueTestSend.isSuccess
               ? `${copy.testEmailQueued} · ${copy.effectiveLocale}: ${localeLabel(queueTestSend.data.locale)}`

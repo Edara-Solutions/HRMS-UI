@@ -886,7 +886,14 @@ function DeliveryTable({ deliveries, onSelect }: DeliveryTableProps) {
                 (label) => (
                   <th
                     key={label}
-                    className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)] ${label === "" || label === "Attempts" ? "text-end" : "text-start"}`}
+                    className={cn(
+                      "px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]",
+                      label === ""
+                        ? "text-end"
+                        : label === "Attempts"
+                          ? "text-center"
+                          : "text-start",
+                    )}
                   >
                     {label}
                   </th>
@@ -914,7 +921,7 @@ function DeliveryTable({ deliveries, onSelect }: DeliveryTableProps) {
                 <td className="px-4 py-3">
                   <StatusBadge status={delivery.status} />
                 </td>
-                <td className="px-4 py-3 text-end tabular-nums text-[13.5px] text-[var(--color-text-muted)]">
+                <td className="px-4 py-3 text-center tabular-nums text-[13.5px] text-[var(--color-text-muted)]">
                   {delivery.attempts}
                 </td>
                 <td className="px-4 py-3 text-[12px] tabular-nums text-[var(--color-text-muted)]">
@@ -1013,7 +1020,14 @@ export function AdminEmailDeliveriesPage() {
   }
 
   const totalPages = Math.max(1, deliveries.data?.meta.totalPages ?? 1);
-  const currentPage = Math.min(search.page, totalPages);
+  const currentPage = Math.min(deliveries.data?.meta.page ?? search.page, totalPages);
+  const totalItems = deliveries.data?.meta.totalItems ?? 0;
+  const pageSize = deliveries.data?.meta.pageSize ?? search.pageSize;
+  const visibleRangeStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const visibleRangeEnd = Math.min(
+    visibleRangeStart + (deliveries.data?.items.length ?? 0) - 1,
+    totalItems,
+  );
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -1203,13 +1217,25 @@ export function AdminEmailDeliveriesPage() {
         </CardContent>
         {deliveries.data ? (
           <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-xs text-[var(--color-text-muted)]">
-              {deliveries.data.meta.totalItems} deliveries
-            </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-baseline gap-1.5 tabular-nums">
+              <span className="text-[13px] font-semibold text-[var(--color-text)]">
+                {totalItems}
+              </span>
+              <span className="text-xs text-[var(--color-text-muted)]">deliveries</span>
+              {totalItems > 0 ? (
+                <span className="text-xs text-[var(--color-text-faint)]">
+                  {" \u00b7 Showing "}
+                  {visibleRangeStart}
+                  {"\u2013"}
+                  {visibleRangeEnd}
+                </span>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-1.5">
               <Button
                 variant="nav"
                 size="iconXs"
+                className="btn-nav-prev"
                 disabled={currentPage <= 1}
                 onClick={() => updateSearch({ page: currentPage - 1 }, false)}
                 aria-label="Previous page"
@@ -1218,11 +1244,13 @@ export function AdminEmailDeliveriesPage() {
                 <ChevronLeft size={14} />
               </Button>
               <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
-                {currentPage} / {totalPages}
+                Page <span className="font-semibold text-[var(--color-text)]">{currentPage}</span>{" "}
+                of {totalPages}
               </span>
               <Button
                 variant="nav"
                 size="iconXs"
+                className="btn-nav-next"
                 disabled={currentPage >= totalPages}
                 onClick={() => updateSearch({ page: currentPage + 1 }, false)}
                 aria-label="Next page"
