@@ -29,6 +29,11 @@ const ENGLISH_EMAIL_PLATFORM_COPY = {
   previewLocaleUnavailable: "Preview locale unavailable",
   previewLocaleUnavailableDescription:
     "This Email Type is not registered for the selected locale. Choose one of its supported locales.",
+  requestedLocale: "Requested locale",
+  effectiveLocale: "Effective locale",
+  previewFallback: "Translation fallback applied",
+  previewFallbackDescription:
+    "The requested translation is unavailable. This preview and any test email use the effective locale shown.",
   previewUnavailable: "Preview unavailable",
   previewUnavailableDescription:
     "The approved sample could not be rendered. Try another locale or retry shortly.",
@@ -47,9 +52,17 @@ const ENGLISH_EMAIL_PLATFORM_COPY = {
   testSend: "Test send",
   testSendDescription:
     "Test messages require an explicit recipient and are queued separately from production communication.",
+  testSendLocaleDescription: "The queued test uses the effective preview locale shown above.",
   testRecipient: "Test recipient",
   testRecipientPlaceholder: "name@company.example",
+  invalidRecipientEmail: "Enter a valid recipient email address",
   queueTestEmail: "Queue test email",
+  testEmailQueued: "Test email queued",
+  testEmailQueuedDescription:
+    "The durable queue accepted the test email. It has not confirmed inbox delivery.",
+  testEmailUnavailable: "Test email could not be queued",
+  testEmailUnavailableDescription:
+    "Check the recipient and try again. No delivery credentials are exposed.",
   testQueueUnavailable: "Test delivery queue unavailable",
   testQueueUnavailableDescription:
     "The current API supports safe previews only. This control will enable when the durable queue contract is published; it will report queued acceptance, never inbox delivery.",
@@ -129,6 +142,7 @@ const ARABIC_EMAIL_PLATFORM_COPY = {
     "تتطلب الرسائل التجريبية مستلمًا محددًا وتوضع في طابور منفصل عن رسائل الإنتاج.",
   testRecipient: "المستلم التجريبي",
   testRecipientPlaceholder: "name@company.example",
+  invalidRecipientEmail: "أدخل عنوان بريد إلكتروني صالحًا للمستلم",
   queueTestEmail: "إضافة البريد التجريبي للطابور",
   testQueueUnavailable: "طابور الإرسال التجريبي غير متاح",
   testQueueUnavailableDescription:
@@ -158,6 +172,17 @@ const ARABIC_EMAIL_PLATFORM_COPY = {
   chooseDefaultPreview: "اختيار المعاينة الافتراضية",
   noEmailTypes: "لم يتم العثور على أنواع بريد",
   noEmailTypesDescription: "لا توجد قوالب مسجلة تطابق هذا السياق.",
+  requestedLocale: "اللغة المطلوبة",
+  effectiveLocale: "اللغة الفعّالة",
+  previewFallback: "تم تطبيق بديل الترجمة",
+  previewFallbackDescription:
+    "الترجمة المطلوبة غير متاحة. تستخدم المعاينة والرسالة التجريبية اللغة الفعّالة المبينة.",
+  testSendLocaleDescription: "تستخدم الرسالة التجريبية لغة المعاينة الفعّالة المبينة أعلاه.",
+  testEmailQueued: "تمت إضافة البريد التجريبي للطابور",
+  testEmailQueuedDescription:
+    "قبل الطابور الدائم الرسالة التجريبية. لا يؤكد ذلك وصولها إلى البريد الوارد.",
+  testEmailUnavailable: "تعذّر إضافة البريد التجريبي إلى الطابور",
+  testEmailUnavailableDescription: "تحقق من المستلم وأعد المحاولة. لا تُعرض بيانات اعتماد الإرسال.",
 } satisfies EmailPlatformCopy;
 
 const EMAIL_PLATFORM_COPY: Readonly<Record<SupportedLocale, EmailPlatformCopy>> = {

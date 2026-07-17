@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleCheck,
+  CircleX,
   Clock3,
   Filter,
   Mail,
@@ -15,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardTitle } from "@/shared/ui/card";
@@ -62,6 +64,24 @@ const DELIVERY_STATUSES: DeliveryStatus[] = [
   "CANCELLED",
 ];
 const EMAIL_CONTEXTS: EmailContext[] = ["EDARA", "COMPANY"];
+const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+const FILTER_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true,
+});
+const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  month: "long",
+  year: "numeric",
+});
+const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", { dateStyle: "full" });
 
 const STATUS_BADGE_VARIANTS: Readonly<
   Record<DeliveryStatus, "default" | "info" | "success" | "warning" | "danger">
@@ -83,21 +103,12 @@ function humanize(value: string): string {
 
 function formatDate(value: string | null): string {
   if (!value) return "–";
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(value),
-  );
+  return DATE_TIME_FORMATTER.format(new Date(value));
 }
 
 function formatFilterDate(value: string | undefined): string {
   if (!value) return "Choose date and time";
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).format(new Date(value));
+  return FILTER_DATE_FORMATTER.format(new Date(value));
 }
 
 function toTwelveHour(hour: number): number {
@@ -179,7 +190,7 @@ function TimelineStageIcon({ stage }: { stage: string }) {
     return <RotateCcw size={14} className="text-[var(--color-warning)]" aria-hidden="true" />;
   }
   if (stage === "CANCELLED") {
-    return <X size={14} className="text-[var(--color-text-muted)]" aria-hidden="true" />;
+    return <CircleX size={16} className="text-[var(--color-text-muted)]" aria-hidden="true" />;
   }
   return <Clock3 size={14} className="text-[var(--color-primary)]" aria-hidden="true" />;
 }
@@ -201,7 +212,6 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
   const [month, setMonth] = useState(
     () => new Date(initialDraft.getFullYear(), initialDraft.getMonth(), 1),
   );
-  const weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
   const firstWeekday = (month.getDay() + 6) % 7;
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const selectedKey = draft ? toDateKey(draft) : undefined;
@@ -268,9 +278,7 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
     });
   }
 
-  const monthLabel = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(
-    month,
-  );
+  const monthLabel = MONTH_LABEL_FORMATTER.format(month);
 
   return (
     <div className="min-h-[74px]">
@@ -294,13 +302,15 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
         onClose={() => setOpen(false)}
         titleId={titleId}
         descriptionId={descriptionId}
-        className="max-w-[420px] p-5"
+        className="max-w-[440px] p-6"
       >
-        <DialogTitle id={titleId}>{label}</DialogTitle>
+        <DialogTitle id={titleId} className="tracking-[-0.02em]">
+          {label}
+        </DialogTitle>
         <DialogDescription id={descriptionId}>
           Select the date and time used by this delivery-history filter.
         </DialogDescription>
-        <div className="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3">
+        <div className="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
           <div className="flex items-center justify-between gap-2">
             <Button
               variant="ghost"
@@ -312,7 +322,9 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
             >
               <ChevronLeft size={15} />
             </Button>
-            <p className="text-sm font-semibold text-[var(--color-text)]">{monthLabel}</p>
+            <p className="text-[13px] font-semibold tracking-tight text-[var(--color-text)]">
+              {monthLabel}
+            </p>
             <Button
               variant="ghost"
               size="iconXs"
@@ -324,12 +336,12 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
               <ChevronRight size={15} />
             </Button>
           </div>
-          <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-[var(--color-text-faint)]">
-            {weekdays.map((day) => (
+          <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
+            {WEEKDAYS.map((day) => (
               <span key={day}>{day}</span>
             ))}
           </div>
-          <div className="mt-1 grid grid-cols-7 gap-1" role="grid" aria-label={monthLabel}>
+          <div className="mt-2 grid grid-cols-7 gap-1.5" role="grid" aria-label={monthLabel}>
             {Array.from({ length: firstWeekday + daysInMonth }, (_, index) => {
               if (index < firstWeekday) return <span key={`blank-${index}`} />;
               const day = index - firstWeekday + 1;
@@ -340,10 +352,16 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
                 <button
                   key={dateKey}
                   type="button"
-                  className={`mx-auto flex size-8 items-center justify-center rounded-[var(--radius-md)] text-xs transition-colors ${selected ? "bg-[var(--color-primary-fill)] font-semibold text-[var(--color-on-primary)]" : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]"} ${dateKey === todayKey && !selected ? "ring-1 ring-[var(--color-primary)]" : ""}`}
+                  className={cn(
+                    "mx-auto flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[13px] tabular-nums transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
+                    selected
+                      ? "bg-[var(--color-primary-fill)] font-semibold text-[var(--color-on-primary)]"
+                      : "font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]",
+                    dateKey === todayKey && !selected && "ring-1 ring-[var(--color-primary)]",
+                  )}
                   onClick={() => selectDay(day)}
                   aria-pressed={selected}
-                  aria-label={new Intl.DateTimeFormat("en-GB", { dateStyle: "full" }).format(date)}
+                  aria-label={FULL_DATE_FORMATTER.format(date)}
                 >
                   {day}
                 </button>
@@ -351,9 +369,11 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
             })}
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-3">
+        <div className="mt-5 grid grid-cols-3 gap-3">
           <div>
-            <Label htmlFor={`${id}-hour`}>Hour</Label>
+            <Label className="block text-xs" htmlFor={`${id}-hour`}>
+              Hour
+            </Label>
             <Select
               value={draft ? String(toTwelveHour(draft.getHours())) : ""}
               onValueChange={updateHour}
@@ -371,7 +391,9 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
             </Select>
           </div>
           <div>
-            <Label htmlFor={`${id}-minute`}>Minute</Label>
+            <Label className="block text-xs" htmlFor={`${id}-minute`}>
+              Minute
+            </Label>
             <Input
               id={`${id}-minute`}
               className="mt-1.5 tabular-nums"
@@ -393,7 +415,9 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
             </span>
           </div>
           <div>
-            <Label htmlFor={`${id}-period`}>AM / PM</Label>
+            <Label className="block text-xs" htmlFor={`${id}-period`}>
+              AM / PM
+            </Label>
             <Select
               value={draft ? timePeriod(draft.getHours()) : ""}
               onValueChange={(nextValue) => {
@@ -410,7 +434,7 @@ function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePicker
             </Select>
           </div>
         </div>
-        <div className="mt-5 flex items-center justify-between gap-2">
+        <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
           <Button
             variant="ghost"
             size="sm"

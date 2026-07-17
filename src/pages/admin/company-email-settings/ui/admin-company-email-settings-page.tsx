@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
+import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
@@ -56,6 +57,25 @@ const testEmailFormSchema = z.object({
 
 type TestEmailFormData = z.infer<typeof testEmailFormSchema>;
 
+const EMAIL_LOCALE_FALLBACK_COPY = {
+  en: {
+    title: "Translation fallback applied",
+    requestedLocale: "Requested locale",
+    effectiveLocale: "Effective locale",
+    description: "This locale is also used when queueing a test email.",
+    previewRequired: "Wait for the preview to load before queueing a test email.",
+    locales: { en: "English", ar: "Arabic" },
+  },
+  ar: {
+    title: "تم تطبيق بديل الترجمة",
+    requestedLocale: "اللغة المطلوبة",
+    effectiveLocale: "اللغة الفعّالة",
+    description: "تُستخدم هذه اللغة أيضًا عند وضع رسالة تجريبية في الطابور.",
+    previewRequired: "انتظر حتى يتم تحميل المعاينة قبل وضع رسالة تجريبية في الطابور.",
+    locales: { en: "الإنجليزية", ar: "العربية" },
+  },
+} as const;
+
 async function readCompanyEmailError(error: unknown, fallback: string): Promise<string> {
   if (error instanceof HTTPError) {
     if (error.response.status >= 500) return fallback;
@@ -82,6 +102,8 @@ function emailTypeLabel(key: string): string {
 export function AdminCompanyEmailSettingsPage() {
   const { publicId } = useParams({ from: "/admin/companies/$publicId/email-settings" });
   const navigate = useNavigate();
+  const displayLocale = usePreferencesStore((state) => state.locale);
+  const fallbackCopy = EMAIL_LOCALE_FALLBACK_COPY[displayLocale];
   const [selectedEmailTypeKey, setSelectedEmailTypeKey] = useState<string>();
   const [locale, setLocale] = useState<EmailLocale>("en");
   const [selectedVariantKey, setSelectedVariantKey] = useState<string>();
@@ -121,9 +143,18 @@ export function AdminCompanyEmailSettingsPage() {
     activeLocale,
     companyIsReady,
   );
+  const effectivePreviewLocale = previewQuery.data?.locale;
+  const previewFallbackApplied =
+    effectivePreviewLocale !== undefined &&
+    activeLocale !== undefined &&
+    effectivePreviewLocale !== activeLocale;
   const assignTemplate = useAssignCompanyEmailTemplate();
   const removeTemplate = useRemoveCompanyEmailTemplate();
   const queueTestSend = useQueueCompanyEmailTestSend();
+  const senderIdentity = previewQuery.data?.senderIdentity;
+  const senderIdentityAvailable = senderIdentity !== undefined;
+  const canQueueTest =
+    senderIdentityAvailable && previewQuery.isSuccess && effectivePreviewLocale !== undefined;
 
   const isMutating = assignTemplate.isPending || removeTemplate.isPending;
   const activeVariantKey = selectedVariantKey ?? assignment?.templateRevisionKey;
@@ -206,18 +237,18 @@ export function AdminCompanyEmailSettingsPage() {
   }
 
   async function sendTest({ recipientEmail }: TestEmailFormData) {
-    if (!activeEmailTypeKey || !activeLocale) return;
+    if (!activeEmailTypeKey || !canQueueTest || !effectivePreviewLocale) return;
 
     try {
-      await queueTestSend.mutateAsync({
+      const queuedTestSend = await queueTestSend.mutateAsync({
         companyPublicId: publicId,
         emailTypeKey: activeEmailTypeKey,
-        locale: activeLocale,
+        locale: effectivePreviewLocale,
         recipientEmail,
       });
       setNotice({
         tone: "success",
-        message: "Test email queued. Delivery proceeds through the transactional outbox.",
+        message: `Test email queued in ${fallbackCopy.locales[queuedTestSend.locale]}. Delivery proceeds through the transactional outbox.`,
       });
     } catch (error) {
       setNotice({
@@ -330,9 +361,6 @@ export function AdminCompanyEmailSettingsPage() {
       </div>
     );
   }
-
-  const senderIdentity = previewQuery.data?.senderIdentity;
-  const senderIdentityAvailable = senderIdentity !== undefined;
 
   return (
     <div className="mx-auto max-w-[1120px] space-y-6">
@@ -617,6 +645,16 @@ export function AdminCompanyEmailSettingsPage() {
                 </SelectContent>
               </Select>
             </div>
+            {previewFallbackApplied ? (
+              <output className="mb-3 rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--color-warning)_55%,var(--color-border))] bg-[var(--color-warning-soft)] p-3 text-sm text-[var(--color-text)]">
+                <p className="font-medium">{fallbackCopy.title}</p>
+                <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                  {fallbackCopy.requestedLocale}: {fallbackCopy.locales[activeLocale ?? "en"]} ·{" "}
+                  {fallbackCopy.effectiveLocale}:{" "}
+                  {fallbackCopy.locales[effectivePreviewLocale ?? "en"]}. {fallbackCopy.description}
+                </p>
+              </output>
+            ) : null}
             {previewQuery.isPending ? (
               <Skeleton className="h-64 w-full" />
             ) : previewQuery.isError || !previewQuery.data ? (
@@ -664,6 +702,7 @@ export function AdminCompanyEmailSettingsPage() {
                 {...register("recipientEmail")}
                 placeholder="operator@example.com"
                 className="mt-1"
+                disabled={!canQueueTest || queueTestSend.isPending}
               />
               {testEmailErrors.recipientEmail && (
                 <p className="mt-1 text-xs text-[var(--color-danger)]">
@@ -675,12 +714,23 @@ export function AdminCompanyEmailSettingsPage() {
               intent="cta"
               type="submit"
               leadingIcon={<Send size={14} />}
-              disabled={!senderIdentityAvailable || queueTestSend.isPending}
+              disabled={!canQueueTest || queueTestSend.isPending}
               isLoading={queueTestSend.isPending}
             >
               Queue test
             </Button>
           </form>
+          <output className="mt-2 block text-xs text-[var(--color-text-muted)]">
+            {effectivePreviewLocale ? (
+              <>
+                {fallbackCopy.requestedLocale}: {fallbackCopy.locales[activeLocale]}
+                <span aria-hidden="true"> · </span>
+                {fallbackCopy.effectiveLocale}: {fallbackCopy.locales[effectivePreviewLocale]}
+              </>
+            ) : (
+              fallbackCopy.previewRequired
+            )}
+          </output>
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             The test is clearly marked and queued through the transactional outbox. SMTP credentials
             are never exposed here.

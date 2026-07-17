@@ -58,6 +58,14 @@ const emailPreviewSchema = z.object({
     .object({ name: z.string(), address: z.string(), replyTo: z.string() })
     .optional(),
 }) satisfies z.ZodType<components["schemas"]["EmailPreview"]>;
+const testSendResponseSchema = z.object({
+  publicId: z.string().uuid(),
+  status: z.enum(["QUEUED", "PROCESSING", "RETRY_SCHEDULED", "SENT", "FAILED", "CANCELLED"]),
+  emailTypeKey: z.string(),
+  context: emailContextSchema,
+  locale: emailLocaleSchema,
+  isTest: z.literal(true),
+}) satisfies z.ZodType<components["schemas"]["TestSendResponse"]>;
 const companyBrandSchema = z.object({
   publicId: z.string(),
   logo: z.string().nullable(),
@@ -175,10 +183,19 @@ async function queueTestSend({
   emailTypeKey,
   locale,
   recipientEmail,
-}: TestSendInput): Promise<void> {
-  await apiClient.post("emails/test-send", {
-    json: { companyPublicId, emailTypeKey, locale, recipientEmail },
-  });
+}: TestSendInput): Promise<components["schemas"]["TestSendResponse"]> {
+  const response: unknown = await apiClient
+    .post("emails/test-send", {
+      json: { companyPublicId, emailTypeKey, locale, recipientEmail },
+    })
+    .json();
+  const queuedTestSend = testSendResponseSchema.parse(response);
+
+  if (queuedTestSend.emailTypeKey !== emailTypeKey || queuedTestSend.context !== "COMPANY") {
+    throw new Error("Invalid test email response");
+  }
+
+  return queuedTestSend;
 }
 
 export function useCompanyEmailTypes() {

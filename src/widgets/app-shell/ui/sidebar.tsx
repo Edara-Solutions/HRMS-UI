@@ -33,19 +33,25 @@ export function Sidebar({
   onToggleCollapsed,
 }: SidebarProps) {
   const user = useAuthStore((state) => state.session?.user);
-  const visibleGroups = groups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => !item.permission || hasPermission(user, item.permission)),
-    }))
-    .filter((group) => group.items.length > 0);
+  const visibleGroups = groups.reduce<NavGroup[]>((result, group) => {
+    const items = group.items.filter(
+      (item) => !item.permission || hasPermission(user, item.permission),
+    );
+    if (items.length > 0) result.push({ ...group, items });
+    return result;
+  }, []);
   const { pathname } = useLocation();
-  const matchingItems = visibleGroups
-    .flatMap((group) => group.items)
-    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-  const activeHref = [...matchingItems].sort(
-    (left, right) => right.href.length - left.href.length,
-  )[0]?.href;
+  const matchingItems = visibleGroups.reduce<NavItem[]>((result, group) => {
+    for (const item of group.items) {
+      if (pathname === item.href || pathname.startsWith(`${item.href}/`)) result.push(item);
+    }
+    return result;
+  }, []);
+  const activeHref = matchingItems.reduce<string | undefined>(
+    (longestHref, item) =>
+      !longestHref || item.href.length > longestHref.length ? item.href : longestHref,
+    undefined,
+  );
 
   return (
     <aside

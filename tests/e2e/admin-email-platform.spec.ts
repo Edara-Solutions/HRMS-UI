@@ -109,7 +109,7 @@ test("opens the Admin Email catalog and keeps Company preview white-label", asyn
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.getByRole("heading", { name: "Email", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Email" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Email", exact: true })).toBeVisible();
   await expect(page.getByTitle("Owner Invitation email preview")).toBeVisible();
 
   await page.getByRole("button", { name: /Employee Invitation Company Email/ }).click();
@@ -132,7 +132,7 @@ test("stays usable in dark mode, RTL, and a narrow desktop viewport", async ({ p
   await page.getByRole("button", { name: /Switch language.*English/ }).click();
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(page.getByRole("heading", { name: "البريد", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "البريد" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "البريد", exact: true })).toBeVisible();
 
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,

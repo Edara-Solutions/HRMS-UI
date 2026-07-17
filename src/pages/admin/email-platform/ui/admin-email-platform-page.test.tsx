@@ -6,6 +6,7 @@ import type { EmailPreview, EmailTypeListResponse } from "../api/email-platform"
 import { AdminEmailPlatformPage } from "./admin-email-platform-page";
 
 const API_GET_MOCK = vi.hoisted(() => vi.fn());
+const API_POST_MOCK = vi.hoisted(() => vi.fn());
 const NAVIGATE_MOCK = vi.hoisted(() => vi.fn());
 const SEARCH_STATE = vi.hoisted(() => ({
   context: "ALL",
@@ -27,6 +28,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
     get: API_GET_MOCK,
+    post: API_POST_MOCK,
   },
 }));
 
@@ -119,6 +121,7 @@ describe("AdminEmailPlatformPage", () => {
   afterEach(() => {
     cleanup();
     API_GET_MOCK.mockReset();
+    API_POST_MOCK.mockReset();
     NAVIGATE_MOCK.mockReset();
     usePreferencesStore.getState().setLocale("en");
     Object.assign(SEARCH_STATE, {
@@ -308,14 +311,52 @@ describe("AdminEmailPlatformPage", () => {
     expect(screen.queryByTitle("Employee Invitation email preview")).not.toBeInTheDocument();
   });
 
-  it("keeps test-send disabled until the backend can durably queue a message", async () => {
+  it("queues a test email with the effective preview locale", async () => {
     mockCatalogAndPreview();
+    API_POST_MOCK.mockReturnValue(
+      jsonResponse({
+        publicId: "3cd209c2-e6d4-49c9-92f1-9f9e58e20f13",
+        status: "QUEUED",
+        emailTypeKey: "owner-invitation",
+        context: "EDARA",
+        locale: "en",
+        isTest: true,
+      }),
+    );
     renderPage();
 
-    const testSend = await screen.findByRole("button", { name: "Queue test email" });
-    expect(testSend).toBeDisabled();
-    expect(screen.getByText("Test delivery queue unavailable")).toBeInTheDocument();
-    expect(screen.getByLabelText("Test recipient")).toBeDisabled();
+    await screen.findByTitle("Owner Invitation email preview");
+    fireEvent.change(await screen.findByLabelText("Test recipient"), {
+      target: { value: "operator@edara.example" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Queue test email" }));
+
+    await waitFor(() =>
+      expect(API_POST_MOCK).toHaveBeenCalledWith(
+        "emails/test-send",
+        expect.objectContaining({
+          json: {
+            emailTypeKey: "owner-invitation",
+            locale: "en",
+            recipientEmail: "operator@edara.example",
+          },
+        }),
+      ),
+    );
+    expect(await screen.findByText(/Test email queued/)).toBeInTheDocument();
+  });
+
+  it("identifies the backend effective locale when a supported translation falls back", async () => {
+    Object.assign(SEARCH_STATE, {
+      context: "COMPANY",
+      emailTypeKey: "employee-invitation",
+      locale: "ar",
+    });
+    mockCatalogAndPreview({ ...COMPANY_PREVIEW, locale: "en" });
+    renderPage();
+
+    expect(await screen.findByText("Translation fallback applied")).toBeInTheDocument();
+    expect(screen.getAllByText(/Effective locale: English/)).toHaveLength(2);
   });
 
   it("writes context, locale, and preview-view controls to URL search state", async () => {
