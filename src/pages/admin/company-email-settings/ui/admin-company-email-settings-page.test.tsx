@@ -36,6 +36,7 @@ function mockApi(
   templateRevisionKey?: string,
   supportedLocales: EmailLocale[] = ["en", "ar"],
   companyProfileFails = false,
+  previewLocale: EmailLocale = supportedLocales[0] ?? "en",
 ) {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "email-types") {
@@ -118,7 +119,7 @@ function mockApi(
         emailTypeKey: "employee-invitation",
         templateKey: templateRevisionKey ?? "company-employee-invitation-v1",
         context: "COMPANY",
-        locale: supportedLocales[0],
+        locale: previewLocale,
         subject: "Welcome",
         preheader: "Your invitation",
         html: "<p>Company invitation</p>",
@@ -133,7 +134,16 @@ function mockApi(
 
     throw new Error(`Unexpected path: ${path}`);
   });
-  apiPostMock.mockResolvedValue(undefined);
+  apiPostMock.mockReturnValue(
+    jsonResponse({
+      publicId: "3cd209c2-e6d4-49c9-92f1-9f9e58e20f13",
+      status: "QUEUED",
+      emailTypeKey: "employee-invitation",
+      context: "COMPANY",
+      locale: previewLocale,
+      isTest: true,
+    }),
+  );
   apiDeleteMock.mockResolvedValue(undefined);
 }
 
@@ -232,6 +242,25 @@ describe("AdminCompanyEmailSettingsPage", () => {
         expect.objectContaining({
           json: expect.objectContaining({ locale: "ar" }),
         }),
+      ),
+    );
+  });
+
+  it("queues the preview's effective locale when the backend applies a fallback", async () => {
+    mockApi(undefined, ["ar"], false, "en");
+    renderPage();
+
+    expect((await screen.findAllByText(/Requested locale: Arabic/)).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Effective locale: English/).length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText("Recipient email"), {
+      target: { value: "operator@nexus.example" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Queue test" }));
+
+    await waitFor(() =>
+      expect(apiPostMock).toHaveBeenCalledWith(
+        "emails/test-send",
+        expect.objectContaining({ json: expect.objectContaining({ locale: "en" }) }),
       ),
     );
   });

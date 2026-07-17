@@ -1,16 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import {
-  Building2,
-  Info,
-  Mail,
-  MailX,
-  Maximize2,
-  RefreshCw,
-  Send,
-  ShieldCheck,
-  X,
-} from "lucide-react";
+import { Building2, Mail, MailX, Maximize2, RefreshCw, Send, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { usePreferencesStore } from "@/shared/config";
 import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
@@ -28,6 +21,7 @@ import {
   type EmailType,
   useEmailPreview,
   useEmailTypes,
+  useQueueEmailTestSend,
 } from "../api/email-platform";
 import {
   companyPreviewContainsEdaraIdentity,
@@ -38,6 +32,16 @@ import { type EmailPlatformCopy, getEmailPlatformCopy } from "../model/email-pla
 
 type ContextFilter = "ALL" | EmailContext;
 type PreviewView = "html" | "text";
+
+const TEST_EMAIL_FORM_SCHEMA = z.object({
+  recipientEmail: z.string().trim().email(),
+});
+
+type TestEmailFormData = z.infer<typeof TEST_EMAIL_FORM_SCHEMA>;
+
+function localeLabel(locale: EmailLocale): string {
+  return locale === "en" ? "English" : "Arabic";
+}
 
 interface EmailTypeCardProps {
   emailType: EmailType;
@@ -178,6 +182,7 @@ interface PreviewPanelProps {
   view: PreviewView;
   onLocaleChange: (locale: EmailLocale) => void;
   onViewChange: (view: PreviewView) => void;
+  preview: ReturnType<typeof useEmailPreview>;
 }
 
 const MAILBOX_SCROLLBAR_STYLES = `<style>
@@ -213,9 +218,10 @@ function PreviewPanel({
   view,
   onLocaleChange,
   onViewChange,
+  preview,
 }: PreviewPanelProps) {
   const localeSupported = emailType.supportedLocales.includes(locale);
-  const preview = useEmailPreview(localeSupported ? emailType : undefined, locale);
+  const requestedLocale = localeSupported ? locale : undefined;
   const [fullScreenPreviewOpen, setFullScreenPreviewOpen] = useState(false);
   const { titleId, descriptionId } = useDialogIds();
   const darkTheme = document.documentElement.dataset.theme === "dark";
@@ -225,6 +231,8 @@ function PreviewPanel({
     emailType.context === "COMPANY" &&
     companyPreviewContainsEdaraIdentity(preview.data);
   const safePreview = hasCompanyIdentityViolation ? undefined : preview.data;
+  const effectiveLocale = safePreview?.locale ?? requestedLocale;
+  const fallbackApplied = effectiveLocale !== undefined && effectiveLocale !== locale;
 
   return (
     <Card as="section" aria-labelledby="email-preview-title" className="min-w-0 overflow-hidden">
@@ -289,7 +297,7 @@ function PreviewPanel({
         </div>
       </CardHeader>
       <CardContent>
-        {!localeSupported ? (
+        {!requestedLocale ? (
           <div className="p-6 text-center" role="alert">
             <p className="text-sm font-semibold text-[var(--color-text)]">
               {copy.previewLocaleUnavailable}
@@ -299,14 +307,23 @@ function PreviewPanel({
             </p>
           </div>
         ) : null}
-        {localeSupported && preview.isPending ? (
+        {fallbackApplied ? (
+          <output className="m-4 rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--color-warning)_55%,var(--color-border))] bg-[var(--color-warning-soft)] p-3 text-sm text-[var(--color-text)]">
+            <p className="font-semibold">{copy.previewFallback}</p>
+            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+              {copy.requestedLocale}: {localeLabel(locale)} · {copy.effectiveLocale}:{" "}
+              {localeLabel(effectiveLocale)}. {copy.previewFallbackDescription}
+            </p>
+          </output>
+        ) : null}
+        {requestedLocale && preview.isPending ? (
           <div className="space-y-3 p-4" role="status" aria-label={copy.loadingPreview}>
             <Skeleton className="h-4 w-2/3" />
             <Skeleton className="h-3 w-full" />
             <Skeleton className="h-[360px] w-full" />
           </div>
         ) : null}
-        {localeSupported && preview.isError ? (
+        {requestedLocale && preview.isError ? (
           <div className="p-6 text-center" role="alert">
             <p className="text-sm font-semibold text-[var(--color-text)]">
               {copy.previewUnavailable}
@@ -392,7 +409,7 @@ function PreviewPanel({
               ) : (
                 <pre
                   className="min-h-[360px] whitespace-pre-wrap rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start text-xs leading-relaxed text-[var(--color-text)]"
-                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  dir={effectiveLocale === "ar" ? "rtl" : "ltr"}
                   aria-label={`${title} ${copy.plainTextPreview}`}
                 >
                   {safePreview.text}
@@ -400,9 +417,9 @@ function PreviewPanel({
               )}
               <Button
                 variant="secondary"
-                size="sm"
+                size="md"
                 className="mt-3"
-                leadingIcon={<Maximize2 size={14} aria-hidden="true" />}
+                leadingIcon={<Maximize2 size={15} aria-hidden="true" />}
                 onClick={() => setFullScreenPreviewOpen(true)}
               >
                 {copy.fullScreenPreview}
@@ -450,7 +467,7 @@ function PreviewPanel({
                 ) : (
                   <pre
                     className="scrollbar-calm h-full overflow-auto whitespace-pre-wrap bg-[var(--color-surface)] p-4 text-start text-sm leading-relaxed text-[var(--color-text)]"
-                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    dir={effectiveLocale === "ar" ? "rtl" : "ltr"}
                   >
                     {safePreview.text}
                   </pre>
@@ -464,11 +481,34 @@ function PreviewPanel({
   );
 }
 
-interface TestSendUnavailableProps {
+interface TestSendPanelProps {
   copy: EmailPlatformCopy;
+  emailType: EmailType;
+  requestedLocale: EmailLocale;
+  effectiveLocale: EmailLocale | undefined;
 }
 
-function TestSendUnavailable({ copy }: TestSendUnavailableProps) {
+function TestSendPanel({ copy, emailType, requestedLocale, effectiveLocale }: TestSendPanelProps) {
+  const queueTestSend = useQueueEmailTestSend();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TestEmailFormData>({
+    resolver: zodResolver(TEST_EMAIL_FORM_SCHEMA),
+    defaultValues: { recipientEmail: "" },
+  });
+  const canQueue = effectiveLocale !== undefined;
+
+  async function submitTestEmail({ recipientEmail }: TestEmailFormData) {
+    if (!effectiveLocale) return;
+    await queueTestSend.mutateAsync({
+      emailType,
+      locale: effectiveLocale,
+      recipientEmail,
+    });
+  }
+
   return (
     <Card as="section" aria-labelledby="test-send-title">
       <CardHeader>
@@ -476,39 +516,60 @@ function TestSendUnavailable({ copy }: TestSendUnavailableProps) {
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">{copy.testSendDescription}</p>
       </CardHeader>
       <CardContent className="p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="min-w-0 flex-1 space-y-2">
-            <Label htmlFor="email-platform-test-recipient">{copy.testRecipient}</Label>
+        <form
+          noValidate
+          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          onSubmit={handleSubmit((data) => void submitTestEmail(data))}
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <Label className="block" htmlFor="email-platform-test-recipient">
+              {copy.testRecipient}
+            </Label>
             <Input
               id="email-platform-test-recipient"
               type="email"
               placeholder={copy.testRecipientPlaceholder}
-              disabled
-              aria-describedby="test-send-readiness"
+              disabled={!canQueue || queueTestSend.isPending}
+              aria-invalid={Boolean(errors.recipientEmail)}
+              aria-describedby={
+                errors.recipientEmail ? "email-platform-test-recipient-error" : undefined
+              }
+              {...register("recipientEmail")}
             />
+            {errors.recipientEmail ? (
+              <p
+                id="email-platform-test-recipient-error"
+                className="text-xs text-[var(--color-danger)]"
+              >
+                {copy.invalidRecipientEmail}
+              </p>
+            ) : null}
           </div>
-          <Button leadingIcon={<Send size={16} aria-hidden="true" />} disabled>
+          <Button
+            type="submit"
+            leadingIcon={<Send size={16} aria-hidden="true" />}
+            disabled={!canQueue || queueTestSend.isPending}
+            isLoading={queueTestSend.isPending}
+          >
             {copy.queueTestEmail}
           </Button>
-        </div>
-        <div
-          id="test-send-readiness"
-          className="mt-3 flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3"
-        >
-          <Info
-            size={15}
-            className="mt-1 shrink-0 text-[var(--color-text-muted)]"
-            aria-hidden="true"
-          />
-          <div>
-            <p className="text-xs font-semibold text-[var(--color-text)]">
-              {copy.testQueueUnavailable}
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">
-              {copy.testQueueUnavailableDescription}
-            </p>
-          </div>
-        </div>
+        </form>
+        <output className="mt-3 block rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-3">
+          <p className="text-xs font-semibold text-[var(--color-text)]">
+            {queueTestSend.isSuccess
+              ? `${copy.testEmailQueued} · ${copy.effectiveLocale}: ${localeLabel(queueTestSend.data.locale)}`
+              : queueTestSend.isError
+                ? copy.testEmailUnavailable
+                : `${copy.requestedLocale}: ${localeLabel(requestedLocale)} · ${copy.effectiveLocale}: ${effectiveLocale ? localeLabel(effectiveLocale) : "—"}`}
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">
+            {queueTestSend.isSuccess
+              ? copy.testEmailQueuedDescription
+              : queueTestSend.isError
+                ? copy.testEmailUnavailableDescription
+                : copy.testSendLocaleDescription}
+          </p>
+        </output>
       </CardContent>
     </Card>
   );
@@ -529,6 +590,11 @@ export function AdminEmailPlatformPage() {
     ? visibleEmailTypes.find((emailType) => emailType.key === search.emailTypeKey)
     : visibleEmailTypes.find((emailType) => emailType.key === defaultEmailTypeKey(context));
   const hasInvalidSelection = visibleEmailTypes.length > 0 && selectedEmailType === undefined;
+  const selectedLocaleSupported = selectedEmailType?.supportedLocales.includes(locale) ?? false;
+  const selectedPreview = useEmailPreview(
+    selectedLocaleSupported ? selectedEmailType : undefined,
+    locale,
+  );
 
   function selectEmailType(emailTypeKey: string) {
     void navigate({ search: (previous) => ({ ...previous, emailTypeKey }) });
@@ -693,8 +759,14 @@ export function AdminEmailPlatformPage() {
                   view={view}
                   onLocaleChange={setLocale}
                   onViewChange={setView}
+                  preview={selectedPreview}
                 />
-                <TestSendUnavailable copy={copy} />
+                <TestSendPanel
+                  copy={copy}
+                  emailType={selectedEmailType}
+                  requestedLocale={locale}
+                  effectiveLocale={selectedPreview.data?.locale}
+                />
               </div>
             ) : null}
           </div>

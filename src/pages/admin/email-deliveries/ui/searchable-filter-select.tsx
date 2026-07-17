@@ -106,19 +106,8 @@ export function SearchableFilterSelect({
       </div>
       <div className="mt-1 min-h-5 text-[11px] text-[var(--color-text-muted)]">
         {selected && !open ? (
-          <span
-            className="group relative inline-flex max-w-full cursor-help items-center"
-            tabIndex={0}
-          >
+          <span className="inline-flex max-w-full items-center">
             <span className="truncate">
-              <code className="font-semibold text-[var(--color-primary)]">{selected.code}</code>
-              <span aria-hidden="true"> · </span>
-              {selected.label}
-            </span>
-            <span
-              role="tooltip"
-              className="pointer-events-none absolute start-0 top-full z-30 mt-1 w-max max-w-[min(24rem,calc(100vw-2rem))] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-2 text-start text-xs leading-relaxed text-[var(--color-text)] opacity-0 shadow-[var(--shadow-md)] transition-opacity duration-[var(--motion-fast)] group-hover:opacity-100 group-focus-visible:opacity-100"
-            >
               <code className="font-semibold text-[var(--color-primary)]">{selected.code}</code>
               <span aria-hidden="true"> · </span>
               {selected.label}
