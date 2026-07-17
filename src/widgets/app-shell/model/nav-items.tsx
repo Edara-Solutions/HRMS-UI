@@ -10,6 +10,7 @@ import {
   Mail,
   Network,
   PackageSearch,
+  PauseCircle,
   Receipt,
   Settings,
   Shield,
@@ -208,6 +209,12 @@ export const adminNavGroups: NavGroup[] = [
         localizedLabels: { ar: "عمليات تسليم البريد" },
         href: "/admin/email/deliveries",
         icon: <Mail size={ICON_SIZE} />,
+      },
+      {
+        label: "Sending Controls",
+        localizedLabels: { ar: "ضوابط الإرسال" },
+        href: "/admin/email/sending",
+        icon: <PauseCircle size={ICON_SIZE} />,
       },
       {
         label: "Audit Log",
