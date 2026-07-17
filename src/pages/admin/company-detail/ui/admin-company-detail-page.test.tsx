@@ -131,24 +131,35 @@ function mockApi() {
     if (path === "companies/company-1") return jsonResponse(company);
     if (path === "company-configs") return jsonResponse(configsResponse());
     if (path === "plans") return jsonResponse(plansResponse());
-    if (path === "email-types") {
+    if (path === "companies/company-1/sending-domain") {
       return jsonResponse({
-        items: [
+        domain: "mail.nexustech.sa",
+        status: "VERIFIED",
+        health: "HEALTHY",
+        dnsRecords: [
           {
-            key: "employee-invitation",
-            context: "COMPANY",
-            supportedLocales: ["en", "ar"],
+            kind: "OWNERSHIP_TXT",
+            host: "_edara-verify.mail.nexustech.sa",
+            recordType: "TXT",
+            value: "edara-verify=nexus",
+            description: "Ownership record",
+          },
+          {
+            kind: "DKIM",
+            host: "edara._domainkey.mail.nexustech.sa",
+            recordType: "CNAME",
+            value: "edara.example",
+            description: "DKIM record",
           },
         ],
-      });
-    }
-    if (path === "email-types/employee-invitation/preview") {
-      return jsonResponse({
-        senderIdentity: {
-          name: "Nexus Technologies",
-          address: "people@nexus.example",
-          replyTo: "support@nexus.example",
-        },
+        checkResults: [
+          { kind: "OWNERSHIP_TXT", status: "VERIFIED", failureDetail: null },
+          { kind: "DKIM", status: "VERIFIED", failureDetail: null },
+        ],
+        verifiedAt: "2026-06-01T10:00:00.000Z",
+        lastFailure: null,
+        createdAt: "2026-05-20T10:00:00.000Z",
+        updatedAt: "2026-06-01T10:00:00.000Z",
       });
     }
     throw new Error(`Unexpected path: ${path}`);
@@ -183,8 +194,10 @@ describe("AdminCompanyDetailPage", () => {
     expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
     expect(screen.getByText("Trial")).toBeInTheDocument();
     expect(screen.getByText("Full Access")).toBeInTheDocument();
-    expect(await screen.findByText("Sender identity available")).toBeInTheDocument();
-    expect(screen.getByText("Nexus Technologies <people@nexus.example>")).toBeInTheDocument();
+    expect(await screen.findByText("Verified sending domain")).toBeInTheDocument();
+    expect(screen.getByText("mail.nexustech.sa")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "DNS check timeline" })).toBeInTheDocument();
+    expect(screen.getByText("Ownership TXT")).toBeInTheDocument();
   });
 
   it("edits the company profile without exposing the company code as editable", async () => {

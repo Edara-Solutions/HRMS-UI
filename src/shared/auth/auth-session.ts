@@ -15,6 +15,7 @@ export interface SessionUser {
   email: string;
   status: "ACTIVE" | "ONBOARDING" | "PROBATION" | "SUSPENDED" | "TERMINATED" | "RESIGNED";
   companyCode: string;
+  companyPublicId?: string | null;
   mustChangePassword: boolean;
   permissions: string[];
   isOwner: boolean;

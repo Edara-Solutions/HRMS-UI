@@ -15,6 +15,11 @@ const permissionActions = [
   "sessions:revoke",
   "companies:read",
   "companies:update",
+  "companies:email-readiness:read",
+  "companies:email-settings:read",
+  "companies:email-settings:update",
+  "sending-domains:read",
+  "sending-domains:manage",
   "audit:read",
 ] as const;
 

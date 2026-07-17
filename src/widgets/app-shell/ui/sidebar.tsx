@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useAuthStore } from "@/shared/auth";
+import { hasPermission, useAuthStore } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
@@ -32,11 +32,20 @@ export function Sidebar({
   collapsed,
   onToggleCollapsed,
 }: SidebarProps) {
+  const user = useAuthStore((state) => state.session?.user);
+  const visibleGroups = groups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.permission || hasPermission(user, item.permission)),
+    }))
+    .filter((group) => group.items.length > 0);
   const { pathname } = useLocation();
-  const activeHref = groups
+  const matchingItems = visibleGroups
     .flatMap((group) => group.items)
-    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
-    .sort((left, right) => right.href.length - left.href.length)[0]?.href;
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const activeHref = [...matchingItems].sort(
+    (left, right) => right.href.length - left.href.length,
+  )[0]?.href;
 
   return (
     <aside
@@ -81,7 +90,7 @@ export function Sidebar({
 
       {/* Navigation */}
       <nav className="scrollbar-calm scrollbar-stable flex-1 overflow-y-auto px-2.5 py-3">
-        {groups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.title} className="mb-5">
             {!collapsed && (
               <p className="mb-1.5 px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">

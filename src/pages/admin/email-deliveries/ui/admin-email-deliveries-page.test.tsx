@@ -50,6 +50,11 @@ const FAILED_DELIVERY: DeliveryRecord = {
   lastFailureKind: "SMTP",
   providerMessageId: null,
   companyId: 1,
+  company: {
+    publicId: "22222222-2222-2222-2222-222222222222",
+    name: "Acme Corp",
+    code: "ACME",
+  },
   businessReference: "employee:123",
   createdAt: "2026-07-15T10:00:00.000Z",
   sentAt: null,
@@ -129,6 +134,19 @@ describe("AdminEmailDeliveriesPage", () => {
     expect(query.get("context")).toBe("COMPANY");
   });
 
+  it("renders deliveries without a resolved company sender", async () => {
+    API_GET_MOCK.mockReturnValue(
+      jsonResponse({
+        ...DELIVERY_LIST,
+        items: [{ ...FAILED_DELIVERY, senderName: null, senderAddress: null }],
+      }),
+    );
+    renderPage();
+
+    expect((await screen.findAllByText("Failed")).length).toBeGreaterThan(0);
+    expect(screen.queryByText("Delivery history unavailable")).not.toBeInTheDocument();
+  });
+
   it("requires a reason before retrying a failed delivery and posts only the operator reason", async () => {
     Object.assign(SEARCH_STATE, { deliveryId: FAILED_DELIVERY.publicId });
     API_GET_MOCK.mockImplementation((path: string) => {
@@ -155,6 +173,23 @@ describe("AdminEmailDeliveriesPage", () => {
       { json: { reason: "SMTP access restored" } },
     );
     expect(screen.queryByText(/SMTP access restored/)).not.toBeInTheDocument();
+  });
+
+  it("shows the safe Company and dispatch metadata for a delivery", async () => {
+    Object.assign(SEARCH_STATE, { deliveryId: FAILED_DELIVERY.publicId });
+    API_GET_MOCK.mockImplementation((path: string) => {
+      if (path === "emails/deliveries") return jsonResponse(DELIVERY_LIST);
+      if (path === `emails/deliveries/${FAILED_DELIVERY.publicId}`)
+        return jsonResponse(FAILED_DELIVERY);
+      throw new Error(`Unexpected request: ${path}`);
+    });
+    renderPage();
+
+    expect(await screen.findByText("Acme Corp")).toBeInTheDocument();
+    expect(screen.getByText("Company email · Production")).toBeInTheDocument();
+    expect(screen.getByText("Acme <people@acme.example>")).toBeInTheDocument();
+    expect(screen.getByText("Smtp")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close delivery detail" })).toBeInTheDocument();
   });
 
   it("does not automatically retry a failed delivery-history request", async () => {
