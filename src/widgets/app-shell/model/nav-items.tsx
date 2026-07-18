@@ -7,8 +7,10 @@ import {
   CreditCard,
   FileText,
   LayoutDashboard,
+  Mail,
   Network,
   PackageSearch,
+  PauseCircle,
   Receipt,
   Settings,
   Shield,
@@ -17,12 +19,17 @@ import {
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import type { PermissionAction } from "@/shared/auth";
+import type { SupportedLocale } from "@/shared/i18n";
 
 export interface NavItem {
   label: string;
+  /** Optional translated labels keyed by the application's active locale. */
+  localizedLabels?: Partial<Record<SupportedLocale, string>>;
   href: string;
   icon: ReactNode;
   indicator?: NavIndicator;
+  permission?: PermissionAction;
 }
 
 export interface NavIndicator {
@@ -111,6 +118,12 @@ export const companyNavGroups: NavGroup[] = [
     title: "Operations",
     items: [
       {
+        label: "Email settings",
+        href: "/company/email-settings",
+        icon: <Mail size={ICON_SIZE} />,
+        permission: "companies:email-settings:read",
+      },
+      {
         label: "Documents",
         href: "/company/documents",
         icon: <FileText size={ICON_SIZE} />,
@@ -184,6 +197,24 @@ export const adminNavGroups: NavGroup[] = [
         label: "Settings",
         href: "/admin/settings",
         icon: <Settings size={ICON_SIZE} />,
+      },
+      {
+        label: "Email",
+        localizedLabels: { ar: "البريد" },
+        href: "/admin/email",
+        icon: <Mail size={ICON_SIZE} />,
+      },
+      {
+        label: "Email Deliveries",
+        localizedLabels: { ar: "عمليات تسليم البريد" },
+        href: "/admin/email/deliveries",
+        icon: <Mail size={ICON_SIZE} />,
+      },
+      {
+        label: "Sending Controls",
+        localizedLabels: { ar: "ضوابط الإرسال" },
+        href: "/admin/email/sending",
+        icon: <PauseCircle size={ICON_SIZE} />,
       },
       {
         label: "Audit Log",

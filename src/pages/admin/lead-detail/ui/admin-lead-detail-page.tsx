@@ -38,10 +38,16 @@ import {
   useUpdateLeadContact,
 } from "../api/lead-detail";
 import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "../api/lead-labels";
+import {
+  isSendingDomainPermissionError,
+  type ReadinessReason,
+  useLeadSendingDomainReadiness,
+} from "../api/sending-domain";
 import { ConvertLeadModal } from "./convert-lead-modal";
 import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
+import { SendingDomainCard } from "./sending-domain-card";
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleDateString("en-GB", {
@@ -77,6 +83,21 @@ function canConvertLead(lead: Lead, allowConvertFromAnyState: boolean): boolean 
   if (lead.isConverted || lead.status === "WON_CONVERTED") return false;
   if (allowConvertFromAnyState) return true;
   return CONVERTIBLE_LEAD_STATUSES.has(lead.status);
+}
+
+function conversionReadinessMessage(reason: ReadinessReason | undefined): string {
+  switch (reason) {
+    case "NOT_PROVISIONED":
+      return "Provision a Company sending domain before converting this lead.";
+    case "NOT_VERIFIED":
+      return "Verify the Company sending domain before converting this lead.";
+    case "UNHEALTHY":
+      return "Fix the failed DNS checks before converting this lead.";
+    case "STALE":
+      return "Refresh DNS verification before converting this lead.";
+    default:
+      return "The latest sending-domain readiness is unavailable. Refresh the status and try again.";
+  }
 }
 
 // --- Profile ----------------------------------------------------------------
@@ -368,6 +389,7 @@ export function AdminLeadDetailPage() {
 
   const { data, isPending, isError } = useLead(publicId);
   const activities = useLeadActivities(publicId, activityPage);
+  const sendingDomainReadiness = useLeadSendingDomainReadiness(publicId);
   const deleteLead = useDeleteLead();
   const deleteContact = useDeleteLeadContact();
   const updateContact = useUpdateLeadContact();
@@ -429,6 +451,18 @@ export function AdminLeadDetailPage() {
 
   const { lead, contacts } = data;
   const canConvert = canConvertLead(lead, allowConvertFromAnyState);
+  const convertDisabledReason = canConvert
+    ? sendingDomainReadiness.isPending
+      ? "Checking sending-domain readiness..."
+      : sendingDomainReadiness.isError
+        ? isSendingDomainPermissionError(sendingDomainReadiness.error)
+          ? "You do not have permission to verify sending-domain readiness."
+          : conversionReadinessMessage(undefined)
+        : sendingDomainReadiness.data?.ready === true
+          ? null
+          : conversionReadinessMessage(sendingDomainReadiness.data?.reason)
+    : null;
+  const convertReadinessReasonId = `${publicId}-convert-readiness`;
 
   return (
     <div className="mx-auto max-w-[1200px]">
@@ -458,15 +492,28 @@ export function AdminLeadDetailPage() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             {canConvert && (
-              <Button
-                intent="utility"
-                leadingIcon={<ArrowRightLeft size={13} />}
-                onClick={() => setPanel({ kind: "convert-lead" })}
-              >
-                Convert
-              </Button>
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  intent="utility"
+                  leadingIcon={<ArrowRightLeft size={13} />}
+                  disabled={convertDisabledReason !== null}
+                  title={convertDisabledReason ?? "Convert lead to company"}
+                  aria-describedby={convertDisabledReason ? convertReadinessReasonId : undefined}
+                  onClick={() => setPanel({ kind: "convert-lead" })}
+                >
+                  Convert
+                </Button>
+                {convertDisabledReason && (
+                  <span
+                    id={convertReadinessReasonId}
+                    className="max-w-56 text-end text-[11px] leading-snug text-[var(--color-text-muted)]"
+                  >
+                    {convertDisabledReason}
+                  </span>
+                )}
+              </div>
             )}
             <Button
               intent="utility"
@@ -485,6 +532,10 @@ export function AdminLeadDetailPage() {
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
       </div>
 
       {/* Content */}

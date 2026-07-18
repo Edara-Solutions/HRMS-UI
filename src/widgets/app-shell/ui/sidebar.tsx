@@ -1,4 +1,4 @@
-import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
 import {
   type ReactNode,
@@ -9,7 +9,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useAuthStore } from "@/shared/auth";
+import { hasPermission, useAuthStore } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
 import type { NavGroup, NavIndicator, NavItem } from "../model/nav-items";
@@ -31,6 +32,27 @@ export function Sidebar({
   collapsed,
   onToggleCollapsed,
 }: SidebarProps) {
+  const user = useAuthStore((state) => state.session?.user);
+  const visibleGroups = groups.reduce<NavGroup[]>((result, group) => {
+    const items = group.items.filter(
+      (item) => !item.permission || hasPermission(user, item.permission),
+    );
+    if (items.length > 0) result.push({ ...group, items });
+    return result;
+  }, []);
+  const { pathname } = useLocation();
+  const matchingItems = visibleGroups.reduce<NavItem[]>((result, group) => {
+    for (const item of group.items) {
+      if (pathname === item.href || pathname.startsWith(`${item.href}/`)) result.push(item);
+    }
+    return result;
+  }, []);
+  const activeHref = matchingItems.reduce<string | undefined>(
+    (longestHref, item) =>
+      !longestHref || item.href.length > longestHref.length ? item.href : longestHref,
+    undefined,
+  );
+
   return (
     <aside
       className={cn(
@@ -74,7 +96,7 @@ export function Sidebar({
 
       {/* Navigation */}
       <nav className="scrollbar-calm scrollbar-stable flex-1 overflow-y-auto px-2.5 py-3">
-        {groups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.title} className="mb-5">
             {!collapsed && (
               <p className="mb-1.5 px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
@@ -83,7 +105,12 @@ export function Sidebar({
             )}
             <ul className="flex flex-col gap-px">
               {group.items.map((item) => (
-                <SidebarLink key={item.href} item={item} collapsed={collapsed} />
+                <SidebarLink
+                  key={item.href}
+                  item={item}
+                  collapsed={collapsed}
+                  isActive={item.href === activeHref}
+                />
               ))}
             </ul>
           </div>
@@ -145,6 +172,7 @@ function SidebarBrandToggle({
 interface SidebarLinkProps {
   item: NavItem;
   collapsed: boolean;
+  isActive: boolean;
 }
 
 // Expanded badge: color-mixed background gives more saturation than pure -soft while staying readable
@@ -172,10 +200,10 @@ const dotClassName: Record<NavIndicator["tone"], string> = {
   danger: "bg-[var(--color-danger)] text-[var(--color-danger)]",
 };
 
-function SidebarLink({ item, collapsed }: SidebarLinkProps) {
-  const matchRoute = useMatchRoute();
-  const isActive = matchRoute({ to: item.href, fuzzy: true });
+function SidebarLink({ item, collapsed, isActive }: SidebarLinkProps) {
+  const locale = usePreferencesStore((state) => state.locale);
   const indicator = item.indicator;
+  const label = item.localizedLabels?.[locale] ?? item.label;
 
   return (
     <li>
@@ -189,12 +217,12 @@ function SidebarLink({ item, collapsed }: SidebarLinkProps) {
           collapsed && "justify-center px-0",
         )}
         aria-current={isActive ? "page" : undefined}
-        title={collapsed ? item.label : undefined}
+        title={collapsed ? label : undefined}
       >
         <span className={cn("shrink-0 opacity-70", isActive && "opacity-100")}>{item.icon}</span>
         {!collapsed && (
           <>
-            <span className="truncate">{item.label}</span>
+            <span className="truncate">{label}</span>
             {indicator && <SidebarIndicator indicator={indicator} isActive={Boolean(isActive)} />}
           </>
         )}

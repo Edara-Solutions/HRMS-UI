@@ -101,25 +101,19 @@ body {
 
 /* Firefox: standard scrollbar API — scrollbar-width: thin removes arrow buttons natively */
 @supports not selector(::-webkit-scrollbar) {
-  html,
-  body,
-  .scrollbar-calm {
+  * {
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     scrollbar-width: thin;
   }
 }
 
 /* Chromium / Safari: webkit pseudo-element path — no standard API conflict */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-.scrollbar-calm::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: var(--scrollbar-size);
   height: var(--scrollbar-size);
 }
 
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-.scrollbar-calm::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
 
@@ -129,9 +123,7 @@ body::-webkit-scrollbar-track,
   height: 0;
 }
 
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-.scrollbar-calm::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   min-height: 44px;
   border: 2px solid transparent;
   border-radius: var(--radius-md);
@@ -139,21 +131,15 @@ body::-webkit-scrollbar-thumb,
   background-color: var(--scrollbar-thumb);
 }
 
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-.scrollbar-calm::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
   background-color: var(--scrollbar-thumb-hover);
 }
 
-html::-webkit-scrollbar-thumb:active,
-body::-webkit-scrollbar-thumb:active,
-.scrollbar-calm::-webkit-scrollbar-thumb:active {
+*::-webkit-scrollbar-thumb:active {
   background-color: var(--scrollbar-thumb-active);
 }
 
-html::-webkit-scrollbar-corner,
-body::-webkit-scrollbar-corner,
-.scrollbar-calm::-webkit-scrollbar-corner {
+*::-webkit-scrollbar-corner {
   background: transparent;
 }
 

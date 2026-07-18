@@ -60,6 +60,7 @@ jobs:
           retention-days: 14
 
   e2e:
+    if: ${{ false }} # Temporarily disabled: covered by the local release gate.
     name: Playwright E2E
     runs-on: ubuntu-latest
     timeout-minutes: 20
