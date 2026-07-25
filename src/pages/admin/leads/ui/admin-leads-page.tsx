@@ -1,23 +1,15 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ExternalLink, Plus, Search, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ExternalLink, Plus, Users } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
-import { CountrySelect } from "@/shared/ui/country-select";
-import { Input } from "@/shared/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import {
-  ALL_SOURCES,
-  ALL_STATUSES,
-  getStatusBadge,
-  SIZE_LABEL,
-  SOURCE_LABEL,
-} from "../api/lead-labels";
+import { getStatusBadge, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 import type { LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
 import { useLeads } from "../api/leads";
 import { CreateLeadModal } from "./create-lead-modal";
+import { LeadListFilters, LeadListPagination } from "./lead-list-controls";
 
 // --- Table --------------------------------------------------------------
 
@@ -296,16 +288,42 @@ export function AdminLeadsPage() {
   const debouncedQuery = useDebouncedValue(queryInput, 400);
   const debouncedCountry = useDebouncedValue(countryInput, 400);
 
+  const setQuery = useCallback(
+    (nextQuery: string) => {
+      void navigate({
+        search: (previous) => ({
+          ...previous,
+          q: nextQuery || undefined,
+          page: 1,
+        }),
+      });
+    },
+    [navigate],
+  );
+
+  const setCountryFilter = useCallback(
+    (nextCountry: string) => {
+      void navigate({
+        search: (previous) => ({
+          ...previous,
+          country: nextCountry || undefined,
+          page: 1,
+        }),
+      });
+    },
+    [navigate],
+  );
+
   useEffect(() => setQueryInput(query), [query]);
   useEffect(() => setCountryInput(countryFilter), [countryFilter]);
   // Only commit on the debounced value settling, not on every URL query state change.
   useEffect(() => {
     if (debouncedQuery !== query) setQuery(debouncedQuery);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, query, setQuery]);
   // Only commit on the debounced value settling, not on every URL country state change.
   useEffect(() => {
     if (debouncedCountry !== countryFilter) setCountryFilter(debouncedCountry);
-  }, [debouncedCountry]);
+  }, [countryFilter, debouncedCountry, setCountryFilter]);
 
   const { data, isPending, isError } = useLeads({
     search: query || undefined,
@@ -319,16 +337,6 @@ export function AdminLeadsPage() {
     page,
     pageSize,
   });
-
-  function setQuery(nextQuery: string) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        q: nextQuery || undefined,
-        page: 1,
-      }),
-    });
-  }
 
   function setStatusFilter(nextStatus: LeadStatus | "") {
     void navigate({
@@ -345,16 +353,6 @@ export function AdminLeadsPage() {
       search: (previous) => ({
         ...previous,
         source: nextSource || undefined,
-        page: 1,
-      }),
-    });
-  }
-
-  function setCountryFilter(nextCountry: string) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        country: nextCountry || undefined,
         page: 1,
       }),
     });
@@ -414,133 +412,33 @@ export function AdminLeadsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-        <div className="relative w-full lg:max-w-52">
-          <Search
-            size={14}
-            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-            aria-hidden="true"
-          />
-          <Input
-            type="search"
-            placeholder="Search by company"
-            value={queryInput}
-            onChange={(event) => setQueryInput(event.target.value)}
-            className="ps-8"
-          />
-        </div>
-
-        <Select
-          value={statusFilter}
-          onValueChange={(next) => setStatusFilter(next as LeadStatus | "")}
-        >
-          <SelectTrigger className="lg:w-44" aria-label="Filter by status">
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All statuses</SelectItem>
-            {ALL_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {getStatusBadge(s).label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={sourceFilter}
-          onValueChange={(next) => setSourceFilter(next as LeadSource | "")}
-        >
-          <SelectTrigger className="lg:w-40" aria-label="Filter by source">
-            <SelectValue placeholder="All sources" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All sources</SelectItem>
-            {ALL_SOURCES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {SOURCE_LABEL[s]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <CountrySelect
-          value={countryFilter}
-          onValueChange={(next) => setCountryFilter(next)}
-          id="admin-leads-country"
-          className="lg:w-38"
-        />
-
-        <Input
-          type="date"
-          aria-label="Created from"
-          value={createdFrom ?? ""}
-          onChange={(event) => setCreatedDateFilter("createdFrom", event.target.value)}
-          className="lg:w-40"
-        />
-
-        <Input
-          type="date"
-          aria-label="Created to"
-          value={createdTo ?? ""}
-          onChange={(event) => setCreatedDateFilter("createdTo", event.target.value)}
-          className="lg:w-40"
-        />
-
-        <Select
-          value={isArchived === undefined ? "all" : String(isArchived)}
-          onValueChange={(value) =>
-            setArchivedFilter(value === "all" ? undefined : value === "true")
-          }
-        >
-          <SelectTrigger className="lg:w-36" aria-label="Filter by archive state">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All leads</SelectItem>
-            <SelectItem value="false">Active</SelectItem>
-            <SelectItem value="true">Archived</SelectItem>
-          </SelectContent>
-        </Select>
-        {/* reset button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setQueryInput("");
-            setStatusFilter("");
-            setSourceFilter("");
-            setCountryFilter("");
-            setArchivedFilter(undefined);
-            setCreatedDateFilter("createdFrom", "");
-            setCreatedDateFilter("createdTo", "");
-            setSort(undefined);
-          }}
-        >
-          Reset
-        </Button>
-
-        <div className="flex items-center gap-1 lg:ms-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            pressed={sort !== "createdAtAsc"}
-            onClick={() => setSort(undefined)}
-          >
-            Newest
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            pressed={sort === "createdAtAsc"}
-            onClick={() => setSort("createdAtAsc")}
-          >
-            Oldest
-          </Button>
-        </div>
-      </div>
-
+      <LeadListFilters
+        archived={isArchived}
+        country={countryFilter}
+        createdFrom={createdFrom}
+        createdTo={createdTo}
+        onArchivedChange={setArchivedFilter}
+        onCountryChange={setCountryInput}
+        onCreatedDateChange={setCreatedDateFilter}
+        onQueryChange={setQueryInput}
+        onReset={() => {
+          setQueryInput("");
+          setStatusFilter("");
+          setSourceFilter("");
+          setCountryInput("");
+          setArchivedFilter(undefined);
+          setCreatedDateFilter("createdFrom", "");
+          setCreatedDateFilter("createdTo", "");
+          setSort(undefined);
+        }}
+        onSortChange={setSort}
+        onSourceChange={setSourceFilter}
+        onStatusChange={setStatusFilter}
+        query={queryInput}
+        sort={sort}
+        source={sourceFilter}
+        status={statusFilter}
+      />
       {/* Table card */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
@@ -551,38 +449,13 @@ export function AdminLeadsPage() {
             onView={viewLead}
           />
         </CardContent>
-        <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-xs text-[var(--color-text-muted)]">
-            {visible.length} of {totalItems} leads
-          </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="nav"
-              size="iconXs"
-              className="btn-nav-prev"
-              disabled={currentPage <= 1}
-              onClick={() => setPage(currentPage - 1)}
-              aria-label="Previous page"
-              title="Previous page"
-            >
-              <ChevronLeft size={14} />
-            </Button>
-            <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
-              {currentPage} / {totalPages}
-            </span>
-            <Button
-              variant="nav"
-              size="iconXs"
-              className="btn-nav-next"
-              disabled={currentPage >= totalPages}
-              onClick={() => setPage(currentPage + 1)}
-              aria-label="Next page"
-              title="Next page"
-            >
-              <ChevronRight size={14} />
-            </Button>
-          </div>
-        </div>
+        <LeadListPagination
+          currentPage={currentPage}
+          onPageChange={setPage}
+          totalItems={totalItems}
+          totalPages={totalPages}
+          visibleItems={visible.length}
+        />
       </Card>
       <CreateLeadModal
         open={isCreatingLead}
