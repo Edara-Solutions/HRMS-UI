@@ -8,6 +8,17 @@ export {
   mapLoginError,
   readBackendErrorMessage,
 } from "./error-mapper";
+export type {
+  components as leadComponents,
+  paths as leadPaths,
+} from "./lead-contract";
+export {
+  parseLeadActivityListResponse,
+  parseLeadConversionEligibility,
+  parseLeadCreateResult,
+  parseLeadDetails,
+  parseLeadListResponse,
+} from "./lead-runtime-contract";
 export {
   ALL_KNOWN_PLAN_FEATURES,
   ALL_KNOWN_PLAN_LIMITS,

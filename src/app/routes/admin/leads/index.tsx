@@ -48,6 +48,22 @@ const adminLeadsSearchSchema = z.object({
       z.string().max(120).optional(),
     )
     .catch(undefined),
+  createdFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .catch(undefined),
+  createdTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .catch(undefined),
+  isArchived: z
+    .preprocess(
+      (value) => (value === "true" ? true : value === "false" ? false : value),
+      z.boolean().optional(),
+    )
+    .catch(undefined),
   sort: z.enum(["createdAtAsc", "createdAtDesc"]).optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(1).max(100).catch(10),

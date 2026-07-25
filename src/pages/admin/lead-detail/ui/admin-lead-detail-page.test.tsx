@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { LeadActivityListResponse, LeadDetails, LeadStatus } from "../api/lead-detail";
+import type { LeadActivityListResponse, LeadDetails } from "../api/lead-detail";
 import type { SendingDomain, SendingDomainReadiness } from "../api/sending-domain";
 import { AdminLeadDetailPage } from "./admin-lead-detail-page";
 
@@ -74,6 +74,8 @@ function buildLeadDetails(overrides: Partial<LeadDetails["lead"]> = {}): LeadDet
       lostReason: null,
       isConverted: false,
       numberOfAttempts: 3,
+      lastAttemptAt: "2026-06-10T00:00:00.000Z",
+      isArchived: false,
       createdAt: "2026-05-01T00:00:00.000Z",
       updatedAt: "2026-06-10T00:00:00.000Z",
       deletedAt: null,
@@ -104,6 +106,22 @@ function buildLeadDetails(overrides: Partial<LeadDetails["lead"]> = {}): LeadDet
       },
     ],
     activities: [],
+    primaryContact: {
+      publicId: "contact-1",
+      name: "Sara Youssef",
+      email: "sara@acme.example.com",
+      phone: "0100000000",
+      jobTitle: "COO",
+      isPrimary: true,
+      createdAt: "2026-05-01T00:00:00.000Z",
+      updatedAt: "2026-05-01T00:00:00.000Z",
+      deletedAt: null,
+    },
+    conversionEligibility: {
+      isEligible: true,
+      reasons: [],
+      primaryContact: null,
+    },
   };
 }
 
@@ -158,6 +176,9 @@ function mockApiForLead(
   apiGetMock.mockImplementation((path: string) => {
     if (path === "leads/lead-1") return jsonResponse(details);
     if (path === "leads/lead-1/activities") return jsonResponse(activitiesResponse());
+    if (path === "leads/lead-1/conversion-eligibility") {
+      return jsonResponse(details.conversionEligibility);
+    }
     if (path === "leads/lead-1/sending-domain") return jsonResponse(sendingDomain);
     if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse(readiness);
     throw new Error(`Unexpected path: ${path}`);
@@ -203,6 +224,67 @@ describe("AdminLeadDetailPage", () => {
     expect(screen.getByText("Meeting", { selector: "span" })).toBeInTheDocument();
   });
 
+  it("renders a safe fallback and disables editing for an unknown lead status", async () => {
+    const details = buildLeadDetails();
+    details.lead.status = "FUTURE_PIPELINE_STATE" as LeadDetails["lead"]["status"];
+    mockApiForLead(details);
+    renderPage();
+
+    expect(await screen.findByText("future pipeline state")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Edit" })[0]).toBeDisabled();
+  });
+  it("renders every conversion blocker returned by the server", async () => {
+    const details = buildLeadDetails();
+    details.conversionEligibility = {
+      isEligible: false,
+      reasons: [
+        { code: "PRIMARY_CONTACT_NAME_REQUIRED", message: "Primary contact name is required." },
+        { code: "PRIMARY_CONTACT_EMAIL_REQUIRED", message: "Primary contact email is required." },
+      ],
+      primaryContact: null,
+    };
+    mockApiForLead(details);
+    renderPage();
+
+    expect(await screen.findByText("Primary contact name is required.")).toBeInTheDocument();
+    expect(screen.getByText("Primary contact email is required.")).toBeInTheDocument();
+  });
+
+  it("refreshes authoritative conversion eligibility on demand", async () => {
+    mockApiForLead();
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Refresh eligibility" }));
+
+    await waitFor(() => {
+      expect(
+        apiGetMock.mock.calls.filter(([path]) => path === "leads/lead-1/conversion-eligibility"),
+      ).toHaveLength(2);
+    });
+  });
+
+  it("archives using the idempotent command and renders returned state", async () => {
+    mockApiForLead();
+    apiPostMock.mockReturnValue(jsonResponse(buildLeadDetails({ isArchived: true })));
+    renderPage();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
+
+    await waitFor(() => {
+      expect(apiPostMock).toHaveBeenCalledWith("leads/lead-1/archive");
+    });
+  });
+
+  it("requires promotion before deleting the primary contact", async () => {
+    mockApiForLead();
+    renderPage();
+
+    const removeButtons = await screen.findAllByRole("button", { name: "Remove" });
+    fireEvent.click(removeButtons[0]);
+
+    expect(screen.getByText("Promote another contact first")).toBeInTheDocument();
+    expect(apiDeleteMock).not.toHaveBeenCalled();
+  });
   it("renders DNS instructions and copies a host value", async () => {
     mockApiForLead();
     const writeText = vi.fn().mockResolvedValue(undefined);
@@ -224,6 +306,9 @@ describe("AdminLeadDetailPage", () => {
     apiGetMock.mockImplementation((path: string) => {
       if (path === "leads/lead-1") return jsonResponse(buildLeadDetails());
       if (path === "leads/lead-1/activities") return jsonResponse(activitiesResponse());
+      if (path === "leads/lead-1/conversion-eligibility") {
+        return jsonResponse(buildLeadDetails().conversionEligibility);
+      }
       if (path === "leads/lead-1/sending-domain") {
         return errorResponse(404, { error: "No sending domain provisioned for this lead" });
       }
@@ -253,7 +338,7 @@ describe("AdminLeadDetailPage", () => {
     renderPage();
 
     await screen.findByRole("heading", { name: "Acme Corp" });
-    fireEvent.click(screen.getByRole("button", { name: /recheck dns/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /recheck dns/i }));
 
     await waitFor(() =>
       expect(apiPostMock).toHaveBeenCalledWith("leads/lead-1/sending-domain/verify"),
@@ -327,96 +412,6 @@ describe("AdminLeadDetailPage", () => {
     expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ to: "/admin/leads" }));
   });
 
-  it("shows Convert for sales-ready statuses when any-state conversion is disabled", async () => {
-    mockApiForLead(buildLeadDetails({ status: "QUALIFIED" }));
-    renderPage();
-
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    expect(screen.getByRole("button", { name: /^convert$/i })).toBeEnabled();
-  });
-
-  it.each<[SendingDomainReadiness, RegExp]>([
-    [{ ready: false, reason: "NOT_PROVISIONED" }, /provision a company sending domain/i],
-    [{ ready: false, reason: "NOT_VERIFIED" }, /verify the company sending domain/i],
-    [{ ready: false, reason: "UNHEALTHY" }, /fix the failed dns checks/i],
-    [{ ready: false, reason: "STALE" }, /refresh dns verification/i],
-  ])("disables Convert with an actionable %s readiness reason", async (readiness, message) => {
-    mockApiForLead(buildLeadDetails({ status: "QUALIFIED" }), readiness);
-    renderPage();
-
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    expect(screen.getByRole("button", { name: /^convert$/i })).toBeDisabled();
-    expect(screen.getByText(message)).toBeInTheDocument();
-  });
-
-  it("hides Convert for non-sales-ready statuses when any-state conversion is disabled", async () => {
-    mockApiForLead(buildLeadDetails({ status: "NEW" }));
-    renderPage();
-
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    expect(screen.queryByRole("button", { name: /^convert$/i })).not.toBeInTheDocument();
-  });
-
-  it("shows Convert for non-sales-ready statuses when any-state conversion is enabled", async () => {
-    vi.stubEnv("ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE", "true");
-    mockApiForLead(buildLeadDetails({ status: "NEW" }));
-    renderPage();
-
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    expect(screen.getByRole("button", { name: /^convert$/i })).toBeInTheDocument();
-  });
-
-  it.each<[Partial<LeadDetails["lead"]>, string]>([
-    [{ isConverted: true }, "converted leads"],
-    [{ status: "WON_CONVERTED" as LeadStatus }, "won-converted leads"],
-  ])("never shows Convert for %s", async (overrides) => {
-    vi.stubEnv("ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE", "true");
-    mockApiForLead(buildLeadDetails(overrides));
-    renderPage();
-
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    expect(screen.queryByRole("button", { name: /^convert$/i })).not.toBeInTheDocument();
-  });
-
-  it("opens the convert modal from detail and navigates to the converted company", async () => {
-    mockApiForLead();
-    apiPostMock.mockReturnValue(
-      jsonResponse({ publicId: "company-9", name: "Acme Corp", companyCode: "ACME" }),
-    );
-    renderPage();
-    await screen.findByRole("heading", { name: "Acme Corp" });
-
-    fireEvent.click(screen.getByRole("button", { name: /^convert$/i }));
-    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: "0100000000" } });
-    fireEvent.click(screen.getByRole("button", { name: /convert to company/i }));
-    fireEvent.click(await screen.findByRole("button", { name: /view company/i }));
-
-    expect(apiPostMock).toHaveBeenCalledWith(
-      "leads/lead-1/convert",
-      expect.objectContaining({
-        json: expect.objectContaining({
-          name: "Acme Corp",
-          country: "Egypt",
-          phoneNumber: "0100000000",
-          ownerFirstName: "Sara",
-          ownerLastName: "Youssef",
-          ownerEmail: "sara@acme.example.com",
-        }),
-      }),
-    );
-    expect(navigateMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: "/admin/companies/$publicId",
-        params: { publicId: "company-9" },
-      }),
-    );
-  });
-
   it("deletes the lead after confirmation and navigates back to the list", async () => {
     mockApiForLead();
     apiDeleteMock.mockResolvedValue(undefined);
@@ -456,11 +451,11 @@ describe("AdminLeadDetailPage", () => {
     renderPage();
     await screen.findByRole("heading", { name: "Acme Corp" });
 
-    fireEvent.click(screen.getAllByRole("button", { name: /^remove$/i })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /^remove$/i })[1]);
     fireEvent.click(screen.getByRole("button", { name: /remove contact/i }));
 
     await waitFor(() =>
-      expect(apiDeleteMock).toHaveBeenCalledWith("leads/lead-1/contacts/contact-1"),
+      expect(apiDeleteMock).toHaveBeenCalledWith("leads/lead-1/contacts/contact-2"),
     );
   });
 });
