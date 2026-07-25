@@ -47,6 +47,7 @@ import {
   SOURCE_LABEL,
   STATUS_BADGE,
 } from "../api/lead-labels";
+import { ConversionPlanDiscoveryCard } from "./conversion-plan-discovery-card";
 import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
@@ -545,6 +546,7 @@ export function AdminLeadDetailPage() {
           isRefreshing={eligibility.isFetching}
           onRefresh={() => void eligibility.refetch()}
         />
+        <ConversionPlanDiscoveryCard />
         <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
       </div>
 

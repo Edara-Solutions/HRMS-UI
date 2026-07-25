@@ -1,9 +1,4 @@
-import {
-  BILLING_INTERVAL_VALUES,
-  type BillingInterval,
-  type Plan,
-  type PlanFeature,
-} from "@/shared/api";
+import { BILLING_INTERVAL_VALUES, type Plan, type PlanFeature } from "@/shared/api";
 
 export const SYSTEM_DEFAULT_PLAN_NAME = "Default Full Access";
 
@@ -20,7 +15,7 @@ export const LIMIT_LABEL: Record<string, string> = {
   MAX_POSITIONS: "Max positions",
 };
 
-export const BILLING_INTERVAL_LABEL: Record<BillingInterval, string> = {
+export const BILLING_INTERVAL_LABEL: Record<string, string> = {
   monthly: "Monthly",
   quarterly: "Quarterly",
   biannual: "Biannual",

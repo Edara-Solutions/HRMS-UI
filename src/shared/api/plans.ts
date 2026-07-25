@@ -15,6 +15,8 @@ export type PlanFeature = KnownPlanFeature | (string & {});
 export type KnownPlanLimit = (typeof knownPlanLimitValues)[number];
 export type PlanLimits = Partial<Record<KnownPlanLimit, number>>;
 export type BillingInterval = (typeof billingIntervalValues)[number];
+export type PlanBillingInterval = BillingInterval | (string & {});
+export type EffectivePriceSource = "country" | "region" | "default_row" | (string & {});
 
 export interface Money {
   currencyCode: string;
@@ -29,7 +31,7 @@ export interface PlanPrice {
   planId?: number;
   countryCode: string | null;
   regionCode: string | null;
-  billingInterval: BillingInterval;
+  billingInterval: PlanBillingInterval;
   intervalCount: number;
   isActive: boolean;
   money: Money;
@@ -38,9 +40,9 @@ export interface PlanPrice {
 }
 
 export interface EffectivePrice {
-  source: "country" | "region" | "default_row";
+  source: EffectivePriceSource;
   pricePublicId: string;
-  billingInterval: BillingInterval;
+  billingInterval: PlanBillingInterval;
   intervalCount: number;
   countryCode: string | null;
   regionCode: string | null;
@@ -168,7 +170,7 @@ const moneySchema = z.object({
   formattedAmount: z.string().min(1),
 });
 
-const billingIntervalSchema = z.enum(billingIntervalValues);
+const billingIntervalSchema = z.string().min(1);
 
 const planPriceSchema = z.object({
   publicId: z.string().uuid(),
@@ -184,7 +186,7 @@ const planPriceSchema = z.object({
 });
 
 const effectivePriceSchema = z.object({
-  source: z.enum(["country", "region", "default_row"]),
+  source: z.string().min(1),
   pricePublicId: z.string().uuid(),
   billingInterval: billingIntervalSchema,
   intervalCount: z.number().int().positive(),
@@ -219,10 +221,13 @@ const planSchema = basePlanSchema.extend({
   effectivePrice: effectivePriceSchema.nullable(),
 });
 
-const planListResponseSchema = z.object({
+export const planListResponseSchema = z.object({
   data: z.array(planSchema),
 });
 
+export function parsePlanListResponse(data: unknown): PlanListResponse {
+  return planListResponseSchema.parse(data);
+}
 const planPriceListResponseSchema = z.object({
   data: z.array(planPriceSchema),
 });
@@ -397,6 +402,13 @@ async function deletePlanPrice(pricePublicId: string): Promise<{ message: string
   );
 }
 
+const pendingConversionRequestKeys = ["lead-conversion-requests"] as const;
+
+async function invalidatePlanQueries(queryClient: ReturnType<typeof useQueryClient>) {
+  await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+  await queryClient.invalidateQueries({ queryKey: pendingConversionRequestKeys });
+}
+
 export const plansKeys = {
   all: ["plans"] as const,
   list: (params: PlanListParams) => ["plans", "list", params] as const,
@@ -447,8 +459,8 @@ export function useCreatePlan() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPlan,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
@@ -458,8 +470,8 @@ export function useUpdatePlan() {
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: UpdatePlanInput }) =>
       updatePlan(publicId, input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
@@ -468,8 +480,8 @@ export function useDeletePlan() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deletePlan,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
@@ -495,8 +507,8 @@ export function useCreatePlanPrice() {
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: CreatePlanPriceInput }) =>
       createPlanPrice(publicId, input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
@@ -511,8 +523,8 @@ export function useUpdatePlanPrice() {
       pricePublicId: string;
       input: UpdatePlanPriceInput;
     }) => updatePlanPrice(pricePublicId, input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
@@ -521,8 +533,8 @@ export function useDeletePlanPrice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deletePlanPrice,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: plansKeys.all });
+    onSettled: async () => {
+      await invalidatePlanQueries(queryClient);
     },
   });
 }
