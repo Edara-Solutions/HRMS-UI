@@ -19,6 +19,7 @@ export {
   parseLeadDetails,
   parseLeadListResponse,
 } from "./lead-runtime-contract";
+
 export {
   ALL_KNOWN_PLAN_FEATURES,
   ALL_KNOWN_PLAN_LIMITS,
@@ -40,6 +41,7 @@ export {
   type PlanPrice,
   type PlanPriceListParams,
   type PublicPlanListParams,
+  parsePlanListResponse,
   plansKeys,
   type ResolvedEffectivePrice,
   type UpdatePlanInput,
@@ -57,5 +59,6 @@ export {
   useUpdatePlan,
   useUpdatePlanPrice,
 } from "./plans";
+
 export { queryClient } from "./query-client";
 export type { components, paths } from "./schema";

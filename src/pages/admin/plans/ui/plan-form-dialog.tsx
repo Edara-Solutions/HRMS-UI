@@ -21,6 +21,13 @@ import { getFeatureLabel, getPlanUnknownFeatures, isSystemDefaultPlan } from "..
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
+const optionalNonNegativeIntegerSchema = z.string().refine((value) => {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  const parsed = Number(trimmed);
+  return Number.isInteger(parsed) && parsed >= 0;
+}, "Use a non-negative integer");
+
 const planFormSchema = z.object({
   name: z.string().trim().min(1, "Plan name is required").max(255, "Plan name is too long"),
   description: z.string().max(2000, "Description is too long"),
@@ -28,9 +35,9 @@ const planFormSchema = z.object({
   isPublic: z.boolean(),
   isActive: z.boolean(),
   features: z.array(z.enum(ALL_KNOWN_PLAN_FEATURES)).min(1, "Select at least one feature"),
-  maxUsers: z.string(),
-  maxDepartments: z.string(),
-  maxPositions: z.string(),
+  maxUsers: optionalNonNegativeIntegerSchema,
+  maxDepartments: optionalNonNegativeIntegerSchema,
+  maxPositions: optionalNonNegativeIntegerSchema,
 });
 
 type PlanFormData = z.infer<typeof planFormSchema>;

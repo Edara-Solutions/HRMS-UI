@@ -118,6 +118,11 @@ test("deduplicates a lead and refreshes every conversion blocker at the API boun
       return;
     }
 
+    if (url.pathname === "/api/v1/plans/public") {
+      await route.fulfill({ json: { data: [] } });
+      return;
+    }
+
     if (url.pathname === "/api/v1/leads/lead-1") {
       await route.fulfill({
         json: {
