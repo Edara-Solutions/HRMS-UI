@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Plan } from "@/shared/api";
 import type { LeadActivityListResponse, LeadDetails } from "../api/lead-detail";
 import type { SendingDomain, SendingDomainReadiness } from "../api/sending-domain";
 import { AdminLeadDetailPage } from "./admin-lead-detail-page";
@@ -172,6 +173,7 @@ function mockApiForLead(
   details = buildLeadDetails(),
   readiness: SendingDomainReadiness = { ready: true },
   sendingDomain = buildSendingDomain(),
+  publicPlans: Plan[] = [],
 ) {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "leads/lead-1") return jsonResponse(details);
@@ -179,6 +181,7 @@ function mockApiForLead(
     if (path === "leads/lead-1/conversion-eligibility") {
       return jsonResponse(details.conversionEligibility);
     }
+    if (path === "plans/public") return jsonResponse({ data: publicPlans });
     if (path === "leads/lead-1/sending-domain") return jsonResponse(sendingDomain);
     if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse(readiness);
     throw new Error(`Unexpected path: ${path}`);
@@ -224,6 +227,40 @@ describe("AdminLeadDetailPage", () => {
     expect(screen.getByText("Meeting", { selector: "span" })).toBeInTheDocument();
   });
 
+  it("requests active public conversion plans without substituting the private default", async () => {
+    const publicPlan: Plan = {
+      publicId: "11111111-1111-4111-8111-111111111111",
+      name: "Growth",
+      description: "For growing teams",
+      duration: 30,
+      features: ["OVERVIEW"],
+      limits: { MAX_USERS: 100 },
+      isPublic: true,
+      isActive: true,
+      prices: [],
+      effectivePrice: null,
+      createdAt: "2026-07-25T10:00:00.000Z",
+      updatedAt: "2026-07-25T10:00:00.000Z",
+      deletedAt: null,
+    };
+    const privateDefault = {
+      ...publicPlan,
+      publicId: "22222222-2222-4222-8222-222222222222",
+      name: "Default Full Access",
+      isPublic: false,
+    };
+    mockApiForLead(buildLeadDetails(), { ready: true }, buildSendingDomain(), [
+      publicPlan,
+      privateDefault,
+    ]);
+
+    renderPage();
+
+    expect(await screen.findByText("Growth", { exact: true })).toBeInTheDocument();
+    expect(screen.queryByText("Default Full Access", { exact: true })).not.toBeInTheDocument();
+    const plansCall = apiGetMock.mock.calls.find(([path]) => path === "plans/public");
+    expect(plansCall?.[1].searchParams.get("isActive")).toBe("true");
+  });
   it("renders a safe fallback and disables editing for an unknown lead status", async () => {
     const details = buildLeadDetails();
     details.lead.status = "FUTURE_PIPELINE_STATE" as LeadDetails["lead"]["status"];
@@ -309,6 +346,7 @@ describe("AdminLeadDetailPage", () => {
       if (path === "leads/lead-1/conversion-eligibility") {
         return jsonResponse(buildLeadDetails().conversionEligibility);
       }
+      if (path === "plans/public") return jsonResponse({ data: [] });
       if (path === "leads/lead-1/sending-domain") {
         return errorResponse(404, { error: "No sending domain provisioned for this lead" });
       }
@@ -392,6 +430,7 @@ describe("AdminLeadDetailPage", () => {
           meta: { mode: "page", page: 1, pageSize: 20, totalItems: 0, totalPages: 1 },
         });
       }
+      if (path === "plans/public") return jsonResponse({ data: [] });
       if (path === "leads/lead-1/sending-domain") return jsonResponse(buildSendingDomain());
       if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse({ ready: true });
       throw new Error(`Unexpected path: ${path}`);
