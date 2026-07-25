@@ -11,9 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   ALL_SOURCES,
   ALL_STATUSES,
+  getStatusBadge,
   SIZE_LABEL,
   SOURCE_LABEL,
-  STATUS_BADGE,
 } from "../api/lead-labels";
 import type { LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
 import { useLeads } from "../api/leads";
@@ -32,8 +32,8 @@ function LeadsTable({
     <>
       <div className="divide-y divide-[var(--color-border)] lg:hidden">
         {items.map(({ lead, contacts }) => {
-          const primary = contacts.find((c) => c.isPrimary) ?? contacts[0];
-          const status = STATUS_BADGE[lead.status];
+          const primary = contacts.find((contact) => contact.isPrimary);
+          const status = getStatusBadge(lead.status);
           return (
             <article key={lead.publicId} className="p-4">
               <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
@@ -138,8 +138,8 @@ function LeadsTable({
           </thead>
           <tbody>
             {items.map(({ lead, contacts }) => {
-              const primary = contacts.find((c) => c.isPrimary) ?? contacts[0];
-              const status = STATUS_BADGE[lead.status];
+              const primary = contacts.find((contact) => contact.isPrimary);
+              const status = getStatusBadge(lead.status);
               return (
                 <tr
                   key={lead.publicId}
@@ -278,9 +278,10 @@ function LeadsTableCardContent({
 // --- Page -----------------------------------------------------------------
 
 export function AdminLeadsPage() {
-  const { page, pageSize, q, status, source, country, sort } = useSearch({
-    from: "/admin/leads/",
-  });
+  const { page, pageSize, q, status, source, country, createdFrom, createdTo, isArchived, sort } =
+    useSearch({
+      from: "/admin/leads/",
+    });
   const navigate = useNavigate({ from: "/admin/leads/" });
   const query = q ?? "";
   const statusFilter = status ?? "";
@@ -311,6 +312,9 @@ export function AdminLeadsPage() {
     status: statusFilter || undefined,
     source: sourceFilter || undefined,
     country: countryFilter || undefined,
+    createdFrom,
+    createdTo,
+    isArchived,
     sort,
     page,
     pageSize,
@@ -356,6 +360,21 @@ export function AdminLeadsPage() {
     });
   }
 
+  function setCreatedDateFilter(field: "createdFrom" | "createdTo", value: string) {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        [field]: value || undefined,
+        page: 1,
+      }),
+    });
+  }
+
+  function setArchivedFilter(value: boolean | undefined) {
+    void navigate({
+      search: (previous) => ({ ...previous, isArchived: value, page: 1 }),
+    });
+  }
   function setSort(nextSort: "createdAtAsc" | "createdAtDesc" | undefined) {
     void navigate({
       search: (previous) => ({ ...previous, sort: nextSort, page: 1 }),
@@ -423,7 +442,7 @@ export function AdminLeadsPage() {
             <SelectItem value="">All statuses</SelectItem>
             {ALL_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {STATUS_BADGE[s].label}
+                {getStatusBadge(s).label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -453,6 +472,37 @@ export function AdminLeadsPage() {
           className="lg:w-38"
         />
 
+        <Input
+          type="date"
+          aria-label="Created from"
+          value={createdFrom ?? ""}
+          onChange={(event) => setCreatedDateFilter("createdFrom", event.target.value)}
+          className="lg:w-40"
+        />
+
+        <Input
+          type="date"
+          aria-label="Created to"
+          value={createdTo ?? ""}
+          onChange={(event) => setCreatedDateFilter("createdTo", event.target.value)}
+          className="lg:w-40"
+        />
+
+        <Select
+          value={isArchived === undefined ? "all" : String(isArchived)}
+          onValueChange={(value) =>
+            setArchivedFilter(value === "all" ? undefined : value === "true")
+          }
+        >
+          <SelectTrigger className="lg:w-36" aria-label="Filter by archive state">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All leads</SelectItem>
+            <SelectItem value="false">Active</SelectItem>
+            <SelectItem value="true">Archived</SelectItem>
+          </SelectContent>
+        </Select>
         {/* reset button */}
         <Button
           variant="ghost"
@@ -462,6 +512,9 @@ export function AdminLeadsPage() {
             setStatusFilter("");
             setSourceFilter("");
             setCountryFilter("");
+            setArchivedFilter(undefined);
+            setCreatedDateFilter("createdFrom", "");
+            setCreatedDateFilter("createdTo", "");
             setSort(undefined);
           }}
         >
@@ -531,7 +584,14 @@ export function AdminLeadsPage() {
           </div>
         </div>
       </Card>
-      <CreateLeadModal open={isCreatingLead} onClose={() => setIsCreatingLead(false)} />
+      <CreateLeadModal
+        open={isCreatingLead}
+        onClose={() => setIsCreatingLead(false)}
+        onViewLead={(publicId) => {
+          setIsCreatingLead(false);
+          viewLead(publicId);
+        }}
+      />
     </div>
   );
 }

@@ -38,6 +38,8 @@ const lead: Lead = {
   lostReason: null,
   isConverted: false,
   numberOfAttempts: 0,
+  lastAttemptAt: "2026-06-01T00:00:00.000Z",
+  isArchived: false,
   createdAt: "2026-06-01T00:00:00.000Z",
   updatedAt: "2026-06-01T00:00:00.000Z",
   deletedAt: null,
@@ -122,43 +124,6 @@ describe("EditLeadModal", () => {
     expect(screen.queryByRole("option", { name: "Contacted" })).not.toBeInTheDocument();
   });
 
-  it("shows every editable status when override is enabled", async () => {
-    vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "true");
-
-    renderModal();
-
-    await waitFor(() => expect(screen.getByLabelText(/^country$/i)).toHaveTextContent("Egypt"));
-    fireEvent.click(screen.getByLabelText(/status/i));
-
-    expect(screen.getByRole("option", { name: "Contacted" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Rejoined" })).not.toBeInTheDocument();
-  });
-
-  it("submits allowStatusOverride when override is enabled", async () => {
-    vi.stubEnv("ALLOW_LEAD_STATUS_OVERRIDE", "true");
-    updatePatchMock.mockReturnValue(
-      jsonResponse({ lead: { ...lead, status: "CONTACTED" }, contacts: [] }),
-    );
-
-    renderModal();
-
-    fireEvent.click(screen.getByLabelText(/status/i));
-    fireEvent.click(screen.getByRole("option", { name: "Contacted" }));
-    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
-
-    await waitFor(() =>
-      expect(updatePatchMock).toHaveBeenCalledWith(
-        "leads/lead-1",
-        expect.objectContaining({
-          json: expect.objectContaining({
-            status: "CONTACTED",
-            allowStatusOverride: true,
-          }),
-        }),
-      ),
-    );
-  });
-
   it("submits the selected country and state as city", async () => {
     updatePatchMock.mockReturnValue(
       jsonResponse({
@@ -212,7 +177,6 @@ describe("EditLeadModal", () => {
           json: expect.objectContaining({
             status: "LOST",
             lostReason: "NO_BUDGET",
-            allowStatusOverride: false,
           }),
         }),
       ),

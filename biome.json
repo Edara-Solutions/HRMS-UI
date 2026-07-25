@@ -15,7 +15,8 @@
       "!.agents",
       "!.claude",
       "!src/routeTree.gen.ts",
-      "!src/shared/api/schema.d.ts"
+      "!src/shared/api/schema.d.ts",
+      "!src/shared/api/lead-contract.d.ts"
     ]
   },
   "formatter": {

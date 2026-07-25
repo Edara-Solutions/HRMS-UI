@@ -8,7 +8,7 @@ import type {
 
 type StatusBadgeVariant = "success" | "primary" | "warning" | "danger" | "info" | "default";
 
-export const STATUS_BADGE: Record<LeadStatus, { variant: StatusBadgeVariant; label: string }> = {
+export const STATUS_BADGE: Record<string, { variant: StatusBadgeVariant; label: string }> = {
   NEW: { variant: "default", label: "New" },
   NO_ANSWER: { variant: "default", label: "No answer" },
   WRONG_NUMBER: { variant: "danger", label: "Wrong number" },
@@ -27,10 +27,24 @@ export const STATUS_BADGE: Record<LeadStatus, { variant: StatusBadgeVariant; lab
   REJOINED: { variant: "success", label: "Rejoined" },
 };
 
+export function getStatusBadge(status: string): {
+  variant: StatusBadgeVariant;
+  label: string;
+} {
+  return (
+    STATUS_BADGE[status] ?? {
+      variant: "default",
+      label: status.toLowerCase().replace(/_/g, " "),
+    }
+  );
+}
+
 export const ALL_STATUSES = Object.keys(STATUS_BADGE) as LeadStatus[];
 
 /** REJOINED is a system-assigned status (a lost lead re-engaging) — never settable by hand. */
-export const EDITABLE_STATUSES = ALL_STATUSES.filter((status) => status !== "REJOINED");
+export const EDITABLE_STATUSES = ALL_STATUSES.filter(
+  (status) => status !== "REJOINED" && status !== "WON_CONVERTED",
+);
 
 export const SOURCE_LABEL: Record<LeadSource, string> = {
   CRM: "CRM",

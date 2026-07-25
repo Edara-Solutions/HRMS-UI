@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
+  Archive,
+  ArchiveRestore,
   ArrowLeft,
-  ArrowRightLeft,
   ChevronLeft,
   ChevronRight,
   Globe,
@@ -11,6 +12,7 @@ import {
   Pencil,
   Phone,
   Plus,
+  RefreshCw,
   Star,
   Trash2,
   Users,
@@ -24,26 +26,27 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Skeleton } from "@/shared/ui/skeleton";
 import type {
-  ConvertLeadResult,
   Lead,
   LeadActivityListResponse,
   LeadContact,
-  LeadStatus,
+  LeadConversionEligibility,
 } from "../api/lead-detail";
 import {
   useDeleteLead,
   useDeleteLeadContact,
   useLead,
   useLeadActivities,
+  useLeadConversionEligibility,
+  useSetLeadArchived,
   useUpdateLeadContact,
 } from "../api/lead-detail";
-import { ACTIVITY_TYPE_LABEL, SIZE_LABEL, SOURCE_LABEL, STATUS_BADGE } from "../api/lead-labels";
 import {
-  isSendingDomainPermissionError,
-  type ReadinessReason,
-  useLeadSendingDomainReadiness,
-} from "../api/sending-domain";
-import { ConvertLeadModal } from "./convert-lead-modal";
+  ACTIVITY_TYPE_LABEL,
+  getStatusBadge,
+  SIZE_LABEL,
+  SOURCE_LABEL,
+  STATUS_BADGE,
+} from "../api/lead-labels";
 import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
@@ -66,44 +69,10 @@ function formatDateTime(value: string): string {
   });
 }
 
-const CONVERTIBLE_LEAD_STATUSES = new Set<LeadStatus>([
-  "QUALIFIED",
-  "DEMO_SCHEDULED",
-  "WAITING_QUOTATION",
-  "QUOTATION_SENT",
-  "TRIAL_STARTED",
-  "NEGOTIATION",
-]);
-
-function isLeadConversionFromAnyStateAllowed(): boolean {
-  return import.meta.env.ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE === "true";
-}
-
-function canConvertLead(lead: Lead, allowConvertFromAnyState: boolean): boolean {
-  if (lead.isConverted || lead.status === "WON_CONVERTED") return false;
-  if (allowConvertFromAnyState) return true;
-  return CONVERTIBLE_LEAD_STATUSES.has(lead.status);
-}
-
-function conversionReadinessMessage(reason: ReadinessReason | undefined): string {
-  switch (reason) {
-    case "NOT_PROVISIONED":
-      return "Provision a Company sending domain before converting this lead.";
-    case "NOT_VERIFIED":
-      return "Verify the Company sending domain before converting this lead.";
-    case "UNHEALTHY":
-      return "Fix the failed DNS checks before converting this lead.";
-    case "STALE":
-      return "Refresh DNS verification before converting this lead.";
-    default:
-      return "The latest sending-domain readiness is unavailable. Refresh the status and try again.";
-  }
-}
-
 // --- Profile ----------------------------------------------------------------
 
 function LeadProfileCard({ lead }: { lead: Lead }) {
-  const status = STATUS_BADGE[lead.status];
+  const status = getStatusBadge(lead.status);
 
   return (
     <Card>
@@ -120,11 +89,15 @@ function LeadProfileCard({ lead }: { lead: Lead }) {
           </div>
           <div>
             <dt className="text-[var(--color-text-faint)]">Source</dt>
-            <dd className="mt-1 text-[var(--color-text)]">{SOURCE_LABEL[lead.source]}</dd>
+            <dd className="mt-1 text-[var(--color-text)]">
+              {SOURCE_LABEL[lead.source] ?? lead.source.toLowerCase().replace(/_/g, " ")}
+            </dd>
           </div>
           <div>
             <dt className="text-[var(--color-text-faint)]">Company size</dt>
-            <dd className="mt-1 text-[var(--color-text)]">{SIZE_LABEL[lead.companySizeRange]}</dd>
+            <dd className="mt-1 text-[var(--color-text)]">
+              {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
+            </dd>
           </div>
           <div>
             <dt className="text-[var(--color-text-faint)]">Attempts</dt>
@@ -317,7 +290,8 @@ function LeadActivityTimelineCard({
               <li key={activity.publicId} className="p-4">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                    {ACTIVITY_TYPE_LABEL[activity.type]}
+                    {ACTIVITY_TYPE_LABEL[activity.type] ??
+                      activity.type.toLowerCase().replace(/_/g, " ")}
                   </span>
                   <span className="shrink-0 text-[11px] tabular-nums text-[var(--color-text-faint)]">
                     {formatDateTime(activity.createdAt)}
@@ -369,13 +343,68 @@ function LeadActivityTimelineCard({
   );
 }
 
+function LeadEligibilityCard({
+  data,
+  isPending,
+  isError,
+  isRefreshing,
+  onRefresh,
+}: {
+  data: LeadConversionEligibility | undefined;
+  isPending: boolean;
+  isError: boolean;
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Conversion eligibility</CardTitle>
+        <Button
+          intent="utility"
+          leadingIcon={<RefreshCw size={13} />}
+          disabled={isRefreshing}
+          isLoading={isRefreshing}
+          onClick={onRefresh}
+        >
+          Refresh eligibility
+        </Button>
+      </CardHeader>
+      <CardContent className="p-4" aria-live="polite">
+        {isPending ? (
+          <p className="text-sm text-[var(--color-text-muted)]">Checking eligibility...</p>
+        ) : isError || !data ? (
+          <p className="text-sm text-[var(--color-danger)]">
+            Eligibility is unavailable. Refresh before continuing.
+          </p>
+        ) : data.isEligible ? (
+          <p className="text-sm font-medium text-[var(--color-success)]">
+            This lead is eligible for conversion.
+          </p>
+        ) : (
+          <div>
+            <p className="text-sm font-medium text-[var(--color-text)]">
+              Resolve every blocker before conversion:
+            </p>
+            <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-[var(--color-danger)]">
+              {data.reasons.map((reason) => (
+                <li key={reason.code}>{reason.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // --- Page ---------------------------------------------------------------------
 
 /** Mutually exclusive: at most one edit/confirm surface is open at a time. */
 type LeadDetailPanel =
   | { kind: "none" }
   | { kind: "edit-lead" }
-  | { kind: "convert-lead" }
+  | { kind: "primary-contact-warning" }
   | { kind: "delete-lead" }
   | { kind: "contact-form"; contact: LeadContact | null }
   | { kind: "delete-contact"; contact: LeadContact };
@@ -389,11 +418,11 @@ export function AdminLeadDetailPage() {
 
   const { data, isPending, isError } = useLead(publicId);
   const activities = useLeadActivities(publicId, activityPage);
-  const sendingDomainReadiness = useLeadSendingDomainReadiness(publicId);
+  const eligibility = useLeadConversionEligibility(publicId);
   const deleteLead = useDeleteLead();
   const deleteContact = useDeleteLeadContact();
   const updateContact = useUpdateLeadContact();
-  const allowConvertFromAnyState = isLeadConversionFromAnyStateAllowed();
+  const setArchived = useSetLeadArchived();
 
   function backToLeads() {
     void navigate({ to: "/admin/leads", search: { page: 1, pageSize: 10 } });
@@ -408,11 +437,6 @@ export function AdminLeadDetailPage() {
     if (panel.kind !== "delete-contact") return;
     await deleteContact.mutateAsync({ publicId, contactPublicId: panel.contact.publicId });
     closePanel();
-  }
-
-  function goToConvertedCompany(company: ConvertLeadResult) {
-    closePanel();
-    void navigate({ to: "/admin/companies/$publicId", params: { publicId: company.publicId } });
   }
 
   function makeContactPrimary(contact: LeadContact) {
@@ -450,19 +474,6 @@ export function AdminLeadDetailPage() {
   }
 
   const { lead, contacts } = data;
-  const canConvert = canConvertLead(lead, allowConvertFromAnyState);
-  const convertDisabledReason = canConvert
-    ? sendingDomainReadiness.isPending
-      ? "Checking sending-domain readiness..."
-      : sendingDomainReadiness.isError
-        ? isSendingDomainPermissionError(sendingDomainReadiness.error)
-          ? "You do not have permission to verify sending-domain readiness."
-          : conversionReadinessMessage(undefined)
-        : sendingDomainReadiness.data?.ready === true
-          ? null
-          : conversionReadinessMessage(sendingDomainReadiness.data?.reason)
-    : null;
-  const convertReadinessReasonId = `${publicId}-convert-readiness`;
 
   return (
     <div className="mx-auto max-w-[1200px]">
@@ -493,31 +504,23 @@ export function AdminLeadDetailPage() {
             </p>
           </div>
           <div className="flex items-start gap-2">
-            {canConvert && (
-              <div className="flex flex-col items-end gap-1">
-                <Button
-                  intent="utility"
-                  leadingIcon={<ArrowRightLeft size={13} />}
-                  disabled={convertDisabledReason !== null}
-                  title={convertDisabledReason ?? "Convert lead to company"}
-                  aria-describedby={convertDisabledReason ? convertReadinessReasonId : undefined}
-                  onClick={() => setPanel({ kind: "convert-lead" })}
-                >
-                  Convert
-                </Button>
-                {convertDisabledReason && (
-                  <span
-                    id={convertReadinessReasonId}
-                    className="max-w-56 text-end text-[11px] leading-snug text-[var(--color-text-muted)]"
-                  >
-                    {convertDisabledReason}
-                  </span>
-                )}
-              </div>
-            )}
+            <Button
+              intent="utility"
+              leadingIcon={lead.isArchived ? <ArchiveRestore size={13} /> : <Archive size={13} />}
+              disabled={setArchived.isPending || lead.isConverted}
+              isLoading={setArchived.isPending}
+              onClick={() => setArchived.mutate({ publicId, isArchived: !lead.isArchived })}
+            >
+              {lead.isArchived ? "Unarchive" : "Archive"}
+            </Button>
             <Button
               intent="utility"
               leadingIcon={<Pencil size={13} />}
+              disabled={
+                lead.isConverted ||
+                lead.status === "WON_CONVERTED" ||
+                STATUS_BADGE[lead.status] === undefined
+              }
               onClick={() => setPanel({ kind: "edit-lead" })}
             >
               Edit
@@ -534,7 +537,14 @@ export function AdminLeadDetailPage() {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 space-y-6">
+        <LeadEligibilityCard
+          data={eligibility.data}
+          isPending={eligibility.isPending}
+          isError={eligibility.isError}
+          isRefreshing={eligibility.isFetching}
+          onRefresh={() => void eligibility.refetch()}
+        />
         <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
       </div>
 
@@ -557,20 +567,35 @@ export function AdminLeadDetailPage() {
             contacts={contacts}
             onAdd={() => setPanel({ kind: "contact-form", contact: null })}
             onEdit={(contact) => setPanel({ kind: "contact-form", contact })}
-            onDelete={(contact) => setPanel({ kind: "delete-contact", contact })}
+            onDelete={(contact) =>
+              setPanel(
+                contact.isPrimary
+                  ? { kind: "primary-contact-warning" }
+                  : { kind: "delete-contact", contact },
+              )
+            }
             onMakePrimary={makeContactPrimary}
             isMakingPrimary={updateContact.isPending}
           />
         </div>
       </div>
 
-      <ConvertLeadModal
-        leadWithContacts={panel.kind === "convert-lead" ? { lead, contacts } : null}
-        onClose={closePanel}
-        onConverted={goToConvertedCompany}
-      />
-
       <EditLeadModal lead={panel.kind === "edit-lead" ? lead : null} onClose={closePanel} />
+      {panel.kind === "primary-contact-warning" && (
+        <div
+          role="alert"
+          className="mt-4 rounded-[var(--radius-md)] border border-[var(--color-warning)] bg-[var(--color-warning-soft)] px-4 py-3 text-sm text-[var(--color-text)]"
+        >
+          <p className="font-semibold">Promote another contact first</p>
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+            Make another contact primary, wait for the refreshed lead state, then remove this
+            contact.
+          </p>
+          <Button className="mt-3" intent="dismissive" onClick={closePanel}>
+            Close
+          </Button>
+        </div>
+      )}
 
       <ConfirmDialog
         open={panel.kind === "delete-lead"}

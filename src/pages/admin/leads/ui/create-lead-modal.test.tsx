@@ -23,14 +23,51 @@ function jsonResponse<T>(value: T) {
   return { json: () => Promise.resolve(value) };
 }
 
-function renderModal(onClose = vi.fn()) {
+function createResult(duplicate: boolean) {
+  return {
+    lead: {
+      publicId: duplicate ? "existing-lead" : "lead-1",
+      companyName: "Acme Corp",
+      website: null,
+      industry: null,
+      companySizeRange: "21_TO_50",
+      country: "Egypt",
+      city: "Cairo Governorate",
+      source: "CRM",
+      status: "NEW",
+      lostReason: null,
+      isConverted: false,
+      numberOfAttempts: duplicate ? 4 : 1,
+      lastAttemptAt: "2026-07-25T10:00:00.000Z",
+      isArchived: false,
+      createdAt: "2026-07-25T10:00:00.000Z",
+      updatedAt: "2026-07-25T10:00:00.000Z",
+      deletedAt: null,
+    },
+    contacts: [
+      {
+        publicId: "contact-1",
+        name: "Sara Youssef",
+        email: "owner@acme.example",
+        phone: null,
+        jobTitle: null,
+        isPrimary: true,
+        createdAt: "2026-07-25T10:00:00.000Z",
+        updatedAt: "2026-07-25T10:00:00.000Z",
+        deletedAt: null,
+      },
+    ],
+    meta: { duplicate },
+  };
+}
+function renderModal(onClose = vi.fn(), onViewLead = vi.fn()) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <CreateLeadModal open onClose={onClose} />
+      <CreateLeadModal open onClose={onClose} onViewLead={onViewLead} />
     </QueryClientProvider>,
   );
 }
@@ -101,16 +138,11 @@ describe("CreateLeadModal", () => {
     expect(screen.getByLabelText(/^state$/i)).toHaveTextContent("Cairo Governorate");
   });
 
-  it("submits the selected state as city, then closes", async () => {
-    const onClose = vi.fn();
-    createPostMock.mockReturnValue(
-      jsonResponse({
-        lead: { publicId: "lead-1" },
-        contacts: [],
-      }),
-    );
+  it("submits the selected state as city, then opens the returned lead", async () => {
+    const onViewLead = vi.fn();
+    createPostMock.mockReturnValue(jsonResponse(createResult(false)));
 
-    renderModal(onClose);
+    renderModal(vi.fn(), onViewLead);
 
     fireEvent.change(screen.getByLabelText(/company name/i), { target: { value: "Acme Corp" } });
     fireEvent.change(screen.getByLabelText(/^name$/i), { target: { value: "Sara Youssef" } });
@@ -142,6 +174,22 @@ describe("CreateLeadModal", () => {
       ),
     );
 
-    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    await waitFor(() => expect(onViewLead).toHaveBeenCalledWith("lead-1"));
+  });
+
+  it("keeps a successful duplicate attempt visible and uses normalized server state", async () => {
+    const onViewLead = vi.fn();
+    createPostMock.mockReturnValue(jsonResponse(createResult(true)));
+    renderModal(vi.fn(), onViewLead);
+
+    fireEvent.change(screen.getByLabelText(/^name$/i), { target: { value: "Sara Youssef" } });
+    fireEvent.click(screen.getByRole("button", { name: /add lead/i }));
+
+    expect(await screen.findByText("Existing lead updated")).toBeInTheDocument();
+    expect(screen.getByText("owner@acme.example")).toBeInTheDocument();
+    expect(screen.getByText(/attempt 4 recorded/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /view existing lead/i }));
+    expect(onViewLead).toHaveBeenCalledWith("existing-lead");
   });
 });

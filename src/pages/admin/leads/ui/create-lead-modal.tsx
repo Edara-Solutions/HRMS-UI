@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HTTPError } from "ky";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
@@ -13,6 +14,7 @@ import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { StateSelect } from "@/shared/ui/state-select";
 import { ALL_SIZES, ALL_SOURCES, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
+import type { LeadCreateResult } from "../api/leads";
 import { useCreateLead } from "../api/leads";
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
@@ -44,9 +46,10 @@ type CreateLeadFormData = z.infer<typeof createLeadFormSchema>;
 interface CreateLeadModalProps {
   open: boolean;
   onClose: () => void;
+  onViewLead: (publicId: string) => void;
 }
 
-export function CreateLeadModal({ open, onClose }: CreateLeadModalProps) {
+export function CreateLeadModal({ open, onClose, onViewLead }: CreateLeadModalProps) {
   const { titleId, descriptionId } = useDialogIds();
 
   return (
@@ -58,7 +61,12 @@ export function CreateLeadModal({ open, onClose }: CreateLeadModalProps) {
       className="max-w-lg"
     >
       {open && (
-        <CreateLeadModalContent onClose={onClose} titleId={titleId} descriptionId={descriptionId} />
+        <CreateLeadModalContent
+          onClose={onClose}
+          onViewLead={onViewLead}
+          titleId={titleId}
+          descriptionId={descriptionId}
+        />
       )}
     </Dialog>
   );
@@ -66,12 +74,19 @@ export function CreateLeadModal({ open, onClose }: CreateLeadModalProps) {
 
 interface CreateLeadModalContentProps {
   onClose: () => void;
+  onViewLead: (publicId: string) => void;
   titleId: string;
   descriptionId: string;
 }
 
-function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadModalContentProps) {
+function CreateLeadModalContent({
+  onClose,
+  onViewLead,
+  titleId,
+  descriptionId,
+}: CreateLeadModalContentProps) {
   const createLead = useCreateLead();
+  const [duplicateResult, setDuplicateResult] = useState<LeadCreateResult | null>(null);
 
   const {
     register,
@@ -102,7 +117,7 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
 
   async function onSubmit(data: CreateLeadFormData) {
     try {
-      await createLead.mutateAsync({
+      const result = await createLead.mutateAsync({
         companyName: data.companyName || undefined,
         website: data.website || undefined,
         industry: data.industry || undefined,
@@ -119,10 +134,53 @@ function CreateLeadModalContent({ onClose, titleId, descriptionId }: CreateLeadM
           isPrimary: true,
         },
       });
-      onClose();
+      if (result.meta.duplicate) {
+        setDuplicateResult(result);
+        return;
+      }
+      onViewLead(result.lead.publicId);
     } catch (error) {
       setError("root", { message: await readCreateErrorMessage(error) });
     }
+  }
+
+  if (duplicateResult) {
+    const primaryContact = duplicateResult.contacts.find((contact) => contact.isPrimary);
+    return (
+      <div>
+        <DialogTitle id={titleId}>Existing lead updated</DialogTitle>
+        <DialogDescription id={descriptionId}>
+          This contact matches an active lead. The server updated that lead instead of creating a
+          duplicate.
+        </DialogDescription>
+        <div
+          className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-success)] bg-[var(--color-success-soft)] p-4"
+          aria-live="polite"
+        >
+          <p className="font-semibold text-[var(--color-text)]">
+            {duplicateResult.lead.companyName ?? "Untitled lead"}
+          </p>
+          {primaryContact?.email && (
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">{primaryContact.email}</p>
+          )}
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+            Attempt {duplicateResult.lead.numberOfAttempts} recorded using normalized server data.
+          </p>
+        </div>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button intent="dismissive" type="button" onClick={onClose}>
+            Close
+          </Button>
+          <Button
+            intent="cta"
+            type="button"
+            onClick={() => onViewLead(duplicateResult.lead.publicId)}
+          >
+            View existing lead
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (

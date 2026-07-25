@@ -12,7 +12,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { StateSelect } from "@/shared/ui/state-select";
-import type { Lead, LeadStatus } from "../api/lead-detail";
+import type { Lead, LeadStatus, UpdateLeadInput } from "../api/lead-detail";
 import { useUpdateLead } from "../api/lead-detail";
 import {
   ALL_LOST_REASONS,
@@ -27,7 +27,9 @@ import {
 
 const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
-const statusTransitions: Record<LeadStatus, LeadStatus[]> = {
+type ClientLeadStatus = NonNullable<UpdateLeadInput["status"]>;
+
+const statusTransitions: Record<LeadStatus, ClientLeadStatus[]> = {
   NEW: ["CONTACTED", "WRONG_NUMBER", "NO_ANSWER", "FOLLOWING_UP"],
   REJOINED: ["CONTACTED", "WRONG_NUMBER", "NO_ANSWER", "FOLLOWING_UP"],
   WRONG_NUMBER: ["CONTACTED", "LOST"],
@@ -39,27 +41,22 @@ const statusTransitions: Record<LeadStatus, LeadStatus[]> = {
   NOT_INTERESTED: ["LOST"],
   DEMO_SCHEDULED: ["WAITING_QUOTATION", "TRIAL_STARTED", "LOST"],
   WAITING_QUOTATION: ["QUOTATION_SENT", "NEGOTIATION", "LOST"],
-  QUOTATION_SENT: ["NEGOTIATION", "WON_CONVERTED", "LOST"],
-  TRIAL_STARTED: ["NEGOTIATION", "WON_CONVERTED", "LOST"],
-  NEGOTIATION: ["WON_CONVERTED", "LOST"],
+  QUOTATION_SENT: ["NEGOTIATION", "LOST"],
+  TRIAL_STARTED: ["NEGOTIATION", "LOST"],
+  NEGOTIATION: ["LOST"],
   WON_CONVERTED: [],
   LOST: [],
 };
 
-function isLeadStatusOverrideAllowed(): boolean {
-  return import.meta.env.ALLOW_LEAD_STATUS_OVERRIDE === "true";
+function isClientLeadStatus(status: LeadStatus): status is ClientLeadStatus {
+  return status !== "REJOINED" && status !== "WON_CONVERTED";
 }
 
-function getEditableStatusOptions(
-  leadStatus: LeadStatus,
-  allowStatusOverride: boolean,
-): LeadStatus[] {
-  if (allowStatusOverride) return EDITABLE_STATUSES;
+const CLIENT_EDITABLE_STATUSES = EDITABLE_STATUSES.filter(isClientLeadStatus);
 
-  const currentStatus = leadStatus === "REJOINED" ? "NEW" : leadStatus;
-  const allowedStatuses = statusTransitions[leadStatus].filter((status) => status !== "REJOINED");
-
-  return Array.from(new Set([currentStatus, ...allowedStatuses]));
+function getEditableStatusOptions(leadStatus: LeadStatus): ClientLeadStatus[] {
+  const currentStatus = isClientLeadStatus(leadStatus) ? leadStatus : "NEW";
+  return Array.from(new Set([currentStatus, ...statusTransitions[leadStatus]]));
 }
 
 async function readUpdateErrorMessage(error: unknown): Promise<string> {
@@ -79,7 +76,7 @@ const editLeadFormSchema = z
     country: z.string().optional(),
     city: z.string().optional(),
     source: z.enum(asZodEnumValues(ALL_SOURCES)),
-    status: z.enum(asZodEnumValues(EDITABLE_STATUSES)),
+    status: z.enum(asZodEnumValues(CLIENT_EDITABLE_STATUSES)),
     lostReason: z.union([z.enum(asZodEnumValues(ALL_LOST_REASONS)), z.literal("")]),
   })
   .refine((data) => data.status !== "LOST" || data.lostReason !== "", {
@@ -132,8 +129,7 @@ function EditLeadModalContent({
   descriptionId,
 }: EditLeadModalContentProps) {
   const updateLead = useUpdateLead();
-  const allowStatusOverride = isLeadStatusOverrideAllowed();
-  const editableStatusOptions = getEditableStatusOptions(lead.status, allowStatusOverride);
+  const editableStatusOptions = getEditableStatusOptions(lead.status);
 
   const {
     register,
@@ -153,7 +149,7 @@ function EditLeadModalContent({
       country: lead.country ?? "",
       city: lead.city ?? "",
       source: lead.source,
-      status: lead.status === "REJOINED" ? "NEW" : lead.status,
+      status: isClientLeadStatus(lead.status) ? lead.status : "NEW",
       lostReason: lead.lostReason ?? "",
     },
   });
@@ -175,7 +171,6 @@ function EditLeadModalContent({
           source: data.source,
           status: data.status,
           lostReason: data.status === "LOST" ? data.lostReason || undefined : undefined,
-          allowStatusOverride,
         },
       });
       onClose();
