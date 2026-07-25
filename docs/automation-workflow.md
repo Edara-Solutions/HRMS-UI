@@ -69,7 +69,7 @@ Pushes to `main` upload the verified `dist` folder as a short-lived artifact. Th
 
 ## E2E Runner
 
-`bun run test:e2e` uses `scripts/run-e2e.mjs` instead of Playwright's built-in `webServer` lifecycle. On Windows, the built-in lifecycle can leave the runner waiting after tests pass. The script starts Vite, waits for `http://127.0.0.1:5173`, runs Playwright with `PLAYWRIGHT_SKIP_WEB_SERVER=1`, and then tears the server down.
+`bun run test:e2e` uses `scripts/run-e2e.mjs` instead of Playwright's built-in `webServer` lifecycle. On Windows, the built-in lifecycle can leave the runner waiting after tests pass. The script starts Vite, waits for `http://127.0.0.1:3000`, runs Playwright with `PLAYWRIGHT_SKIP_WEB_SERVER=1`, and then tears the server down.
 
 If you intentionally want Playwright to manage the server itself:
 
