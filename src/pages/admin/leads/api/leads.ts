@@ -1,7 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient, type components, type paths } from "@/shared/api";
+import type { leadComponents as components, leadPaths as paths } from "@/shared/api";
+import {
+  apiClient,
+  parseLeadActivityListResponse,
+  parseLeadCreateResult,
+  parseLeadDetails,
+  parseLeadListResponse,
+} from "@/shared/api";
 
-// ─── Types (generated from the backend OpenAPI contract) ──────────────────────
+// Types generated from the backend OpenAPI contract.
 
 export type LeadStatus = components["schemas"]["LeadStatus"];
 export type LeadSource = components["schemas"]["LeadSource"];
@@ -18,14 +25,13 @@ export type LeadCreateResult = components["schemas"]["LeadCreateResult"];
 export type LeadListMeta = components["schemas"]["PageMeta"];
 export type LeadListResponse = components["schemas"]["LeadListResponse"];
 export type LeadActivityListResponse = components["schemas"]["LeadActivityListResponse"];
-export type ConvertLeadResult = components["schemas"]["ConvertedCompany"];
+export type LeadConversionEligibility = components["schemas"]["LeadConversionEligibility"];
 
 type LeadsPaths = paths["/api/v1/leads"];
 type LeadPaths = paths["/api/v1/leads/{publicId}"];
 type LeadContactsPaths = paths["/api/v1/leads/{publicId}/contacts"];
 type LeadContactPaths = paths["/api/v1/leads/{publicId}/contacts/{contactPublicId}"];
 type LeadActivitiesPaths = paths["/api/v1/leads/{publicId}/activities"];
-type ConvertLeadPaths = paths["/api/v1/leads/{publicId}/convert"];
 
 export type LeadListParams = NonNullable<LeadsPaths["get"]["parameters"]["query"]>;
 export type CreateLeadInput = LeadsPaths["post"]["requestBody"]["content"]["application/json"];
@@ -36,10 +42,8 @@ export type UpdateContactInput =
   LeadContactPaths["patch"]["requestBody"]["content"]["application/json"];
 export type AddActivityInput =
   LeadActivitiesPaths["post"]["requestBody"]["content"]["application/json"];
-export type ConvertLeadInput =
-  ConvertLeadPaths["post"]["requestBody"]["content"]["application/json"];
 
-// ─── Query Keys ───────────────────────────────────────────────────────────────
+// Query keys
 
 const leadsKeys = {
   all: ["leads"] as const,
@@ -49,26 +53,34 @@ const leadsKeys = {
   activitiesAll: (id: string) => ["leads", id, "activities"] as const,
 };
 
-// ─── API Fns ──────────────────────────────────────────────────────────────────
+// API functions
 
 async function fetchLeads(params: LeadListParams): Promise<LeadListResponse> {
   const searchParams = new URLSearchParams();
   if (params.status) searchParams.set("status", params.status);
   if (params.source) searchParams.set("source", params.source);
   if (params.country) searchParams.set("country", params.country);
+  if (params.createdFrom) searchParams.set("createdFrom", params.createdFrom);
+  if (params.createdTo) searchParams.set("createdTo", params.createdTo);
+  if (params.isArchived !== undefined) {
+    searchParams.set("isArchived", String(params.isArchived));
+  }
   if (params.search) searchParams.set("search", params.search);
   if (params.page) searchParams.set("page", String(params.page));
   if (params.pageSize) searchParams.set("pageSize", String(params.pageSize));
   if (params.sort) searchParams.set("sort", params.sort);
-  return apiClient.get("leads", { searchParams }).json();
+  const response: unknown = await apiClient.get("leads", { searchParams }).json();
+  return parseLeadListResponse(response);
 }
 
 async function fetchLead(publicId: string): Promise<LeadDetails> {
-  return apiClient.get(`leads/${publicId}`).json();
+  const response: unknown = await apiClient.get(`leads/${publicId}`).json();
+  return parseLeadDetails(response);
 }
 
 async function createLead(input: CreateLeadInput): Promise<LeadCreateResult> {
-  return apiClient.post("leads", { json: input }).json();
+  const response: unknown = await apiClient.post("leads", { json: input }).json();
+  return parseLeadCreateResult(response);
 }
 
 async function updateLead(publicId: string, input: UpdateLeadInput): Promise<LeadWithContacts> {
@@ -79,12 +91,11 @@ async function deleteLead(publicId: string): Promise<void> {
   await apiClient.delete(`leads/${publicId}`);
 }
 
-async function convertLead(publicId: string, input: ConvertLeadInput): Promise<ConvertLeadResult> {
-  return apiClient.post(`leads/${publicId}/convert`, { json: input }).json();
-}
-
 async function fetchLeadActivities(publicId: string, page = 1): Promise<LeadActivityListResponse> {
-  return apiClient.get(`leads/${publicId}/activities`, { searchParams: { page } }).json();
+  const response: unknown = await apiClient
+    .get(`leads/${publicId}/activities`, { searchParams: { page } })
+    .json();
+  return parseLeadActivityListResponse(response);
 }
 
 async function addLeadActivity(publicId: string, input: AddActivityInput): Promise<LeadActivity> {
@@ -107,7 +118,7 @@ async function deleteLeadContact(publicId: string, contactPublicId: string): Pro
   await apiClient.delete(`leads/${publicId}/contacts/${contactPublicId}`);
 }
 
-// ─── Hooks ────────────────────────────────────────────────────────────────────
+// Hooks
 
 export function useLeads(params: LeadListParams = {}) {
   return useQuery({
@@ -137,7 +148,7 @@ export function useUpdateLead() {
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: UpdateLeadInput }) =>
       updateLead(publicId, input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: leadsKeys.all }),
+    onSettled: () => qc.invalidateQueries({ queryKey: leadsKeys.all }),
   });
 }
 
@@ -146,17 +157,6 @@ export function useDeleteLead() {
   return useMutation({
     mutationFn: deleteLead,
     onSuccess: () => qc.invalidateQueries({ queryKey: leadsKeys.all }),
-  });
-}
-
-export function useConvertLead() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ publicId, input }: { publicId: string; input: ConvertLeadInput }) =>
-      convertLead(publicId, input),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: leadsKeys.all });
-    },
   });
 }
 
@@ -173,7 +173,7 @@ export function useAddLeadActivity() {
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: AddActivityInput }) =>
       addLeadActivity(publicId, input),
-    onSuccess: (_data, vars) => {
+    onSettled: (_data, _error, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.activitiesAll(vars.publicId) });
     },
   });
@@ -184,7 +184,7 @@ export function useAddLeadContact() {
   return useMutation({
     mutationFn: ({ publicId, input }: { publicId: string; input: AddContactInput }) =>
       addLeadContact(publicId, input),
-    onSuccess: (_data, vars) => {
+    onSettled: (_data, _error, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
       qc.invalidateQueries({ queryKey: leadsKeys.all });
     },
@@ -203,7 +203,7 @@ export function useUpdateLeadContact() {
       contactPublicId: string;
       input: UpdateContactInput;
     }) => updateLeadContact(publicId, contactPublicId, input),
-    onSuccess: (_data, vars) => {
+    onSettled: (_data, _error, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
       qc.invalidateQueries({ queryKey: leadsKeys.all });
     },
@@ -215,7 +215,7 @@ export function useDeleteLeadContact() {
   return useMutation({
     mutationFn: ({ publicId, contactPublicId }: { publicId: string; contactPublicId: string }) =>
       deleteLeadContact(publicId, contactPublicId),
-    onSuccess: (_data, vars) => {
+    onSettled: (_data, _error, vars) => {
       qc.invalidateQueries({ queryKey: leadsKeys.detail(vars.publicId) });
       qc.invalidateQueries({ queryKey: leadsKeys.all });
     },

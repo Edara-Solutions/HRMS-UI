@@ -29,7 +29,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm — stub the client boundary instead of the network.
+// rejects as cross-realm —? stub the client boundary instead of the network.
 
 vi.mock("@/shared/ui/country-select", () => ({
   CountrySelect: ({ id, value }: { id?: string; value: string }) => (
@@ -64,6 +64,8 @@ function makeLead(): LeadWithContacts {
       lostReason: null,
       isConverted: false,
       numberOfAttempts: 2,
+      lastAttemptAt: "2026-06-02T00:00:00.000Z",
+      isArchived: false,
       createdAt: "2026-06-01T00:00:00.000Z",
       updatedAt: "2026-06-02T00:00:00.000Z",
       deletedAt: null,
@@ -122,6 +124,14 @@ describe("AdminLeadsPage", () => {
     expect(screen.getAllByText("CRM").length).toBeGreaterThan(0);
   });
 
+  it("renders a safe fallback for an unknown server-owned status", async () => {
+    const item = makeLead();
+    Object.defineProperty(item.lead, "status", { value: "FUTURE_STATUS" });
+    leadsGetMock.mockReturnValue(jsonResponse(makeResponse({ items: [item] })));
+    renderPage();
+
+    expect((await screen.findAllByText("future status")).length).toBeGreaterThan(0);
+  });
   it("drives status, source, and country filters through useLeads query params", async () => {
     Object.assign(searchState, { status: "QUALIFIED", source: "GOOGLE", country: "Egypt" });
     leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
@@ -142,6 +152,21 @@ describe("AdminLeadsPage", () => {
     expect(searchParams.get("country")).toBe("Egypt");
   });
 
+  it("forwards archive and creation-date filters to the controlled API boundary", async () => {
+    Object.assign(searchState, {
+      createdFrom: "2026-06-01",
+      createdTo: "2026-06-30",
+      isArchived: true,
+    });
+    leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
+    renderPage();
+
+    await waitFor(() => expect(leadsGetMock).toHaveBeenCalled());
+    const { searchParams } = leadsGetMock.mock.calls[0][1] as { searchParams: URLSearchParams };
+    expect(searchParams.get("createdFrom")).toBe("2026-06-01");
+    expect(searchParams.get("createdTo")).toBe("2026-06-30");
+    expect(searchParams.get("isArchived")).toBe("true");
+  });
   it("navigates with a search-string update and resets to page 1 when the free-text search changes", async () => {
     leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
     renderPage();
