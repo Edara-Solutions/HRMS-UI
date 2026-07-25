@@ -48,6 +48,7 @@ import {
   STATUS_BADGE,
 } from "../api/lead-labels";
 import { ConversionPlanDiscoveryCard } from "./conversion-plan-discovery-card";
+import { ConversionSubmissionCard } from "./conversion-submission-card";
 import { EditLeadModal } from "./edit-lead-modal";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
 import { LogActivityForm } from "./log-activity-form";
@@ -547,6 +548,10 @@ export function AdminLeadDetailPage() {
           onRefresh={() => void eligibility.refetch()}
         />
         <ConversionPlanDiscoveryCard />
+        <ConversionSubmissionCard
+          leadPublicId={publicId}
+          refreshEligibility={async () => (await eligibility.refetch()).data}
+        />
         <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
       </div>
 
