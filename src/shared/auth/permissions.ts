@@ -21,6 +21,9 @@ const permissionActions = [
   "sending-domains:read",
   "sending-domains:manage",
   "audit:read",
+  "REQUEST_LEAD_CONVERSION",
+  "AUTO_APPROVE_LEAD_CONVERSION",
+  "APPROVE_LEAD_CONVERSION_REQUEST",
 ] as const;
 
 export type PermissionAction = (typeof permissionActions)[number];
