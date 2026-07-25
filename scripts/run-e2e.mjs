@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 
-const serverUrl = "http://127.0.0.1:5173";
+const serverUrl = "http://127.0.0.1:3000";
 const serverTimeoutMs = 60_000;
 const serverCommand = ["bun", "./node_modules/vite/bin/vite.js", "--host", "127.0.0.1"];
 const playwrightCommand = [

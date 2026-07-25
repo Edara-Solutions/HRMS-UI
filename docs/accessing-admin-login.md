@@ -5,7 +5,7 @@ The admin login is a separate entry point from the company user login. It target
 ## URL
 
 ```
-http://localhost:5173/admin/login
+http://localhost:3000/admin/login
 ```
 
 The route is defined in `src/app/routes/admin_/login.tsx`. The trailing underscore in `admin_` is TanStack Router's convention for opting out of the `/admin` parent layout; the URL still renders as `/admin/login`.
@@ -20,7 +20,7 @@ The route is defined in `src/app/routes/admin_/login.tsx`. The trailing undersco
 
 2. **Open the URL directly** in your browser:
    ```
-   http://localhost:5173/admin/login
+   http://localhost:3000/admin/login
    ```
 
    Or, from the regular login screen, click the admin entry link rendered by `src/pages/login/ui/login-page.tsx` (`to="/admin/login"`).
@@ -32,7 +32,7 @@ The route is defined in `src/app/routes/admin_/login.tsx`. The trailing undersco
 ## Troubleshooting
 
 - **Redirected away from `/admin/login`** - the `adminConsole` feature flag is disabled for this build. Enable it in your environment config and reload.
-- **404 on the URL** - make sure the dev server is running on port `5173` (configured in `vite.config.ts`). Other ports will not serve the route.
+- **404 on the URL** - make sure the dev server is running on port `3000` (configured in `vite.config.ts`). Other ports will not serve the route.
 - **Build vs. dev** - in production (`bun run build` + static host), the same path is served by the SPA fallback. Configure your host to rewrite unknown paths to `/index.html`.
 
 ## Related Files
