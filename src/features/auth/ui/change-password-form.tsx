@@ -65,11 +65,18 @@ export function ChangePasswordForm() {
     setApiError(null);
 
     try {
-      await changePassword.mutateAsync({
+      const session = await changePassword.mutateAsync({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      void navigate({ to: "/login" });
+
+      if (session.user.mustChangePassword) {
+        void navigate({ to: "/change-password" });
+      } else if (session.user.isPlatformAdmin) {
+        void navigate({ to: "/admin/dashboard" });
+      } else {
+        void navigate({ to: "/company/dashboard" });
+      }
     } catch (error) {
       setApiError(changePasswordErrorMessage(error));
     }

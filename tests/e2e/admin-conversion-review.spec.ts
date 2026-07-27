@@ -188,8 +188,8 @@ test("reviewer corrects the plan and approves a pending request", async ({ page 
   await expect.poll(() => approvalBody).toEqual({ templateKey: 1 });
   await expect(page.getByText("This request is terminal and cannot be changed.")).toBeVisible();
   await expect(page.getByText("Provisioned company")).toBeVisible();
-  await expect(page.getByText("Invitation delivery")).toBeVisible();
-  await expect(page.getByText("succeeded")).toBeVisible();
+  await expect(page.getByText("Owner invitation delivery", { exact: true })).toBeVisible();
+  await expect(page.getByText("succeeded", { exact: true })).toBeVisible();
 });
 
 test("reviewer rejects with a trimmed reason and sees that later resubmission remains available", async ({
@@ -307,4 +307,132 @@ test("reviewer rejects with a trimmed reason and sees that later resubmission re
       leadPublicId: LEAD_ID,
       planPublicId: PLAN_ID,
     });
+});
+
+test("recovers retryable owner delivery and completes invitation acceptance into tenant context", async ({
+  page,
+}) => {
+  const invitationToken = "owner-invitation-token";
+  const ownerTokens = {
+    accessToken: "owner-access-token",
+    refreshToken: "owner-refresh-token",
+    sessionId: "owner-session-1",
+    expiresIn: 900,
+  };
+  const owner = {
+    publicId: "99999999-9999-4999-8999-999999999999",
+    employeeCode: "OWN-001",
+    firstName: "Omar",
+    lastName: "Ali",
+    email: "omar@acme.example",
+    status: "ACTIVE",
+    companyCode: "ACME",
+    mustChangePassword: false,
+    permissions: [],
+    isOwner: true,
+    isPlatformAdmin: false,
+  };
+  let delivery = {
+    publicId: "88888888-8888-4888-8888-888888888888",
+    status: "FAILED_RETRYABLE",
+    attemptCount: 2,
+    maxAttempts: 3,
+    lastError: "SMTP timeout",
+    lastAttemptedAt: "2026-07-25T10:05:00.000Z",
+    deliveredAt: null,
+    exhaustedAt: null,
+    createdAt: NOW,
+    updatedAt: "2026-07-25T10:05:00.000Z",
+  };
+  let retryCount = 0;
+  let acceptBody: unknown;
+
+  const current = {
+    ...request("APPROVED"),
+    ownerOnboardingDelivery: delivery,
+  };
+
+  await page.route("**/api/v1/plans?**", (route) =>
+    route.fulfill({
+      json: {
+        data: [plan(PLAN_ID, "Growth")],
+        meta: { mode: "offset", total: 1, limit: 20, offset: 0 },
+      },
+    }),
+  );
+
+  await page.route("**/api/v1/lead-conversion-requests/**", async (route) => {
+    const url = new URL(route.request().url());
+    const method = route.request().method();
+
+    if (url.pathname.endsWith(`/${REQUEST_ID}/onboarding-delivery/retry`) && method === "POST") {
+      retryCount += 1;
+      delivery = {
+        ...delivery,
+        status: "SUCCEEDED",
+        attemptCount: 3,
+        lastError: null,
+        deliveredAt: "2026-07-25T10:10:00.000Z",
+        updatedAt: "2026-07-25T10:10:00.000Z",
+      };
+      await route.fulfill({ json: delivery });
+      return;
+    }
+
+    if (url.pathname.endsWith(`/${REQUEST_ID}/onboarding-delivery`) && method === "GET") {
+      await route.fulfill({ json: delivery });
+      return;
+    }
+
+    if (url.pathname.endsWith(`/${REQUEST_ID}`)) {
+      await route.fulfill({ json: { ...current, ownerOnboardingDelivery: delivery } });
+      return;
+    }
+
+    await route.abort();
+  });
+
+  await page.route("**/api/v1/auth/accept-invitation", async (route) => {
+    acceptBody = route.request().postDataJSON();
+    await route.fulfill({ json: ownerTokens });
+  });
+
+  await page.route("**/api/v1/auth/me", async (route) => {
+    await route.fulfill({ json: owner });
+  });
+
+  await page.goto(`/admin/conversion-requests/${REQUEST_ID}`);
+  await expect(page.getByText("failed retryable")).toBeVisible();
+  await expect(page.getByText("SMTP timeout")).toBeVisible();
+  await page.getByRole("button", { name: "Retry delivery" }).click();
+
+  await expect.poll(() => retryCount).toBe(1);
+  await expect(page.getByText("succeeded", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("This does not mean the owner accepted the invitation."),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Retry delivery" })).toBeDisabled();
+
+  await page.goto(`/accept-invitation?token=${invitationToken}`);
+  await page.getByRole("textbox", { name: "New password", exact: true }).fill("StrongPassword123!");
+  await page
+    .getByRole("textbox", { name: "Confirm new password", exact: true })
+    .fill("StrongPassword123!");
+  await page.getByRole("button", { name: "Accept invitation" }).click();
+
+  await expect
+    .poll(() => acceptBody)
+    .toEqual({
+      token: invitationToken,
+      newPassword: "StrongPassword123!",
+      clientType: "web",
+    });
+  await expect(page).toHaveURL(/\/company\/dashboard/);
+  await expect(
+    page.evaluate(() => JSON.parse(localStorage.getItem("hrms-auth") ?? "{}").state.session.user),
+  ).resolves.toMatchObject({
+    isOwner: true,
+    companyCode: "ACME",
+    permissions: [],
+  });
 });

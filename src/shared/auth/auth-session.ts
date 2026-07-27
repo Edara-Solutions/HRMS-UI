@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type AuthStatus =
   | "anonymous"
   | "authenticating"
@@ -7,27 +9,30 @@ export type AuthStatus =
   | "expired"
   | "forbidden";
 
-export interface SessionUser {
-  publicId: string;
-  employeeCode: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  status: "ACTIVE" | "ONBOARDING" | "PROBATION" | "SUSPENDED" | "TERMINATED" | "RESIGNED";
-  companyCode: string;
-  companyPublicId?: string | null;
-  mustChangePassword: boolean;
-  permissions: string[];
-  isOwner: boolean;
-  isPlatformAdmin: boolean;
-}
+export const sessionUserSchema = z.object({
+  publicId: z.string(),
+  employeeCode: z.string().nullable(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  status: z.enum(["ACTIVE", "ONBOARDING", "PROBATION", "SUSPENDED", "TERMINATED", "RESIGNED"]),
+  companyCode: z.string(),
+  companyPublicId: z.string().nullable().optional(),
+  mustChangePassword: z.boolean(),
+  permissions: z.array(z.string()),
+  isOwner: z.boolean(),
+  isPlatformAdmin: z.boolean(),
+});
 
-export interface LoginTokens {
-  accessToken: string;
-  refreshToken: string;
-  sessionId: string;
-  expiresIn: number;
-}
+export const loginTokensSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  sessionId: z.string(),
+  expiresIn: z.number().int().positive(),
+});
+
+export type SessionUser = z.infer<typeof sessionUserSchema>;
+export type LoginTokens = z.infer<typeof loginTokensSchema>;
 
 export interface AuthSession extends LoginTokens {
   user: SessionUser;
@@ -43,6 +48,12 @@ export interface LoginCredentials {
 export interface AdminLoginCredentials {
   email: string;
   password: string;
+  clientType: "web";
+}
+
+export interface AcceptInvitationInput {
+  token: string;
+  newPassword: string;
   clientType: "web";
 }
 

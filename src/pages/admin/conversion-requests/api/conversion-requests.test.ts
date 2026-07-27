@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { approvalInputSchema, rejectionInputSchema } from "./conversion-requests";
+import {
+  approvalInputSchema,
+  onboardingDeliverySchema,
+  rejectionInputSchema,
+} from "./conversion-requests";
 
 describe("conversion request decision validation", () => {
   it("accepts each approval preset", () => {
@@ -79,5 +83,35 @@ describe("conversion request decision validation", () => {
       "Missing contact",
     );
     expect(rejectionInputSchema.safeParse({ reason: "   " }).success).toBe(false);
+  });
+});
+describe("onboarding delivery contract", () => {
+  it("parses delivery support state without exposing transport idempotency fields", () => {
+    const delivery = onboardingDeliverySchema.parse({
+      publicId: "11111111-1111-4111-8111-111111111111",
+      status: "FAILED_RETRYABLE",
+      attemptCount: 2,
+      maxAttempts: 3,
+      lastError: "SMTP timeout",
+      lastAttemptedAt: "2026-08-01T10:30:00+02:00",
+      deliveredAt: null,
+      exhaustedAt: null,
+      createdAt: "2026-08-01T10:00:00+02:00",
+      updatedAt: "2026-08-01T10:30:00+02:00",
+      idempotencyKey: "internal-only",
+    });
+
+    expect(delivery).toEqual({
+      publicId: "11111111-1111-4111-8111-111111111111",
+      status: "FAILED_RETRYABLE",
+      attemptCount: 2,
+      maxAttempts: 3,
+      lastError: "SMTP timeout",
+      lastAttemptedAt: "2026-08-01T10:30:00+02:00",
+      deliveredAt: null,
+      exhaustedAt: null,
+      createdAt: "2026-08-01T10:00:00+02:00",
+      updatedAt: "2026-08-01T10:30:00+02:00",
+    });
   });
 });
