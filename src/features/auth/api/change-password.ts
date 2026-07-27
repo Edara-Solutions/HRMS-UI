@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api";
 import type { AuthSession, ChangePasswordInput, SessionUser } from "@/shared/auth";
 import { sessionUserSchema, useAuthStore } from "@/shared/auth";
@@ -15,6 +15,7 @@ async function fetchMe(accessToken: string): Promise<SessionUser> {
 }
 
 export function useChangePassword() {
+  const queryClient = useQueryClient();
   const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation({
@@ -29,6 +30,9 @@ export function useChangePassword() {
       const updatedSession: AuthSession = { ...session, user };
       setSession(updatedSession);
       return updatedSession;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [] });
     },
   });
 }
