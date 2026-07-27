@@ -20,6 +20,7 @@ import { Route as AcceptInvitationIndexRouteImport } from "./app/routes/accept-i
 import { Route as AdminLoginRouteImport } from "./app/routes/admin_/login"
 import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
 import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
+import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
 import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
 import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
@@ -92,6 +93,11 @@ const AdminCompaniesRouteRoute = AdminCompaniesRouteRouteImport.update({
   id: "/companies",
   path: "/companies",
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const CompanyProfileIndexRoute = CompanyProfileIndexRouteImport.update({
+  id: "/profile/",
+  path: "/profile/",
+  getParentRoute: () => CompanyRouteRoute,
 } as any)
 const CompanyEmailSettingsIndexRoute =
   CompanyEmailSettingsIndexRouteImport.update({
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
+  "/company/profile/": typeof CompanyProfileIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
   "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
+  "/company/profile": typeof CompanyProfileIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
+  "/company/profile/": typeof CompanyProfileIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -301,6 +310,7 @@ export interface FileRouteTypes {
     | "/admin/subscriptions/"
     | "/company/dashboard/"
     | "/company/email-settings/"
+    | "/company/profile/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
   fileRoutesByTo: FileRoutesByTo
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | "/admin/subscriptions"
     | "/company/dashboard"
     | "/company/email-settings"
+    | "/company/profile"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId"
   id:
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | "/admin/subscriptions/"
     | "/company/dashboard/"
     | "/company/email-settings/"
+    | "/company/profile/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
   fileRoutesById: FileRoutesById
@@ -450,6 +462,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/companies"
       preLoaderRoute: typeof AdminCompaniesRouteRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    "/company/profile/": {
+      id: "/company/profile/"
+      path: "/profile"
+      fullPath: "/company/profile/"
+      preLoaderRoute: typeof CompanyProfileIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
     }
     "/company/email-settings/": {
       id: "/company/email-settings/"
@@ -655,11 +674,13 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface CompanyRouteRouteChildren {
   CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
   CompanyEmailSettingsIndexRoute: typeof CompanyEmailSettingsIndexRoute
+  CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
 }
 
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
   CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
   CompanyEmailSettingsIndexRoute: CompanyEmailSettingsIndexRoute,
+  CompanyProfileIndexRoute: CompanyProfileIndexRoute,
 }
 
 const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
