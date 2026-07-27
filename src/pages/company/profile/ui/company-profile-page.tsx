@@ -23,17 +23,7 @@ import {
   useCompanySetupChecklist,
   useUpdateCompanyProfile,
 } from "../api/company-profile";
-
-const nullableFieldNames = [
-  "logoUrl",
-  "email",
-  "phone",
-  "country",
-  "city",
-  "addressLine",
-  "taxNumber",
-  "commercialNumber",
-] as const satisfies readonly ProfileFieldName[];
+import { buildProfileUpdate, type CompanyProfileFormValues } from "../model/company-profile-update";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Company name is required."),
@@ -47,7 +37,7 @@ const formSchema = z.object({
   commercialNumber: z.string(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema> & CompanyProfileFormValues;
 
 interface TextFieldConfig {
   name: ProfileFieldName;
@@ -96,31 +86,6 @@ function toFormValues(profile: CompanyProfile): FormValues {
   };
 }
 
-function isNullableField(name: ProfileFieldName): name is (typeof nullableFieldNames)[number] {
-  return nullableFieldNames.some((fieldName) => fieldName === name);
-}
-
-export function buildProfileUpdate(
-  values: FormValues,
-  dirtyFields: Partial<Record<ProfileFieldName, boolean>>,
-) {
-  const input: UpdateCompanyProfileInput = {};
-
-  for (const name of profileFieldNames) {
-    if (!dirtyFields[name]) continue;
-    const value = values[name].trim();
-    if (name === "name") {
-      input.name = value;
-      continue;
-    }
-    if (isNullableField(name)) {
-      input[name] = value === "" ? null : value;
-    }
-  }
-
-  return input;
-}
-
 function hasUpdates(input: UpdateCompanyProfileInput) {
   return Object.keys(input).length > 0;
 }
@@ -166,7 +131,6 @@ async function readProfileError(error: unknown) {
 
 export function CompanyProfilePage() {
   const session = useCurrentSession();
-  console.log("session", session);
   const companyPublicId = session?.user.companyPublicId ?? null;
   const profileQuery = useCompanyProfile(companyPublicId);
   const setupQuery = useCompanySetupChecklist(companyPublicId);
