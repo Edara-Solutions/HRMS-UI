@@ -3,7 +3,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAuthStore } from "@/shared/auth";
-import { buildProfileUpdate, CompanyProfilePage } from "./company-profile-page";
+import { buildProfileUpdate } from "../model/company-profile-update";
+import { CompanyProfilePage } from "./company-profile-page";
 
 const apiGetMock = vi.hoisted(() => vi.fn());
 const apiPatchMock = vi.hoisted(() => vi.fn());
