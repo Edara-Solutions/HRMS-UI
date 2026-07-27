@@ -56,7 +56,7 @@ const companySchema = z.object({
   name: z.string(),
   companyCode: z.string(),
 });
-const deliverySchema = z.object({
+export const onboardingDeliverySchema = z.object({
   publicId: z.string().uuid(),
   status: z.enum(["PENDING", "SUCCEEDED", "FAILED_RETRYABLE", "EXHAUSTED"]),
   attemptCount: z.number().int().nonnegative(),
@@ -84,7 +84,7 @@ export const conversionRequestSchema = z.object({
   approvedBy: actorSchema.nullable(),
   rejectedBy: actorSchema.nullable(),
   company: companySchema.nullable(),
-  ownerOnboardingDelivery: deliverySchema.nullable(),
+  ownerOnboardingDelivery: onboardingDeliverySchema.nullable(),
 });
 
 const conversionRequestListSchema = z.object({
@@ -148,6 +148,7 @@ export const rejectionInputSchema = z.object({
 });
 
 export type ConversionRequest = z.infer<typeof conversionRequestSchema>;
+export type OnboardingDelivery = z.infer<typeof onboardingDeliverySchema>;
 export type ConversionRequestStatus = (typeof CONVERSION_REQUEST_STATUSES)[number];
 export type ConversionRequestList = z.infer<typeof conversionRequestListSchema>;
 export type SetupStepType = (typeof SETUP_STEP_TYPES)[number];
@@ -164,6 +165,8 @@ export const conversionRequestKeys = {
   list: (params: ConversionRequestListParams) =>
     ["lead-conversion-requests", "list", params] as const,
   detail: (publicId: string) => ["lead-conversion-requests", "detail", publicId] as const,
+  delivery: (publicId: string) =>
+    ["lead-conversion-requests", "detail", publicId, "onboarding-delivery"] as const,
 };
 
 function createSearchParams(params: ConversionRequestListParams) {
@@ -209,12 +212,27 @@ async function rejectConversionRequest(publicId: string, reason: string) {
   return conversionRequestSchema.parse(response);
 }
 
+async function fetchOnboardingDelivery(publicId: string): Promise<OnboardingDelivery> {
+  const response: unknown = await apiClient
+    .get(`lead-conversion-requests/${publicId}/onboarding-delivery`)
+    .json();
+  return onboardingDeliverySchema.parse(response);
+}
+
+async function retryOnboardingDelivery(publicId: string): Promise<OnboardingDelivery> {
+  const response: unknown = await apiClient
+    .post(`lead-conversion-requests/${publicId}/onboarding-delivery/retry`)
+    .json();
+  return onboardingDeliverySchema.parse(response);
+}
+
 function useRequestInvalidation() {
   const queryClient = useQueryClient();
   return async (publicId: string) => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: conversionRequestKeys.all }),
       queryClient.invalidateQueries({ queryKey: conversionRequestKeys.detail(publicId) }),
+      queryClient.invalidateQueries({ queryKey: conversionRequestKeys.delivery(publicId) }),
       queryClient.invalidateQueries({ queryKey: ["leads"] }),
       queryClient.invalidateQueries({ queryKey: ["companies"] }),
     ]);
@@ -233,6 +251,15 @@ export function useConversionRequest(publicId: string) {
     queryKey: conversionRequestKeys.detail(publicId),
     queryFn: () => fetchConversionRequest(publicId),
     enabled: Boolean(publicId),
+  });
+}
+
+export function useOnboardingDelivery(publicId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: conversionRequestKeys.delivery(publicId),
+    queryFn: () => fetchOnboardingDelivery(publicId),
+    enabled: Boolean(publicId) && enabled,
+    retry: false,
   });
 }
 
@@ -261,6 +288,15 @@ export function useRejectConversionRequest() {
   return useMutation({
     mutationFn: ({ publicId, reason }: { publicId: string; reason: string }) =>
       rejectConversionRequest(publicId, reason),
+    onSettled: (_data, _error, input) => invalidate(input.publicId),
+  });
+}
+
+export function useRetryOnboardingDelivery() {
+  const invalidate = useRequestInvalidation();
+  return useMutation({
+    mutationFn: ({ publicId }: { publicId: string }) => retryOnboardingDelivery(publicId),
+    retry: false,
     onSettled: (_data, _error, input) => invalidate(input.publicId),
   });
 }

@@ -1,24 +1,34 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api";
-import type { ChangePasswordInput } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import type { AuthSession, ChangePasswordInput, SessionUser } from "@/shared/auth";
+import { sessionUserSchema, useAuthStore } from "@/shared/auth";
 
 async function changePassword(input: ChangePasswordInput): Promise<void> {
   await apiClient.post("auth/change-password", { json: input }).json();
 }
 
+async function fetchMe(accessToken: string): Promise<SessionUser> {
+  const response: unknown = await apiClient
+    .get("auth/me", { headers: { Authorization: `Bearer ${accessToken}` } })
+    .json();
+  return sessionUserSchema.parse(response);
+}
+
 export function useChangePassword() {
-  const clearSession = useAuthStore((state) => state.clearSession);
+  const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation({
-    mutationFn: async (input: ChangePasswordInput): Promise<void> => {
+    mutationFn: async (input: ChangePasswordInput): Promise<AuthSession> => {
       const session = useAuthStore.getState().session;
       if (!session) {
         throw new Error("No active session");
       }
 
       await changePassword(input);
-      clearSession();
+      const user = await fetchMe(session.accessToken);
+      const updatedSession: AuthSession = { ...session, user };
+      setSession(updatedSession);
+      return updatedSession;
     },
   });
 }
