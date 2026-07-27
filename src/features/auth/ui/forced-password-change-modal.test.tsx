@@ -7,6 +7,7 @@ import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
 
 const navigateMock = vi.hoisted(() => vi.fn());
 const changePasswordPostMock = vi.hoisted(() => vi.fn());
+const meGetMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
@@ -17,7 +18,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 // rejects as cross-realm — stub the client boundary instead of the network.
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { post: changePasswordPostMock },
+  apiClient: { post: changePasswordPostMock, get: meGetMock },
 }));
 
 function renderModal() {
@@ -61,6 +62,7 @@ describe("ForcedPasswordChangeModal", () => {
     cleanup();
     navigateMock.mockClear();
     changePasswordPostMock.mockReset();
+    meGetMock.mockReset();
     useAuthStore.setState({ session: null, status: "anonymous" });
   });
 
@@ -115,13 +117,16 @@ describe("ForcedPasswordChangeModal", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("clears the session and redirects to /login after a successful password change", async () => {
+  it("hydrates /auth/me and enters tenant context after a successful password change", async () => {
     useAuthStore.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });
 
     changePasswordPostMock.mockReturnValue({ json: () => Promise.resolve({ ok: true }) });
+    meGetMock.mockReturnValue({
+      json: () => Promise.resolve({ ...baseUser, mustChangePassword: false, isOwner: true }),
+    });
 
     renderModal();
 
@@ -137,16 +142,20 @@ describe("ForcedPasswordChangeModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /change password/i }));
 
     await waitFor(() => {
-      expect(useAuthStore.getState().session).toBeNull();
+      expect(useAuthStore.getState().session?.user.mustChangePassword).toBe(false);
     });
-    expect(useAuthStore.getState().status).toBe("anonymous");
+    expect(useAuthStore.getState().status).toBe("authenticated");
     expect(changePasswordPostMock).toHaveBeenCalledWith(
       "auth/change-password",
       expect.objectContaining({
         json: { currentPassword: "TempPass1!", newPassword: "NewSecret1!" },
       }),
     );
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/login" });
+    expect(meGetMock).toHaveBeenCalledWith(
+      "auth/me",
+      expect.objectContaining({ headers: { Authorization: "Bearer access-token" } }),
+    );
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/company/dashboard" });
   });
 
   it("does not dismiss when Escape is pressed", () => {

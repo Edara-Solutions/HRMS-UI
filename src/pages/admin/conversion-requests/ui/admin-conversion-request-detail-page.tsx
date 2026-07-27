@@ -15,7 +15,9 @@ import {
   useApproveConversionRequest,
   useChangeConversionPlan,
   useConversionRequest,
+  useOnboardingDelivery,
   useRejectConversionRequest,
+  useRetryOnboardingDelivery,
 } from "../api/conversion-requests";
 import {
   type CustomStepDraft,
@@ -44,6 +46,7 @@ export function AdminConversionRequestDetailPage() {
   const changePlan = useChangeConversionPlan();
   const approveRequest = useApproveConversionRequest();
   const rejectRequest = useRejectConversionRequest();
+  const retryDelivery = useRetryOnboardingDelivery();
   const [selectedPlanPublicId, setSelectedPlanPublicId] = useState("");
   const [templateKey, setTemplateKey] = useState("1");
   const [trialEndDate, setTrialEndDate] = useState("");
@@ -54,8 +57,10 @@ export function AdminConversionRequestDetailPage() {
   const [stepToAdd, setStepToAdd] = useState<SetupStepType>("SET_BRANCHES");
   const [message, setMessage] = useState("");
   const isDeciding = approveRequest.isPending || rejectRequest.isPending;
-  const isMutating = isDeciding || changePlan.isPending;
+  const isMutating = isDeciding || changePlan.isPending || retryDelivery.isPending;
   const request = requestQuery.data;
+  const deliveryQuery = useOnboardingDelivery(publicId, request?.status === "APPROVED");
+  const delivery = deliveryQuery.data ?? request?.ownerOnboardingDelivery ?? null;
 
   function updateCustomStep(index: number, update: Partial<CustomStepDraft>) {
     setCustomSteps((current) =>
@@ -145,6 +150,18 @@ export function AdminConversionRequestDetailPage() {
     }
   }
 
+  async function retryOnboardingDelivery() {
+    setMessage("");
+    try {
+      await retryDelivery.mutateAsync({ publicId });
+      setMessage("Delivery retry requested without reprovisioning the company.");
+    } catch (error) {
+      await deliveryQuery.refetch();
+      await requestQuery.refetch();
+      setMessage(`${await getErrorMessage(error)} The delivery state was reloaded.`);
+    }
+  }
+
   async function reject() {
     const input = rejectionInputSchema.safeParse({ reason: rejectionReason });
     if (!input.success) {
@@ -209,7 +226,15 @@ export function AdminConversionRequestDetailPage() {
         onReload={() => void requestQuery.refetch()}
       />
       <ConversionRequestDetailsCard request={request} />
-      <ConversionRequestProvisioningCard request={request} />
+      <ConversionRequestProvisioningCard
+        request={request}
+        delivery={delivery}
+        isDeliveryLoading={deliveryQuery.isFetching}
+        isRetryingDelivery={retryDelivery.isPending}
+        hasDeliveryLoadError={deliveryQuery.isError}
+        onReloadDelivery={() => void deliveryQuery.refetch()}
+        onRetryDelivery={() => void retryOnboardingDelivery()}
+      />
 
       {request.status === "PENDING" ? (
         <>
