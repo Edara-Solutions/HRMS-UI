@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../api/client";
 import type {
   AcceptInvitationInput,
@@ -34,6 +34,7 @@ async function fetchMe(accessToken: string): Promise<SessionUser> {
 }
 
 export function useLogin() {
+  const queryClient = useQueryClient();
   const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation({
@@ -44,10 +45,14 @@ export function useLogin() {
       setSession(session);
       return session;
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [] });
+    },
   });
 }
 
 export function useAcceptInvitation() {
+  const queryClient = useQueryClient();
   const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation({
@@ -58,10 +63,14 @@ export function useAcceptInvitation() {
       setSession(session);
       return session;
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [] });
+    },
   });
 }
 
 export function useAdminLogin() {
+  const queryClient = useQueryClient();
   const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation({
@@ -71,6 +80,9 @@ export function useAdminLogin() {
       const session: AuthSession = { ...tokens, user };
       setSession(session);
       return session;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [] });
     },
   });
 }
