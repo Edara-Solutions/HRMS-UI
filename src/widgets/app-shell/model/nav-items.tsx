@@ -61,6 +61,11 @@ export const companyNavGroups: NavGroup[] = [
         href: "/company/profile",
         icon: <IdCard size={ICON_SIZE} />,
       },
+      {
+        label: "Setup checklist",
+        href: "/company/setup",
+        icon: <ClipboardCheck size={ICON_SIZE} />,
+      },
     ],
   },
   {

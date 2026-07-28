@@ -20,6 +20,7 @@ import { Route as AcceptInvitationIndexRouteImport } from "./app/routes/accept-i
 import { Route as AdminLoginRouteImport } from "./app/routes/admin_/login"
 import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
 import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
+import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
 import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
 import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
@@ -93,6 +94,11 @@ const AdminCompaniesRouteRoute = AdminCompaniesRouteRouteImport.update({
   id: "/companies",
   path: "/companies",
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const CompanySetupIndexRoute = CompanySetupIndexRouteImport.update({
+  id: "/setup/",
+  path: "/setup/",
+  getParentRoute: () => CompanyRouteRoute,
 } as any)
 const CompanyProfileIndexRoute = CompanyProfileIndexRouteImport.update({
   id: "/profile/",
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
   "/company/profile/": typeof CompanyProfileIndexRoute
+  "/company/setup/": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   "/company/dashboard": typeof CompanyDashboardIndexRoute
   "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
   "/company/profile": typeof CompanyProfileIndexRoute
+  "/company/setup": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -278,6 +286,7 @@ export interface FileRoutesById {
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
   "/company/profile/": typeof CompanyProfileIndexRoute
+  "/company/setup/": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
 }
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | "/company/dashboard/"
     | "/company/email-settings/"
     | "/company/profile/"
+    | "/company/setup/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
   fileRoutesByTo: FileRoutesByTo
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | "/company/dashboard"
     | "/company/email-settings"
     | "/company/profile"
+    | "/company/setup"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId"
   id:
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | "/company/dashboard/"
     | "/company/email-settings/"
     | "/company/profile/"
+    | "/company/setup/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
   fileRoutesById: FileRoutesById
@@ -462,6 +474,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/companies"
       preLoaderRoute: typeof AdminCompaniesRouteRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    "/company/setup/": {
+      id: "/company/setup/"
+      path: "/setup"
+      fullPath: "/company/setup/"
+      preLoaderRoute: typeof CompanySetupIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
     }
     "/company/profile/": {
       id: "/company/profile/"
@@ -675,12 +694,14 @@ interface CompanyRouteRouteChildren {
   CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
   CompanyEmailSettingsIndexRoute: typeof CompanyEmailSettingsIndexRoute
   CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
+  CompanySetupIndexRoute: typeof CompanySetupIndexRoute
 }
 
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
   CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
   CompanyEmailSettingsIndexRoute: CompanyEmailSettingsIndexRoute,
   CompanyProfileIndexRoute: CompanyProfileIndexRoute,
+  CompanySetupIndexRoute: CompanySetupIndexRoute,
 }
 
 const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
