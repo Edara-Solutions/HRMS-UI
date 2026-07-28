@@ -92,6 +92,76 @@ function configsResponse(): CompanyConfigListResponse {
   };
 }
 
+function subscriptionState() {
+  return {
+    subscription: {
+      publicId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      companyPublicId: "company-1",
+      plan: { publicId: "plan-1", name: "Full Access", duration: 30 },
+      status: "TRIAL",
+      startDate: "2026-05-20T10:00:00.000Z",
+      endDate: null,
+      initialTrialEndDate: "2026-06-20T00:00:00.000Z",
+      trialEndDate: "2026-06-20T00:00:00.000Z",
+      note: null,
+      createdAt: "2026-05-20T10:00:00.000Z",
+      updatedAt: "2026-05-20T10:00:00.000Z",
+    },
+    history: [
+      {
+        publicId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        type: "TRIAL_STARTED",
+        plan: { publicId: "plan-1", name: "Full Access", duration: 30 },
+        oldStatus: null,
+        newStatus: "TRIAL",
+        oldTrialEndDate: null,
+        newTrialEndDate: "2026-06-20T00:00:00.000Z",
+        actorUserId: 1,
+        reason: "Initial onboarding trial",
+        occurredAt: "2026-05-20T10:00:00.000Z",
+      },
+    ],
+  };
+}
+
+function accessPolicyState() {
+  return {
+    policy: {
+      publicId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      companyPublicId: "company-1",
+      mode: "NORMAL",
+      reason: "Default access",
+      note: null,
+      effectiveFrom: "2026-05-20T10:00:00.000Z",
+      effectiveUntil: null,
+      changedByUserId: 1,
+      createdAt: "2026-05-20T10:00:00.000Z",
+      updatedAt: "2026-05-20T10:00:00.000Z",
+      source: "policy",
+    },
+    effectiveMode: "NORMAL",
+    effectiveAt: "2026-07-28T10:00:00.000Z",
+    isCurrentlyEffective: true,
+    isExpired: false,
+    legacyMapping: null,
+  };
+}
+
+function activationState() {
+  return {
+    companyPublicId: "company-1",
+    lifecycleStatus: "ONBOARDING",
+    activatedAt: null,
+    canActivate: false,
+    unmetRequirements: [
+      {
+        code: "SUBSCRIPTION_NOT_ACTIVATABLE",
+        message: "Trial is expired.",
+        details: {},
+      },
+    ],
+  };
+}
 function plansResponse() {
   return {
     data: [
@@ -131,6 +201,9 @@ function mockApi() {
     if (path === "companies/company-1") return jsonResponse(company);
     if (path === "company-configs") return jsonResponse(configsResponse());
     if (path === "plans") return jsonResponse(plansResponse());
+    if (path === "companies/company-1/subscription") return jsonResponse(subscriptionState());
+    if (path === "companies/company-1/access-policy") return jsonResponse(accessPolicyState());
+    if (path === "companies/company-1/activation") return jsonResponse(activationState());
     if (path === "companies/company-1/sending-domain") {
       return jsonResponse({
         domain: "mail.nexustech.sa",

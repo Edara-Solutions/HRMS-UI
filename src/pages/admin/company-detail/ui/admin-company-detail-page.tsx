@@ -26,6 +26,7 @@ import {
 } from "../api/company-detail";
 import { SITE_STATUS_FLAG_LABEL, SUBSCRIPTION_STATUS_BADGE } from "../api/company-labels";
 import { type CompanySendingDomain, useCompanySendingDomain } from "../api/company-sending-domain";
+import { ActivationRepairCard } from "./activation-repair-card";
 import { EditCompanyConfigModal } from "./edit-company-config-modal";
 import { EditCompanyModal } from "./edit-company-modal";
 
@@ -491,6 +492,7 @@ export function AdminCompanyDetailPage() {
         <CompanyProfileCard company={company} onEdit={() => setPanel("edit-company")} />
         <CompanyConfigCard config={config} onEdit={() => setPanel("edit-config")} />
         <CompanyEmailReadinessCard companyPublicId={publicId} onOpenSettings={openEmailSettings} />
+        <ActivationRepairCard companyPublicId={publicId} />
       </div>
 
       <EditCompanyModal company={panel === "edit-company" ? company : null} onClose={closePanel} />
