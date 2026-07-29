@@ -88,7 +88,7 @@ export function LeadListFilters({
           if (value === "" || isLeadStatus(value)) onStatusChange(value);
         }}
       >
-        <SelectTrigger className="lg:w-44" aria-label="Filter by status">
+        <SelectTrigger className="lg:w-40" aria-label="Filter by status">
           <SelectValue placeholder="All statuses" />
         </SelectTrigger>
         <SelectContent>
