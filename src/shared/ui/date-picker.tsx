@@ -1,0 +1,216 @@
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/shared/lib/cn";
+import { Button } from "./button";
+import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "./dialog";
+import { Label } from "./label";
+
+const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  month: "long",
+  year: "numeric",
+});
+const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", { dateStyle: "full" });
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
+export function toDateKey(value: Date): string {
+  return [
+    value.getFullYear(),
+    String(value.getMonth() + 1).padStart(2, "0"),
+    String(value.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+export function parseDateValue(value: string | undefined): Date | undefined {
+  if (!value) return undefined;
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnlyMatch) {
+    const year = Number(dateOnlyMatch[1]);
+    const month = Number(dateOnlyMatch[2]) - 1;
+    const day = Number(dateOnlyMatch[3]);
+    return new Date(year, month, day);
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date;
+}
+
+function formatDateValue(value: string | undefined): string {
+  const date = parseDateValue(value);
+  if (!date) return "Choose date";
+  return DATE_FORMATTER.format(date);
+}
+
+export interface CalendarGridProps {
+  month: Date;
+  selected: Date | undefined;
+  onMonthChange: (month: Date) => void;
+  onSelectDay: (day: number) => void;
+}
+
+export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: CalendarGridProps) {
+  const firstWeekday = (month.getDay() + 6) % 7;
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const selectedKey = selected ? toDateKey(selected) : undefined;
+  const todayKey = toDateKey(new Date());
+  const monthLabel = MONTH_LABEL_FORMATTER.format(month);
+
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
+      <div className="flex items-center justify-between gap-2">
+        <Button
+          variant="ghost"
+          size="iconXs"
+          aria-label="Previous month"
+          onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
+        >
+          <ChevronLeft size={15} />
+        </Button>
+        <p className="text-[13px] font-semibold tracking-tight text-[var(--color-text)]">
+          {monthLabel}
+        </p>
+        <Button
+          variant="ghost"
+          size="iconXs"
+          aria-label="Next month"
+          onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
+        >
+          <ChevronRight size={15} />
+        </Button>
+      </div>
+      <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
+        {WEEKDAYS.map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1.5" role="grid" aria-label={monthLabel}>
+        {Array.from({ length: firstWeekday + daysInMonth }, (_, index) => {
+          if (index < firstWeekday) return <span key={`blank-${index}`} />;
+          const day = index - firstWeekday + 1;
+          const date = new Date(month.getFullYear(), month.getMonth(), day);
+          const dateKey = toDateKey(date);
+          const selectedDay = dateKey === selectedKey;
+          return (
+            <button
+              key={dateKey}
+              type="button"
+              className={cn(
+                "mx-auto flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[13px] tabular-nums transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
+                selectedDay
+                  ? "bg-[var(--color-primary-fill)] font-semibold text-[var(--color-on-primary)]"
+                  : "font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]",
+                dateKey === todayKey && !selectedDay && "ring-1 ring-[var(--color-primary)]",
+              )}
+              onClick={() => onSelectDay(day)}
+              aria-pressed={selectedDay}
+              aria-label={FULL_DATE_FORMATTER.format(date)}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface DatePickerProps {
+  id: string;
+  label: string;
+  value: string | undefined;
+  onChange: (nextValue: string | undefined) => void;
+  description?: string;
+  placeholder?: string;
+}
+
+export function DatePicker({
+  id,
+  label,
+  value,
+  onChange,
+  description = "Select the date for this field.",
+  placeholder = "Choose date",
+}: DatePickerProps) {
+  const { titleId, descriptionId } = useDialogIds();
+  const selectedDate = parseDateValue(value);
+  const initialDraft = selectedDate ?? new Date();
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Date | undefined>(selectedDate);
+  const [month, setMonth] = useState(
+    () => new Date(initialDraft.getFullYear(), initialDraft.getMonth(), 1),
+  );
+
+  function openPicker() {
+    const nextDraft = parseDateValue(value) ?? new Date();
+    setDraft(parseDateValue(value));
+    setMonth(new Date(nextDraft.getFullYear(), nextDraft.getMonth(), 1));
+    setOpen(true);
+  }
+
+  function selectDay(day: number) {
+    setDraft(new Date(month.getFullYear(), month.getMonth(), day));
+  }
+
+  return (
+    <div className="min-h-[74px]">
+      <Label htmlFor={id}>{label}</Label>
+      <Button
+        id={id}
+        type="button"
+        variant="secondary"
+        size="md"
+        className="mt-1.5 w-full justify-start font-normal"
+        leadingIcon={<CalendarDays size={15} aria-hidden="true" />}
+        onClick={openPicker}
+      >
+        <span className={value ? "text-[var(--color-text)]" : "text-[var(--color-text-faint)]"}>
+          {value ? formatDateValue(value) : placeholder}
+        </span>
+      </Button>
+      <span className="mt-1 block min-h-5" aria-hidden="true" />
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        titleId={titleId}
+        descriptionId={descriptionId}
+        className="max-w-[440px] p-6"
+      >
+        <DialogTitle id={titleId} className="tracking-[-0.02em]">
+          {label}
+        </DialogTitle>
+        <DialogDescription id={descriptionId}>{description}</DialogDescription>
+        <div className="mt-5">
+          <CalendarGrid
+            month={month}
+            selected={draft}
+            onMonthChange={setMonth}
+            onSelectDay={selectDay}
+          />
+        </div>
+        <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
+          <Button variant="ghost" size="sm" onClick={() => setDraft(undefined)}>
+            Clear
+          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                onChange(draft ? toDateKey(draft) : undefined);
+                setOpen(false);
+              }}
+            >
+              Apply date
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+    </div>
+  );
+}
