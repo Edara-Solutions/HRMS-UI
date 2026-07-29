@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { CountrySelect } from "@/shared/ui/country-select";
+import { DatePicker } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { ALL_SOURCES, ALL_STATUSES, getStatusBadge, SOURCE_LABEL } from "../api/lead-labels";
@@ -126,20 +127,18 @@ export function LeadListFilters({
         className="lg:w-38"
       />
 
-      <Input
-        type="date"
-        aria-label="Created from"
-        value={createdFrom ?? ""}
-        onChange={(event) => onCreatedDateChange("createdFrom", event.target.value)}
-        className="lg:w-40"
+      <DatePicker
+        id="admin-leads-created-from"
+        value={createdFrom}
+        onChange={(value) => onCreatedDateChange("createdFrom", value ?? "")}
+        placeholder="Date From"
       />
 
-      <Input
-        type="date"
-        aria-label="Created to"
-        value={createdTo ?? ""}
-        onChange={(event) => onCreatedDateChange("createdTo", event.target.value)}
-        className="lg:w-40"
+      <DatePicker
+        id="admin-leads-created-to"
+        value={createdTo}
+        onChange={(value) => onCreatedDateChange("createdTo", value ?? "")}
+        placeholder="Date To"
       />
 
       <Select
