@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api";
 
-export type SubscriptionStatus = "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+export type CompanyLifecycleStatus = "ONBOARDING" | "ACTIVE" | "SUSPENDED" | "CLOSED";
 
 export interface Company {
   publicId: string;
@@ -12,6 +12,7 @@ export interface Company {
   country: string;
   companyCode: string;
   isActive: boolean;
+  lifecycleStatus: CompanyLifecycleStatus;
   addressLine: string | null;
   createdAt: string;
   updatedAt: string;
@@ -30,46 +31,6 @@ export interface CompanyListResponse {
   meta: CompanyListMeta;
 }
 
-export interface SiteStatus {
-  isFrozen: boolean;
-  isReadOnly: boolean;
-  isBlocked: boolean;
-  isUnderMaintenance: boolean;
-  note: string | null;
-}
-
-export interface CompanyConfig {
-  public_id: string;
-  companyId: number;
-  planId: number;
-  subscriptionStatus: SubscriptionStatus;
-  siteStatus: SiteStatus;
-  subscriptionStartDate: string | null;
-  subscriptionEndDate: string | null;
-  trialEndDate: string | null;
-  subscriptionNotes: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  company?: Pick<
-    Company,
-    "publicId" | "name" | "companyCode" | "country" | "isActive" | "phoneNumber"
-  >;
-  plan?: {
-    publicId: string;
-    name: string;
-    duration: number;
-    features: string[];
-    limits: Record<string, number>;
-    isPublic: boolean;
-    isActive: boolean;
-  };
-}
-
-export interface CompanyConfigListResponse {
-  data: CompanyConfig[];
-}
-
 export interface CompanyListParams {
   page?: number;
   limit?: number;
@@ -77,7 +38,6 @@ export interface CompanyListParams {
 
 const companiesKeys = {
   list: (params: CompanyListParams) => ["companies", "list", params] as const,
-  configList: () => ["company-configs", "list"] as const,
 };
 
 async function fetchCompanies(params: CompanyListParams): Promise<CompanyListResponse> {
@@ -87,20 +47,9 @@ async function fetchCompanies(params: CompanyListParams): Promise<CompanyListRes
   return apiClient.get("companies", { searchParams }).json();
 }
 
-async function fetchCompanyConfigs(): Promise<CompanyConfigListResponse> {
-  return apiClient.get("company-configs").json();
-}
-
 export function useCompanies(params: CompanyListParams = {}) {
   return useQuery({
     queryKey: companiesKeys.list(params),
     queryFn: () => fetchCompanies(params),
-  });
-}
-
-export function useCompanyConfigs() {
-  return useQuery({
-    queryKey: companiesKeys.configList(),
-    queryFn: fetchCompanyConfigs,
   });
 }

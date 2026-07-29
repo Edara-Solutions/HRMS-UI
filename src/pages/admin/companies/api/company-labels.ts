@@ -1,25 +1,13 @@
-import type { SubscriptionStatus } from "./companies";
+import type { CompanyLifecycleStatus } from "./companies";
 
 type StatusBadgeVariant = "success" | "primary" | "warning" | "danger" | "default";
 
-export const SUBSCRIPTION_STATUS_BADGE: Record<
-  SubscriptionStatus,
+export const COMPANY_LIFECYCLE_STATUS_BADGE: Record<
+  CompanyLifecycleStatus,
   { variant: StatusBadgeVariant; label: string }
 > = {
-  TRIAL: { variant: "primary", label: "Trial" },
   ACTIVE: { variant: "success", label: "Active" },
-  FROZEN: { variant: "warning", label: "Frozen" },
-  CANCELLED: { variant: "danger", label: "Cancelled" },
-  EXPIRED: { variant: "default", label: "Expired" },
+  ONBOARDING: { variant: "primary", label: "Onboarding" },
+  SUSPENDED: { variant: "warning", label: "Suspended" },
+  CLOSED: { variant: "default", label: "Closed" },
 };
-
-export const ALL_SUBSCRIPTION_STATUSES = Object.keys(
-  SUBSCRIPTION_STATUS_BADGE,
-) as SubscriptionStatus[];
-
-export const SITE_STATUS_FLAG_LABEL = {
-  isFrozen: "Frozen",
-  isReadOnly: "Read-only",
-  isBlocked: "Blocked",
-  isUnderMaintenance: "Maintenance",
-} as const;

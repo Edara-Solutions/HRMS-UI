@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Company, CompanyConfigListResponse, CompanyListResponse } from "../api/companies";
+import type { Company, CompanyListResponse } from "../api/companies";
 import { AdminCompaniesPage } from "./admin-companies-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm — stub the client boundary instead of the network.
+// rejects as cross-realm - stub the client boundary instead of the network.
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/api")>()),
   apiClient: {
@@ -42,6 +42,7 @@ function makeCompany(overrides: Partial<Company> = {}): Company {
     country: "Saudi Arabia",
     companyCode: "NEXUS",
     isActive: true,
+    lifecycleStatus: "ONBOARDING",
     addressLine: null,
     createdAt: "2026-05-20T10:00:00.000Z",
     updatedAt: "2026-05-20T10:00:00.000Z",
@@ -58,54 +59,9 @@ function makeCompaniesResponse(overrides: Partial<CompanyListResponse> = {}): Co
   };
 }
 
-function makeConfigsResponse(): CompanyConfigListResponse {
-  return {
-    data: [
-      {
-        public_id: "config-1",
-        companyId: 1,
-        planId: 1,
-        subscriptionStatus: "TRIAL",
-        siteStatus: {
-          isFrozen: false,
-          isReadOnly: false,
-          isBlocked: false,
-          isUnderMaintenance: false,
-          note: null,
-        },
-        subscriptionStartDate: null,
-        subscriptionEndDate: null,
-        trialEndDate: "2026-06-20T00:00:00.000Z",
-        subscriptionNotes: null,
-        createdAt: "2026-05-20T10:00:00.000Z",
-        updatedAt: "2026-05-20T10:00:00.000Z",
-        deletedAt: null,
-        company: {
-          publicId: "company-1",
-          name: "Nexus Technologies",
-          companyCode: "NEXUS",
-          country: "Saudi Arabia",
-          isActive: true,
-          phoneNumber: "+966112345678",
-        },
-        plan: {
-          publicId: "plan-1",
-          name: "Full Access",
-          duration: 30,
-          features: [],
-          limits: {},
-          isPublic: false,
-          isActive: true,
-        },
-      },
-    ],
-  };
-}
-
 function mockApi() {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "companies") return jsonResponse(makeCompaniesResponse());
-    if (path === "company-configs") return jsonResponse(makeConfigsResponse());
     throw new Error(`Unexpected path: ${path}`);
   });
 }
@@ -129,14 +85,15 @@ describe("AdminCompaniesPage", () => {
     Object.assign(searchState, { page: 1, pageSize: 10, q: undefined });
   });
 
-  it("renders companies with plan and status from the real hooks, not fixtures", async () => {
+  it("renders companies with lifecycle and active status from the real hook", async () => {
     mockApi();
     renderPage();
 
     expect(await screen.findByRole("heading", { name: "Nexus Technologies" })).toBeInTheDocument();
     expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Trial").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Full Access").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Onboarding").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Enabled").length).toBeGreaterThan(0);
+    expect(apiGetMock).not.toHaveBeenCalledWith("company-configs");
   });
 
   it("reflects backend totals via useCompanies, not client-side slicing", async () => {
@@ -146,7 +103,6 @@ describe("AdminCompaniesPage", () => {
           makeCompaniesResponse({ meta: { page: 2, limit: 10, total: 42, totalPages: 5 } }),
         );
       }
-      if (path === "company-configs") return jsonResponse({ data: [] });
       throw new Error(`Unexpected path: ${path}`);
     });
     renderPage();
