@@ -427,7 +427,7 @@ export function AdminLeadDetailPage() {
   const setArchived = useSetLeadArchived();
 
   function backToLeads() {
-    void navigate({ to: "/admin/leads", search: { page: 1, pageSize: 10 } });
+    void navigate({ to: "/admin/leads", search: { isArchived: false, page: 1, pageSize: 10 } });
   }
 
   async function confirmDeleteLead() {

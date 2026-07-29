@@ -61,9 +61,9 @@ const adminLeadsSearchSchema = z.object({
   isArchived: z
     .preprocess(
       (value) => (value === "true" ? true : value === "false" ? false : value),
-      z.boolean().optional(),
+      z.boolean().default(false),
     )
-    .catch(undefined),
+    .catch(false),
   sort: z.enum(["createdAtAsc", "createdAtDesc"]).optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(1).max(100).catch(10),

@@ -18,11 +18,11 @@ function isLeadSource(value: string): value is LeadSource {
 }
 
 interface LeadListFiltersProps {
-  archived: boolean | undefined;
+  archived: boolean;
   country: string;
   createdFrom?: string;
   createdTo?: string;
-  onArchivedChange: (value: boolean | undefined) => void;
+  onArchivedChange: (value: boolean) => void;
   onCountryChange: (value: string) => void;
   onCreatedDateChange: (field: "createdFrom" | "createdTo", value: string) => void;
   onQueryChange: (value: string) => void;
@@ -133,14 +133,13 @@ export function LeadListFilters({
       />
 
       <Select
-        value={archived === undefined ? "all" : String(archived)}
-        onValueChange={(value) => onArchivedChange(value === "all" ? undefined : value === "true")}
+        value={String(archived)}
+        onValueChange={(value) => onArchivedChange(value === "true")}
       >
         <SelectTrigger className="lg:w-36" aria-label="Filter by archive state">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All leads</SelectItem>
           <SelectItem value="false">Active</SelectItem>
           <SelectItem value="true">Archived</SelectItem>
         </SelectContent>

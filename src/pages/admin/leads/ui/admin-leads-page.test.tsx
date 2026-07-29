@@ -15,6 +15,7 @@ const searchState = vi.hoisted(
       status: undefined,
       source: undefined,
       country: undefined,
+      isArchived: false,
       sort: undefined,
     }) as Record<string, unknown>,
 );
@@ -111,6 +112,7 @@ describe("AdminLeadsPage", () => {
       status: undefined,
       source: undefined,
       country: undefined,
+      isArchived: false,
       sort: undefined,
     });
   });
@@ -124,6 +126,17 @@ describe("AdminLeadsPage", () => {
     expect(screen.getAllByText("CRM").length).toBeGreaterThan(0);
   });
 
+  it("defaults the archive filter to active leads only", async () => {
+    leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
+    renderPage();
+
+    await screen.findByRole("heading", { name: "Acme Corp" });
+    expect(screen.getByLabelText(/filter by archive state/i)).toHaveTextContent("Active");
+    expect(screen.queryByText("All leads")).not.toBeInTheDocument();
+
+    const { searchParams } = leadsGetMock.mock.calls[0][1] as { searchParams: URLSearchParams };
+    expect(searchParams.get("isArchived")).toBe("false");
+  });
   it("renders a safe fallback for an unknown server-owned status", async () => {
     const item = makeLead();
     Object.defineProperty(item.lead, "status", { value: "FUTURE_STATUS" });

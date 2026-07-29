@@ -368,7 +368,7 @@ export function AdminLeadsPage() {
     });
   }
 
-  function setArchivedFilter(value: boolean | undefined) {
+  function setArchivedFilter(value: boolean) {
     void navigate({
       search: (previous) => ({ ...previous, isArchived: value, page: 1 }),
     });
@@ -426,7 +426,7 @@ export function AdminLeadsPage() {
           setStatusFilter("");
           setSourceFilter("");
           setCountryInput("");
-          setArchivedFilter(undefined);
+          setArchivedFilter(false);
           setCreatedDateFilter("createdFrom", "");
           setCreatedDateFilter("createdTo", "");
           setSort(undefined);
