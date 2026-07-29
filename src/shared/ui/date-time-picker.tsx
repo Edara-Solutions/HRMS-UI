@@ -34,7 +34,7 @@ function timePeriod(hour: number): "AM" | "PM" {
 
 interface DateTimePickerProps {
   id: string;
-  label: string;
+  label?: string;
   value: string | undefined;
   onChange: (nextValue: string | undefined) => void;
   boundary?: DateTimeBoundary;
@@ -52,6 +52,7 @@ export function DateTimePicker({
   placeholder = "Choose date and time",
 }: DateTimePickerProps) {
   const { titleId, descriptionId } = useDialogIds();
+  const accessibleLabel = label ?? placeholder;
   const parsedValue = parseDateValue(value);
   const initialDraft = parsedValue ?? new Date();
   const [open, setOpen] = useState(false);
@@ -123,14 +124,17 @@ export function DateTimePicker({
   }
 
   return (
-    <div className="min-h-[74px]">
-      <Label htmlFor={id}>{label}</Label>
+    <div className={label ? "min-h-[74px]" : undefined}>
+      {label ? <Label htmlFor={id}>{label}</Label> : null}
       <Button
         id={id}
         type="button"
         variant="secondary"
         size="md"
-        className="mt-1.5 w-full justify-start font-normal"
+        className={
+          label ? "mt-1.5 w-full justify-start font-normal" : "w-full justify-start font-normal"
+        }
+        aria-label={accessibleLabel}
         leadingIcon={<CalendarDays size={15} aria-hidden="true" />}
         onClick={openPicker}
       >
@@ -138,7 +142,7 @@ export function DateTimePicker({
           {value ? formatDateTimeValue(value) : placeholder}
         </span>
       </Button>
-      <span className="mt-1 block min-h-5" aria-hidden="true" />
+      {label ? <span className="mt-1 block min-h-5" aria-hidden="true" /> : null}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -147,7 +151,7 @@ export function DateTimePicker({
         className="max-w-[440px] p-6"
       >
         <DialogTitle id={titleId} className="tracking-[-0.02em]">
-          {label}
+          {accessibleLabel}
         </DialogTitle>
         <DialogDescription id={descriptionId}>{description}</DialogDescription>
         <div className="mt-5">
