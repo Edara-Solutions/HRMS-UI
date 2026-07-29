@@ -6,7 +6,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { getStatusBadge, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
-import type { LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
+import type { LeadSort, LeadSource, LeadStatus, LeadWithContacts } from "../api/leads";
 import { useLeads } from "../api/leads";
 import { CreateLeadModal } from "./create-lead-modal";
 import { LeadListFilters, LeadListPagination } from "./lead-list-controls";
@@ -373,7 +373,7 @@ export function AdminLeadsPage() {
       search: (previous) => ({ ...previous, isArchived: value, page: 1 }),
     });
   }
-  function setSort(nextSort: "createdAtAsc" | "createdAtDesc" | undefined) {
+  function setSort(nextSort: LeadSort | undefined) {
     void navigate({
       search: (previous) => ({ ...previous, sort: nextSort, page: 1 }),
     });

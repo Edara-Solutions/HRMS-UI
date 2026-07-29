@@ -1,2 +1,2 @@
-export type { LeadSource, LeadStatus } from "./api/leads";
+export type { LeadSort, LeadSource, LeadStatus } from "./api/leads";
 export { AdminLeadsPage } from "./ui/admin-leads-page";

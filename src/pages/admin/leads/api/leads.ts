@@ -33,7 +33,9 @@ type LeadContactsPaths = paths["/api/v1/leads/{publicId}/contacts"];
 type LeadContactPaths = paths["/api/v1/leads/{publicId}/contacts/{contactPublicId}"];
 type LeadActivitiesPaths = paths["/api/v1/leads/{publicId}/activities"];
 
-export type LeadListParams = NonNullable<LeadsPaths["get"]["parameters"]["query"]>;
+type GeneratedLeadListParams = NonNullable<LeadsPaths["get"]["parameters"]["query"]>;
+export type LeadSort = "createdAtAsc" | "createdAtDesc" | "lastAttemptAtAsc" | "lastAttemptAtDesc";
+export type LeadListParams = Omit<GeneratedLeadListParams, "sort"> & { sort?: LeadSort };
 export type CreateLeadInput = LeadsPaths["post"]["requestBody"]["content"]["application/json"];
 export type UpdateLeadInput = LeadPaths["patch"]["requestBody"]["content"]["application/json"];
 export type AddContactInput =

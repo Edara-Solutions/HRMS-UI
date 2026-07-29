@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import type { LeadSource, LeadStatus } from "@/pages/admin/leads";
+import type { LeadSort, LeadSource, LeadStatus } from "@/pages/admin/leads";
 import { AdminLeadsPage } from "@/pages/admin/leads";
 
 const leadStatuses = [
@@ -33,6 +33,13 @@ const leadSources = [
   "OTHER",
 ] as const satisfies readonly LeadSource[];
 
+const leadSorts = [
+  "createdAtAsc",
+  "createdAtDesc",
+  "lastAttemptAtAsc",
+  "lastAttemptAtDesc",
+] as const satisfies readonly LeadSort[];
+
 const adminLeadsSearchSchema = z.object({
   q: z
     .preprocess(
@@ -64,7 +71,7 @@ const adminLeadsSearchSchema = z.object({
       z.boolean().default(false),
     )
     .catch(false),
-  sort: z.enum(["createdAtAsc", "createdAtDesc"]).optional().catch(undefined),
+  sort: z.enum(leadSorts).optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(1).max(100).catch(10),
 });

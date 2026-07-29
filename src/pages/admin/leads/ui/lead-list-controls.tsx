@@ -4,10 +4,16 @@ import { CountrySelect } from "@/shared/ui/country-select";
 import { Input } from "@/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { ALL_SOURCES, ALL_STATUSES, getStatusBadge, SOURCE_LABEL } from "../api/lead-labels";
-import type { LeadSource, LeadStatus } from "../api/leads";
+import type { LeadSort, LeadSource, LeadStatus } from "../api/leads";
 
 const knownStatuses = new Set<string>(ALL_STATUSES);
 const knownSources = new Set<string>(ALL_SOURCES);
+const knownSorts = new Set<string>([
+  "createdAtAsc",
+  "createdAtDesc",
+  "lastAttemptAtAsc",
+  "lastAttemptAtDesc",
+]);
 
 function isLeadStatus(value: string): value is LeadStatus {
   return knownStatuses.has(value);
@@ -15,6 +21,10 @@ function isLeadStatus(value: string): value is LeadStatus {
 
 function isLeadSource(value: string): value is LeadSource {
   return knownSources.has(value);
+}
+
+function isLeadSort(value: string): value is LeadSort {
+  return knownSorts.has(value);
 }
 
 interface LeadListFiltersProps {
@@ -27,11 +37,11 @@ interface LeadListFiltersProps {
   onCreatedDateChange: (field: "createdFrom" | "createdTo", value: string) => void;
   onQueryChange: (value: string) => void;
   onReset: () => void;
-  onSortChange: (value: "createdAtAsc" | "createdAtDesc" | undefined) => void;
+  onSortChange: (value: LeadSort | undefined) => void;
   onSourceChange: (value: LeadSource | "") => void;
   onStatusChange: (value: LeadStatus | "") => void;
   query: string;
-  sort: "createdAtAsc" | "createdAtDesc" | undefined;
+  sort: LeadSort | undefined;
   source: LeadSource | "";
   status: LeadStatus | "";
 }
@@ -149,24 +159,22 @@ export function LeadListFilters({
         Reset
       </Button>
 
-      <div className="flex items-center gap-1 lg:ms-auto">
-        <Button
-          variant="ghost"
-          size="sm"
-          pressed={sort !== "createdAtAsc"}
-          onClick={() => onSortChange(undefined)}
-        >
-          Newest
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          pressed={sort === "createdAtAsc"}
-          onClick={() => onSortChange("createdAtAsc")}
-        >
-          Oldest
-        </Button>
-      </div>
+      <Select
+        value={sort ?? "createdAtDesc"}
+        onValueChange={(value) => {
+          if (isLeadSort(value)) onSortChange(value === "createdAtDesc" ? undefined : value);
+        }}
+      >
+        <SelectTrigger className="lg:ms-auto lg:w-44" aria-label="Sort leads">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="createdAtDesc">Newest created</SelectItem>
+          <SelectItem value="createdAtAsc">Oldest created</SelectItem>
+          <SelectItem value="lastAttemptAtDesc">Latest attempt</SelectItem>
+          <SelectItem value="lastAttemptAtAsc">Oldest attempt</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
