@@ -190,6 +190,11 @@ export const adminNavGroups: NavGroup[] = [
         href: "/admin/plans",
         icon: <PackageSearch size={ICON_SIZE} />,
       },
+    ],
+  },
+  {
+    title: "Requests",
+    items: [
       {
         label: "Conversion requests",
         href: "/admin/conversion-requests",
