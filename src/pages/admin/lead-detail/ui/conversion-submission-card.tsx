@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { SearchableSelect } from "@/shared/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { useConversionPlans } from "../api/conversion-plans";
 import {
@@ -46,7 +47,8 @@ export function ConversionSubmissionCard({
   refreshEligibility,
 }: ConversionSubmissionCardProps) {
   const plansQuery = useConversionPlans();
-  const plans = (plansQuery.data?.data ?? []).filter((plan) => plan.isActive && plan.isPublic);
+  const plans = plansQuery.data?.data ?? [];
+  const planOptions = plans.map((plan) => ({ value: plan.publicId, label: plan.name }));
   const user = useAuthStore((state) => state.session?.user);
   const canRequest = hasPermission(user, "REQUEST_LEAD_CONVERSION");
   const canConvertImmediately = hasPermission(user, "AUTO_APPROVE_LEAD_CONVERSION");
@@ -155,22 +157,20 @@ export function ConversionSubmissionCard({
       <CardContent className="space-y-4 p-4">
         <div>
           <Label htmlFor="conversion-plan">Conversion plan</Label>
-          <Select
-            value={selectedPlanPublicId}
-            onValueChange={setSelectedPlanPublicId}
-            disabled={plansQuery.isPending || plans.length === 0 || isSubmitting}
-          >
-            <SelectTrigger id="conversion-plan" className="mt-1">
-              <SelectValue placeholder="Select an active public plan" />
-            </SelectTrigger>
-            <SelectContent>
-              {plans.map((plan) => (
-                <SelectItem key={plan.publicId} value={plan.publicId}>
-                  {plan.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="mt-1">
+            <SearchableSelect
+              id="conversion-plan"
+              value={selectedPlanPublicId || undefined}
+              options={planOptions}
+              placeholder="Select an active plan"
+              searchPlaceholder="Search plans..."
+              emptyText={
+                plansQuery.isPending ? "Loading active plans..." : "No active plans found."
+              }
+              onValueChange={(value) => setSelectedPlanPublicId(value ?? "")}
+              disabled={plansQuery.isPending || plans.length === 0 || isSubmitting}
+            />
+          </div>
         </div>
 
         {canConvertImmediately && (

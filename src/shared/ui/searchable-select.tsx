@@ -18,6 +18,7 @@ interface SearchableSelectProps {
   emptyText: string;
   onValueChange: (value: string | undefined) => void;
   allowClear?: boolean;
+  disabled?: boolean;
 }
 
 export function SearchableSelect({
@@ -29,6 +30,7 @@ export function SearchableSelect({
   emptyText,
   onValueChange,
   allowClear = false,
+  disabled = false,
 }: SearchableSelectProps) {
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -78,9 +80,10 @@ export function SearchableSelect({
         role="combobox"
         aria-expanded={open}
         aria-controls={listboxId}
+        disabled={disabled}
         onClick={() => setOpen((previous) => !previous)}
         className={cn(
-          "flex h-[34px] w-full items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] ps-3 pe-2.5 text-[13px] text-[var(--color-text)] outline-none transition-colors focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--color-primary)_50%,var(--color-border))] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--color-primary)_20%,transparent)]",
+          "flex h-[34px] w-full items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] ps-3 pe-2.5 text-[13px] text-[var(--color-text)] outline-none transition-colors focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--color-primary)_50%,var(--color-border))] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--color-primary)_20%,transparent)] disabled:cursor-not-allowed disabled:opacity-60",
           open && "border-[var(--color-primary)]",
         )}
       >

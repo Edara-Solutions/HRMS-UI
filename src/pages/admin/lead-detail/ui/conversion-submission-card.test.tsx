@@ -110,7 +110,7 @@ async function selectGrowthPlan() {
 describe("ConversionSubmissionCard", () => {
   beforeEach(() => {
     apiGetMock.mockImplementation((path: string) => {
-      if (path === "plans/public") return jsonResponse({ data: [PLAN] });
+      if (path === "plans") return jsonResponse({ data: [PLAN] });
       if (path === "lead-conversion-requests") {
         return jsonResponse({
           items: [],
@@ -165,7 +165,7 @@ describe("ConversionSubmissionCard", () => {
   it("recovers a committed pending request after an immediate conversion error", async () => {
     setPermissions(["AUTO_APPROVE_LEAD_CONVERSION", "APPROVE_LEAD_CONVERSION_REQUEST"]);
     apiGetMock.mockImplementation((path: string) => {
-      if (path === "plans/public") return jsonResponse({ data: [PLAN] });
+      if (path === "plans") return jsonResponse({ data: [PLAN] });
       if (path === "lead-conversion-requests") {
         return jsonResponse({
           items: [PENDING_REQUEST],
