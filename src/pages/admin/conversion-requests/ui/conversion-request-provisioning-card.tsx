@@ -1,7 +1,7 @@
 import { RefreshCw } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Status } from "@/shared/ui/status";
 import type { ConversionRequest, OnboardingDelivery } from "../api/conversion-requests";
 
 interface ConversionRequestProvisioningCardProps {
@@ -20,12 +20,6 @@ function formatDateTime(value: string | null): string {
     dateStyle: "medium",
     timeStyle: "short",
   });
-}
-
-function getDeliveryVariant(status: OnboardingDelivery["status"]) {
-  if (status === "SUCCEEDED") return "success";
-  if (status === "EXHAUSTED") return "danger";
-  return "warning";
 }
 
 function getDeliveryStateMessage(status: OnboardingDelivery["status"]): string {
@@ -108,9 +102,7 @@ export function ConversionRequestProvisioningCard({
           {delivery ? (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant={getDeliveryVariant(delivery.status)}>
-                  {delivery.status.toLowerCase().replace(/_/g, " ")}
-                </Badge>
+                <Status status={delivery.status} />
                 <span className="text-xs text-[var(--color-text-muted)]">
                   Attempts {delivery.attemptCount} / {delivery.maxAttempts}
                 </span>

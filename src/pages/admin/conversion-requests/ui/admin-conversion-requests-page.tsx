@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/shared/ui/card";
 import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { Status } from "@/shared/ui/status";
 import {
   CONVERSION_REQUEST_STATUSES,
   type ConversionRequest,
@@ -63,7 +64,7 @@ function createConversionRequestColumns(
     },
     {
       id: "industry-size",
-      header: "Industry / size range",
+      header: "Industry / size",
       cell: (request) => (
         <>
           <p>{request.lead.industry ?? "-"}</p>
@@ -91,16 +92,21 @@ function createConversionRequestColumns(
       cell: (request) => formatDateTime(request.createdAt),
     },
     {
-      id: "requester-email",
-      header: "Requester email",
-      cell: (request) => request.requester.email,
+      id: "requester",
+      header: "Requester",
+      cell: (request) => request.requester.firstName + " " + request.requester.lastName,
+    },
+    {
+      id: "status",
+      header: "Status",
+      cell: (request) => <Status status={request.status} />,
     },
     {
       id: "action",
       header: "Action",
       align: "end",
       cell: (request) => (
-        <Button 
+        <Button
           intent="utility"
           leadingIcon={<ExternalLink size={13} />}
           onClick={() => onView(request.publicId)}
@@ -127,6 +133,7 @@ function renderMobileConversionRequestCard(
             {request.lead.industry ?? "-"} / {formatSizeRange(request.lead.companySizeRange)}
           </p>
         </div>
+        <Status status={request.status} />
         <Button intent="action" onClick={() => onView(request.publicId)}>
           View
         </Button>
@@ -138,8 +145,10 @@ function renderMobileConversionRequestCard(
           <dd className="mt-0.5 text-[var(--color-text-muted)]">{getActionActor(request)}</dd>
         </div>
         <div>
-          <dt className="text-[var(--color-text-faint)]">Requester email</dt>
-          <dd className="mt-0.5 text-[var(--color-text-muted)]">{request.requester.email}</dd>
+          <dt className="text-[var(--color-text-faint)]">Requester</dt>
+          <dd className="mt-0.5 text-[var(--color-text-muted)]">
+            {request.requester.firstName + " " + request.requester.lastName}
+          </dd>
         </div>
         <div>
           <dt className="text-[var(--color-text-faint)]">Action date</dt>

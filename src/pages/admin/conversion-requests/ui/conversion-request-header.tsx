@@ -1,6 +1,6 @@
 import { ArrowLeft, RefreshCw } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { Status } from "@/shared/ui/status";
 import type { ConversionRequest } from "../api/conversion-requests";
 
 interface ConversionRequestHeaderProps {
@@ -25,17 +25,7 @@ export function ConversionRequestHeader({
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-[26px] font-bold text-[var(--color-text)]">Conversion request</h1>
-            <Badge
-              variant={
-                request.status === "APPROVED"
-                  ? "success"
-                  : request.status === "REJECTED"
-                    ? "danger"
-                    : "warning"
-              }
-            >
-              {request.status.toLowerCase()}
-            </Badge>
+            <Status status={request.status} />
           </div>
           <code className="text-xs text-[var(--color-text-muted)]">{request.publicId}</code>
         </div>

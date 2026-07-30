@@ -1,12 +1,11 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Building2, ChevronLeft, ChevronRight, ExternalLink, Globe, Search } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { Status } from "@/shared/ui/status";
 import type { Company } from "../api/companies";
 import { useCompanies } from "../api/companies";
-import { COMPANY_LIFECYCLE_STATUS_BADGE } from "../api/company-labels";
 
 function CompanySquare({ code }: { code: string }) {
   return (
@@ -20,14 +19,13 @@ function CompanySquare({ code }: { code: string }) {
 }
 
 function CompanyStatusBadges({ company }: { company: Company }) {
-  const lifecycleStatus = COMPANY_LIFECYCLE_STATUS_BADGE[company.lifecycleStatus];
-
   return (
     <div className="flex flex-wrap gap-1.5">
-      <Badge variant={lifecycleStatus.variant}>{lifecycleStatus.label}</Badge>
-      <Badge variant={company.isActive ? "success" : "danger"}>
-        {company.isActive ? "Enabled" : "Disabled"}
-      </Badge>
+      <Status status={company.lifecycleStatus} />
+      <Status
+        status={company.isActive ? "ACTIVE" : "SUSPENDED"}
+        label={company.isActive ? "Enabled" : "Disabled"}
+      />
     </div>
   );
 }

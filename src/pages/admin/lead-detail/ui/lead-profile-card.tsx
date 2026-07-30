@@ -1,8 +1,8 @@
 import { Globe } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Status } from "@/shared/ui/status";
 import type { Lead } from "../api/lead-detail";
-import { getStatusBadge, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
+import { SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 import { formatLeadDate } from "../lib/lead-detail-date";
 
 interface LeadProfileCardProps {
@@ -10,8 +10,6 @@ interface LeadProfileCardProps {
 }
 
 export function LeadProfileCard({ lead }: LeadProfileCardProps) {
-  const status = getStatusBadge(lead.status);
-
   return (
     <Card>
       <CardHeader>
@@ -22,7 +20,7 @@ export function LeadProfileCard({ lead }: LeadProfileCardProps) {
           <div>
             <dt className="text-[var(--color-text-faint)]">Status</dt>
             <dd className="mt-1">
-              <Badge variant={status.variant}>{status.label}</Badge>
+              <Status status={lead.status} />
             </dd>
           </div>
           <div>

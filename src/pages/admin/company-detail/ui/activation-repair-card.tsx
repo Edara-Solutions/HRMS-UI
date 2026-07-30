@@ -1,15 +1,15 @@
-﻿import { HTTPError } from "ky";
+import { HTTPError } from "ky";
 import { AlertTriangle, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { Status } from "@/shared/ui/status";
 import { Textarea } from "@/shared/ui/textarea";
 import {
   type AccessPolicyMode,
@@ -120,12 +120,11 @@ function ActivationReadinessPanel({ activation }: { activation: CompanyActivatio
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Badge variant={activation.canActivate ? "success" : "warning"}>
-            {activation.canActivate ? "Can activate" : "Blocked"}
-          </Badge>
-          <Badge variant={activation.lifecycleStatus === "ACTIVE" ? "success" : "default"}>
-            {activation.lifecycleStatus}
-          </Badge>
+          <Status
+            status={activation.canActivate ? "ACTIVE" : "SUSPENDED"}
+            label={activation.canActivate ? "Can activate" : "Blocked"}
+          />
+          <Status status={activation.lifecycleStatus} />
         </div>
       </div>
       {activation.unmetRequirements.length === 0 ? (
@@ -495,7 +494,7 @@ export function ActivationRepairCard({ companyPublicId }: { companyPublicId: str
           <CardTitle>Activation repairs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 p-4 text-sm">
-          <Badge variant="danger">Support state unavailable</Badge>
+          <Status status="FAILED" label="Support state unavailable" />
           <p className="text-[var(--color-text-muted)]">
             Subscription, access policy, or activation state could not be loaded.
           </p>

@@ -1,8 +1,8 @@
 import { ExternalLink, Users } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
-import { getStatusBadge, SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
+import { Status } from "@/shared/ui/status";
+import { SIZE_LABEL, SOURCE_LABEL } from "../api/lead-labels";
 import type { LeadWithContacts } from "../api/leads";
 
 interface LeadsTableProps {
@@ -29,7 +29,6 @@ function formatLostReason(value: string): string {
 function renderMobileLeadCard(item: LeadWithContacts, onView: (publicId: string) => void) {
   const { lead, contacts } = item;
   const primary = contacts.find((contact) => contact.isPrimary);
-  const status = getStatusBadge(lead.status);
 
   return (
     <article className="p-4">
@@ -42,9 +41,7 @@ function renderMobileLeadCard(item: LeadWithContacts, onView: (publicId: string)
             {lead.city ?? lead.country ?? "-"}
           </p>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          <Badge variant={status.variant}>{status.label}</Badge>
-        </div>
+        <Status status={lead.status} />
       </div>
 
       <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-xs min-[520px]:grid-cols-2">
@@ -156,19 +153,16 @@ function createLeadColumns(
     {
       id: "status",
       header: "Status",
-      cell: ({ lead }) => {
-        const status = getStatusBadge(lead.status);
-        return (
-          <>
-            <Badge variant={status.variant}>{status.label}</Badge>
-            {lead.lostReason && (
-              <p className="mt-0.5 text-[11px] text-[var(--color-text-muted)]">
-                {formatLostReason(lead.lostReason)}
-              </p>
-            )}
-          </>
-        );
-      },
+      cell: ({ lead }) => (
+        <>
+          <Status status={lead.status} />
+          {lead.lostReason && (
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-muted)]">
+              {formatLostReason(lead.lostReason)}
+            </p>
+          )}
+        </>
+      ),
     },
     {
       id: "attempts",
@@ -188,6 +182,7 @@ function createLeadColumns(
       header: "Actions",
       align: "end",
       cell: ({ lead }) => (
+        <div className="flex justify-end gap-2">
           <Button
             intent="utility"
             leadingIcon={<ExternalLink size={13} />}
@@ -195,6 +190,7 @@ function createLeadColumns(
           >
             View
           </Button>
+        </div>
       ),
     },
   ];
