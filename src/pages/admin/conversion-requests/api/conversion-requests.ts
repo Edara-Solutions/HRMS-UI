@@ -25,6 +25,7 @@ const leadSchema = z.object({
   companyName: z.string().nullable(),
   website: z.string().nullable(),
   industry: z.string().nullable(),
+  companySizeRange: z.string().nullable().optional(),
   country: z.string().nullable(),
   city: z.string().nullable(),
   status: z.string(),

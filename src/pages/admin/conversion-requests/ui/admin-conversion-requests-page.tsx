@@ -1,12 +1,13 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ClipboardCheck } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
+import { ChevronLeft, ChevronRight, ClipboardCheck, ExternalLink } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
+import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import {
   CONVERSION_REQUEST_STATUSES,
+  type ConversionRequest,
   type ConversionRequestStatus,
   useConversionRequests,
 } from "../api/conversion-requests";
@@ -17,11 +18,145 @@ const STATUS_LABEL: Record<ConversionRequestStatus, string> = {
   REJECTED: "Rejected",
 };
 
-const STATUS_VARIANT: Record<ConversionRequestStatus, "warning" | "success" | "danger"> = {
-  PENDING: "warning",
-  APPROVED: "success",
-  REJECTED: "danger",
-};
+function formatDateTime(value: string | null): string {
+  if (!value) return "-";
+  return new Date(value).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatActor(actor: ConversionRequest["approvedBy"]): string {
+  if (!actor) return "-";
+  const name = [actor.firstName, actor.lastName].filter(Boolean).join(" ").trim();
+  return name ? `${name} (${actor.email})` : actor.email;
+}
+
+function formatSizeRange(value: string | null | undefined): string {
+  if (!value) return "-";
+  return value.toLowerCase().replace(/_/g, " ");
+}
+
+function getActionActor(request: ConversionRequest): string {
+  return formatActor(request.approvedBy ?? request.rejectedBy);
+}
+
+function getActionDate(request: ConversionRequest): string {
+  return formatDateTime(request.approvedAt ?? request.rejectedAt);
+}
+
+function createConversionRequestColumns(
+  onView: (publicId: string) => void,
+): Array<DataTableColumn<ConversionRequest>> {
+  return [
+    {
+      id: "name",
+      header: "Name",
+      cell: (request) => (
+        <p className="font-medium text-[var(--color-text)]">
+          {request.lead.companyName ?? "Untitled lead"}
+        </p>
+      ),
+    },
+    {
+      id: "industry-size",
+      header: "Industry / size range",
+      cell: (request) => (
+        <>
+          <p>{request.lead.industry ?? "-"}</p>
+          <p className="mt-0.5 text-xs text-[var(--color-text-faint)]">
+            {formatSizeRange(request.lead.companySizeRange)}
+          </p>
+        </>
+      ),
+    },
+    {
+      id: "action-actor",
+      header: "Action actor",
+      cell: getActionActor,
+    },
+    {
+      id: "action-date",
+      header: "Action date",
+      className: "tabular-nums",
+      cell: getActionDate,
+    },
+    {
+      id: "created-at",
+      header: "Created",
+      className: "tabular-nums",
+      cell: (request) => formatDateTime(request.createdAt),
+    },
+    {
+      id: "requester-email",
+      header: "Requester email",
+      cell: (request) => request.requester.email,
+    },
+    {
+      id: "action",
+      header: "Action",
+      align: "end",
+      cell: (request) => (
+        <Button 
+          intent="utility"
+          leadingIcon={<ExternalLink size={13} />}
+          onClick={() => onView(request.publicId)}
+        >
+          View
+        </Button>
+      ),
+    },
+  ];
+}
+
+function renderMobileConversionRequestCard(
+  request: ConversionRequest,
+  onView: (publicId: string) => void,
+) {
+  return (
+    <article className="space-y-3 p-4">
+      <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
+        <div className="min-w-0">
+          <h2 className="truncate text-sm font-semibold text-[var(--color-text)]">
+            {request.lead.companyName ?? "Untitled lead"}
+          </h2>
+          <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
+            {request.lead.industry ?? "-"} / {formatSizeRange(request.lead.companySizeRange)}
+          </p>
+        </div>
+        <Button intent="action" onClick={() => onView(request.publicId)}>
+          View
+        </Button>
+      </div>
+
+      <dl className="grid grid-cols-1 gap-x-4 gap-y-2 text-xs min-[560px]:grid-cols-2">
+        <div>
+          <dt className="text-[var(--color-text-faint)]">Action actor</dt>
+          <dd className="mt-0.5 text-[var(--color-text-muted)]">{getActionActor(request)}</dd>
+        </div>
+        <div>
+          <dt className="text-[var(--color-text-faint)]">Requester email</dt>
+          <dd className="mt-0.5 text-[var(--color-text-muted)]">{request.requester.email}</dd>
+        </div>
+        <div>
+          <dt className="text-[var(--color-text-faint)]">Action date</dt>
+          <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+            {getActionDate(request)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[var(--color-text-faint)]">Created</dt>
+          <dd className="mt-0.5 tabular-nums text-[var(--color-text-muted)]">
+            {formatDateTime(request.createdAt)}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  );
+}
 
 export function AdminConversionRequestsPage() {
   const { status, page, pageSize } = useSearch({ from: "/admin/conversion-requests/" });
@@ -42,6 +177,13 @@ export function AdminConversionRequestsPage() {
 
   function setPage(nextPage: number) {
     void navigate({ search: (previous) => ({ ...previous, page: nextPage }) });
+  }
+
+  function viewRequest(publicId: string) {
+    void navigate({
+      to: "/admin/conversion-requests/$publicId",
+      params: { publicId },
+    });
   }
 
   return (
@@ -101,43 +243,16 @@ export function AdminConversionRequestsPage() {
       ) : (
         <Card className="overflow-hidden">
           <CardContent className="p-0">
-            <div className="divide-y divide-[var(--color-border)]">
-              {result.items.map((request) => (
-                <article
-                  key={request.publicId}
-                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-sm font-semibold text-[var(--color-text)]">
-                        {request.lead.companyName ?? "Untitled lead"}
-                      </h2>
-                      <Badge variant={STATUS_VARIANT[request.status]}>
-                        {STATUS_LABEL[request.status]}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                      {request.plan.name} - requested by {request.requester.firstName}{" "}
-                      {request.requester.lastName}
-                    </p>
-                    <code className="mt-1 block text-[11px] text-[var(--color-text-faint)]">
-                      {request.publicId}
-                    </code>
-                  </div>
-                  <Button
-                    intent="action"
-                    onClick={() =>
-                      void navigate({
-                        to: "/admin/conversion-requests/$publicId",
-                        params: { publicId: request.publicId },
-                      })
-                    }
-                  >
-                    Review request
-                  </Button>
-                </article>
-              ))}
-            </div>
+            <DataTable
+              items={result.items}
+              columns={createConversionRequestColumns(viewRequest)}
+              getRowKey={(request) => request.publicId}
+              minWidth="1040px"
+              mobileBreakpoint="lg"
+              renderMobileItem={(request) =>
+                renderMobileConversionRequestCard(request, viewRequest)
+              }
+            />
           </CardContent>
           <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-3">
             <span className="text-xs text-[var(--color-text-muted)]">
