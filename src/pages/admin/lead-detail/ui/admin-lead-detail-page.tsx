@@ -1,36 +1,12 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
-import {
-  Archive,
-  ArchiveRestore,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  Globe,
-  Mail,
-  MapPin,
-  MessageSquare,
-  Pencil,
-  Phone,
-  Plus,
-  RefreshCw,
-  Star,
-  Trash2,
-  Users,
-} from "lucide-react";
+import { Archive, ArchiveRestore, ArrowLeft, MapPin, Pencil, Trash2, Users } from "lucide-react";
 import { useState } from "react";
-import { Avatar } from "@/shared/ui/avatar";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { type PageTabItem, PageTabs } from "@/shared/ui/page-tabs";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type {
-  Lead,
-  LeadActivityListResponse,
-  LeadContact,
-  LeadConversionEligibility,
-} from "../api/lead-detail";
+import type { LeadContact } from "../api/lead-detail";
 import {
   useDeleteLead,
   useDeleteLeadContact,
@@ -40,365 +16,24 @@ import {
   useSetLeadArchived,
   useUpdateLeadContact,
 } from "../api/lead-detail";
-import {
-  ACTIVITY_TYPE_LABEL,
-  getStatusBadge,
-  SIZE_LABEL,
-  SOURCE_LABEL,
-  STATUS_BADGE,
-} from "../api/lead-labels";
-import { ConversionPlanDiscoveryCard } from "./conversion-plan-discovery-card";
+import { STATUS_BADGE } from "../api/lead-labels";
 import { ConversionSubmissionCard } from "./conversion-submission-card";
 import { EditLeadModal } from "./edit-lead-modal";
+import { LeadActivityTimelineCard } from "./lead-activity-timeline-card";
 import { LeadContactFormModal } from "./lead-contact-form-modal";
-import { LogActivityForm } from "./log-activity-form";
+import { LeadContactsCard } from "./lead-contacts-card";
+import { LeadEligibilityCard } from "./lead-eligibility-card";
+import { LeadProfileCard } from "./lead-profile-card";
 import { SendingDomainCard } from "./sending-domain-card";
 
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
+type LeadDetailTab = "profile" | "conversion" | "domain" | "activity";
 
-function formatDateTime(value: string): string {
-  return new Date(value).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-// --- Profile ----------------------------------------------------------------
-
-function LeadProfileCard({ lead }: { lead: Lead }) {
-  const status = getStatusBadge(lead.status);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 p-4">
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Status</dt>
-            <dd className="mt-1">
-              <Badge variant={status.variant}>{status.label}</Badge>
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Source</dt>
-            <dd className="mt-1 text-[var(--color-text)]">
-              {SOURCE_LABEL[lead.source] ?? lead.source.toLowerCase().replace(/_/g, " ")}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Company size</dt>
-            <dd className="mt-1 text-[var(--color-text)]">
-              {SIZE_LABEL[lead.companySizeRange] ?? lead.companySizeRange}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Attempts</dt>
-            <dd className="mt-1 tabular-nums text-[var(--color-text)]">{lead.numberOfAttempts}</dd>
-          </div>
-          {lead.website && (
-            <div className="col-span-2">
-              <dt className="text-[var(--color-text-faint)]">Website</dt>
-              <dd className="mt-1 flex items-center gap-1 text-[var(--color-text)]">
-                <Globe size={11} className="shrink-0 text-[var(--color-text-muted)]" />
-                <a
-                  href={lead.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="truncate hover:text-[var(--color-primary)]"
-                >
-                  {lead.website.replace(/^https?:\/\//, "")}
-                </a>
-              </dd>
-            </div>
-          )}
-          {lead.lostReason && (
-            <div className="col-span-2">
-              <dt className="text-[var(--color-text-faint)]">Lost reason</dt>
-              <dd className="mt-1 text-[var(--color-text)]">
-                {lead.lostReason.toLowerCase().replace(/_/g, " ")}
-              </dd>
-            </div>
-          )}
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Created</dt>
-            <dd className="mt-1 tabular-nums text-[var(--color-text-muted)]">
-              {formatDate(lead.createdAt)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[var(--color-text-faint)]">Updated</dt>
-            <dd className="mt-1 tabular-nums text-[var(--color-text-muted)]">
-              {formatDate(lead.updatedAt)}
-            </dd>
-          </div>
-        </dl>
-      </CardContent>
-    </Card>
-  );
-}
-
-// --- Contacts ----------------------------------------------------------------
-
-function LeadContactsCard({
-  contacts,
-  onAdd,
-  onEdit,
-  onDelete,
-  onMakePrimary,
-  isMakingPrimary,
-}: {
-  contacts: LeadContact[];
-  onAdd: () => void;
-  onEdit: (contact: LeadContact) => void;
-  onDelete: (contact: LeadContact) => void;
-  onMakePrimary: (contact: LeadContact) => void;
-  isMakingPrimary: boolean;
-}) {
-  return (
-    <Card>
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle>Contacts</CardTitle>
-        <Button intent="utility" leadingIcon={<Plus size={13} />} onClick={onAdd}>
-          Add
-        </Button>
-      </CardHeader>
-      <CardContent className="p-4">
-        {contacts.length === 0 ? (
-          <p className="text-xs text-[var(--color-text-faint)]">No contacts recorded.</p>
-        ) : (
-          <ul className="space-y-3">
-            {contacts.map((contact) => (
-              <li key={contact.publicId} className="flex items-start gap-3">
-                <Avatar size="sm" alt={contact.name ?? "?"} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="truncate text-[13px] font-medium text-[var(--color-text)]">
-                      {contact.name ?? "-"}
-                    </p>
-                    {contact.isPrimary && <Badge variant="primary">Primary</Badge>}
-                  </div>
-                  {contact.jobTitle && (
-                    <p className="text-xs text-[var(--color-text-muted)]">{contact.jobTitle}</p>
-                  )}
-                  {contact.email && (
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
-                      <Mail size={11} className="shrink-0" />
-                      <span className="truncate">{contact.email}</span>
-                    </p>
-                  )}
-                  {contact.phone && (
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
-                      <Phone size={11} className="shrink-0" />
-                      {contact.phone}
-                    </p>
-                  )}
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {!contact.isPrimary && (
-                      <Button
-                        intent="utility"
-                        leadingIcon={<Star size={12} />}
-                        disabled={isMakingPrimary}
-                        isLoading={isMakingPrimary}
-                        onClick={() => onMakePrimary(contact)}
-                      >
-                        Make primary
-                      </Button>
-                    )}
-                    <Button
-                      intent="utility"
-                      leadingIcon={<Pencil size={12} />}
-                      onClick={() => onEdit(contact)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      intent="utility"
-                      className="text-[var(--color-danger)] hover:text-[var(--color-danger)]"
-                      leadingIcon={<Trash2 size={12} />}
-                      onClick={() => onDelete(contact)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-// --- Activity timeline --------------------------------------------------------
-
-function LeadActivityTimelineCard({
-  leadPublicId,
-  page,
-  onPageChange,
-  data,
-  isPending,
-  isError,
-}: {
-  leadPublicId: string;
-  page: number;
-  onPageChange: (page: number) => void;
-  data: LeadActivityListResponse | undefined;
-  isPending: boolean;
-  isError: boolean;
-}) {
-  const items = data?.items ?? [];
-  const totalItems = data?.meta.totalItems ?? 0;
-  const currentPage = data?.meta.page ?? page;
-  const totalPages = Math.max(1, data?.meta.totalPages ?? 1);
-
-  return (
-    <Card className="overflow-hidden">
-      <CardHeader>
-        <CardTitle>Activity timeline</CardTitle>
-      </CardHeader>
-      <LogActivityForm leadPublicId={leadPublicId} />
-      <CardContent className="p-0">
-        {isError ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="Couldn't load activity"
-            description="Please try again shortly."
-          />
-        ) : isPending ? (
-          <div className="space-y-3 p-4">
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-14 w-full" />
-          </div>
-        ) : items.length === 0 ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="No activity yet"
-            description="Calls, emails, and notes logged on this lead will show up here."
-          />
-        ) : (
-          <ul className="divide-y divide-[var(--color-border)]">
-            {items.map((activity) => (
-              <li key={activity.publicId} className="p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                    {ACTIVITY_TYPE_LABEL[activity.type] ??
-                      activity.type.toLowerCase().replace(/_/g, " ")}
-                  </span>
-                  <span className="shrink-0 text-[11px] tabular-nums text-[var(--color-text-faint)]">
-                    {formatDateTime(activity.createdAt)}
-                  </span>
-                </div>
-                {activity.note && (
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--color-text)]">
-                    {activity.note}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-      <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-3">
-        <span className="text-xs text-[var(--color-text-muted)]">
-          {items.length} of {totalItems} activities
-        </span>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="nav"
-            size="iconXs"
-            className="btn-nav-prev"
-            disabled={currentPage <= 1}
-            onClick={() => onPageChange(currentPage - 1)}
-            aria-label="Previous page"
-            title="Previous page"
-          >
-            <ChevronLeft size={14} />
-          </Button>
-          <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
-            {currentPage} / {totalPages}
-          </span>
-          <Button
-            variant="nav"
-            size="iconXs"
-            className="btn-nav-next"
-            disabled={currentPage >= totalPages}
-            onClick={() => onPageChange(currentPage + 1)}
-            aria-label="Next page"
-            title="Next page"
-          >
-            <ChevronRight size={14} />
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function LeadEligibilityCard({
-  data,
-  isPending,
-  isError,
-  isRefreshing,
-  onRefresh,
-}: {
-  data: LeadConversionEligibility | undefined;
-  isPending: boolean;
-  isError: boolean;
-  isRefreshing: boolean;
-  onRefresh: () => void;
-}) {
-  return (
-    <Card>
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle>Conversion eligibility</CardTitle>
-        <Button
-          intent="utility"
-          leadingIcon={<RefreshCw size={13} />}
-          disabled={isRefreshing}
-          isLoading={isRefreshing}
-          onClick={onRefresh}
-        >
-          Refresh eligibility
-        </Button>
-      </CardHeader>
-      <CardContent className="p-4" aria-live="polite">
-        {isPending ? (
-          <p className="text-sm text-[var(--color-text-muted)]">Checking eligibility...</p>
-        ) : isError || !data ? (
-          <p className="text-sm text-[var(--color-danger)]">
-            Eligibility is unavailable. Refresh before continuing.
-          </p>
-        ) : data.isEligible ? (
-          <p className="text-sm font-medium text-[var(--color-success)]">
-            This lead is eligible for conversion.
-          </p>
-        ) : (
-          <div>
-            <p className="text-sm font-medium text-[var(--color-text)]">
-              Resolve every blocker before conversion:
-            </p>
-            <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-[var(--color-danger)]">
-              {data.reasons.map((reason) => (
-                <li key={reason.code}>{reason.message}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+const LEAD_DETAIL_TABS: Array<PageTabItem<LeadDetailTab>> = [
+  { value: "profile", label: "Profile" },
+  { value: "conversion", label: "Conversion" },
+  { value: "domain", label: "Domain" },
+  { value: "activity", label: "Activity" },
+];
 
 // --- Page ---------------------------------------------------------------------
 
@@ -415,6 +50,7 @@ export function AdminLeadDetailPage() {
   const { publicId } = useParams({ from: "/admin/leads/$publicId" });
   const navigate = useNavigate();
   const [activityPage, setActivityPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<LeadDetailTab>("profile");
   const [panel, setPanel] = useState<LeadDetailPanel>({ kind: "none" });
   const closePanel = () => setPanel({ kind: "none" });
 
@@ -539,36 +175,15 @@ export function AdminLeadDetailPage() {
         </div>
       </div>
 
-      <div className="mb-6 space-y-6">
-        <LeadEligibilityCard
-          data={eligibility.data}
-          isPending={eligibility.isPending}
-          isError={eligibility.isError}
-          isRefreshing={eligibility.isFetching}
-          onRefresh={() => void eligibility.refetch()}
-        />
-        <ConversionPlanDiscoveryCard />
-        <ConversionSubmissionCard
-          leadPublicId={publicId}
-          refreshEligibility={async () => (await eligibility.refetch()).data}
-        />
-        <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
-      </div>
+      <PageTabs
+        items={LEAD_DETAIL_TABS}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        ariaLabel="Lead detail sections"
+      />
 
-      {/* Content */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <LeadActivityTimelineCard
-            leadPublicId={publicId}
-            page={activityPage}
-            onPageChange={setActivityPage}
-            data={activities.data}
-            isPending={activities.isPending}
-            isError={activities.isError}
-          />
-        </div>
-
-        <div className="space-y-6">
+      {activeTab === "profile" ? (
+        <div className="grid gap-6 lg:grid-cols-2">
           <LeadProfileCard lead={lead} />
           <LeadContactsCard
             contacts={contacts}
@@ -585,7 +200,38 @@ export function AdminLeadDetailPage() {
             isMakingPrimary={updateContact.isPending}
           />
         </div>
-      </div>
+      ) : null}
+
+      {activeTab === "conversion" ? (
+        <div className="space-y-6">
+          <LeadEligibilityCard
+            data={eligibility.data}
+            isPending={eligibility.isPending}
+            isError={eligibility.isError}
+            isRefreshing={eligibility.isFetching}
+            onRefresh={() => void eligibility.refetch()}
+          />
+          <ConversionSubmissionCard
+            leadPublicId={publicId}
+            refreshEligibility={async () => (await eligibility.refetch()).data}
+          />
+        </div>
+      ) : null}
+
+      {activeTab === "domain" ? (
+        <SendingDomainCard leadPublicId={publicId} leadWebsite={lead.website} />
+      ) : null}
+
+      {activeTab === "activity" ? (
+        <LeadActivityTimelineCard
+          leadPublicId={publicId}
+          page={activityPage}
+          onPageChange={setActivityPage}
+          data={activities.data}
+          isPending={activities.isPending}
+          isError={activities.isError}
+        />
+      ) : null}
 
       <EditLeadModal lead={panel.kind === "edit-lead" ? lead : null} onClose={closePanel} />
       {panel.kind === "primary-contact-warning" && (

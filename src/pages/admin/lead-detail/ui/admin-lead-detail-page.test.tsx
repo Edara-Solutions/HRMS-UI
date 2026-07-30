@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Plan } from "@/shared/api";
 import type { LeadActivityListResponse, LeadDetails } from "../api/lead-detail";
 import type { SendingDomain, SendingDomainReadiness } from "../api/sending-domain";
 import { AdminLeadDetailPage } from "./admin-lead-detail-page";
@@ -173,7 +172,7 @@ function mockApiForLead(
   details = buildLeadDetails(),
   readiness: SendingDomainReadiness = { ready: true },
   sendingDomain = buildSendingDomain(),
-  publicPlans: Plan[] = [],
+  publicPlans: unknown[] = [],
 ) {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "leads/lead-1") return jsonResponse(details);
@@ -214,7 +213,7 @@ describe("AdminLeadDetailPage", () => {
     vi.unstubAllEnvs();
   });
 
-  it("renders the lead profile, contacts, and activity timeline from the real hooks", async () => {
+  it("renders the lead profile and contacts by default, then shows activity in its tab", async () => {
     mockApiForLead();
     renderPage();
 
@@ -223,44 +222,14 @@ describe("AdminLeadDetailPage", () => {
     expect(screen.getByText("Referral")).toBeInTheDocument();
     expect(screen.getByText("Sara Youssef")).toBeInTheDocument();
     expect(screen.getByText("Primary")).toBeInTheDocument();
-    expect(screen.getByText("Kickoff call with the COO")).toBeInTheDocument();
+    expect(screen.queryByText("Kickoff call with the COO")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Activity" }));
+
+    expect(await screen.findByText("Kickoff call with the COO")).toBeInTheDocument();
     expect(screen.getByText("Meeting", { selector: "span" })).toBeInTheDocument();
   });
 
-  it("requests active public conversion plans without substituting the private default", async () => {
-    const publicPlan: Plan = {
-      publicId: "11111111-1111-4111-8111-111111111111",
-      name: "Growth",
-      description: "For growing teams",
-      duration: 30,
-      features: ["OVERVIEW"],
-      limits: { MAX_USERS: 100 },
-      isPublic: true,
-      isActive: true,
-      prices: [],
-      effectivePrice: null,
-      createdAt: "2026-07-25T10:00:00.000Z",
-      updatedAt: "2026-07-25T10:00:00.000Z",
-      deletedAt: null,
-    };
-    const privateDefault = {
-      ...publicPlan,
-      publicId: "22222222-2222-4222-8222-222222222222",
-      name: "Default Full Access",
-      isPublic: false,
-    };
-    mockApiForLead(buildLeadDetails(), { ready: true }, buildSendingDomain(), [
-      publicPlan,
-      privateDefault,
-    ]);
-
-    renderPage();
-
-    expect(await screen.findByText("Growth", { exact: true })).toBeInTheDocument();
-    expect(screen.queryByText("Default Full Access", { exact: true })).not.toBeInTheDocument();
-    const plansCall = apiGetMock.mock.calls.find(([path]) => path === "plans/public");
-    expect(plansCall?.[1].searchParams.get("isActive")).toBe("true");
-  });
   it("renders a safe fallback and disables editing for an unknown lead status", async () => {
     const details = buildLeadDetails();
     details.lead.status = "FUTURE_PIPELINE_STATE" as LeadDetails["lead"]["status"];
@@ -283,6 +252,8 @@ describe("AdminLeadDetailPage", () => {
     mockApiForLead(details);
     renderPage();
 
+    fireEvent.click(await screen.findByRole("tab", { name: "Conversion" }));
+
     expect(await screen.findByText("Primary contact name is required.")).toBeInTheDocument();
     expect(screen.getByText("Primary contact email is required.")).toBeInTheDocument();
   });
@@ -291,6 +262,7 @@ describe("AdminLeadDetailPage", () => {
     mockApiForLead();
     renderPage();
 
+    fireEvent.click(await screen.findByRole("tab", { name: "Conversion" }));
     fireEvent.click(await screen.findByRole("button", { name: "Refresh eligibility" }));
 
     await waitFor(() => {
@@ -331,6 +303,8 @@ describe("AdminLeadDetailPage", () => {
     });
     renderPage();
 
+    fireEvent.click(await screen.findByRole("tab", { name: "Domain" }));
+
     expect(await screen.findByText("mail.acme.example.com")).toBeInTheDocument();
     expect(screen.getByText("Domain ownership")).toBeInTheDocument();
 
@@ -358,6 +332,8 @@ describe("AdminLeadDetailPage", () => {
     apiPostMock.mockReturnValue(jsonResponse(buildSendingDomain()));
     renderPage();
 
+    fireEvent.click(await screen.findByRole("tab", { name: "Domain" }));
+
     const domainInput = await screen.findByLabelText("Company sending domain");
     expect(domainInput).toHaveValue("acme.example.com");
     fireEvent.click(screen.getByRole("button", { name: /provision domain/i }));
@@ -376,6 +352,7 @@ describe("AdminLeadDetailPage", () => {
     renderPage();
 
     await screen.findByRole("heading", { name: "Acme Corp" });
+    fireEvent.click(await screen.findByRole("tab", { name: "Domain" }));
     fireEvent.click(await screen.findByRole("button", { name: /recheck dns/i }));
 
     await waitFor(() =>
@@ -417,6 +394,8 @@ describe("AdminLeadDetailPage", () => {
     );
     renderPage();
 
+    fireEvent.click(await screen.findByRole("tab", { name: "Domain" }));
+
     expect(await screen.findByText("pending")).toBeInTheDocument();
     expect(screen.getByText("CNAME not found")).toBeInTheDocument();
   });
@@ -430,6 +409,9 @@ describe("AdminLeadDetailPage", () => {
           meta: { mode: "page", page: 1, pageSize: 20, totalItems: 0, totalPages: 1 },
         });
       }
+      if (path === "leads/lead-1/conversion-eligibility") {
+        return jsonResponse(buildLeadDetails().conversionEligibility);
+      }
       if (path === "plans/public") return jsonResponse({ data: [] });
       if (path === "leads/lead-1/sending-domain") return jsonResponse(buildSendingDomain());
       if (path === "leads/lead-1/sending-domain/readiness") return jsonResponse({ ready: true });
@@ -437,6 +419,8 @@ describe("AdminLeadDetailPage", () => {
     });
 
     renderPage();
+
+    fireEvent.click(await screen.findByRole("tab", { name: "Activity" }));
 
     expect(await screen.findByText(/no activity yet/i)).toBeInTheDocument();
   });
