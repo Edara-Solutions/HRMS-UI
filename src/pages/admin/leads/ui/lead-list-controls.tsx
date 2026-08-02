@@ -88,7 +88,7 @@ export function LeadListFilters({
           if (value === "" || isLeadStatus(value)) onStatusChange(value);
         }}
       >
-        <SelectTrigger className="lg:w-40" aria-label="Filter by status">
+        <SelectTrigger className="lg:w-32" aria-label="Filter by status">
           <SelectValue placeholder="All statuses" />
         </SelectTrigger>
         <SelectContent>
@@ -107,7 +107,7 @@ export function LeadListFilters({
           if (value === "" || isLeadSource(value)) onSourceChange(value);
         }}
       >
-        <SelectTrigger className="lg:w-40" aria-label="Filter by source">
+        <SelectTrigger className="lg:w-32" aria-label="Filter by source">
           <SelectValue placeholder="All sources" />
         </SelectTrigger>
         <SelectContent>
@@ -124,28 +124,32 @@ export function LeadListFilters({
         value={country}
         onValueChange={onCountryChange}
         id="admin-leads-country"
-        className="lg:w-38"
+        className="lg:w-32"
       />
-
-      <DatePicker
+      
+      <div className="lg:w-32">
+        <DatePicker
         id="admin-leads-created-from"
         value={createdFrom}
         onChange={(value) => onCreatedDateChange("createdFrom", value ?? "")}
         placeholder="Date From"
-      />
+        />
+      </div>
 
-      <DatePicker
-        id="admin-leads-created-to"
-        value={createdTo}
-        onChange={(value) => onCreatedDateChange("createdTo", value ?? "")}
-        placeholder="Date To"
-      />
+      <div className="lg:w-32">
+        <DatePicker
+          id="admin-leads-created-to"
+          value={createdTo}
+          onChange={(value) => onCreatedDateChange("createdTo", value ?? "")}
+          placeholder="Date To"
+        />
+      </div>
 
       <Select
         value={String(archived)}
         onValueChange={(value) => onArchivedChange(value === "true")}
       >
-        <SelectTrigger className="lg:w-36" aria-label="Filter by archive state">
+        <SelectTrigger className="lg:w-32" aria-label="Filter by archive state">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -164,7 +168,7 @@ export function LeadListFilters({
           if (isLeadSort(value)) onSortChange(value === "createdAtDesc" ? undefined : value);
         }}
       >
-        <SelectTrigger className="lg:ms-auto lg:w-44" aria-label="Sort leads">
+        <SelectTrigger className="lg:ms-auto lg:w-32" aria-label="Sort leads">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

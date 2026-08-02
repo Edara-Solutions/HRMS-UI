@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HTTPError } from "ky";
 import { RefreshCw } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 import { readBackendErrorMessage, usePlans } from "@/shared/api";
 import { Card } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
-import { SelectItem } from "@/shared/ui/select";
+import { PageTabs } from "@/shared/ui/page-tabs";
 import {
   type ApprovalInput,
   approvalInputSchema,
@@ -30,6 +30,15 @@ import { ConversionRequestHeader } from "./conversion-request-header";
 import { ConversionRequestProvisioningCard } from "./conversion-request-provisioning-card";
 import { ConversionRequestRejectCard } from "./conversion-request-reject-card";
 import { ConversionRequestTerminalCard } from "./conversion-request-terminal-card";
+
+type ConversionRequestDetailTab = "details" | "correct" | "actions";
+
+const CONVERSION_REQUEST_DETAIL_TABS: Array<{ value: ConversionRequestDetailTab; label: string }> =
+  [
+    { value: "details", label: "Details" },
+    { value: "correct", label: "Correct" },
+    { value: "actions", label: "Actions" },
+  ];
 
 async function getErrorMessage(error: unknown) {
   if (error instanceof HTTPError) {
@@ -56,6 +65,7 @@ export function AdminConversionRequestDetailPage() {
   ]);
   const [stepToAdd, setStepToAdd] = useState<SetupStepType>("SET_BRANCHES");
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState<ConversionRequestDetailTab>("details");
   const isDeciding = approveRequest.isPending || rejectRequest.isPending;
   const isMutating = isDeciding || changePlan.isPending || retryDelivery.isPending;
   const request = requestQuery.data;
@@ -201,16 +211,9 @@ export function AdminConversionRequestDetailPage() {
     );
   }
 
-  const planOptions = (plansQuery.data?.data ?? []).reduce<ReactNode[]>((options, plan) => {
-    if (plan.isActive) {
-      options.push(
-        <SelectItem key={plan.publicId} value={plan.publicId}>
-          {plan.name}
-        </SelectItem>,
-      );
-    }
-    return options;
-  }, []);
+  const planOptions = (plansQuery.data?.data ?? [])
+    .filter((plan) => plan.isActive)
+    .map((plan) => ({ value: plan.publicId, label: plan.name }));
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-5">
@@ -225,19 +228,30 @@ export function AdminConversionRequestDetailPage() {
         }
         onReload={() => void requestQuery.refetch()}
       />
-      <ConversionRequestDetailsCard request={request} />
-      <ConversionRequestProvisioningCard
-        request={request}
-        delivery={delivery}
-        isDeliveryLoading={deliveryQuery.isFetching}
-        isRetryingDelivery={retryDelivery.isPending}
-        hasDeliveryLoadError={deliveryQuery.isError}
-        onReloadDelivery={() => void deliveryQuery.refetch()}
-        onRetryDelivery={() => void retryOnboardingDelivery()}
+      <PageTabs
+        items={CONVERSION_REQUEST_DETAIL_TABS}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        ariaLabel="Conversion request sections"
       />
 
-      {request.status === "PENDING" ? (
-        <>
+      {activeTab === "details" && (
+        <div className="space-y-5">
+          <ConversionRequestDetailsCard request={request} />
+          <ConversionRequestProvisioningCard
+            request={request}
+            delivery={delivery}
+            isDeliveryLoading={deliveryQuery.isFetching}
+            isRetryingDelivery={retryDelivery.isPending}
+            hasDeliveryLoadError={deliveryQuery.isError}
+            onReloadDelivery={() => void deliveryQuery.refetch()}
+            onRetryDelivery={() => void retryOnboardingDelivery()}
+          />
+        </div>
+      )}
+
+      {activeTab === "correct" &&
+        (request.status === "PENDING" ? (
           <ConversionRequestCorrectionsCard
             request={request}
             planOptions={planOptions}
@@ -253,35 +267,41 @@ export function AdminConversionRequestDetailPage() {
             onPlanChange={setSelectedPlanPublicId}
             onSavePlan={() => void savePlan()}
           />
-          <ConversionRequestApprovalSetupCard
-            templateKey={templateKey}
-            stepToAdd={stepToAdd}
-            customSteps={customSteps}
-            trialEndDate={trialEndDate}
-            isMutating={isMutating}
-            isApproving={approveRequest.isPending}
-            onTemplateChange={setTemplateKey}
-            onStepToAddChange={setStepToAdd}
-            onAddStep={addCustomStep}
-            onUpdateStep={updateCustomStep}
-            onRemoveStep={(stepType) =>
-              setCustomSteps((current) => current.filter((item) => item.stepType !== stepType))
-            }
-            onTrialEndDateChange={setTrialEndDate}
-            onApprove={() => void approve()}
-          />
-          <ConversionRequestRejectCard
-            rejectionReason={rejectionReason}
-            isMutating={isMutating}
-            isRejecting={rejectRequest.isPending}
-            onReasonChange={setRejectionReason}
-            onReject={() => void reject()}
-          />
-        </>
-      ) : (
-        <ConversionRequestTerminalCard rejectionReason={request.rejectionReason} />
-      )}
+        ) : (
+          <ConversionRequestTerminalCard rejectionReason={request.rejectionReason} />
+        ))}
 
+      {activeTab === "actions" &&
+        (request.status === "PENDING" ? (
+          <div className="grid gap-5 xl:grid-cols-2">
+            <ConversionRequestApprovalSetupCard
+              templateKey={templateKey}
+              stepToAdd={stepToAdd}
+              customSteps={customSteps}
+              trialEndDate={trialEndDate}
+              isMutating={isMutating}
+              isApproving={approveRequest.isPending}
+              onTemplateChange={setTemplateKey}
+              onStepToAddChange={setStepToAdd}
+              onAddStep={addCustomStep}
+              onUpdateStep={updateCustomStep}
+              onRemoveStep={(stepType) =>
+                setCustomSteps((current) => current.filter((item) => item.stepType !== stepType))
+              }
+              onTrialEndDateChange={setTrialEndDate}
+              onApprove={() => void approve()}
+            />
+            <ConversionRequestRejectCard
+              rejectionReason={rejectionReason}
+              isMutating={isMutating}
+              isRejecting={rejectRequest.isPending}
+              onReasonChange={setRejectionReason}
+              onReject={() => void reject()}
+            />
+          </div>
+        ) : (
+          <ConversionRequestTerminalCard rejectionReason={request.rejectionReason} />
+        ))}
       {message && (
         <p
           role="status"

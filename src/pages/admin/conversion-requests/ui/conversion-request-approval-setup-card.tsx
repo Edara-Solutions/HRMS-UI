@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { DateTimePicker } from "@/shared/ui/date-time-picker";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -131,16 +132,14 @@ export function ConversionRequestApprovalSetupCard({
             ))}
           </div>
         )}
-        <div>
-          <Label htmlFor="approval-trial-end">Trial end date (optional)</Label>
-          <Input
-            id="approval-trial-end"
-            type="datetime-local"
-            value={trialEndDate}
-            onChange={(event) => onTrialEndDateChange(event.target.value)}
-            disabled={isMutating}
-          />
-        </div>
+        <DateTimePicker
+          id="approval-trial-end"
+          label="Trial end date (optional)"
+          value={trialEndDate || undefined}
+          onChange={(value) => onTrialEndDateChange(value ?? "")}
+          boundary="to"
+          disabled={isMutating}
+        />
         <Button intent="cta" disabled={isMutating} isLoading={isApproving} onClick={onApprove}>
           Approve and provision
         </Button>
