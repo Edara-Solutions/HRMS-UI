@@ -40,6 +40,7 @@ interface DateTimePickerProps {
   boundary?: DateTimeBoundary;
   description?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function DateTimePicker({
@@ -50,6 +51,7 @@ export function DateTimePicker({
   boundary = "from",
   description = "Select the date and time for this field.",
   placeholder = "Choose date and time",
+  disabled = false,
 }: DateTimePickerProps) {
   const { titleId, descriptionId } = useDialogIds();
   const accessibleLabel = label ?? placeholder;
@@ -131,6 +133,7 @@ export function DateTimePicker({
         type="button"
         variant="secondary"
         size="md"
+        disabled={disabled}
         className={
           label ? "mt-1.5 w-full justify-start font-normal" : "w-full justify-start font-normal"
         }
