@@ -6,7 +6,7 @@ import { readBackendErrorMessage } from "@/shared/api";
 import { hasPermission, useAuthStore } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
+import { DateTimePicker } from "@/shared/ui/date-time-picker";
 import { Label } from "@/shared/ui/label";
 import { SearchableSelect } from "@/shared/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -188,17 +188,14 @@ export function ConversionSubmissionCard({
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="conversion-trial-end">Trial end date (optional)</Label>
-              <Input
-                id="conversion-trial-end"
-                className="mt-1"
-                type="datetime-local"
-                value={trialEndDate}
-                onChange={(event) => setTrialEndDate(event.target.value)}
-                disabled={isSubmitting}
-              />
-            </div>
+            <DateTimePicker
+              id="conversion-trial-end"
+              label="Trial end date (optional)"
+              value={trialEndDate || undefined}
+              onChange={(value) => setTrialEndDate(value ?? "")}
+              boundary="to"
+              disabled={isSubmitting}
+            />
           </div>
         )}
 
