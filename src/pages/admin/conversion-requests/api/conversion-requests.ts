@@ -157,6 +157,8 @@ export type ApprovalInput = z.infer<typeof approvalInputSchema>;
 
 export interface ConversionRequestListParams {
   status?: ConversionRequestStatus;
+  createdFrom?: string;
+  createdTo?: string;
   page?: number;
   pageSize?: number;
 }
@@ -173,6 +175,8 @@ export const conversionRequestKeys = {
 function createSearchParams(params: ConversionRequestListParams) {
   const searchParams = new URLSearchParams();
   if (params.status) searchParams.set("status", params.status);
+  if (params.createdFrom) searchParams.set("createdFrom", params.createdFrom);
+  if (params.createdTo) searchParams.set("createdTo", params.createdTo);
   if (params.page) searchParams.set("page", String(params.page));
   if (params.pageSize) searchParams.set("pageSize", String(params.pageSize));
   return searchParams;

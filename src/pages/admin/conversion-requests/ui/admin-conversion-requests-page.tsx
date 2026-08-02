@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ClipboardCheck, ExternalLink } from "lucide-
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
+import { DatePicker } from "@/shared/ui/date-picker";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Status } from "@/shared/ui/status";
@@ -168,9 +169,11 @@ function renderMobileConversionRequestCard(
 }
 
 export function AdminConversionRequestsPage() {
-  const { status, page, pageSize } = useSearch({ from: "/admin/conversion-requests/" });
+  const { status, page, pageSize, createdFrom, createdTo } = useSearch({
+    from: "/admin/conversion-requests/",
+  });
   const navigate = useNavigate({ from: "/admin/conversion-requests/" });
-  const requestsQuery = useConversionRequests({ status, page, pageSize });
+  const requestsQuery = useConversionRequests({ status, page, pageSize, createdFrom, createdTo });
   const result = requestsQuery.data;
   const totalPages = Math.max(1, result?.meta.totalPages ?? 1);
 
@@ -179,6 +182,16 @@ export function AdminConversionRequestsPage() {
       search: (previous) => ({
         ...previous,
         status: CONVERSION_REQUEST_STATUSES.find((statusValue) => statusValue === nextStatus),
+        page: 1,
+      }),
+    });
+  }
+
+  function setCreatedDateFilter(field: "createdFrom" | "createdTo", value: string) {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        [field]: value || undefined,
         page: 1,
       }),
     });
@@ -194,6 +207,18 @@ export function AdminConversionRequestsPage() {
       params: { publicId },
     });
   }
+  
+  function onReset() {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        status: undefined,
+        page: 1,
+        createdFrom: undefined,
+        createdTo: undefined,
+      }),
+    });
+  }
 
   return (
     <div className="mx-auto max-w-[1480px]">
@@ -206,23 +231,43 @@ export function AdminConversionRequestsPage() {
         </p>
       </div>
 
-      <div className="mb-4 max-w-xs">
-        <label htmlFor="conversion-status" className="text-sm font-medium text-[var(--color-text)]">
-          Request status
-        </label>
-        <Select value={status ?? "ALL"} onValueChange={setStatus}>
-          <SelectTrigger id="conversion-status" className="mt-1">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All statuses</SelectItem>
-            {CONVERSION_REQUEST_STATUSES.map((value) => (
-              <SelectItem key={value} value={value}>
-                {STATUS_LABEL[value]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-wrap">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="w-full sm:w-32">
+            <Select value={status ?? "ALL"} onValueChange={setStatus}>
+              <SelectTrigger id="conversion-status" className="w-full sm:w-32 h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All statuses</SelectItem>
+                {CONVERSION_REQUEST_STATUSES.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {STATUS_LABEL[value]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="w-full sm:w-32">
+            <DatePicker
+              id="conversion-requests-created-from"
+              value={createdFrom}
+              onChange={(value) => setCreatedDateFilter("createdFrom", value ?? "")}
+              placeholder="Date From"
+            />
+          </div>
+          <div className="w-full sm:w-32">
+            <DatePicker
+              id="conversion-requests-created-to"
+              value={createdTo}
+              onChange={(value) => setCreatedDateFilter("createdTo", value ?? "")}
+              placeholder="Date To"
+            />
+          </div>
+          <Button variant="ghost" size="sm" onClick={onReset}>
+            Reset
+          </Button>
+        </div>
       </div>
 
       {requestsQuery.isPending ? (
