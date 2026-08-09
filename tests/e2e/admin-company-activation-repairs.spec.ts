@@ -46,50 +46,6 @@ function company() {
   };
 }
 
-function companyConfigs() {
-  return {
-    data: [
-      {
-        public_id: "config-1",
-        companyId: 1,
-        planId: 1,
-        subscriptionStatus: "TRIAL",
-        siteStatus: {
-          isFrozen: false,
-          isReadOnly: false,
-          isBlocked: true,
-          isUnderMaintenance: false,
-          note: "Blocked during activation repair",
-        },
-        subscriptionStartDate: null,
-        subscriptionEndDate: null,
-        trialEndDate: "2026-07-20T00:00:00.000Z",
-        subscriptionNotes: null,
-        createdAt: "2026-05-20T10:00:00.000Z",
-        updatedAt: "2026-05-20T10:00:00.000Z",
-        deletedAt: null,
-        company: {
-          publicId: COMPANY_ID,
-          name: "Nexus Technologies",
-          companyCode: "NEXUS",
-          country: "Saudi Arabia",
-          isActive: true,
-          phoneNumber: "+966112345678",
-        },
-        plan: {
-          publicId: PLAN_ID,
-          name: "Full Access",
-          duration: 30,
-          features: [],
-          limits: {},
-          isPublic: false,
-          isActive: true,
-        },
-      },
-    ],
-  };
-}
-
 function sendingDomain() {
   return {
     domain: "mail.nexustech.sa",
@@ -224,10 +180,6 @@ test("support repairs subscription and access-policy activation blockers", async
 
     if (request.method() === "GET" && url.pathname === `/api/v1/companies/${COMPANY_ID}`) {
       await route.fulfill({ json: company() });
-      return;
-    }
-    if (request.method() === "GET" && url.pathname === "/api/v1/company-configs") {
-      await route.fulfill({ json: companyConfigs() });
       return;
     }
     if (

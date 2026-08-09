@@ -93,7 +93,6 @@ describe("AdminCompaniesPage", () => {
     expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Onboarding").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Enabled").length).toBeGreaterThan(0);
-    expect(apiGetMock).not.toHaveBeenCalledWith("company-configs");
   });
 
   it("reflects backend totals via useCompanies, not client-side slicing", async () => {
