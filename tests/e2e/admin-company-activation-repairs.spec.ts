@@ -68,6 +68,47 @@ function sendingDomain() {
   };
 }
 
+function companyProfile() {
+  return {
+    publicId: "profile-1",
+    companyPublicId: COMPANY_ID,
+    name: "Nexus Technologies",
+    logoUrl: null,
+    email: "ops@nexustech.sa",
+    phone: "+966112345678",
+    country: "Saudi Arabia",
+    city: "Riyadh",
+    addressLine: "King Fahd Road, Riyadh",
+    taxNumber: null,
+    commercialNumber: null,
+    status: "COMPLETE",
+    createdAt: "2026-05-20T10:00:00.000Z",
+    updatedAt: "2026-05-20T10:00:00.000Z",
+  };
+}
+
+function setupState() {
+  return {
+    companyPublicId: COMPANY_ID,
+    templateVersion: 1,
+    steps: [
+      {
+        publicId: "setup-1",
+        stepType: "SET_COMPANY_PROFILE",
+        status: "COMPLETED",
+        isRequired: true,
+        sequence: 1,
+        templateVersion: 1,
+        dependencies: [],
+        startedAt: "2026-05-20T10:00:00.000Z",
+        completedAt: "2026-05-20T10:00:00.000Z",
+        createdAt: "2026-05-20T10:00:00.000Z",
+        updatedAt: "2026-05-20T10:00:00.000Z",
+      },
+    ],
+  };
+}
+
 function subscriptionState(
   trialEndDate = "2026-07-20T00:00:00.000Z",
   reason = "Initial onboarding trial",
@@ -182,6 +223,14 @@ test("support repairs subscription and access-policy activation blockers", async
       await route.fulfill({ json: company() });
       return;
     }
+    if (request.method() === "GET" && url.pathname === `/api/v1/companies/${COMPANY_ID}/profile`) {
+      await route.fulfill({ json: companyProfile() });
+      return;
+    }
+    if (request.method() === "GET" && url.pathname === `/api/v1/companies/${COMPANY_ID}/setup`) {
+      await route.fulfill({ json: setupState() });
+      return;
+    }
     if (
       request.method() === "GET" &&
       url.pathname === `/api/v1/companies/${COMPANY_ID}/sending-domain`
@@ -234,17 +283,14 @@ test("support repairs subscription and access-policy activation blockers", async
   });
 
   await page.goto(`/admin/companies/${COMPANY_ID}`);
-  await expect(page.getByRole("heading", { name: "Activation repairs" })).toBeVisible();
-  await expect(page.getByText("Blocked", { exact: true }).first()).toBeVisible();
-  await expect(page.getByText("Trial is expired.")).toBeVisible();
+  await page.getByRole("tab", { name: "Subscription" }).click();
+  await expect(page.getByRole("heading", { name: "Company subscription" })).toBeVisible();
 
-  await page.getByLabel("New trial end").fill("2026-08-05T00:00:00");
+  await page.getByRole("button", { name: "New trial end" }).click();
+  await page.getByRole("button", { name: "Next month" }).click();
+  await page.getByRole("button", { name: "Wednesday, 5 August 2026" }).click();
+  await page.getByRole("button", { name: "Apply date" }).click();
   await page.getByLabel("Reason").first().fill("  Customer needs setup buffer  ");
-  await page.getByRole("button", { name: "Extend trial" }).click();
-  await expect(page.getByText("Trial end must be a timezone-qualified instant.")).toBeVisible();
-  await expect(page.getByLabel("New trial end")).toHaveValue("2026-08-05T00:00:00");
-
-  await page.getByLabel("New trial end").fill("2026-08-05T00:00:00.000Z");
   await page.getByRole("button", { name: "Extend trial" }).click();
   await expect(
     page.getByText("Trial extension saved. Activation readiness refreshed."),
@@ -254,9 +300,16 @@ test("support repairs subscription and access-policy activation blockers", async
     reason: "Customer needs setup buffer",
   });
 
+  await page.getByRole("tab", { name: "Access & activation" }).click();
+  await expect(page.getByRole("heading", { name: "Access & activation" })).toBeVisible();
+  await expect(page.getByText("Blocked", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Trial is expired.")).toBeVisible();
+
   await page.getByRole("combobox", { name: "Stored mode" }).press("n");
-  await page.getByLabel("Reason").nth(1).fill("Activation blockers repaired");
-  await page.getByLabel("Effective from").fill("2026-07-28T10:00:00.000Z");
+  await page.getByLabel("Reason").fill("Activation blockers repaired");
+  await page.getByRole("button", { name: "Effective from" }).click();
+  await page.getByRole("button", { name: "Tuesday, 28 July 2026" }).click();
+  await page.getByRole("button", { name: "Apply date" }).click();
   await page.getByRole("button", { name: "Save policy" }).click();
 
   await expect(
@@ -267,7 +320,7 @@ test("support repairs subscription and access-policy activation blockers", async
     mode: "NORMAL",
     reason: "Activation blockers repaired",
     note: "Support lock",
-    effectiveFrom: "2026-07-28T10:00:00.000Z",
+    effectiveFrom: "2026-07-28T00:00:00.000Z",
     effectiveUntil: null,
   });
 });
