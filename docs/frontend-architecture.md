@@ -185,8 +185,8 @@ type Company = components["schemas"]["Company"];
 ```
 
 `shared/api/schema.d.ts` is the **single source of domain truth** and maps 1:1
-to the backend's bounded contexts (auth, companies, company-configs, leads,
-plans, rbac, users). This is why we need no `entities` layer.
+to the backend's bounded contexts (auth, companies, leads, plans, rbac, users).
+This is why we need no `entities` layer.
 
 Backend↔frontend map (all real except dashboards):
 
@@ -194,7 +194,6 @@ Backend↔frontend map (all real except dashboards):
 | --------------- | ----------------------------------------- |
 | auth / rbac     | `pages/*/login`, `features/auth`, `shared/auth` |
 | companies       | `pages/admin/companies`, `company-detail` |
-| company-configs | folded into companies / subscriptions     |
 | leads           | `pages/admin/leads`, `lead-detail`        |
 | plans           | `pages/admin/plans`                       |
 | audit           | `pages/admin/audit`                        |
