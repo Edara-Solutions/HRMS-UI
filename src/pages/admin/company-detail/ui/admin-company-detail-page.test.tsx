@@ -78,6 +78,60 @@ function subscriptionState() {
   };
 }
 
+function companyProfile() {
+  return {
+    publicId: "profile-1",
+    companyPublicId: "company-1",
+    name: "Nexus Technologies Legal",
+    logoUrl: null,
+    email: "ops@nexustech.sa",
+    phone: "+966112345678",
+    country: "Saudi Arabia",
+    city: "Riyadh",
+    addressLine: "King Fahd Road, Riyadh",
+    taxNumber: "TAX-123",
+    commercialNumber: "CR-456",
+    status: "COMPLETE",
+    createdAt: "2026-05-20T10:00:00.000Z",
+    updatedAt: "2026-05-21T10:00:00.000Z",
+  };
+}
+
+function setupState() {
+  return {
+    companyPublicId: "company-1",
+    templateVersion: 1,
+    steps: [
+      {
+        publicId: "setup-1",
+        stepType: "SET_COMPANY_PROFILE",
+        status: "COMPLETED",
+        isRequired: true,
+        sequence: 1,
+        templateVersion: 1,
+        dependencies: [],
+        startedAt: "2026-05-20T10:00:00.000Z",
+        completedAt: "2026-05-21T10:00:00.000Z",
+        createdAt: "2026-05-20T10:00:00.000Z",
+        updatedAt: "2026-05-21T10:00:00.000Z",
+      },
+      {
+        publicId: "setup-2",
+        stepType: "SET_DEPARTMENTS",
+        status: "IN_PROGRESS",
+        isRequired: true,
+        sequence: 2,
+        templateVersion: 1,
+        dependencies: ["SET_COMPANY_PROFILE"],
+        startedAt: "2026-05-22T10:00:00.000Z",
+        completedAt: null,
+        createdAt: "2026-05-20T10:00:00.000Z",
+        updatedAt: "2026-05-22T10:00:00.000Z",
+      },
+    ],
+  };
+}
+
 function accessPolicyState() {
   return {
     policy: {
@@ -119,6 +173,8 @@ function activationState() {
 function mockApi() {
   apiGetMock.mockImplementation((path: string) => {
     if (path === "companies/company-1") return jsonResponse(company);
+    if (path === "companies/company-1/profile") return jsonResponse(companyProfile());
+    if (path === "companies/company-1/setup") return jsonResponse(setupState());
     if (path === "companies/company-1/subscription") return jsonResponse(subscriptionState());
     if (path === "companies/company-1/access-policy") return jsonResponse(accessPolicyState());
     if (path === "companies/company-1/activation") return jsonResponse(activationState());
@@ -176,18 +232,32 @@ describe("AdminCompanyDetailPage", () => {
     apiPatchMock.mockReset();
   });
 
-  it("renders the company profile and support state from the real hooks", async () => {
+  it("renders company detail tabs with lazy endpoint-backed panels", async () => {
     mockApi();
     renderPage();
 
     expect(await screen.findByRole("heading", { name: "Nexus Technologies" })).toBeInTheDocument();
     expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
-    expect(screen.getByRole("heading", { name: "Activation repairs" })).toBeInTheDocument();
-    expect(await screen.findByText("Full Access")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Profile" })).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByText("Nexus Technologies Legal")).toBeInTheDocument();
     expect(await screen.findByText("Verified sending domain")).toBeInTheDocument();
     expect(screen.getByText("mail.nexustech.sa")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "DNS check timeline" })).toBeInTheDocument();
     expect(screen.getByText("Ownership TXT")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Setup" }));
+    expect(await screen.findByRole("heading", { name: "Company setup" })).toBeInTheDocument();
+    expect(await screen.findByText("Departments")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Subscription" }));
+    expect(
+      await screen.findByRole("heading", { name: "Company subscription" }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("Full Access")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Access & activation" }));
+    expect(await screen.findByRole("heading", { name: "Access & activation" })).toBeInTheDocument();
+    expect(screen.getByText("Trial is expired.")).toBeInTheDocument();
   });
 
   it("edits the company profile without exposing the company code as editable", async () => {

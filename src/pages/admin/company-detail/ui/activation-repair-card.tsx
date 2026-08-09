@@ -5,6 +5,7 @@ import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { DateTimePicker } from "@/shared/ui/date-time-picker";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -238,16 +239,17 @@ function SubscriptionPanel({
         className="grid gap-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] p-3 sm:grid-cols-[1fr_1fr_auto]"
         onSubmit={submitTrialExtension}
       >
-        <div className="space-y-1.5">
-          <Label htmlFor="trial-extension-end">New trial end</Label>
-          <Input
+        <div>
+          <DateTimePicker
             id="trial-extension-end"
+            label="New trial end"
             value={trialEndDate}
-            onChange={(event) => setTrialEndDate(event.target.value)}
+            onChange={(nextValue) => setTrialEndDate(nextValue ?? "")}
+            boundary="to"
             placeholder="2026-08-30T23:59:59.000Z"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="flex flex-col gap-3">
           <Label htmlFor="trial-extension-reason">Reason</Label>
           <Input
             id="trial-extension-reason"
@@ -425,20 +427,22 @@ function AccessPolicyPanel({
             onChange={(event) => setReason(event.target.value)}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="access-policy-from">Effective from</Label>
-          <Input
+        <div>
+          <DateTimePicker
             id="access-policy-from"
+            label="Effective from"
             value={effectiveFrom}
-            onChange={(event) => setEffectiveFrom(event.target.value)}
+            onChange={(nextValue) => setEffectiveFrom(nextValue ?? "")}
+            boundary="from"
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="access-policy-until">Effective until</Label>
-          <Input
+        <div>
+          <DateTimePicker
             id="access-policy-until"
-            value={effectiveUntil}
-            onChange={(event) => setEffectiveUntil(event.target.value)}
+            label="Effective until"
+            value={effectiveUntil || undefined}
+            onChange={(nextValue) => setEffectiveUntil(nextValue ?? "")}
+            boundary="to"
           />
         </div>
         <div className="space-y-1.5 lg:col-span-2">
@@ -470,33 +474,28 @@ function AccessPolicyPanel({
   );
 }
 
-export function ActivationRepairCard({ companyPublicId }: { companyPublicId: string }) {
+export function CompanySubscriptionCard({ companyPublicId }: { companyPublicId: string }) {
   const subscriptionQuery = useCompanySubscription(companyPublicId);
-  const accessPolicyQuery = useCompanyAccessPolicy(companyPublicId);
   const activationQuery = useCompanyActivation(companyPublicId);
 
   async function refreshSubscriptionAndActivation() {
     await Promise.all([subscriptionQuery.refetch(), activationQuery.refetch()]);
   }
 
-  async function refreshPolicyAndActivation() {
-    await Promise.all([accessPolicyQuery.refetch(), activationQuery.refetch()]);
-  }
-
-  if (subscriptionQuery.isPending || accessPolicyQuery.isPending || activationQuery.isPending) {
+  if (subscriptionQuery.isPending || activationQuery.isPending) {
     return <LoadingCard />;
   }
 
-  if (subscriptionQuery.isError || accessPolicyQuery.isError || activationQuery.isError) {
+  if (subscriptionQuery.isError || activationQuery.isError) {
     return (
-      <Card className="lg:col-span-2">
+      <Card>
         <CardHeader>
-          <CardTitle>Activation repairs</CardTitle>
+          <CardTitle>Company subscription</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 p-4 text-sm">
           <Status status="FAILED" label="Support state unavailable" />
           <p className="text-[var(--color-text-muted)]">
-            Subscription, access policy, or activation state could not be loaded.
+            Subscription or activation state could not be loaded.
           </p>
         </CardContent>
       </Card>
@@ -504,41 +503,91 @@ export function ActivationRepairCard({ companyPublicId }: { companyPublicId: str
   }
 
   const subscription = subscriptionQuery.data;
-  const accessPolicy = accessPolicyQuery.data;
   const activation = activationQuery.data;
 
-  if (!subscription || !accessPolicy || !activation) return <LoadingCard />;
+  if (!subscription || !activation) return <LoadingCard />;
 
   return (
-    <Card className="lg:col-span-2">
+    <Card>
       <CardHeader className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <CardTitle>Activation repairs</CardTitle>
+          <CardTitle>Company subscription</CardTitle>
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            Support-only controls for subscription and access-policy blockers.
+            Authoritative subscription state from this company.
           </p>
         </div>
         <Button
           intent="utility"
           leadingIcon={<RefreshCw size={13} />}
-          onClick={() =>
-            void Promise.all([
-              subscriptionQuery.refetch(),
-              accessPolicyQuery.refetch(),
-              activationQuery.refetch(),
-            ])
-          }
+          onClick={() => void Promise.all([subscriptionQuery.refetch(), activationQuery.refetch()])}
+        >
+          Refresh
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-5 p-4">
+        <SubscriptionPanel
+          companyPublicId={companyPublicId}
+          state={subscription}
+          onRefresh={refreshSubscriptionAndActivation}
+        />
+        <ActivationReadinessPanel activation={activation} />
+      </CardContent>
+    </Card>
+  );
+}
+
+export function CompanyAccessActivationCard({ companyPublicId }: { companyPublicId: string }) {
+  const accessPolicyQuery = useCompanyAccessPolicy(companyPublicId);
+  const activationQuery = useCompanyActivation(companyPublicId);
+
+  async function refreshPolicyAndActivation() {
+    await Promise.all([accessPolicyQuery.refetch(), activationQuery.refetch()]);
+  }
+
+  if (accessPolicyQuery.isPending || activationQuery.isPending) {
+    return <LoadingCard />;
+  }
+
+  if (accessPolicyQuery.isError || activationQuery.isError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Access & activation</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 p-4 text-sm">
+          <Status status="FAILED" label="Support state unavailable" />
+          <p className="text-[var(--color-text-muted)]">
+            Access policy or activation state could not be loaded.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const accessPolicy = accessPolicyQuery.data;
+  const activation = activationQuery.data;
+
+  if (!accessPolicy || !activation) return <LoadingCard />;
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <CardTitle>Access & activation</CardTitle>
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+            Support-only controls for access-policy blockers.
+          </p>
+        </div>
+        <Button
+          intent="utility"
+          leadingIcon={<RefreshCw size={13} />}
+          onClick={() => void Promise.all([accessPolicyQuery.refetch(), activationQuery.refetch()])}
         >
           Refresh
         </Button>
       </CardHeader>
       <CardContent className="space-y-5 p-4">
         <ActivationReadinessPanel activation={activation} />
-        <SubscriptionPanel
-          companyPublicId={companyPublicId}
-          state={subscription}
-          onRefresh={refreshSubscriptionAndActivation}
-        />
         <AccessPolicyPanel
           companyPublicId={companyPublicId}
           state={accessPolicy}
@@ -553,5 +602,14 @@ export function ActivationRepairCard({ companyPublicId }: { companyPublicId: str
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+export function ActivationRepairCard({ companyPublicId }: { companyPublicId: string }) {
+  return (
+    <div className="space-y-5 lg:col-span-2">
+      <CompanySubscriptionCard companyPublicId={companyPublicId} />
+      <CompanyAccessActivationCard companyPublicId={companyPublicId} />
+    </div>
   );
 }

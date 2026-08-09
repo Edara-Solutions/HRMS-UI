@@ -12,15 +12,26 @@ import {
   ShieldCheck,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { type PageTabItem, PageTabs } from "@/shared/ui/page-tabs";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { type Company, useCompany } from "../api/company-detail";
+import {
+  type Company,
+  type CompanyProfile,
+  type CompanySetupChecklist,
+  type CompanySetupStep,
+  type SetupStepStatus,
+  type SetupStepType,
+  useCompany,
+  useCompanyProfile,
+  useCompanySetup,
+} from "../api/company-detail";
 import { type CompanySendingDomain, useCompanySendingDomain } from "../api/company-sending-domain";
-import { ActivationRepairCard } from "./activation-repair-card";
+import { CompanyAccessActivationCard, CompanySubscriptionCard } from "./activation-repair-card";
 import { EditCompanyModal } from "./edit-company-modal";
 
 function formatDate(value: string | null): string {
@@ -34,11 +45,20 @@ function formatDate(value: string | null): string {
 
 // --- Profile ------------------------------------------------------------------
 
-function CompanyProfileCard({ company, onEdit }: { company: Company; onEdit: () => void }) {
+function Field({ label, value, wide }: { label: string; value: string; wide?: boolean }) {
+  return (
+    <div className={wide ? "sm:col-span-2" : undefined}>
+      <dt className="text-[var(--color-text-faint)]">{label}</dt>
+      <dd className="mt-1 text-[var(--color-text)]">{value}</dd>
+    </div>
+  );
+}
+
+function CompanyCoreCard({ company, onEdit }: { company: Company; onEdit: () => void }) {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
-        <CardTitle>Profile</CardTitle>
+        <CardTitle>Company record</CardTitle>
         <Button intent="utility" leadingIcon={<Pencil size={13} />} onClick={onEdit}>
           Edit
         </Button>
@@ -105,6 +125,66 @@ function CompanyProfileCard({ company, onEdit }: { company: Company; onEdit: () 
               {formatDate(company.updatedAt)}
             </dd>
           </div>
+        </dl>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CompanyManagedProfileCard({ companyPublicId }: { companyPublicId: string }) {
+  const profileQuery = useCompanyProfile(companyPublicId);
+  const profile = profileQuery.data;
+
+  if (profileQuery.isPending) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Managed profile</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-4">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-28 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (profileQuery.isError || !profile) {
+    return (
+      <Card>
+        <EmptyState
+          icon={Building2}
+          title="Profile unavailable"
+          description="The company-managed profile could not be loaded."
+        />
+      </Card>
+    );
+  }
+
+  return <CompanyManagedProfileDetails profile={profile} />;
+}
+
+function CompanyManagedProfileDetails({ profile }: { profile: CompanyProfile }) {
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Managed profile</CardTitle>
+        <Badge variant={profile.status === "COMPLETE" ? "success" : "warning"}>
+          {profile.status === "COMPLETE" ? "Complete" : "Incomplete"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-3 p-4">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+          <Field label="Profile name" value={profile.name} />
+          <Field label="Email" value={profile.email ?? "-"} />
+          <Field label="Phone" value={profile.phone ?? "-"} />
+          <Field label="Country" value={profile.country ?? "-"} />
+          <Field label="City" value={profile.city ?? "-"} />
+          <Field label="Tax number" value={profile.taxNumber ?? "-"} />
+          <Field label="Commercial number" value={profile.commercialNumber ?? "-"} />
+          <Field label="Address" value={profile.addressLine ?? "-"} wide />
+          <Field label="Created" value={formatDate(profile.createdAt)} />
+          <Field label="Updated" value={formatDate(profile.updatedAt)} />
         </dl>
       </CardContent>
     </Card>
@@ -300,14 +380,147 @@ function CompanyEmailReadinessCard({
   );
 }
 
+const setupStepLabels: Record<SetupStepType, string> = {
+  SET_COMPANY_PROFILE: "Company profile",
+  SET_ROLES: "Roles",
+  SET_JOBS: "Jobs",
+  SET_BRANCHES: "Branches",
+  SET_SHIFTS: "Shifts",
+  SET_DEPARTMENTS: "Departments",
+};
+
+const setupStepStatusVariants: Record<SetupStepStatus, "default" | "info" | "success" | "warning"> =
+  {
+    PENDING: "default",
+    IN_PROGRESS: "info",
+    COMPLETED: "success",
+    SKIPPED: "warning",
+  };
+
+function setupStepStatusLabel(value: SetupStepStatus) {
+  return value.toLowerCase().replaceAll("_", " ");
+}
+
+function setupDependencyLabels(step: CompanySetupStep) {
+  if (step.dependencies.length === 0) return "None";
+  return step.dependencies.map((dependency) => setupStepLabels[dependency]).join(", ");
+}
+
+function CompanySetupTab({ companyPublicId }: { companyPublicId: string }) {
+  const setupQuery = useCompanySetup(companyPublicId);
+  const setup = setupQuery.data;
+  const steps = useMemo(
+    () => (setup?.steps ?? []).slice().sort((left, right) => left.sequence - right.sequence),
+    [setup],
+  );
+
+  if (setupQuery.isPending) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Company setup</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-4">
+          <Skeleton className="h-8 w-52" />
+          <Skeleton className="h-40 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (setupQuery.isError || !setup) {
+    return (
+      <Card>
+        <EmptyState
+          icon={Building2}
+          title="Setup unavailable"
+          description="The company setup checklist could not be loaded."
+        />
+      </Card>
+    );
+  }
+
+  return <CompanySetupDetails setup={setup} steps={steps} />;
+}
+
+function CompanySetupDetails({
+  setup,
+  steps,
+}: {
+  setup: CompanySetupChecklist;
+  steps: CompanySetupStep[];
+}) {
+  const completedCount = steps.filter((step) => step.status === "COMPLETED").length;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <CardTitle>Company setup</CardTitle>
+            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+              Template v{setup.templateVersion} for {setup.companyPublicId}
+            </p>
+          </div>
+          <Badge variant={completedCount === steps.length ? "success" : "info"}>
+            {completedCount} / {steps.length} complete
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3 p-4">
+        {steps.map((step) => (
+          <section
+            key={step.publicId}
+            className="rounded-[var(--radius-md)] border border-[var(--color-border)] p-4"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h4 className="text-sm font-semibold text-[var(--color-text)]">
+                  {setupStepLabels[step.stepType]}
+                </h4>
+                <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                  Sequence {step.sequence} · Dependencies: {setupDependencyLabels(step)}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant={setupStepStatusVariants[step.status]}>
+                  {setupStepStatusLabel(step.status)}
+                </Badge>
+                <Badge variant={step.isRequired ? "warning" : "default"}>
+                  {step.isRequired ? "Required" : "Optional"}
+                </Badge>
+              </div>
+            </div>
+            <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+              <Field label="Started" value={formatDate(step.startedAt)} />
+              <Field label="Completed" value={formatDate(step.completedAt)} />
+              <Field label="Created" value={formatDate(step.createdAt)} />
+              <Field label="Updated" value={formatDate(step.updatedAt)} />
+            </dl>
+          </section>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 // --- Page ---------------------------------------------------------------------
 
 type CompanyDetailPanel = "none" | "edit-company";
+type CompanyDetailTab = "profile" | "setup" | "subscription" | "access";
+
+const companyDetailTabs: Array<PageTabItem<CompanyDetailTab>> = [
+  { value: "profile", label: "Profile" },
+  { value: "setup", label: "Setup" },
+  { value: "subscription", label: "Subscription" },
+  { value: "access", label: "Access & activation" },
+];
 
 export function AdminCompanyDetailPage() {
   const { publicId } = useParams({ from: "/admin/companies/$publicId" });
   const navigate = useNavigate();
   const [panel, setPanel] = useState<CompanyDetailPanel>("none");
+  const [activeTab, setActiveTab] = useState<CompanyDetailTab>("profile");
   const closePanel = () => setPanel("none");
 
   const { data: company, isPending, isError } = useCompany(publicId);
@@ -382,12 +595,29 @@ export function AdminCompanyDetailPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <CompanyProfileCard company={company} onEdit={() => setPanel("edit-company")} />
-        <CompanyEmailReadinessCard companyPublicId={publicId} onOpenSettings={openEmailSettings} />
-        <ActivationRepairCard companyPublicId={publicId} />
-      </div>
+      <PageTabs
+        items={companyDetailTabs}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        ariaLabel="Company detail sections"
+      />
+
+      {activeTab === "profile" && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <CompanyCoreCard company={company} onEdit={() => setPanel("edit-company")} />
+          <CompanyManagedProfileCard companyPublicId={publicId} />
+          <CompanyEmailReadinessCard
+            companyPublicId={publicId}
+            onOpenSettings={openEmailSettings}
+          />
+        </div>
+      )}
+
+      {activeTab === "setup" && <CompanySetupTab companyPublicId={publicId} />}
+
+      {activeTab === "subscription" && <CompanySubscriptionCard companyPublicId={publicId} />}
+
+      {activeTab === "access" && <CompanyAccessActivationCard companyPublicId={publicId} />}
 
       <EditCompanyModal company={panel === "edit-company" ? company : null} onClose={closePanel} />
     </div>
