@@ -56,4 +56,34 @@ describe("parsePlatformAuditTrailPage", () => {
 
     expect(() => parsePlatformAuditTrailPage(page)).toThrow();
   });
+
+  it("accepts the generated anonymous actor discriminator", () => {
+    const page = {
+      items: [{ ...platformReadEvent, actor: { kind: "ANONYMOUS" } }],
+      nextCursor: null,
+      hasMore: false,
+    };
+
+    expect(parsePlatformAuditTrailPage(page).items[0]?.eventType).toBe("audit.trail.platform_read");
+  });
+
+  it("rejects an event with the wrong version", () => {
+    const page = {
+      items: [{ ...platformReadEvent, eventVersion: 2 }],
+      nextCursor: null,
+      hasMore: false,
+    };
+
+    expect(() => parsePlatformAuditTrailPage(page)).toThrow();
+  });
+
+  it("rejects a Platform event carrying Company scope", () => {
+    const page = {
+      items: [{ ...platformReadEvent, scope: "COMPANY" }],
+      nextCursor: null,
+      hasMore: false,
+    };
+
+    expect(() => parsePlatformAuditTrailPage(page)).toThrow();
+  });
 });

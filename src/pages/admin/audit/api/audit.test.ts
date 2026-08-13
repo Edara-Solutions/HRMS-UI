@@ -1,9 +1,9 @@
 // @vitest-environment node
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
-import { usePlatformAuditTrail } from "./audit";
+import { fetchPlatformAuditTrail } from "./audit";
 
 type PlatformEvent = components["schemas"]["PlatformAuditTrailPage"]["items"][number];
 
@@ -28,18 +28,14 @@ const page: components["schemas"]["PlatformAuditTrailPage"] = {
 };
 
 describe("fetchPlatformAuditTrail", () => {
-  beforeEach(() => {
-    vi.spyOn(apiClient, "get").mockReturnValue({
-      json: async () => page,
-    } as never);
-  });
-
   afterEach(() => vi.restoreAllMocks());
 
   it("calls the real Platform endpoint and forwards cursor/limit/company/scope", async () => {
-    await usePlatformAuditTrailQuery({ cursor: "opaque-prev", limit: 25, scope: "PLATFORM" });
+    const get = mockAuditResponse(page);
 
-    const call = (apiClient.get as ReturnType<typeof vi.fn>).mock.calls[0];
+    await fetchPlatformAuditTrail({ cursor: "opaque-prev", limit: 25, scope: "PLATFORM" });
+
+    const call = get.mock.calls[0];
     expect(call?.[0]).toBe("platform/audit-trail");
     expect(call?.[1]).toMatchObject({
       searchParams: { cursor: "opaque-prev", limit: "25", scope: "PLATFORM" },
@@ -47,27 +43,24 @@ describe("fetchPlatformAuditTrail", () => {
   });
 
   it("returns the parsed page with the opaque cursor preserved", async () => {
-    const parsed = await usePlatformAuditTrailQuery({});
+    mockAuditResponse(page);
+
+    const parsed = await fetchPlatformAuditTrail({});
     expect(parsed.items).toHaveLength(1);
     expect(parsed.nextCursor).toBe("opaque-next");
     expect(parsed.hasMore).toBe(true);
   });
 
   it("throws when the response is not a valid Audit Trail page", async () => {
-    vi.spyOn(apiClient, "get").mockReturnValue({
-      json: async () => ({ items: "not-an-array" }),
-    } as never);
+    mockAuditResponse({ items: "not-an-array" });
 
-    await expect(usePlatformAuditTrailQuery({})).rejects.toThrow();
+    await expect(fetchPlatformAuditTrail({})).rejects.toThrow();
   });
 });
 
-async function usePlatformAuditTrailQuery(params: {
-  cursor?: string;
-  limit?: number;
-  companyPublicId?: string;
-  scope?: "PLATFORM" | "COMPANY";
-}) {
-  const { fetchPlatformAuditTrail } = await import("./audit");
-  return fetchPlatformAuditTrail(params);
+function mockAuditResponse(response: unknown) {
+  // Ky's response exposes more methods than this network-seam test exercises.
+  return vi.spyOn(apiClient, "get").mockReturnValue({
+    json: async () => response,
+  } as never);
 }

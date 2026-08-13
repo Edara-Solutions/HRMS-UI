@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
 import { parsePlatformAuditTrailPage } from "./audit-runtime-contract";
 
-export type PlatformAuditTrailEvent = components["schemas"]["PlatformAuditTrailPage"]["items"][number];
+export type PlatformAuditTrailEvent =
+  components["schemas"]["PlatformAuditTrailPage"]["items"][number];
 export type PlatformAuditTrailPage = components["schemas"]["PlatformAuditTrailPage"];
-
-import type { components } from "@/shared/api";
 
 export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";
 
@@ -18,8 +18,7 @@ export interface PlatformAuditTrailParams {
 
 export const auditTrailKeys = {
   all: ["audit-trail"] as const,
-  platform: (params: PlatformAuditTrailParams) =>
-    ["audit-trail", "platform", params] as const,
+  platform: (params: PlatformAuditTrailParams) => ["audit-trail", "platform", params] as const,
 };
 
 export async function fetchPlatformAuditTrail(
@@ -31,9 +30,7 @@ export async function fetchPlatformAuditTrail(
   if (params.companyPublicId) searchParams.companyPublicId = params.companyPublicId;
   if (params.scope) searchParams.scope = params.scope;
 
-  const response: unknown = await apiClient
-    .get("platform/audit-trail", { searchParams })
-    .json();
+  const response: unknown = await apiClient.get("platform/audit-trail", { searchParams }).json();
 
   return parsePlatformAuditTrailPage(response);
 }

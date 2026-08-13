@@ -18,4 +18,5 @@ Quality gates, hooks, and CI policy are documented in
 
 The OpenAPI snapshot is vendored from the backend into `contracts/` and pinned to
 its producing commit. Generate types from it with `bun run openapi:gen` (or
-`bun run openapi:vendor` then `bun run openapi:types`); CI drift-guards both.
+`bun run openapi:vendor` then `bun run openapi:types`). Run `bun run openapi:check`
+to reproduce and drift-check generated artifacts without a backend checkout.

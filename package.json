@@ -21,6 +21,7 @@
     "openapi:vendor": "bun run scripts/vendor-openapi.mjs",
     "openapi:types": "openapi-typescript contracts/openapi.json -o src/shared/api/schema.d.ts",
     "openapi:gen": "bun run openapi:vendor && bun run openapi:types",
+    "openapi:check": "bun run openapi:types && git diff --exit-code src/shared/api/schema.d.ts",
     "doctor": "react-doctor ."
   },
   "dependencies": {

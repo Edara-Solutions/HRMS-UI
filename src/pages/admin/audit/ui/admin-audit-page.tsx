@@ -4,19 +4,12 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import {
-  usePlatformAuditTrail,
-  type PlatformAuditTrailEvent,
-} from "../api/audit";
+import { type PlatformAuditTrailEvent, usePlatformAuditTrail } from "../api/audit";
 
-type AvailableEvent = Extract<PlatformAuditTrailEvent, { eventType: "audit.trail.platform_read" | "company.profile.material_updated" | "company.profile.completed" }>;
-
-function isUnavailable(event: PlatformAuditTrailEvent): event is Extract<PlatformAuditTrailEvent, { eventType: "audit.event.unavailable" }> {
+function isUnavailable(
+  event: PlatformAuditTrailEvent,
+): event is Extract<PlatformAuditTrailEvent, { eventType: "audit.event.unavailable" }> {
   return event.eventType === "audit.event.unavailable";
-}
-
-function asAvailable(event: PlatformAuditTrailEvent): AvailableEvent | null {
-  return isUnavailable(event) ? null : (event as AvailableEvent);
 }
 
 function eventLabel(event: PlatformAuditTrailEvent): string {
@@ -211,9 +204,7 @@ export function AdminAuditPage() {
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Shield size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                No audit events
-              </p>
+              <p className="text-sm font-medium text-[var(--color-text-muted)]">No audit events</p>
             </div>
           ) : (
             <AuditTable items={items} />

@@ -23,12 +23,7 @@ export async function readBackendErrorMessage(response: Response): Promise<strin
   try {
     const body: unknown = await response.json();
     if (body === null || typeof body !== "object") return null;
-    const problem = body as { detail?: unknown; title?: unknown; error?: unknown };
-    // The locked contract is RFC 9457: `detail` carries the human-readable cause.
-    // `error` is read only as a fallback for endpoints that still bypass the hook
-    // (e.g. the login throttle's raw 429) — see #146.
-    if (typeof problem.detail === "string") return problem.detail;
-    if (typeof problem.error === "string") return problem.error;
+    if ("detail" in body && typeof body.detail === "string") return body.detail;
     return null;
   } catch {
     return null;
