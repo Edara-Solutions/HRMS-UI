@@ -19,8 +19,8 @@ const targetOpenApi = join(contractsDir, "openapi.json");
 const targetCommit = join(contractsDir, "PRODUCING_COMMIT");
 
 const producingCommit = execSync("git rev-parse HEAD", {
-	cwd: backendRepo,
-	encoding: "utf-8",
+  cwd: backendRepo,
+  encoding: "utf-8",
 }).trim();
 
 if (!/^[0-9a-f]{40}$/.test(producingCommit)) {

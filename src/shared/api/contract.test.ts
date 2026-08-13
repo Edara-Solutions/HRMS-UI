@@ -30,7 +30,7 @@ describe("vendored OpenAPI contract", () => {
         schemas: Record<string, { required?: string[]; properties?: Record<string, unknown> }>;
       };
     };
-    const envelope = doc.components.schemas["ErrorEnvelope"];
+    const envelope = doc.components.schemas.ErrorEnvelope;
     expect(envelope).toBeDefined();
     expect(envelope.required).not.toContain("error");
     expect(envelope.properties).not.toHaveProperty("error");
