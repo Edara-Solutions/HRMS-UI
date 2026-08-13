@@ -38,6 +38,14 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Regenerate types from vendored OpenAPI
+        run: bun run openapi:types
+
+      - name: Drift-guard vendored contract
+        run: |
+          bun run openapi:vendor
+          git diff --exit-code contracts/PRODUCING_COMMIT contracts/openapi.json
+
       - name: Typecheck
         run: bun run typecheck
 

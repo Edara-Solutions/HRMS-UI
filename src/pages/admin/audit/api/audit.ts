@@ -1,67 +1,46 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api";
+import { parsePlatformAuditTrailPage } from "./audit-runtime-contract";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+export type PlatformAuditTrailEvent = components["schemas"]["PlatformAuditTrailPage"]["items"][number];
+export type PlatformAuditTrailPage = components["schemas"]["PlatformAuditTrailPage"];
 
-export type AuditOutcome = "success" | "failure";
+import type { components } from "@/shared/api";
 
-export interface AuditEntry {
-  action: string;
-  module: string;
-  targetType: string | null;
-  targetPublicId: string | null;
-  outcome: AuditOutcome;
-  metadata: Record<string, unknown>;
-  createdAt: string;
+export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";
+
+export interface PlatformAuditTrailParams {
+  cursor?: string;
+  limit?: number;
+  companyPublicId?: string;
+  scope?: PlatformAuditTrailScope;
 }
 
-export interface AuditListMeta {
-  mode: "page";
-  page: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
-}
-
-export interface AuditListResponse {
-  items: AuditEntry[];
-  meta: AuditListMeta;
-}
-
-// ─── Query Keys ───────────────────────────────────────────────────────────────
-
-export const auditKeys = {
-  all: ["audit"] as const,
-  list: (params: AuditListParams) => ["audit", "list", params] as const,
+export const auditTrailKeys = {
+  all: ["audit-trail"] as const,
+  platform: (params: PlatformAuditTrailParams) =>
+    ["audit-trail", "platform", params] as const,
 };
 
-// ─── Params ───────────────────────────────────────────────────────────────────
+export async function fetchPlatformAuditTrail(
+  params: PlatformAuditTrailParams,
+): Promise<PlatformAuditTrailPage> {
+  const searchParams: Record<string, string> = {};
+  if (params.cursor) searchParams.cursor = params.cursor;
+  if (params.limit) searchParams.limit = String(params.limit);
+  if (params.companyPublicId) searchParams.companyPublicId = params.companyPublicId;
+  if (params.scope) searchParams.scope = params.scope;
 
-export interface AuditListParams {
-  action?: string;
-  outcome?: AuditOutcome;
-  targetPublicId?: string;
-  page?: number;
-  pageSize?: number;
+  const response: unknown = await apiClient
+    .get("platform/audit-trail", { searchParams })
+    .json();
+
+  return parsePlatformAuditTrailPage(response);
 }
 
-// ─── API Fns ──────────────────────────────────────────────────────────────────
-
-async function fetchAuditLog(params: AuditListParams): Promise<AuditListResponse> {
-  const searchParams = new URLSearchParams();
-  if (params.action) searchParams.set("action", params.action);
-  if (params.outcome) searchParams.set("outcome", params.outcome);
-  if (params.targetPublicId) searchParams.set("targetPublicId", params.targetPublicId);
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.pageSize) searchParams.set("pageSize", String(params.pageSize));
-  return apiClient.get("audit", { searchParams }).json();
-}
-
-// ─── Hooks ────────────────────────────────────────────────────────────────────
-
-export function useAuditLog(params: AuditListParams = {}) {
+export function usePlatformAuditTrail(params: PlatformAuditTrailParams = {}) {
   return useQuery({
-    queryKey: auditKeys.list(params),
-    queryFn: () => fetchAuditLog(params),
+    queryKey: auditTrailKeys.platform(params),
+    queryFn: () => fetchPlatformAuditTrail(params),
   });
 }

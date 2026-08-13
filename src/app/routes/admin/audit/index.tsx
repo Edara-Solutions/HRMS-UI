@@ -2,18 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { AdminAuditPage } from "@/pages/admin/audit";
 
-const auditOutcomes = ["success", "failure"] as const;
-
 const adminAuditSearchSchema = z.object({
-  q: z
-    .preprocess(
-      (value) => (typeof value === "string" && value.trim() ? value.trim() : undefined),
-      z.string().max(120).optional(),
-    )
-    .catch(undefined),
-  outcome: z.enum(auditOutcomes).optional().catch(undefined),
-  page: z.coerce.number().int().min(1).catch(1),
-  pageSize: z.coerce.number().int().min(1).max(100).catch(10),
+  cursor: z.string().max(500).optional().catch(undefined),
+  limit: z.coerce.number().int().min(1).max(100).catch(50),
+  companyPublicId: z.string().uuid().optional().catch(undefined),
+  scope: z.enum(["PLATFORM", "COMPANY"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/admin/audit/")({

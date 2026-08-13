@@ -16,4 +16,6 @@ bun run build
 Quality gates, hooks, and CI policy are documented in
 [`docs/automation-workflow.md`](docs/automation-workflow.md).
 
-The OpenAPI type generation script currently targets `http://localhost:3000/api/v1/openapi.json`.
+The OpenAPI snapshot is vendored from the backend into `contracts/` and pinned to
+its producing commit. Generate types from it with `bun run openapi:gen` (or
+`bun run openapi:vendor` then `bun run openapi:types`); CI drift-guards both.

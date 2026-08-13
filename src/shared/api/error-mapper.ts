@@ -22,12 +22,14 @@ const BACKEND_GENERIC_MESSAGE = "Invalid credentials";
 export async function readBackendErrorMessage(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json();
-    return body !== null &&
-      typeof body === "object" &&
-      "error" in body &&
-      typeof body.error === "string"
-      ? body.error
-      : null;
+    if (body === null || typeof body !== "object") return null;
+    const problem = body as { detail?: unknown; title?: unknown; error?: unknown };
+    // The locked contract is RFC 9457: `detail` carries the human-readable cause.
+    // `error` is read only as a fallback for endpoints that still bypass the hook
+    // (e.g. the login throttle's raw 429) — see #146.
+    if (typeof problem.detail === "string") return problem.detail;
+    if (typeof problem.error === "string") return problem.error;
+    return null;
   } catch {
     return null;
   }
