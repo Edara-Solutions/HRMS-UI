@@ -18,7 +18,9 @@
     "test:e2e": "bun scripts/run-e2e.mjs",
     "quality": "bun run typecheck && bun run lint && bun run test && bun run build",
     "prepare": "bun scripts/install-hooks.mjs",
-    "openapi:types": "openapi-typescript http://localhost:3000/api/v1/openapi.json -o src/shared/api/schema.d.ts",
+    "openapi:vendor": "bun run scripts/vendor-openapi.mjs",
+    "openapi:types": "openapi-typescript contracts/openapi.json -o src/shared/api/schema.d.ts",
+    "openapi:gen": "bun run openapi:vendor && bun run openapi:types",
     "doctor": "react-doctor ."
   },
   "dependencies": {

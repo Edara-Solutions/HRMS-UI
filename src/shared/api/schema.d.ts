@@ -48,6 +48,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/platform/audit-trail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    cursor?: string;
+                    limit?: number;
+                    companyPublicId?: string;
+                    scope?: "PLATFORM" | "COMPANY";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlatformAuditTrailPage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/audit-trail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    cursor?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompanyAuditTrailPage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -690,14 +768,14 @@ export interface paths {
                 query?: {
                     status?: string;
                     source?: string;
-                    ownerUserId?: number;
                     country?: string;
                     createdFrom?: string;
                     createdTo?: string;
                     search?: string;
+                    isArchived?: boolean;
                     page?: number;
                     pageSize?: number;
-                    sort?: "createdAtAsc" | "createdAtDesc";
+                    sort?: "createdAtAsc" | "createdAtDesc" | "lastAttemptAtAsc" | "lastAttemptAtDesc";
                 };
                 header?: never;
                 path?: never;
@@ -721,7 +799,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -732,7 +817,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -756,9 +848,8 @@ export interface paths {
                         country?: string;
                         city?: string;
                         source: components["schemas"]["LeadSource"];
-                        status: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "WON_CONVERTED" | "LOST";
+                        status: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "LOST";
                         lostReason?: components["schemas"]["LostReason"] | null;
-                        ownerUserId?: number | null;
                         primaryContact?: {
                             name?: string;
                             /** Format: email */
@@ -787,7 +878,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -798,7 +896,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -844,7 +949,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -855,7 +967,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -888,7 +1007,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -899,7 +1025,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -926,10 +1059,8 @@ export interface paths {
                         country?: string | null;
                         city?: string | null;
                         source?: components["schemas"]["LeadSource"];
-                        status?: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "WON_CONVERTED" | "LOST";
+                        status?: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "LOST";
                         lostReason?: components["schemas"]["LostReason"] | null;
-                        ownerUserId?: number | null;
-                        allowStatusOverride?: boolean;
                     };
                 };
             };
@@ -950,7 +1081,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -961,12 +1099,238 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
             };
         };
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/conversion-eligibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadConversionEligibility"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadWithContacts"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadWithContacts"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/leads/{publicId}/contacts": {
@@ -1016,7 +1380,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1027,7 +1398,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1075,7 +1453,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1086,7 +1471,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1132,7 +1524,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1143,87 +1542,19 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
             };
         };
-        trace?: never;
-    };
-    "/api/v1/leads/{publicId}/convert": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    publicId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        phoneNumber: string;
-                        name?: string;
-                        country?: string;
-                        website?: string;
-                        logo?: string;
-                        addressLine?: string;
-                        ownerFirstName: string;
-                        ownerLastName: string;
-                        /** Format: email */
-                        ownerEmail: string;
-                        ownerLocale?: "en" | "ar";
-                    };
-                };
-            };
-            responses: {
-                /** @description Default Response */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ConvertedCompany"];
-                    };
-                };
-                /** @description Default Response */
-                "4XX": {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                        };
-                    };
-                };
-                /** @description Default Response */
-                "5XX": {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                        };
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/api/v1/leads/{publicId}/activities": {
@@ -1263,7 +1594,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1274,7 +1612,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1315,7 +1660,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1326,7 +1678,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1374,7 +1733,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1385,12 +1751,1810 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    status?: "PENDING" | "APPROVED" | "REJECTED";
+                    page?: number;
+                    pageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        leadPublicId: string;
+                        /** Format: uuid */
+                        planPublicId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/immediate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Create a PENDING request, then approve it with the same setup and trial contract as manual approval. Approval failure leaves the PENDING request available for review. */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        leadPublicId: string;
+                        /** Format: uuid */
+                        planPublicId: string;
+                        /** @description Supported values are presets 1, 2, and 3, or -1 for a custom checklist. Semantic validation runs after the PENDING request is committed. */
+                        templateKey: number;
+                        /** @description Custom checklist items are validated by the shared setup resolver after the PENDING request is committed. */
+                        setupSteps?: unknown[];
+                        trialEndDate?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        planPublicId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            /** @description Select one backend preset, or use templateKey -1 with custom setupSteps. Failure example: templateKey 1 with setupSteps [] is rejected before provisioning. */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Supported values are presets 1, 2, and 3, or -1 for a custom checklist. Semantic validation runs after the PENDING request is committed. */
+                        templateKey: number;
+                        /** @description Custom checklist items are validated by the shared setup resolver after the PENDING request is committed. */
+                        setupSteps?: unknown[];
+                        trialEndDate?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/onboarding-delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/onboarding-delivery/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/access-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            policy: {
+                                publicId: string | null;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                                reason: string | null;
+                                note: string | null;
+                                effectiveFrom: string | null;
+                                effectiveUntil: string | null;
+                                changedByUserId: number | null;
+                                createdAt: string | null;
+                                updatedAt: string | null;
+                                source: "policy" | "legacy_site_status" | "default";
+                            };
+                            effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                            /** Format: date-time */
+                            effectiveAt: string;
+                            isCurrentlyEffective: boolean;
+                            isExpired: boolean;
+                            legacyMapping: string | null;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                        reason: string;
+                        note?: string | null;
+                        /** Format: date-time */
+                        effectiveFrom: string;
+                        effectiveUntil?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            publicId: string | null;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                            reason: string | null;
+                            note: string | null;
+                            effectiveFrom: string | null;
+                            effectiveUntil: string | null;
+                            changedByUserId: number | null;
+                            createdAt: string | null;
+                            updatedAt: string | null;
+                            source: "policy" | "legacy_site_status" | "default";
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            lifecycleStatus: "ONBOARDING" | "ACTIVE" | "SUSPENDED" | "CLOSED";
+                            activatedAt: string | null;
+                            canActivate: boolean;
+                            unmetRequirements: {
+                                code: "OWNER_ONBOARDING_INCOMPLETE" | "COMPANY_PROFILE_INCOMPLETE" | "REQUIRED_SETUP_INCOMPLETE" | "ACCESS_POLICY_RESTRICTS_ACTIVATION" | "SUBSCRIPTION_NOT_ACTIVATABLE";
+                                message: string;
+                                details: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            subscription: {
+                                /** Format: uuid */
+                                publicId: string;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                status: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                /** Format: date-time */
+                                startDate: string;
+                                endDate: string | null;
+                                /** Format: date-time */
+                                initialTrialEndDate: string;
+                                /** Format: date-time */
+                                trialEndDate: string;
+                                note: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            history: {
+                                /** Format: uuid */
+                                publicId: string;
+                                type: "TRIAL_STARTED" | "TRIAL_EXTENDED" | "TRIAL_EXPIRED";
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                oldStatus: ("TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED") | null;
+                                newStatus: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                oldTrialEndDate: string | null;
+                                /** Format: date-time */
+                                newTrialEndDate: string;
+                                actorUserId: number | null;
+                                reason: string | null;
+                                /** Format: date-time */
+                                occurredAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/subscription/trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        trialEndDate: string;
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            subscription: {
+                                /** Format: uuid */
+                                publicId: string;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                status: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                /** Format: date-time */
+                                startDate: string;
+                                endDate: string | null;
+                                /** Format: date-time */
+                                initialTrialEndDate: string;
+                                /** Format: date-time */
+                                trialEndDate: string;
+                                note: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            history: {
+                                /** Format: uuid */
+                                publicId: string;
+                                type: "TRIAL_STARTED" | "TRIAL_EXTENDED" | "TRIAL_EXPIRED";
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                oldStatus: ("TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED") | null;
+                                newStatus: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                oldTrialEndDate: string | null;
+                                /** Format: date-time */
+                                newTrialEndDate: string;
+                                actorUserId: number | null;
+                                reason: string | null;
+                                /** Format: date-time */
+                                occurredAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/company-subscriptions/expire-trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            expiredCount: number;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            name: string;
+                            logoUrl: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            country: string | null;
+                            city: string | null;
+                            addressLine: string | null;
+                            taxNumber: string | null;
+                            commercialNumber: string | null;
+                            status: "INCOMPLETE" | "COMPLETE";
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name?: string;
+                        logoUrl?: string | null;
+                        email?: string | null;
+                        phone?: string | null;
+                        country?: string | null;
+                        city?: string | null;
+                        addressLine?: string | null;
+                        taxNumber?: string | null;
+                        commercialNumber?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            name: string;
+                            logoUrl: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            country: string | null;
+                            city: string | null;
+                            addressLine: string | null;
+                            taxNumber: string | null;
+                            commercialNumber: string | null;
+                            status: "INCOMPLETE" | "COMPLETE";
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            templateVersion: number;
+                            steps: {
+                                /** Format: uuid */
+                                publicId: string;
+                                stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                                status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                                isRequired: boolean;
+                                sequence: number;
+                                templateVersion: number;
+                                dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                                startedAt: string | null;
+                                completedAt: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1430,7 +3594,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1441,7 +3612,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1481,7 +3659,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1492,7 +3677,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1540,7 +3732,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1551,7 +3750,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1597,7 +3803,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1608,7 +3821,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1656,7 +3876,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1667,7 +3894,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1707,7 +3941,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1718,7 +3959,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1766,7 +4014,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1777,7 +4032,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1823,7 +4085,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1834,7 +4103,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1882,7 +4158,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1893,7 +4176,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -1907,80 +4197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/company-configs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Default Response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        companyId: number;
-                        planId: number;
-                        siteStatus: {
-                            isFrozen: boolean;
-                            isReadOnly: boolean;
-                            isBlocked: boolean;
-                            isUnderMaintenance: boolean;
-                            note?: string | null;
-                        };
-                        /** @enum {string} */
-                        subscriptionStatus: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
-                        /** Format: date-time */
-                        subscriptionStartDate?: string | null;
-                        /** Format: date-time */
-                        subscriptionEndDate?: string | null;
-                        /** Format: date-time */
-                        trialEndDate?: string | null;
-                        subscriptionNotes?: string | null;
-                    };
-                };
-            };
-            responses: {
-                /** @description Default Response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/company-configs/{publicId}": {
+    "/api/v1/companies/{publicId}/email-settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -2003,35 +4220,49 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["CompanyEmailSettings"];
+                    };
                 };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    publicId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
                 /** @description Default Response */
-                200: {
+                "4XX": {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
                 };
             };
         };
-        options?: never;
-        head?: never;
-        patch: {
+        put: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -2043,24 +4274,17 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** Format: uuid */
-                        planPublicId?: string;
-                        siteStatus?: {
-                            isFrozen?: boolean;
-                            isReadOnly?: boolean;
-                            isBlocked?: boolean;
-                            isUnderMaintenance?: boolean;
-                            note?: string | null;
-                        };
-                        /** @enum {string} */
-                        subscriptionStatus?: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
-                        /** Format: date-time */
-                        subscriptionStartDate?: string | null;
-                        /** Format: date-time */
-                        subscriptionEndDate?: string | null;
-                        /** Format: date-time */
-                        trialEndDate?: string | null;
-                        subscriptionNotes?: string | null;
+                        displayName: string;
+                        /** Format: uri */
+                        logoUrl?: string;
+                        primaryColor: string;
+                        onPrimaryColor: string;
+                        footerIdentity: string;
+                        senderLocalPart: string;
+                        /** Format: email */
+                        replyToEmail: string;
+                        defaultLocale: "en" | "ar";
+                        defaultTimeZone: string;
                     };
                 };
             };
@@ -2070,10 +4294,53 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["CompanyEmailSettings"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
                 };
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/companies": {
@@ -2307,7 +4574,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2318,7 +4592,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2374,7 +4655,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2385,7 +4673,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2441,7 +4736,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2452,7 +4754,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2508,7 +4817,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2519,7 +4835,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2575,7 +4898,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2586,7 +4916,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -2614,7 +4951,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2688,7 +5025,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2727,7 +5064,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2822,7 +5159,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode: string;
-                    billingInterval: string;
+                    billingInterval: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2863,7 +5200,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                     isActive?: boolean;
                 };
@@ -2901,7 +5238,8 @@ export interface paths {
                         regionCode?: string | null;
                         currencyCode: string;
                         amountMinor: number;
-                        billingInterval: string;
+                        /** @enum {string} */
+                        billingInterval: "monthly" | "quarterly" | "biannual" | "annually";
                         /** @default 1 */
                         intervalCount?: number;
                         isActive?: boolean;
@@ -2991,7 +5329,8 @@ export interface paths {
                         regionCode?: string | null;
                         currencyCode?: string;
                         amountMinor?: number;
-                        billingInterval?: string;
+                        /** @enum {string} */
+                        billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                         intervalCount?: number;
                         isActive?: boolean;
                     };
@@ -3771,7 +6110,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3782,7 +6128,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3830,7 +6183,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3841,7 +6201,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3889,7 +6256,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3900,7 +6274,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3951,7 +6332,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -3962,7 +6350,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4010,7 +6405,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4021,7 +6423,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4029,6 +6438,159 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/email-template-variants/{key}/removal-readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TemplateVariantRemovalReadiness"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/email-template-variants/{key}/migrate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        toRevisionKey?: string;
+                        reason?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TemplateMigrationResult"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -4080,7 +6642,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4091,7 +6660,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4137,7 +6713,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4148,7 +6731,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4189,7 +6779,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4200,7 +6797,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4248,7 +6852,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4259,7 +6870,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4305,7 +6923,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4316,7 +6941,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4373,7 +7005,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4384,7 +7023,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4432,7 +7078,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4443,7 +7096,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4499,7 +7159,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4510,7 +7177,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4564,7 +7238,14 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4575,7 +7256,237 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingStatusResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending/{context}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    context: components["schemas"]["EmailContext"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingContextStatus"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending/{context}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    context: components["schemas"]["EmailContext"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingContextStatus"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
                         };
                     };
                 };
@@ -4597,7 +7508,14 @@ export interface components {
             timestamp?: string;
         };
         ErrorEnvelope: {
-            error: string;
+            /** Format: uri-reference */
+            type: string;
+            title: string;
+            status: number;
+            detail: string;
+            /** Format: uri-reference */
+            instance: string;
+            traceId: string;
         };
         PageMeta: {
             /** @enum {string} */
@@ -4626,6 +7544,9 @@ export interface components {
             lostReason: components["schemas"]["LostReason"] | null;
             isConverted: boolean;
             numberOfAttempts: number;
+            /** Format: date-time */
+            lastAttemptAt: string;
+            isArchived: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -4661,10 +7582,21 @@ export interface components {
             lead: components["schemas"]["Lead"];
             contacts: components["schemas"]["LeadContact"][];
         };
+        LeadConversionEligibilityReason: {
+            code: "LEAD_ARCHIVED" | "LEAD_ALREADY_CONVERTED" | "STATUS_NOT_CONVERTIBLE" | "PRIMARY_CONTACT_MISSING" | "PRIMARY_CONTACT_NAME_REQUIRED" | "PRIMARY_CONTACT_EMAIL_REQUIRED";
+            message: string;
+        };
+        LeadConversionEligibility: {
+            isEligible: boolean;
+            reasons: components["schemas"]["LeadConversionEligibilityReason"][];
+            primaryContact: components["schemas"]["LeadContact"] | null;
+        };
         LeadDetails: {
             lead: components["schemas"]["Lead"];
             contacts: components["schemas"]["LeadContact"][];
             activities: components["schemas"]["LeadActivity"][];
+            primaryContact: components["schemas"]["LeadContact"] | null;
+            conversionEligibility: components["schemas"]["LeadConversionEligibility"];
         };
         LeadCreateResult: {
             lead: components["schemas"]["Lead"];
@@ -4680,23 +7612,6 @@ export interface components {
         LeadActivityListResponse: {
             items: components["schemas"]["LeadActivity"][];
             meta: components["schemas"]["PageMeta"];
-        };
-        ConvertedCompany: {
-            /** Format: uuid */
-            publicId: string;
-            logo: string | null;
-            name: string;
-            website: string | null;
-            phoneNumber: string;
-            country: string;
-            companyCode: string;
-            isActive: boolean;
-            addressLine: string | null;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            deletedAt: string | null;
         };
         EmailContext: "EDARA" | "COMPANY";
         EmailLocale: "en" | "ar";
@@ -4768,6 +7683,19 @@ export interface components {
             context: components["schemas"]["EmailContext"];
             payloadVersion: number;
             supportedLocales: components["schemas"]["EmailLocale"][];
+            deprecated: boolean;
+        };
+        TemplateMigrationResult: {
+            fromRevisionKey: string;
+            toRevisionKey: string | null;
+            emailTypeKey: string;
+            migratedCount: number;
+        };
+        TemplateVariantRemovalReadiness: {
+            revisionKey: string;
+            activeAssignments: number;
+            pendingMessages: number;
+            removable: boolean;
         };
         TestSendResponse: {
             /** Format: uuid */
@@ -4799,6 +7727,12 @@ export interface components {
             lastFailureKind: string | null;
             providerMessageId: string | null;
             companyId: number | null;
+            company: {
+                /** Format: uuid */
+                publicId: string;
+                name: string;
+                code: string;
+            } | null;
             businessReference: string;
             /** Format: date-time */
             createdAt: string;
@@ -4808,6 +7742,16 @@ export interface components {
         DeliveryListResponse: {
             items: components["schemas"]["DeliveryRecordResponse"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        SendingContextStatus: {
+            context: components["schemas"]["EmailContext"];
+            paused: boolean;
+            reason: string | null;
+            updatedBy: number | null;
+            updatedAt: string | null;
+        };
+        SendingStatusResponse: {
+            items: components["schemas"]["SendingContextStatus"][];
         };
         DnsRecordKind: "OWNERSHIP_TXT" | "DKIM" | "RETURN_PATH";
         DnsCheckStatus: "PENDING" | "VERIFIED" | "FAILED";
@@ -4854,6 +7798,267 @@ export interface components {
         CompanyEmailReadiness: {
             ready: boolean;
             reason?: components["schemas"]["CompanyEmailReadinessReason"];
+        };
+        CompanyEmailSettings: {
+            displayName: string;
+            /** Format: uri */
+            logoUrl?: string;
+            primaryColor: string;
+            onPrimaryColor: string;
+            footerIdentity: string;
+            senderLocalPart: string;
+            /** Format: email */
+            replyToEmail: string;
+            defaultLocale: "en" | "ar";
+            defaultTimeZone: string;
+        } & {
+            sendingDomain: string | null;
+            senderVerified: boolean;
+        };
+        PlatformAuditTrailPage: {
+            items: ({
+                /** @enum {string} */
+                eventType: "audit.trail.platform_read";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    companyPublicId: string | null;
+                    scope: "PLATFORM" | "COMPANY" | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.material_updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "taxNumber" | "commercialNumber";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    beforeStatus: "INCOMPLETE" | "COMPLETE";
+                    /** @enum {string} */
+                    afterStatus: "COMPLETE";
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "audit.event.unavailable";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                reason: "UNSUPPORTED_OR_DAMAGED";
+            })[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        CompanyAuditTrailPage: {
+            items: ({
+                /** @enum {string} */
+                eventType: "company.profile.material_updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "taxNumber" | "commercialNumber";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    beforeStatus: "INCOMPLETE" | "COMPLETE";
+                    /** @enum {string} */
+                    afterStatus: "COMPLETE";
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "audit.event.unavailable";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                reason: "UNSUPPORTED_OR_DAMAGED";
+            })[];
+            nextCursor: string | null;
+            hasMore: boolean;
         };
     };
     responses: never;
