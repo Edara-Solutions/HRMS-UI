@@ -120,7 +120,7 @@ describe("AcceptInvitationPage", () => {
 
   it("gives safe recovery guidance for invalid or expired invitation tokens", async () => {
     acceptPostMock.mockReturnValue(
-      await rejectedWith(409, { error: "Invitation token already used" }),
+      await rejectedWith(409, { detail: "Invitation token already used" }),
     );
 
     renderPage();

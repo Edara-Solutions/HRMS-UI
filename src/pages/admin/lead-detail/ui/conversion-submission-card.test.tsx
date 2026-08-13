@@ -174,7 +174,7 @@ describe("ConversionSubmissionCard", () => {
       }
       throw new Error(`Unexpected path: ${path}`);
     });
-    apiPostMock.mockReturnValue(errorResponse(500, { error: "Provisioning failed" }));
+    apiPostMock.mockReturnValue(errorResponse(500, { detail: "Provisioning failed" }));
     renderCard();
     await selectGrowthPlan();
 

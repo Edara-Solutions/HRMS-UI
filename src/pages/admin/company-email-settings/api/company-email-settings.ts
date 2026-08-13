@@ -44,6 +44,7 @@ const effectiveTemplateSchema = z.object({
   context: emailContextSchema,
   payloadVersion: z.number(),
   supportedLocales: z.array(emailLocaleSchema),
+  deprecated: z.boolean(),
 }) satisfies z.ZodType<components["schemas"]["EffectiveTemplate"]>;
 const emailPreviewSchema = z.object({
   emailTypeKey: z.string(),
@@ -66,6 +67,7 @@ const testSendResponseSchema = z.object({
   locale: emailLocaleSchema,
   isTest: z.literal(true),
 }) satisfies z.ZodType<components["schemas"]["TestSendResponse"]>;
+export type CompanyBrand = z.infer<typeof companyBrandSchema>;
 const companyBrandSchema = z.object({
   publicId: z.string(),
   logo: z.string().nullable(),
@@ -79,7 +81,7 @@ const companyBrandSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   deletedAt: z.string().nullable(),
-}) satisfies z.ZodType<components["schemas"]["ConvertedCompany"]>;
+});
 
 interface TestSendInput {
   companyPublicId: string;
@@ -119,9 +121,7 @@ async function fetchEmailTypes(): Promise<components["schemas"]["EmailType"][]> 
   return emailTypeListResponseSchema.parse(response).items;
 }
 
-async function fetchCompanyBrand(
-  companyPublicId: string,
-): Promise<components["schemas"]["ConvertedCompany"]> {
+async function fetchCompanyBrand(companyPublicId: string): Promise<CompanyBrand> {
   const response: unknown = await apiClient.get(`companies/${companyPublicId}`).json();
   return companyBrandSchema.parse(response);
 }
