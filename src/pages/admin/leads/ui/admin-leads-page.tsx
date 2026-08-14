@@ -1,6 +1,7 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import type { DateEdgeValue } from "@/shared/lib/date-edge";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
@@ -101,11 +102,14 @@ export function AdminLeadsPage() {
     });
   }
 
-  function setCreatedDateFilter(field: "createdFrom" | "createdTo", value: string) {
+  function setCreatedDateFilter(
+    field: "createdFrom" | "createdTo",
+    value: DateEdgeValue | undefined,
+  ) {
     void navigate({
       search: (previous) => ({
         ...previous,
-        [field]: value || undefined,
+        [field]: value,
         page: 1,
       }),
     });
@@ -170,8 +174,8 @@ export function AdminLeadsPage() {
           setSourceFilter("");
           setCountryInput("");
           setArchivedFilter(false);
-          setCreatedDateFilter("createdFrom", "");
-          setCreatedDateFilter("createdTo", "");
+          setCreatedDateFilter("createdFrom", undefined);
+          setCreatedDateFilter("createdTo", undefined);
           setSort(undefined);
         }}
         onSortChange={setSort}

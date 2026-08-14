@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import type { LeadSort, LeadSource, LeadStatus } from "@/pages/admin/leads";
 import { AdminLeadsPage } from "@/pages/admin/leads";
+import { parseDateEdgeSearchValue } from "@/shared/lib/date-edge";
 
 const leadStatuses = [
   "NEW",
@@ -40,6 +41,16 @@ const leadSorts = [
   "lastAttemptAtDesc",
 ] as const satisfies readonly LeadSort[];
 
+const dateEdgeSearchSchema = z.preprocess(
+  parseDateEdgeSearchValue,
+  z
+    .object({
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      edgeDateType: z.enum(["inclusive", "exclusive"]),
+    })
+    .optional(),
+);
+
 const adminLeadsSearchSchema = z.object({
   q: z
     .preprocess(
@@ -55,16 +66,8 @@ const adminLeadsSearchSchema = z.object({
       z.string().max(120).optional(),
     )
     .catch(undefined),
-  createdFrom: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional()
-    .catch(undefined),
-  createdTo: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional()
-    .catch(undefined),
+  createdFrom: dateEdgeSearchSchema.catch(undefined),
+  createdTo: dateEdgeSearchSchema.catch(undefined),
   isArchived: z
     .preprocess(
       (value) => (value === "true" ? true : value === "false" ? false : value),

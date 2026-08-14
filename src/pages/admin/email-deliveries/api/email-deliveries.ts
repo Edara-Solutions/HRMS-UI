@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiClient, type components } from "@/shared/api";
+import { type DateEdgeValue, serializeDateEdgeValue } from "@/shared/lib/date-edge";
 
 export type DeliveryCompanySummary = {
   publicId: string;
@@ -28,8 +29,8 @@ export interface DeliveryListParams {
   emailTypeKey?: string;
   recipientEmail?: string;
   status?: DeliveryStatus;
-  createdFrom?: string;
-  createdTo?: string;
+  createdFrom?: DateEdgeValue;
+  createdTo?: DateEdgeValue;
   page: number;
   pageSize: number;
 }
@@ -132,9 +133,15 @@ function deliverySearchParams(params: DeliveryListParams): URLSearchParams {
     page: String(params.page),
     pageSize: String(params.pageSize),
   });
-  for (const [key, value] of Object.entries(params)) {
-    if (value && key !== "page" && key !== "pageSize") searchParams.set(key, value);
-  }
+  if (params.companyPublicId) searchParams.set("companyPublicId", params.companyPublicId);
+  if (params.context) searchParams.set("context", params.context);
+  if (params.emailTypeKey) searchParams.set("emailTypeKey", params.emailTypeKey);
+  if (params.recipientEmail) searchParams.set("recipientEmail", params.recipientEmail);
+  if (params.status) searchParams.set("status", params.status);
+  const createdFrom = serializeDateEdgeValue(params.createdFrom);
+  const createdTo = serializeDateEdgeValue(params.createdTo);
+  if (createdFrom) searchParams.set("createdFrom", createdFrom);
+  if (createdTo) searchParams.set("createdTo", createdTo);
   return searchParams;
 }
 

@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, ClipboardCheck, ExternalLink } from "lucide-react";
+import { type DateEdgeValue, getDateEdgeDate, getDateEdgeType } from "@/shared/lib/date-edge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
@@ -187,11 +188,14 @@ export function AdminConversionRequestsPage() {
     });
   }
 
-  function setCreatedDateFilter(field: "createdFrom" | "createdTo", value: string) {
+  function setCreatedDateFilter(
+    field: "createdFrom" | "createdTo",
+    value: DateEdgeValue | undefined,
+  ) {
     void navigate({
       search: (previous) => ({
         ...previous,
-        [field]: value || undefined,
+        [field]: value,
         page: 1,
       }),
     });
@@ -207,7 +211,7 @@ export function AdminConversionRequestsPage() {
       params: { publicId },
     });
   }
-  
+
   function onReset() {
     void navigate({
       search: (previous) => ({
@@ -251,16 +255,22 @@ export function AdminConversionRequestsPage() {
           <div className="w-full sm:w-32">
             <DatePicker
               id="conversion-requests-created-from"
-              value={createdFrom}
-              onChange={(value) => setCreatedDateFilter("createdFrom", value ?? "")}
+              value={getDateEdgeDate(createdFrom)}
+              edgeDateType={getDateEdgeType(createdFrom)}
+              onChange={(value) =>
+                setCreatedDateFilter("createdFrom", value ? createdFrom : undefined)
+              }
+              onEdgeValueChange={(value) => setCreatedDateFilter("createdFrom", value)}
               placeholder="Date From"
             />
           </div>
           <div className="w-full sm:w-32">
             <DatePicker
               id="conversion-requests-created-to"
-              value={createdTo}
-              onChange={(value) => setCreatedDateFilter("createdTo", value ?? "")}
+              value={getDateEdgeDate(createdTo)}
+              edgeDateType={getDateEdgeType(createdTo)}
+              onChange={(value) => setCreatedDateFilter("createdTo", value ? createdTo : undefined)}
+              onEdgeValueChange={(value) => setCreatedDateFilter("createdTo", value)}
               placeholder="Date To"
             />
           </div>
