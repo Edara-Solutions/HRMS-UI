@@ -67,9 +67,7 @@ export function ConversionRequestCorrectionsCard({
             intent="action"
             type="button"
             disabled={
-              !selectedPlanPublicId ||
-              selectedPlanPublicId === request.plan.publicId ||
-              isMutating
+              !selectedPlanPublicId || selectedPlanPublicId === request.plan.publicId || isMutating
             }
             isLoading={isChangingPlan}
             onClick={onSavePlan}
