@@ -24,6 +24,7 @@ import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setu
 import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
 import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
+import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
 import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
 import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
 import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
@@ -114,6 +115,11 @@ const CompanyEmailSettingsIndexRoute =
 const CompanyDashboardIndexRoute = CompanyDashboardIndexRouteImport.update({
   id: "/dashboard/",
   path: "/dashboard/",
+  getParentRoute: () => CompanyRouteRoute,
+} as any)
+const CompanyAuditIndexRoute = CompanyAuditIndexRouteImport.update({
+  id: "/audit/",
+  path: "/audit/",
   getParentRoute: () => CompanyRouteRoute,
 } as any)
 const AdminSubscriptionsIndexRoute = AdminSubscriptionsIndexRouteImport.update({
@@ -222,6 +228,7 @@ export interface FileRoutesByFullPath {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
   "/company/profile/": typeof CompanyProfileIndexRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   "/admin/leads": typeof AdminLeadsIndexRoute
   "/admin/plans": typeof AdminPlansIndexRoute
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
+  "/company/audit": typeof CompanyAuditIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
   "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
   "/company/profile": typeof CompanyProfileIndexRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
   "/company/profile/": typeof CompanyProfileIndexRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
+    | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
     | "/company/profile/"
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | "/admin/leads"
     | "/admin/plans"
     | "/admin/subscriptions"
+    | "/company/audit"
     | "/company/dashboard"
     | "/company/email-settings"
     | "/company/profile"
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
+    | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
     | "/company/profile/"
@@ -501,6 +513,13 @@ declare module "@tanstack/react-router" {
       path: "/dashboard"
       fullPath: "/company/dashboard/"
       preLoaderRoute: typeof CompanyDashboardIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
+    "/company/audit/": {
+      id: "/company/audit/"
+      path: "/audit"
+      fullPath: "/company/audit/"
+      preLoaderRoute: typeof CompanyAuditIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
     }
     "/admin/subscriptions/": {
@@ -691,6 +710,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 interface CompanyRouteRouteChildren {
+  CompanyAuditIndexRoute: typeof CompanyAuditIndexRoute
   CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
   CompanyEmailSettingsIndexRoute: typeof CompanyEmailSettingsIndexRoute
   CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
@@ -698,6 +718,7 @@ interface CompanyRouteRouteChildren {
 }
 
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
+  CompanyAuditIndexRoute: CompanyAuditIndexRoute,
   CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
   CompanyEmailSettingsIndexRoute: CompanyEmailSettingsIndexRoute,
   CompanyProfileIndexRoute: CompanyProfileIndexRoute,
