@@ -7,6 +7,7 @@ import {
   parseLeadDetails,
   parseLeadListResponse,
 } from "@/shared/api";
+import { type DateEdgeValue, serializeDateEdgeValue } from "@/shared/lib/date-edge";
 
 // Types generated from the backend OpenAPI contract.
 
@@ -35,7 +36,11 @@ type LeadActivitiesPaths = paths["/api/v1/leads/{publicId}/activities"];
 
 type GeneratedLeadListParams = NonNullable<LeadsPaths["get"]["parameters"]["query"]>;
 export type LeadSort = "createdAtAsc" | "createdAtDesc" | "lastAttemptAtAsc" | "lastAttemptAtDesc";
-export type LeadListParams = Omit<GeneratedLeadListParams, "sort"> & { sort?: LeadSort };
+export type LeadListParams = Omit<GeneratedLeadListParams, "createdFrom" | "createdTo" | "sort"> & {
+  createdFrom?: DateEdgeValue;
+  createdTo?: DateEdgeValue;
+  sort?: LeadSort;
+};
 export type CreateLeadInput = LeadsPaths["post"]["requestBody"]["content"]["application/json"];
 export type UpdateLeadInput = LeadPaths["patch"]["requestBody"]["content"]["application/json"];
 export type AddContactInput =
@@ -62,8 +67,10 @@ async function fetchLeads(params: LeadListParams): Promise<LeadListResponse> {
   if (params.status) searchParams.set("status", params.status);
   if (params.source) searchParams.set("source", params.source);
   if (params.country) searchParams.set("country", params.country);
-  if (params.createdFrom) searchParams.set("createdFrom", params.createdFrom);
-  if (params.createdTo) searchParams.set("createdTo", params.createdTo);
+  const createdFrom = serializeDateEdgeValue(params.createdFrom);
+  const createdTo = serializeDateEdgeValue(params.createdTo);
+  if (createdFrom) searchParams.set("createdFrom", createdFrom);
+  if (createdTo) searchParams.set("createdTo", createdTo);
   if (params.isArchived !== undefined) {
     searchParams.set("isArchived", String(params.isArchived));
   }

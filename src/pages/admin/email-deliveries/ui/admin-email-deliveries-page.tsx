@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { cn } from "@/shared/lib/cn";
+import { type DateEdgeValue, getDateEdgeDate, getDateEdgeType } from "@/shared/lib/date-edge";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardTitle } from "@/shared/ui/card";
@@ -49,8 +50,8 @@ interface DeliveryFilterDraft {
   emailTypeKey: string;
   recipientEmail: string;
   status: DeliveryStatus | undefined;
-  createdFrom: string | undefined;
-  createdTo: string | undefined;
+  createdFrom: DateEdgeValue | undefined;
+  createdTo: DateEdgeValue | undefined;
 }
 
 const DELIVERY_STATUSES: DeliveryStatus[] = [
@@ -96,8 +97,8 @@ function fromSearch(search: {
   emailTypeKey?: string;
   recipientEmail?: string;
   status?: DeliveryStatus;
-  createdFrom?: string;
-  createdTo?: string;
+  createdFrom?: DateEdgeValue;
+  createdTo?: DateEdgeValue;
 }): DeliveryFilterDraft {
   return {
     companyPublicId: search.companyPublicId ?? "",
@@ -848,16 +849,24 @@ export function AdminEmailDeliveriesPage() {
               <DateTimePicker
                 id="delivery-from"
                 label="Created from"
-                value={draft.createdFrom}
+                value={getDateEdgeDate(draft.createdFrom)}
+                edgeDateType={getDateEdgeType(draft.createdFrom)}
                 boundary="from"
-                onChange={(createdFrom) => updateDraft({ createdFrom })}
+                onChange={(createdFrom) =>
+                  updateDraft({ createdFrom: createdFrom ? draft.createdFrom : undefined })
+                }
+                onEdgeValueChange={(createdFrom) => updateDraft({ createdFrom })}
               />
               <DateTimePicker
                 id="delivery-to"
                 label="Created to"
-                value={draft.createdTo}
+                value={getDateEdgeDate(draft.createdTo)}
+                edgeDateType={getDateEdgeType(draft.createdTo)}
                 boundary="to"
-                onChange={(createdTo) => updateDraft({ createdTo })}
+                onChange={(createdTo) =>
+                  updateDraft({ createdTo: createdTo ? draft.createdTo : undefined })
+                }
+                onEdgeValueChange={(createdTo) => updateDraft({ createdTo })}
               />
             </div>
           </form>

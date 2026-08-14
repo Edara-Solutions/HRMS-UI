@@ -1,7 +1,8 @@
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
+import { type DateEdgeType, type DateEdgeValue, toDateEdgeValue } from "@/shared/lib/date-edge";
 import { Button } from "./button";
-import { CalendarGrid, parseDateValue } from "./date-picker";
+import { CalendarGrid, EdgeDateTypeField, parseDateValue } from "./date-picker";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "./dialog";
 import { Input } from "./input";
 import { Label } from "./label";
@@ -37,6 +38,9 @@ interface DateTimePickerProps {
   label?: string;
   value: string | undefined;
   onChange: (nextValue: string | undefined) => void;
+  edgeDateType?: DateEdgeType;
+  onEdgeDateTypeChange?: (nextValue: DateEdgeType) => void;
+  onEdgeValueChange?: (nextValue: DateEdgeValue | undefined) => void;
   boundary?: DateTimeBoundary;
   description?: string;
   placeholder?: string;
@@ -48,6 +52,9 @@ export function DateTimePicker({
   label,
   value,
   onChange,
+  edgeDateType = "inclusive",
+  onEdgeDateTypeChange,
+  onEdgeValueChange,
   boundary = "from",
   description = "Select the date and time for this field.",
   placeholder = "Choose date and time",
@@ -59,6 +66,7 @@ export function DateTimePicker({
   const initialDraft = parsedValue ?? new Date();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Date | undefined>(parsedValue);
+  const [draftEdgeDateType, setDraftEdgeDateType] = useState<DateEdgeType>(edgeDateType);
   const [minuteInput, setMinuteInput] = useState(() => String(initialDraft.getMinutes()));
   const [month, setMonth] = useState(
     () => new Date(initialDraft.getFullYear(), initialDraft.getMonth(), 1),
@@ -73,6 +81,7 @@ export function DateTimePicker({
   function openPicker() {
     const nextDraft = parseDateValue(value) ?? defaultDraft();
     setDraft(nextDraft);
+    setDraftEdgeDateType(edgeDateType);
     setMinuteInput(String(nextDraft.getMinutes()));
     setMonth(new Date(nextDraft.getFullYear(), nextDraft.getMonth(), 1));
     setOpen(true);
@@ -230,6 +239,11 @@ export function DateTimePicker({
             </Select>
           </div>
         </div>
+        <EdgeDateTypeField
+          id={`${id}-edge`}
+          value={draftEdgeDateType}
+          onValueChange={setDraftEdgeDateType}
+        />
         <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
           <Button
             variant="ghost"
@@ -248,7 +262,13 @@ export function DateTimePicker({
             <Button
               size="sm"
               onClick={() => {
-                onChange(draft?.toISOString());
+                const nextValue = draft?.toISOString();
+                if (onEdgeValueChange) {
+                  onEdgeValueChange(toDateEdgeValue(nextValue, draftEdgeDateType));
+                } else {
+                  onChange(nextValue);
+                  onEdgeDateTypeChange?.(draftEdgeDateType);
+                }
                 setOpen(false);
               }}
             >

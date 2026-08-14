@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiClient } from "@/shared/api";
+import { type DateEdgeValue, serializeDateEdgeValue } from "@/shared/lib/date-edge";
 
 export const CONVERSION_REQUEST_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
 export const SETUP_STEP_TYPES = [
@@ -157,8 +158,8 @@ export type ApprovalInput = z.infer<typeof approvalInputSchema>;
 
 export interface ConversionRequestListParams {
   status?: ConversionRequestStatus;
-  createdFrom?: string;
-  createdTo?: string;
+  createdFrom?: DateEdgeValue;
+  createdTo?: DateEdgeValue;
   page?: number;
   pageSize?: number;
 }
@@ -175,8 +176,10 @@ export const conversionRequestKeys = {
 function createSearchParams(params: ConversionRequestListParams) {
   const searchParams = new URLSearchParams();
   if (params.status) searchParams.set("status", params.status);
-  if (params.createdFrom) searchParams.set("createdFrom", params.createdFrom);
-  if (params.createdTo) searchParams.set("createdTo", params.createdTo);
+  const createdFrom = serializeDateEdgeValue(params.createdFrom);
+  const createdTo = serializeDateEdgeValue(params.createdTo);
+  if (createdFrom) searchParams.set("createdFrom", createdFrom);
+  if (createdTo) searchParams.set("createdTo", createdTo);
   if (params.page) searchParams.set("page", String(params.page));
   if (params.pageSize) searchParams.set("pageSize", String(params.pageSize));
   return searchParams;

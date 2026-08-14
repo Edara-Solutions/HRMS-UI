@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { type DateEdgeValue, getDateEdgeDate, getDateEdgeType } from "@/shared/lib/date-edge";
 import { Button } from "@/shared/ui/button";
 import { CountrySelect } from "@/shared/ui/country-select";
 import { DatePicker } from "@/shared/ui/date-picker";
@@ -31,11 +32,14 @@ function isLeadSort(value: string): value is LeadSort {
 interface LeadListFiltersProps {
   archived: boolean;
   country: string;
-  createdFrom?: string;
-  createdTo?: string;
+  createdFrom?: DateEdgeValue;
+  createdTo?: DateEdgeValue;
   onArchivedChange: (value: boolean) => void;
   onCountryChange: (value: string) => void;
-  onCreatedDateChange: (field: "createdFrom" | "createdTo", value: string) => void;
+  onCreatedDateChange: (
+    field: "createdFrom" | "createdTo",
+    value: DateEdgeValue | undefined,
+  ) => void;
   onQueryChange: (value: string) => void;
   onReset: () => void;
   onSortChange: (value: LeadSort | undefined) => void;
@@ -126,21 +130,25 @@ export function LeadListFilters({
         id="admin-leads-country"
         className="lg:w-32"
       />
-      
+
       <div className="lg:w-32">
         <DatePicker
-        id="admin-leads-created-from"
-        value={createdFrom}
-        onChange={(value) => onCreatedDateChange("createdFrom", value ?? "")}
-        placeholder="Date From"
+          id="admin-leads-created-from"
+          value={getDateEdgeDate(createdFrom)}
+          edgeDateType={getDateEdgeType(createdFrom)}
+          onChange={(value) => onCreatedDateChange("createdFrom", value ? createdFrom : undefined)}
+          onEdgeValueChange={(value) => onCreatedDateChange("createdFrom", value)}
+          placeholder="Date From"
         />
       </div>
 
       <div className="lg:w-32">
         <DatePicker
           id="admin-leads-created-to"
-          value={createdTo}
-          onChange={(value) => onCreatedDateChange("createdTo", value ?? "")}
+          value={getDateEdgeDate(createdTo)}
+          edgeDateType={getDateEdgeType(createdTo)}
+          onChange={(value) => onCreatedDateChange("createdTo", value ? createdTo : undefined)}
+          onEdgeValueChange={(value) => onCreatedDateChange("createdTo", value)}
           placeholder="Date To"
         />
       </div>

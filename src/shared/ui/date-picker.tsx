@@ -1,9 +1,17 @@
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/shared/lib/cn";
+import {
+  allowEdgeDateChoice,
+  type DateEdgeType,
+  type DateEdgeValue,
+  dateEdgeTypeValues,
+  toDateEdgeValue,
+} from "@/shared/lib/date-edge";
 import { Button } from "./button";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "./dialog";
 import { Label } from "./label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 
 const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en-GB", {
@@ -44,6 +52,11 @@ function formatDateValue(value: string | undefined): string {
   if (!date) return "Choose date";
   return DATE_FORMATTER.format(date);
 }
+
+const DATE_EDGE_LABEL: Record<DateEdgeType, string> = {
+  inclusive: "Inclusive",
+  exclusive: "Exclusive",
+};
 
 export interface CalendarGridProps {
   month: Date;
@@ -118,11 +131,48 @@ export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: Ca
   );
 }
 
+interface EdgeDateTypeFieldProps {
+  id: string;
+  value: DateEdgeType;
+  onValueChange: (value: DateEdgeType) => void;
+}
+
+export function EdgeDateTypeField({ id, value, onValueChange }: EdgeDateTypeFieldProps) {
+  return (
+    <div className="mt-5">
+      <Label className="block text-xs" htmlFor={id}>
+        Edge
+      </Label>
+      <Select
+        value={value}
+        disabled={!allowEdgeDateChoice()}
+        onValueChange={(nextValue) => {
+          if (nextValue === "inclusive" || nextValue === "exclusive") onValueChange(nextValue);
+        }}
+      >
+        <SelectTrigger id={id} className="mt-1.5">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {dateEdgeTypeValues.map((edgeDateType) => (
+            <SelectItem key={edgeDateType} value={edgeDateType}>
+              {DATE_EDGE_LABEL[edgeDateType]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 interface DatePickerProps {
   id: string;
   label?: string;
   value: string | undefined;
   onChange: (nextValue: string | undefined) => void;
+  edgeDateType?: DateEdgeType;
+  onEdgeDateTypeChange?: (nextValue: DateEdgeType) => void;
+  onEdgeValueChange?: (nextValue: DateEdgeValue | undefined) => void;
   description?: string;
   placeholder?: string;
 }
@@ -132,6 +182,9 @@ export function DatePicker({
   label,
   value,
   onChange,
+  edgeDateType = "inclusive",
+  onEdgeDateTypeChange,
+  onEdgeValueChange,
   description = "Select the date for this field.",
   placeholder = "Choose date",
 }: DatePickerProps) {
@@ -141,6 +194,7 @@ export function DatePicker({
   const initialDraft = selectedDate ?? new Date();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Date | undefined>(selectedDate);
+  const [draftEdgeDateType, setDraftEdgeDateType] = useState<DateEdgeType>(edgeDateType);
   const [month, setMonth] = useState(
     () => new Date(initialDraft.getFullYear(), initialDraft.getMonth(), 1),
   );
@@ -148,6 +202,7 @@ export function DatePicker({
   function openPicker() {
     const nextDraft = parseDateValue(value) ?? new Date();
     setDraft(parseDateValue(value));
+    setDraftEdgeDateType(edgeDateType);
     setMonth(new Date(nextDraft.getFullYear(), nextDraft.getMonth(), 1));
     setOpen(true);
   }
@@ -195,6 +250,11 @@ export function DatePicker({
             onSelectDay={selectDay}
           />
         </div>
+        <EdgeDateTypeField
+          id={`${id}-edge`}
+          value={draftEdgeDateType}
+          onValueChange={setDraftEdgeDateType}
+        />
         <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
           <Button variant="ghost" size="sm" onClick={() => setDraft(undefined)}>
             Clear
@@ -206,7 +266,13 @@ export function DatePicker({
             <Button
               size="sm"
               onClick={() => {
-                onChange(draft ? toDateKey(draft) : undefined);
+                const nextValue = draft ? toDateKey(draft) : undefined;
+                if (onEdgeValueChange) {
+                  onEdgeValueChange(toDateEdgeValue(nextValue, draftEdgeDateType));
+                } else {
+                  onChange(nextValue);
+                  onEdgeDateTypeChange?.(draftEdgeDateType);
+                }
                 setOpen(false);
               }}
             >

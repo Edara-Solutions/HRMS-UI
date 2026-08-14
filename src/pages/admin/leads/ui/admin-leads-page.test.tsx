@@ -167,8 +167,8 @@ describe("AdminLeadsPage", () => {
 
   it("forwards archive and creation-date filters to the controlled API boundary", async () => {
     Object.assign(searchState, {
-      createdFrom: "2026-06-01",
-      createdTo: "2026-06-30",
+      createdFrom: { date: "2026-06-01", edgeDateType: "exclusive" },
+      createdTo: { date: "2026-06-30", edgeDateType: "inclusive" },
       isArchived: true,
     });
     leadsGetMock.mockReturnValue(jsonResponse(makeResponse()));
@@ -176,8 +176,12 @@ describe("AdminLeadsPage", () => {
 
     await waitFor(() => expect(leadsGetMock).toHaveBeenCalled());
     const { searchParams } = leadsGetMock.mock.calls[0][1] as { searchParams: URLSearchParams };
-    expect(searchParams.get("createdFrom")).toBe("2026-06-01");
-    expect(searchParams.get("createdTo")).toBe("2026-06-30");
+    expect(searchParams.get("createdFrom")).toBe(
+      JSON.stringify({ date: "2026-06-01", edgeDateType: "exclusive" }),
+    );
+    expect(searchParams.get("createdTo")).toBe(
+      JSON.stringify({ date: "2026-06-30", edgeDateType: "inclusive" }),
+    );
     expect(searchParams.get("isArchived")).toBe("true");
   });
   it("navigates with a search-string update and resets to page 1 when the free-text search changes", async () => {
