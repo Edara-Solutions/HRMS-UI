@@ -151,6 +151,11 @@ export const companyNavGroups: NavGroup[] = [
         href: "/company/reports",
         icon: <BarChart3 size={ICON_SIZE} />,
       },
+      {
+        label: "Audit log",
+        href: "/company/audit",
+        icon: <Shield size={ICON_SIZE} />,
+      },
     ],
   },
 ];
