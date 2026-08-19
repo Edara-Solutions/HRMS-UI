@@ -1,4 +1,4 @@
-import { type AuditTranslate, humanizeAuditKey } from "@/shared/lib/audit-text";
+import { type AuditTranslate, humanizeAuditKey } from "@/features/audit-filters";
 import { auditEnumFields } from "./audit-enum-fields";
 
 const enumFields = new Set(auditEnumFields);

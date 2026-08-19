@@ -1,9 +1,9 @@
 import { Check, Search } from "lucide-react";
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import { Input } from "@/shared/ui/input";
+import { auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
 
 export interface AuditFilterOption {
@@ -13,7 +13,16 @@ export interface AuditFilterOption {
   hint?: string;
 }
 
-type AuditFilterComboboxState = "ready" | "loading" | "error" | "prompt";
+export type AuditFilterComboboxState = "ready" | "loading" | "error" | "prompt";
+
+/** Reads a options query's phase as the state the panel renders. */
+export function auditFilterComboboxState(query: {
+  isPending: boolean;
+  isError: boolean;
+}): AuditFilterComboboxState {
+  if (query.isError) return "error";
+  return query.isPending ? "loading" : "ready";
+}
 
 interface AuditFilterComboboxProps {
   id: string;
@@ -62,7 +71,7 @@ export function AuditFilterCombobox({
             <Search
               size={13}
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 -translate-y-1/2 text-[var(--color-text-faint)] ltr:start-2.5 rtl:end-2.5"
+              className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-faint)]"
             />
             <Input
               id={searchId}
@@ -79,51 +88,50 @@ export function AuditFilterCombobox({
             />
           </div>
 
-          <ul
+          <div
             id={listboxId}
             role="listbox"
             aria-label={label}
-            className="scrollbar-calm -mx-1 max-h-56 overflow-y-auto px-1"
+            className="scrollbar-calm -mx-1 flex max-h-56 flex-col overflow-y-auto px-1"
           >
             {state === "ready" && matches.length > 0 ? (
               matches.map((option) => (
-                <li key={option.value}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={option.value === value}
-                    className={cn(
-                      "flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-start transition-colors hover:bg-[var(--color-surface-2)]",
-                      option.value === value && "bg-[var(--color-primary-soft)]",
-                    )}
-                    onClick={() => {
-                      onSelect(option);
-                      setQuery("");
-                      close();
-                    }}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] text-[var(--color-text)]">
-                        {option.label}
-                      </span>
-                      {option.hint ? (
-                        <span className="block truncate text-[11px] text-[var(--color-text-faint)]">
-                          {option.hint}
-                        </span>
-                      ) : null}
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={option.value === value}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-start transition-colors hover:bg-[var(--color-surface-2)]",
+                    option.value === value && "bg-[var(--color-primary-soft)]",
+                  )}
+                  onClick={() => {
+                    onSelect(option);
+                    setQuery("");
+                    close();
+                  }}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] text-[var(--color-text)]">
+                      {option.label}
                     </span>
-                    {option.value === value ? (
-                      <Check size={13} className="shrink-0 text-[var(--color-primary)]" />
+                    {option.hint ? (
+                      <span className="block truncate text-[11px] text-[var(--color-text-faint)]">
+                        {option.hint}
+                      </span>
                     ) : null}
-                  </button>
-                </li>
+                  </span>
+                  {option.value === value ? (
+                    <Check size={13} className="shrink-0 text-[var(--color-primary)]" />
+                  ) : null}
+                </button>
               ))
             ) : (
-              <li className="px-2 py-1.5 text-[12px] text-[var(--color-text-muted)]">
+              <p className="px-2 py-1.5 text-[12px] text-[var(--color-text-muted)]">
                 {t(comboboxNoticeKey(state))}
-              </li>
+              </p>
             )}
-          </ul>
+          </div>
         </div>
       )}
     </AuditFilterPopover>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { auditNamespace } from "@/features/audit-filters";
 import { usePreferencesStore } from "@/shared/config";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import {
   type AuditDensity,

@@ -2,6 +2,12 @@ export const auditOutcomes = ["SUCCESS", "FAILURE"] as const;
 
 export type AuditOutcome = (typeof auditOutcomes)[number];
 
+/** An actor a name search resolved, as the two audience-scoped endpoints return them. */
+export interface AuditActorMatch {
+  publicId: string;
+  name: string;
+}
+
 /** The filter set both trails share; the Admin trail adds Company and scope on top of it. */
 export interface AuditTrailFilters {
   occurredFrom?: string;
@@ -46,7 +52,7 @@ export function hasAuditFilters(filters: AuditTrailFilters): boolean {
 }
 
 /** Every shared filter cleared at once — spread into a change so each key is really dropped. */
-export const clearedAuditFilters: Required<Record<keyof AuditTrailFilters, undefined>> = {
+export const clearedAuditFilters: Record<keyof AuditTrailFilters, undefined> = {
   occurredFrom: undefined,
   occurredTo: undefined,
   actorPublicId: undefined,

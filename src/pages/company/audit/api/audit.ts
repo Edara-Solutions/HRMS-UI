@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { type AuditTrailFilters, appendAuditFilterParams } from "@/features/audit-filters";
+import {
+  type AuditTrailFilters,
+  appendAuditFilterParams,
+  filterableAuditEventTypes,
+} from "@/features/audit-filters";
 import { apiClient } from "@/shared/api";
 import {
   CompanyAuditTrailEvent,
@@ -21,13 +25,11 @@ export interface CompanyAuditTrailParams extends AuditTrailFilters {
 }
 
 /**
- * Every event type the Company trail admits — the COMPANY-audience subset of the catalog,
- * read off the generated contract. A Platform-only type is absent because the contract has
- * no literal for it, which is audience isolation as a type error rather than a filter.
+ * Every event type the Company trail admits — the COMPANY-audience subset of the catalog.
+ * A Platform-only type is absent because the contract has no literal for it, which is
+ * audience isolation as a type error rather than a filter.
  */
-export const companyAuditEventTypes: readonly string[] = CompanyAuditTrailEvent.options
-  .map((event) => event.shape.eventType.value)
-  .filter((eventType) => eventType !== "audit.event.unavailable");
+export const companyAuditEventTypes = filterableAuditEventTypes(CompanyAuditTrailEvent.options);
 
 export const companyAuditTrailKeys = {
   page: (params: CompanyAuditTrailParams) => ["audit-trail", "company", params] as const,

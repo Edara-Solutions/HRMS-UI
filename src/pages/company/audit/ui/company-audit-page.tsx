@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import {
   AuditFilterBar,
   applyAuditFilterChange,
+  auditNamespace,
   clearedAuditFilters,
 } from "@/features/audit-filters";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import {

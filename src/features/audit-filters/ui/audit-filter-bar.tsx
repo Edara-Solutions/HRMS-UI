@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { Button } from "@/shared/ui/button";
 import {
+  type AuditActorMatch,
   type AuditOutcome,
   type AuditTrailFilters,
   auditOutcomes,
   hasAuditFilters,
 } from "../model/audit-filters";
-import { AuditActorFilter, type AuditActorMatch } from "./audit-actor-filter";
+import { auditNamespace } from "../model/audit-text";
+import { AuditActorFilter } from "./audit-actor-filter";
 import { AuditDateRangeFilter } from "./audit-date-range-filter";
 import { AuditEventTypePicker } from "./audit-event-type-picker";
 import { AuditFilterChoice } from "./audit-filter-choice";

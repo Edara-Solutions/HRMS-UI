@@ -1,11 +1,11 @@
 import { Check, Minus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { auditNamespace, humanizeAuditKey } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { buildAuditEventTaxonomy } from "../model/audit-event-taxonomy";
+import { auditGroupLabel, auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
 
 interface AuditEventTypePickerProps {
@@ -90,7 +90,7 @@ export function AuditEventTypePicker({
               return (
                 <section key={domain.domain} className="mb-2 last:mb-0">
                   <h3 className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-                    {humanizeAuditKey(domain.domain)}
+                    {auditGroupLabel(t, domain.domain)}
                   </h3>
                   {families.map((family) => {
                     const selectedCount = family.eventTypes.filter((eventType) =>
@@ -110,7 +110,7 @@ export function AuditEventTypePicker({
                             partial={selectedCount > 0}
                           />
                           <span className="flex-1 truncate text-[13px] font-medium text-[var(--color-text)]">
-                            {humanizeAuditKey(family.family)}
+                            {auditGroupLabel(t, family.family)}
                           </span>
                           <span className="text-[11px] tabular-nums text-[var(--color-text-faint)]">
                             {family.eventTypes.length}
@@ -126,7 +126,7 @@ export function AuditEventTypePicker({
                                 onClick={() => toggleEventType(eventType)}
                               >
                                 <SelectionMark checked={selectedTypes.has(eventType)} />
-                                <span className="truncate text-[12.5px] text-[var(--color-text-muted)]">
+                                <span className="truncate text-[12px] text-[var(--color-text-muted)]">
                                   {t(eventType)}
                                 </span>
                               </button>
@@ -152,7 +152,13 @@ export function AuditEventTypePicker({
   );
 }
 
-function SelectionMark({ checked, partial = false }: { checked: boolean; partial?: boolean }) {
+interface SelectionMarkProps {
+  checked: boolean;
+  /** Some but not all of a family's types are chosen. */
+  partial?: boolean;
+}
+
+function SelectionMark({ checked, partial = false }: SelectionMarkProps) {
   return (
     <span
       aria-hidden="true"

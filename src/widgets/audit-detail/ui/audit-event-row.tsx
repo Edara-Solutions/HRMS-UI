@@ -2,9 +2,14 @@ import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import {
+  type AuditTranslate,
+  auditGroupLabel,
+  auditNamespace,
+  humanizeAuditKey,
+} from "@/features/audit-filters";
 import type { components } from "@/shared/api";
 import type { SupportedLocale } from "@/shared/i18n";
-import { type AuditTranslate, auditNamespace, humanizeAuditKey } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Badge } from "@/shared/ui/badge";
@@ -72,8 +77,8 @@ const eventVersionSchema = z.number().int();
 const occurredAtSchema = z.string().datetime({ offset: true });
 
 /** The dotted prefix of an event type, read as a grouping line above the label. */
-function eventFamily(eventType: string): string {
-  return humanizeAuditKey(eventType.split(".").slice(0, -1).join(" "));
+function eventFamily(eventType: string, t: AuditTranslate): string {
+  return auditGroupLabel(t, eventType.split(".").slice(0, -1).join("."));
 }
 
 function actorText(actor: AuditActor, t: AuditTranslate): { primary: string; secondary: string } {
@@ -198,7 +203,7 @@ export function AuditEventRow({
             <span className="min-w-0">
               {density === "comfortable" ? (
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-                  {eventFamily(event.eventType)}
+                  {eventFamily(event.eventType, t)}
                 </span>
               ) : null}
               <span

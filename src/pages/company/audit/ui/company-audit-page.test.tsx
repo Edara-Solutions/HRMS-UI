@@ -212,7 +212,7 @@ describe("CompanyAuditPage filters", () => {
     renderPage({ items: [profileUpdatedEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Event type/ }));
 
-    const panel = screen.getByRole("dialog", { name: "Event type" });
+    const panel = screen.getByRole("group", { name: "Event type" });
     expect(within(panel).getByRole("heading", { name: "Company" })).toBeInTheDocument();
     expect(within(panel).getByRole("button", { name: /^Company lifecycle/ })).toBeInTheDocument();
   });
@@ -222,7 +222,7 @@ describe("CompanyAuditPage filters", () => {
     renderPage({ items: [profileUpdatedEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Outcome/ }));
     fireEvent.click(
-      within(screen.getByRole("dialog", { name: "Outcome" })).getByRole("option", {
+      within(screen.getByRole("group", { name: "Outcome" })).getByRole("option", {
         name: "Failure",
       }),
     );
@@ -259,6 +259,7 @@ describe("CompanyAuditPage filters", () => {
     renderPage({ items: [profileUpdatedEvent] });
     await screen.findByText("Profile details changed");
 
+    // The mocked client is untyped by construction; the fetcher always passes this shape.
     const { searchParams } = apiGetMock.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
     expect(searchParams.get("outcome")).toBe("FAILURE");
     expect(searchParams.getAll("eventType")).toEqual(["company.profile.material_updated"]);

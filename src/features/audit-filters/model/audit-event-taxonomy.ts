@@ -34,3 +34,18 @@ export function buildAuditEventTaxonomy(eventTypes: readonly string[]): AuditEve
     families: [...families].map(([family, members]) => ({ family, eventTypes: members })),
   }));
 }
+
+/** The projection's own placeholder: it stands for a row nobody recorded, so nobody filters by it. */
+const UNAVAILABLE_EVENT_TYPE = "audit.event.unavailable";
+
+/**
+ * The event types a trail can be filtered by, read off the members of its generated event
+ * union rather than authored anywhere — the picker grows the moment the catalog does.
+ */
+export function filterableAuditEventTypes(
+  events: readonly { shape: { eventType: { value: string } } }[],
+): readonly string[] {
+  return events
+    .map((event) => event.shape.eventType.value)
+    .filter((eventType) => eventType !== UNAVAILABLE_EVENT_TYPE);
+}

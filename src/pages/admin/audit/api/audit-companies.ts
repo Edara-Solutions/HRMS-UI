@@ -14,11 +14,11 @@ const companyOptionsSchema = z.object({
 });
 
 /** One page of Companies is enough to pick from by name; the picker filters it in the browser. */
-const optionPageSize = 100;
+const OPTION_PAGE_SIZE = 100;
 
 async function fetchAuditCompanyOptions(): Promise<AuditFilterOption[]> {
   const response: unknown = await apiClient
-    .get("companies", { searchParams: { page: "1", limit: String(optionPageSize) } })
+    .get("companies", { searchParams: { page: "1", limit: String(OPTION_PAGE_SIZE) } })
     .json();
 
   return companyOptionsSchema.parse(response).data.map((company) => ({

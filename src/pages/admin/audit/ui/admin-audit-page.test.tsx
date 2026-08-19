@@ -83,7 +83,7 @@ describe("AdminAuditPage filters", () => {
     renderPage({ items: [platformReadEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Company/ }));
 
-    const panel = screen.getByRole("dialog", { name: "Company" });
+    const panel = screen.getByRole("group", { name: "Company" });
     fireEvent.click(await within(panel).findByRole("option", { name: /Northwind/ }));
 
     expect(readNavigatedSearch()).toEqual({
@@ -97,7 +97,7 @@ describe("AdminAuditPage filters", () => {
     renderPage({ items: [platformReadEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Scope/ }));
     fireEvent.click(
-      within(screen.getByRole("dialog", { name: "Scope" })).getByRole("option", {
+      within(screen.getByRole("group", { name: "Scope" })).getByRole("option", {
         name: "Company",
       }),
     );
@@ -124,7 +124,7 @@ describe("AdminAuditPage filters", () => {
     );
 
     fireEvent.click(await screen.findByRole("button", { name: /Actor/ }));
-    const panel = screen.getByRole("dialog", { name: "Actor" });
+    const panel = screen.getByRole("group", { name: "Actor" });
     fireEvent.change(within(panel).getByRole("combobox"), { target: { value: "lay" } });
 
     fireEvent.click(await within(panel).findByRole("option", { name: "Layla Hassan" }));
@@ -142,13 +142,14 @@ describe("AdminAuditPage filters", () => {
     renderPage({ items: [platformReadEvent] });
     await screen.findByText("Audit trail viewed");
 
+    // The mocked client is untyped by construction; the fetcher always passes this shape.
     const first = trailRequests()[0]?.[1] as { searchParams: URLSearchParams };
     expect(first.searchParams.get("cursor")).toBe("opaque-current");
     expect(first.searchParams.getAll("eventType")).toEqual(["audit.trail.platform_read"]);
 
     fireEvent.click(screen.getByRole("button", { name: /Outcome/ }));
     fireEvent.click(
-      within(screen.getByRole("dialog", { name: "Outcome" })).getByRole("option", {
+      within(screen.getByRole("group", { name: "Outcome" })).getByRole("option", {
         name: "Failure",
       }),
     );

@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { type AuditTrailFilters, appendAuditFilterParams } from "@/features/audit-filters";
+import {
+  type AuditTrailFilters,
+  appendAuditFilterParams,
+  filterableAuditEventTypes,
+} from "@/features/audit-filters";
 import { apiClient } from "@/shared/api";
 import {
   PlatformAuditTrailEvent,
@@ -20,14 +24,8 @@ export interface PlatformAuditTrailParams extends AuditTrailFilters {
   scope?: PlatformAuditTrailScope;
 }
 
-/**
- * Every event type the Platform trail admits, read off the generated contract rather than
- * authored here — the picker grows with the catalog. `audit.event.unavailable` is the
- * projection's own placeholder, not something that was ever recorded, so it is not filterable.
- */
-export const platformAuditEventTypes: readonly string[] = PlatformAuditTrailEvent.options
-  .map((event) => event.shape.eventType.value)
-  .filter((eventType) => eventType !== "audit.event.unavailable");
+/** Every event type the Platform trail admits, read off the generated contract. */
+export const platformAuditEventTypes = filterableAuditEventTypes(PlatformAuditTrailEvent.options);
 
 export const auditTrailKeys = {
   all: ["audit-trail"] as const,

@@ -1,9 +1,9 @@
 import { ChevronDown, X } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
+import { auditNamespace } from "../model/audit-text";
 
 interface AuditFilterPopoverProps {
   id: string;
@@ -41,14 +41,19 @@ export function AuditFilterPopover({
     return () => document.removeEventListener("mousedown", closeOnOutsidePointer);
   }, [open]);
 
+  /** A choice made inside the panel returns the reader to the chip they opened. */
+  function closeAndRestoreFocus() {
+    setOpen(false);
+    triggerRef.current?.focus();
+  }
+
   return (
     <div
       ref={rootRef}
       className="relative inline-flex items-center gap-1"
       onKeyDown={(event) => {
         if (event.key !== "Escape" || !open) return;
-        setOpen(false);
-        triggerRef.current?.focus();
+        closeAndRestoreFocus();
       }}
     >
       <Button
@@ -58,7 +63,6 @@ export function AuditFilterPopover({
         size="sm"
         aria-expanded={open}
         aria-controls={panelId}
-        aria-haspopup="dialog"
         trailingIcon={
           <ChevronDown
             size={13}
@@ -91,11 +95,11 @@ export function AuditFilterPopover({
       {open ? (
         <div
           id={panelId}
-          role="dialog"
+          role="group"
           aria-label={label}
-          className="absolute top-full z-20 mt-1.5 w-[min(20rem,calc(100vw-2rem))] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-[var(--shadow-md)] ltr:start-0 rtl:end-0"
+          className="absolute top-full z-20 mt-1.5 w-[min(20rem,calc(100vw-2rem))] rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 start-0 shadow-[var(--shadow-md)]"
         >
-          {children(() => setOpen(false))}
+          {children(closeAndRestoreFocus)}
         </div>
       ) : null}
     </div>

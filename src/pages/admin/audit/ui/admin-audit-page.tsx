@@ -1,14 +1,16 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AuditFilterBar,
   AuditFilterChoice,
   AuditFilterCombobox,
   applyAuditFilterChange,
+  auditFilterComboboxState,
+  auditNamespace,
   clearedAuditFilters,
 } from "@/features/audit-filters";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import {
@@ -23,7 +25,12 @@ import { AdminAuditTable } from "./admin-audit-table";
 
 const scopes: readonly PlatformAuditTrailScope[] = ["PLATFORM", "COMPANY"];
 
-function TrailNotice({ message, action }: { message: string; action?: React.ReactNode }) {
+interface EmptyStateProps {
+  message: string;
+  action?: ReactNode;
+}
+
+function EmptyState({ message, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-2 py-16 text-center">
       <Shield size={32} className="text-[var(--color-text-faint)]" />
@@ -92,7 +99,7 @@ export function AdminAuditPage() {
             summary={selectedCompany?.label ?? search.companyPublicId}
             value={search.companyPublicId}
             options={companyOptions.data ?? []}
-            state={companyOptionsState()}
+            state={auditFilterComboboxState(companyOptions)}
             onSelect={(option) => changeFilters({ companyPublicId: option.value })}
             onClear={() => changeFilters({ companyPublicId: undefined })}
           />
@@ -114,9 +121,9 @@ export function AdminAuditPage() {
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           {query.isPending ? (
-            <TrailNotice message={t("chrome.loading")} />
+            <EmptyState message={t("chrome.loading")} />
           ) : query.isError ? (
-            <TrailNotice
+            <EmptyState
               message={t("chrome.loadFailed")}
               action={
                 <Button intent="utility" size="sm" onClick={() => query.refetch()}>
@@ -125,7 +132,7 @@ export function AdminAuditPage() {
               }
             />
           ) : items.length === 0 ? (
-            <TrailNotice message={t("chrome.empty")} />
+            <EmptyState message={t("chrome.empty")} />
           ) : (
             <AdminAuditTable
               items={items}
@@ -167,9 +174,4 @@ export function AdminAuditPage() {
       </Card>
     </div>
   );
-
-  function companyOptionsState() {
-    if (companyOptions.isPending) return "loading" as const;
-    return companyOptions.isError ? ("error" as const) : ("ready" as const);
-  }
 }

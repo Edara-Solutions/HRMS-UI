@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -12,6 +11,7 @@ import {
   fromDateTimeLocalValue,
   toDateTimeLocalValue,
 } from "../model/audit-date-range";
+import { auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
 
 interface AuditDateRangeFilterProps {

@@ -1,14 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { auditNamespace } from "@/shared/lib/audit-text";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
-import { AuditFilterCombobox } from "./audit-filter-combobox";
-
-export interface AuditActorMatch {
-  publicId: string;
-  name: string;
-}
+import type { AuditActorMatch } from "../model/audit-filters";
+import { auditNamespace } from "../model/audit-text";
+import { AuditFilterCombobox, auditFilterComboboxState } from "./audit-filter-combobox";
 
 interface AuditActorFilterProps {
   id: string;
@@ -20,7 +16,7 @@ interface AuditActorFilterProps {
 }
 
 /** The shortest fragment the search endpoints answer, so a stray keystroke is not a request. */
-const minimumFragmentLength = 2;
+const MINIMUM_FRAGMENT_LENGTH = 2;
 
 /**
  * Resolves a name to the `actorPublicId` the trail actually filters by. Free text over the
@@ -36,15 +32,21 @@ export function AuditActorFilter({
 }: AuditActorFilterProps) {
   const { t } = useTranslation(auditNamespace);
   const [query, setQuery] = useState("");
-  const [selectedName, setSelectedName] = useState<string>();
+  const [selected, setSelected] = useState<AuditActorMatch>();
   const fragment = useDebouncedValue(query.trim(), 250);
-  const enabled = fragment.length >= minimumFragmentLength;
+  const enabled = fragment.length >= MINIMUM_FRAGMENT_LENGTH;
 
   const matches = useQuery({
     queryKey: ["audit-actor-search", searchKey, fragment],
     queryFn: () => searchActors(fragment),
     enabled,
   });
+
+  // Only the actor this picker resolved has a name to show; one arriving from a row click or
+  // a shared link is an identifier, and last search's name would be the wrong words for it.
+  function nameFor(publicId: string): string | undefined {
+    return selected?.publicId === publicId ? selected.name : undefined;
+  }
 
   return (
     <AuditFilterCombobox
@@ -53,30 +55,23 @@ export function AuditActorFilter({
       searchPlaceholder={t("chrome.filterActorSearch")}
       // A shared link carries the identifier alone; naming it again would need a lookup the
       // trail does not have, so the chip shows the identifier it is honestly filtering by.
-      summary={actorPublicId ? (selectedName ?? shortIdentifier(actorPublicId)) : undefined}
+      summary={
+        actorPublicId ? (nameFor(actorPublicId) ?? shortIdentifier(actorPublicId)) : undefined
+      }
       value={actorPublicId}
-      state={comboboxState(enabled, matches.isPending, matches.isError)}
+      state={enabled ? auditFilterComboboxState(matches) : "prompt"}
       options={(matches.data ?? []).map((actor) => ({
         value: actor.publicId,
         label: actor.name,
       }))}
       onQueryChange={setQuery}
       onSelect={(option) => {
-        setSelectedName(option.label);
+        setSelected({ publicId: option.value, name: option.label });
         onChange(option.value);
       }}
-      onClear={() => {
-        setSelectedName(undefined);
-        onChange(undefined);
-      }}
+      onClear={() => onChange(undefined)}
     />
   );
-}
-
-function comboboxState(enabled: boolean, pending: boolean, failed: boolean) {
-  if (!enabled) return "prompt" as const;
-  if (failed) return "error" as const;
-  return pending ? ("loading" as const) : ("ready" as const);
 }
 
 function shortIdentifier(publicId: string): string {

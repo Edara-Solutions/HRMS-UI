@@ -7,8 +7,10 @@ export {
   type AuditEventDomain,
   type AuditEventFamily,
   buildAuditEventTaxonomy,
+  filterableAuditEventTypes,
 } from "./model/audit-event-taxonomy";
 export {
+  type AuditActorMatch,
   type AuditOutcome,
   type AuditTrailFilters,
   appendAuditFilterParams,
@@ -17,7 +19,16 @@ export {
   clearedAuditFilters,
   hasAuditFilters,
 } from "./model/audit-filters";
-export type { AuditActorMatch } from "./ui/audit-actor-filter";
+export {
+  type AuditTranslate,
+  auditGroupLabel,
+  auditNamespace,
+  humanizeAuditKey,
+} from "./model/audit-text";
 export { AuditFilterBar } from "./ui/audit-filter-bar";
 export { AuditFilterChoice } from "./ui/audit-filter-choice";
-export { AuditFilterCombobox, type AuditFilterOption } from "./ui/audit-filter-combobox";
+export {
+  AuditFilterCombobox,
+  type AuditFilterOption,
+  auditFilterComboboxState,
+} from "./ui/audit-filter-combobox";

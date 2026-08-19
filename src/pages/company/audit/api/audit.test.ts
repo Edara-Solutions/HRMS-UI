@@ -81,6 +81,7 @@ describe("fetchCompanyAuditTrail", () => {
   });
 });
 
+/** The mock's arguments are untyped by construction; the fetcher always passes this shape. */
 function requestedSearch(get: ReturnType<typeof mockAuditResponse>): string {
   const options = get.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
   return options.searchParams.toString();
