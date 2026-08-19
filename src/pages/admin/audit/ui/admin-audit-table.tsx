@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
+import { auditNamespace } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
-  auditNamespace,
   DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
@@ -40,9 +40,10 @@ const emptyCompanyCell = <td className="px-4 py-3 text-[var(--color-text-faint)]
 
 interface AdminAuditTableProps {
   items: PlatformAuditTrailItem[];
+  onActorSelect: (actorPublicId: string) => void;
 }
 
-export function AdminAuditTable({ items }: AdminAuditTableProps) {
+export function AdminAuditTable({ items, onActorSelect }: AdminAuditTableProps) {
   const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
   const [density, setDensity] = useState<AuditDensity>("comfortable");
@@ -113,6 +114,7 @@ export function AdminAuditTable({ items }: AdminAuditTableProps) {
                   detailId={detailId}
                   columnCount={5}
                   locale={locale}
+                  onActorSelect={onActorSelect}
                   subjectFallback={event.companyPublicId ?? t("chrome.platform")}
                   companyCell={companyCell(event.companyPublicId, t("chrome.platform"))}
                   onToggle={toggle}

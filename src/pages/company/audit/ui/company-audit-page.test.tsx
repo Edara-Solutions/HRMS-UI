@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CompanyAuditTrailItem, CompanyAuditTrailPage } from "../api/audit";
 import { CompanyAuditPage } from "./company-audit-page";
@@ -53,7 +53,9 @@ afterEach(() => {
   cleanup();
   apiGetMock.mockReset();
   navigateMock.mockReset();
-  delete searchState.cursor;
+  for (const key of Object.keys(searchState)) {
+    if (key !== "limit") delete searchState[key];
+  }
 });
 
 describe("CompanyAuditPage", () => {
@@ -191,3 +193,74 @@ function readNavigatedSearch() {
   const updateSearch = navigateMock.mock.calls[0]?.[0]?.search;
   return updateSearch({ ...searchState });
 }
+
+describe("CompanyAuditPage filters", () => {
+  it("exposes the Company filter set and neither a Company nor a scope control", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    await screen.findByText("Profile details changed");
+    const filters = within(screen.getByRole("search", { name: "Filters" }));
+
+    expect(filters.getByRole("button", { name: /When/ })).toBeInTheDocument();
+    expect(filters.getByRole("button", { name: /Actor/ })).toBeInTheDocument();
+    expect(filters.getByRole("button", { name: /Event type/ })).toBeInTheDocument();
+    expect(filters.getByRole("button", { name: /Outcome/ })).toBeInTheDocument();
+    expect(filters.queryByRole("button", { name: /Company/ })).not.toBeInTheDocument();
+    expect(filters.queryByRole("button", { name: /Scope/ })).not.toBeInTheDocument();
+  });
+
+  it("groups the event-type picker by the family derived from the event type", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /Event type/ }));
+
+    const panel = screen.getByRole("dialog", { name: "Event type" });
+    expect(within(panel).getByRole("heading", { name: "Company" })).toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: /^Company lifecycle/ })).toBeInTheDocument();
+  });
+
+  it("drops the cursor when a filter changes, and never repeats it in a request", async () => {
+    searchState.cursor = "opaque-current";
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /Outcome/ }));
+    fireEvent.click(
+      within(screen.getByRole("dialog", { name: "Outcome" })).getByRole("option", {
+        name: "Failure",
+      }),
+    );
+
+    const nextSearch = readNavigatedSearch();
+    expect(nextSearch).toEqual({ limit: 50, cursor: undefined, outcome: "FAILURE" });
+
+    cleanup();
+    apiGetMock.mockClear();
+    Object.assign(searchState, nextSearch);
+    renderPage({ items: [profileUpdatedEvent] });
+    await screen.findByText("Profile details changed");
+
+    for (const call of apiGetMock.mock.calls) {
+      expect((call[1] as { searchParams: URLSearchParams }).searchParams.has("cursor")).toBe(false);
+    }
+  });
+
+  it("filters to the actor a reader clicks in a row", async () => {
+    searchState.cursor = "opaque-current";
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /Filter by this actor/ }));
+
+    expect(readNavigatedSearch()).toEqual({
+      limit: 50,
+      cursor: undefined,
+      actorPublicId: "550e8400-e29b-41d4-a716-446655440000",
+    });
+  });
+
+  it("sends the filters the URL carries", async () => {
+    searchState.outcome = "FAILURE";
+    searchState.eventType = ["company.profile.material_updated"];
+    renderPage({ items: [profileUpdatedEvent] });
+    await screen.findByText("Profile details changed");
+
+    const { searchParams } = apiGetMock.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
+    expect(searchParams.get("outcome")).toBe("FAILURE");
+    expect(searchParams.getAll("eventType")).toEqual(["company.profile.material_updated"]);
+  });
+});

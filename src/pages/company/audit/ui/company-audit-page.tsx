@@ -1,10 +1,20 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import {
+  AuditFilterBar,
+  applyAuditFilterChange,
+  clearedAuditFilters,
+} from "@/features/audit-filters";
+import { auditNamespace } from "@/shared/lib/audit-text";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
-import { auditNamespace } from "@/widgets/audit-detail";
-import { useCompanyAuditTrail } from "../api/audit";
+import {
+  type CompanyAuditTrailParams,
+  companyAuditEventTypes,
+  useCompanyAuditTrail,
+} from "../api/audit";
+import { searchCompanyAuditActors } from "../api/audit-actors";
 import { CompanyAuditTable } from "./company-audit-table";
 
 function EmptyState({ message, action }: { message: string; action?: React.ReactNode }) {
@@ -19,14 +29,19 @@ function EmptyState({ message, action }: { message: string; action?: React.React
 
 export function CompanyAuditPage() {
   const { t } = useTranslation(auditNamespace);
-  const { cursor, limit } = useSearch({ from: "/company/audit/" });
+  const search = useSearch({ from: "/company/audit/" });
   const navigate = useNavigate({ from: "/company/audit/" });
-  const query = useCompanyAuditTrail({ cursor, limit });
+  const query = useCompanyAuditTrail(search);
 
   const page = query.data;
   const items = page?.items ?? [];
   const nextCursor = page?.nextCursor ?? null;
   const canGoOlder = (page?.hasMore ?? false) && nextCursor !== null;
+
+  /** Every filter change goes through here, which is what guarantees the cursor is dropped. */
+  function changeFilters(change: Partial<CompanyAuditTrailParams>) {
+    void navigate({ search: (previous) => applyAuditFilterChange(previous, change) });
+  }
 
   function goToOlderEvents() {
     if (!nextCursor) return;
@@ -50,6 +65,16 @@ export function CompanyAuditPage() {
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">{t("chrome.companySubtitle")}</p>
       </div>
 
+      <AuditFilterBar
+        idPrefix="company-audit"
+        filters={search}
+        eventTypes={companyAuditEventTypes}
+        actorSearchKey="company"
+        searchActors={searchCompanyAuditActors}
+        onChange={changeFilters}
+        onClearAll={() => changeFilters(clearedAuditFilters)}
+      />
+
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           {query.isPending ? (
@@ -66,7 +91,10 @@ export function CompanyAuditPage() {
           ) : items.length === 0 ? (
             <EmptyState message={t("chrome.empty")} />
           ) : (
-            <CompanyAuditTable items={items} />
+            <CompanyAuditTable
+              items={items}
+              onActorSelect={(actorPublicId) => changeFilters({ actorPublicId })}
+            />
           )}
         </CardContent>
         {items.length > 0 && (
@@ -75,7 +103,7 @@ export function CompanyAuditPage() {
               {t("chrome.eventCount", { count: items.length })}
             </span>
             <div className="flex items-center gap-1">
-              {cursor && (
+              {search.cursor && (
                 <Button
                   variant="nav"
                   size="iconXs"

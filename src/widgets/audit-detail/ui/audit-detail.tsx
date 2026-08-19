@@ -1,22 +1,17 @@
 import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { SupportedLocale } from "@/shared/i18n";
+import { auditNamespace, humanizeAuditKey } from "@/shared/lib/audit-text";
 import { formatFullInstant, formatInstant } from "@/shared/lib/format-instant";
 import {
   type AuditTarget,
   collectTransitions,
   getAuditDetailKind,
-  humanizeAuditKey,
   isChangedFieldList,
   isFieldDiff,
   isInstantKey,
 } from "../model/audit-detail";
-import {
-  auditEnumLabel,
-  auditFieldLabel,
-  auditNamespace,
-  isAuditEnumField,
-} from "../model/audit-labels";
+import { auditEnumLabel, auditFieldLabel, isAuditEnumField } from "../model/audit-labels";
 
 interface AuditDetailProps {
   details: Record<string, unknown>;

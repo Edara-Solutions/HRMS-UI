@@ -4,11 +4,10 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { components } from "@/shared/api";
 import type { SupportedLocale } from "@/shared/i18n";
+import { type AuditTranslate, auditNamespace, humanizeAuditKey } from "@/shared/lib/audit-text";
 import { cn } from "@/shared/lib/cn";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Badge } from "@/shared/ui/badge";
-import { humanizeAuditKey } from "../model/audit-detail";
-import { type AuditTranslate, auditNamespace } from "../model/audit-labels";
 import { AuditDetail } from "./audit-detail";
 
 export type AuditDensity = "comfortable" | "compact";
@@ -47,6 +46,8 @@ interface AuditEventRowProps {
   subjectFallback: string;
   companyCell?: ReactNode;
   onToggle: () => void;
+  /** Offered only where the trail can filter by actor; absent leaves the cell as plain text. */
+  onActorSelect?: (actorPublicId: string) => void;
 }
 
 interface DegradedAuditEventRowProps {
@@ -111,6 +112,39 @@ function Subject({ event, fallback }: { event: AuditEvent; fallback: string }) {
   );
 }
 
+interface ActorCellProps {
+  actor: { primary: string; secondary: string };
+  actorPublicId: string | undefined;
+  density: AuditDensity;
+  filterLabel: string;
+  onActorSelect?: (actorPublicId: string) => void;
+}
+
+function ActorCell({ actor, actorPublicId, density, filterLabel, onActorSelect }: ActorCellProps) {
+  const nameClassName = "block max-w-52 truncate text-[13px] font-medium";
+
+  return (
+    <>
+      {actorPublicId && onActorSelect ? (
+        <button
+          type="button"
+          title={filterLabel}
+          aria-label={`${filterLabel}: ${actor.primary}`}
+          className="rounded-[var(--radius-sm)] text-start text-[var(--color-text)] underline-offset-4 transition-colors hover:text-[var(--color-primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+          onClick={() => onActorSelect(actorPublicId)}
+        >
+          <span className={nameClassName}>{actor.primary}</span>
+        </button>
+      ) : (
+        <span className={cn(nameClassName, "text-[var(--color-text)]")}>{actor.primary}</span>
+      )}
+      {density === "comfortable" ? (
+        <p className="text-[11px] text-[var(--color-text-faint)]">{actor.secondary}</p>
+      ) : null}
+    </>
+  );
+}
+
 function EmptyCell() {
   return <td className="px-4 py-3 text-[var(--color-text-faint)]">–</td>;
 }
@@ -125,6 +159,7 @@ export function AuditEventRow({
   subjectFallback,
   companyCell,
   onToggle,
+  onActorSelect,
 }: AuditEventRowProps) {
   const { t, i18n } = useTranslation(auditNamespace);
   // A known event with no authored label is a pure presentation gap: it renders as the
@@ -133,6 +168,7 @@ export function AuditEventRow({
   const loaded = i18n.hasResourceBundle(i18n.language, auditNamespace);
   const labelled = !loaded || i18n.exists(event.eventType, { ns: auditNamespace });
   const actor = actorText(event.actor, t);
+  const actorPublicId = "publicId" in event.actor ? event.actor.publicId : undefined;
   const failed = event.outcome === "FAILURE";
 
   return (
@@ -178,12 +214,15 @@ export function AuditEventRow({
           </button>
         </td>
         <td className="px-4 py-3">
-          <p className="max-w-52 truncate text-[13px] font-medium text-[var(--color-text)]">
-            {actor.primary}
-          </p>
-          {density === "comfortable" ? (
-            <p className="text-[11px] text-[var(--color-text-faint)]">{actor.secondary}</p>
-          ) : null}
+          {/* Clicking an actor is how a departed employee stays reachable: their name is gone
+              from the actor search once soft-delete drops their Company, but their rows are not. */}
+          <ActorCell
+            actor={actor}
+            actorPublicId={actorPublicId}
+            density={density}
+            filterLabel={t("chrome.filterByThisActor")}
+            onActorSelect={onActorSelect}
+          />
         </td>
         <td className="px-4 py-3">
           <Subject event={event} fallback={subjectFallback} />

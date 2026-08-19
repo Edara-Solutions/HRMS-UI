@@ -1,0 +1,55 @@
+export const auditOutcomes = ["SUCCESS", "FAILURE"] as const;
+
+export type AuditOutcome = (typeof auditOutcomes)[number];
+
+/** The filter set both trails share; the Admin trail adds Company and scope on top of it. */
+export interface AuditTrailFilters {
+  occurredFrom?: string;
+  occurredTo?: string;
+  actorPublicId?: string;
+  eventType?: string[];
+  outcome?: AuditOutcome;
+}
+
+/**
+ * Merges a filter change into the current URL search and always drops the cursor.
+ * The server binds a cursor to the filter set it was minted under and answers 400 on a
+ * mismatch, so carrying one across a filter change is a visible error, not a stale read.
+ */
+export function applyAuditFilterChange<TSearch extends { cursor?: string }>(
+  search: TSearch,
+  change: Partial<NoInfer<TSearch>>,
+): TSearch {
+  return { ...search, ...change, cursor: undefined };
+}
+
+/** Writes the shared filters onto a request, repeating `eventType` once per selected value. */
+export function appendAuditFilterParams(
+  searchParams: URLSearchParams,
+  filters: AuditTrailFilters,
+): void {
+  if (filters.occurredFrom) searchParams.set("occurredFrom", filters.occurredFrom);
+  if (filters.occurredTo) searchParams.set("occurredTo", filters.occurredTo);
+  if (filters.actorPublicId) searchParams.set("actorPublicId", filters.actorPublicId);
+  if (filters.outcome) searchParams.set("outcome", filters.outcome);
+  for (const eventType of filters.eventType ?? []) searchParams.append("eventType", eventType);
+}
+
+export function hasAuditFilters(filters: AuditTrailFilters): boolean {
+  return Boolean(
+    filters.occurredFrom ||
+      filters.occurredTo ||
+      filters.actorPublicId ||
+      filters.outcome ||
+      filters.eventType?.length,
+  );
+}
+
+/** Every shared filter cleared at once — spread into a change so each key is really dropped. */
+export const clearedAuditFilters: Required<Record<keyof AuditTrailFilters, undefined>> = {
+  occurredFrom: undefined,
+  occurredTo: undefined,
+  actorPublicId: undefined,
+  eventType: undefined,
+  outcome: undefined,
+};
