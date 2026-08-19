@@ -1,109 +1,10 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { type PlatformAuditTrailItem, usePlatformAuditTrail } from "../api/audit";
-
-function isUnrecognized(
-  event: PlatformAuditTrailItem,
-): event is Extract<PlatformAuditTrailItem, { eventType: "__unrecognized__" }> {
-  return event.eventType === "__unrecognized__";
-}
-
-function isUnavailable(
-  event: PlatformAuditTrailItem,
-): event is Extract<PlatformAuditTrailItem, { eventType: "audit.event.unavailable" }> {
-  return event.eventType === "audit.event.unavailable";
-}
-
-function eventLabel(event: PlatformAuditTrailItem): string {
-  if (isUnrecognized(event)) return "Unrecognized event";
-  return isUnavailable(event) ? "Unavailable event" : event.eventType;
-}
-
-function eventOutcome(event: PlatformAuditTrailItem): "SUCCESS" | "FAILURE" | null {
-  if (isUnrecognized(event)) return null;
-  return isUnavailable(event) ? null : event.outcome;
-}
-
-function eventActor(event: PlatformAuditTrailItem): string {
-  if (isUnrecognized(event)) return "—";
-  if (isUnavailable(event)) return "—";
-  return event.actor.kind.replace("_", " ").toLowerCase();
-}
-
-function eventScope(event: PlatformAuditTrailItem): string {
-  if (isUnrecognized(event)) return "—";
-  return isUnavailable(event) ? "—" : event.scope;
-}
-
-function eventOccurredAt(event: PlatformAuditTrailItem): string {
-  if (isUnrecognized(event)) return "—";
-  return new Date(event.occurredAt).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function AuditTable({ items }: { items: PlatformAuditTrailItem[] }) {
-  return (
-    <div className="scrollbar-calm overflow-x-auto">
-      <table className="w-full min-w-[760px]">
-        <thead>
-          <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
-            {["Event", "Actor", "Outcome", "Scope", "Timestamp"].map((h) => (
-              <th
-                key={h}
-                className="px-4 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((event, index) => {
-            const outcome = eventOutcome(event);
-            return (
-              <tr
-                key={`${event.eventType}-${eventOccurredAt(event)}-${index}`}
-                className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
-              >
-                <td className="px-4 py-3">
-                  <code className="text-[12.5px] font-mono text-[var(--color-text)]">
-                    {eventLabel(event)}
-                  </code>
-                </td>
-                <td className="px-4 py-3 text-[12.5px] text-[var(--color-text-muted)]">
-                  {eventActor(event)}
-                </td>
-                <td className="px-4 py-3">
-                  {outcome ? (
-                    <Badge variant={outcome === "SUCCESS" ? "success" : "danger"}>
-                      {outcome === "SUCCESS" ? "Success" : "Failure"}
-                    </Badge>
-                  ) : (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-[12.5px] text-[var(--color-text-muted)]">
-                  {eventScope(event)}
-                </td>
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {eventOccurredAt(event)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import { usePlatformAuditTrail } from "../api/audit";
+import { AdminAuditTable } from "./admin-audit-table";
 
 export function AdminAuditPage() {
   const { cursor, limit, companyPublicId, scope } = useSearch({
@@ -218,7 +119,7 @@ export function AdminAuditPage() {
               <p className="text-sm font-medium text-[var(--color-text-muted)]">No audit events</p>
             </div>
           ) : (
-            <AuditTable items={items} />
+            <AdminAuditTable items={items} />
           )}
         </CardContent>
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
