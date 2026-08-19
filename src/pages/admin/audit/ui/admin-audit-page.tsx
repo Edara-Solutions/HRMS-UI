@@ -4,32 +4,43 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import { type PlatformAuditTrailEvent, usePlatformAuditTrail } from "../api/audit";
+import { type PlatformAuditTrailItem, usePlatformAuditTrail } from "../api/audit";
+
+function isUnrecognized(
+  event: PlatformAuditTrailItem,
+): event is Extract<PlatformAuditTrailItem, { eventType: "__unrecognized__" }> {
+  return event.eventType === "__unrecognized__";
+}
 
 function isUnavailable(
-  event: PlatformAuditTrailEvent,
-): event is Extract<PlatformAuditTrailEvent, { eventType: "audit.event.unavailable" }> {
+  event: PlatformAuditTrailItem,
+): event is Extract<PlatformAuditTrailItem, { eventType: "audit.event.unavailable" }> {
   return event.eventType === "audit.event.unavailable";
 }
 
-function eventLabel(event: PlatformAuditTrailEvent): string {
+function eventLabel(event: PlatformAuditTrailItem): string {
+  if (isUnrecognized(event)) return "Unrecognized event";
   return isUnavailable(event) ? "Unavailable event" : event.eventType;
 }
 
-function eventOutcome(event: PlatformAuditTrailEvent): "SUCCESS" | "FAILURE" | null {
+function eventOutcome(event: PlatformAuditTrailItem): "SUCCESS" | "FAILURE" | null {
+  if (isUnrecognized(event)) return null;
   return isUnavailable(event) ? null : event.outcome;
 }
 
-function eventActor(event: PlatformAuditTrailEvent): string {
+function eventActor(event: PlatformAuditTrailItem): string {
+  if (isUnrecognized(event)) return "—";
   if (isUnavailable(event)) return "—";
   return event.actor.kind.replace("_", " ").toLowerCase();
 }
 
-function eventScope(event: PlatformAuditTrailEvent): string {
+function eventScope(event: PlatformAuditTrailItem): string {
+  if (isUnrecognized(event)) return "—";
   return isUnavailable(event) ? "—" : event.scope;
 }
 
-function eventOccurredAt(event: PlatformAuditTrailEvent): string {
+function eventOccurredAt(event: PlatformAuditTrailItem): string {
+  if (isUnrecognized(event)) return "—";
   return new Date(event.occurredAt).toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -38,7 +49,7 @@ function eventOccurredAt(event: PlatformAuditTrailEvent): string {
   });
 }
 
-function AuditTable({ items }: { items: PlatformAuditTrailEvent[] }) {
+function AuditTable({ items }: { items: PlatformAuditTrailItem[] }) {
   return (
     <div className="scrollbar-calm overflow-x-auto">
       <table className="w-full min-w-[760px]">
@@ -59,7 +70,7 @@ function AuditTable({ items }: { items: PlatformAuditTrailEvent[] }) {
             const outcome = eventOutcome(event);
             return (
               <tr
-                key={`${event.eventType}-${event.occurredAt}-${index}`}
+                key={`${event.eventType}-${eventOccurredAt(event)}-${index}`}
                 className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
               >
                 <td className="px-4 py-3">

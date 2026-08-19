@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { CompanyAuditTrailEvent, CompanyAuditTrailPage } from "../api/audit";
+import type { CompanyAuditTrailItem, CompanyAuditTrailPage } from "../api/audit";
 import { CompanyAuditPage } from "./company-audit-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -24,7 +24,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   apiClient: { get: apiGetMock },
 }));
 
-const profileUpdatedEvent: CompanyAuditTrailEvent = {
+const profileUpdatedEvent: CompanyAuditTrailItem = {
   eventType: "company.profile.material_updated",
   eventVersion: 1,
   occurredAt: "2026-08-13T10:00:00.000Z",

@@ -47,14 +47,30 @@ describe("parsePlatformAuditTrailPage", () => {
     ).toThrow();
   });
 
-  it("rejects an item whose eventType is not in the locked union", () => {
+  it("degrades an unknown event while preserving its raw payload and valid siblings", () => {
+    const unknownEvent = { ...platformReadEvent, eventType: "audit.trail.unknown_event" };
     const page = {
-      items: [{ ...platformReadEvent, eventType: "audit.trail.unknown_event" }],
+      items: [platformReadEvent, unknownEvent],
       nextCursor: null,
       hasMore: false,
     };
 
-    expect(() => parsePlatformAuditTrailPage(page)).toThrow();
+    const parsed = parsePlatformAuditTrailPage(page);
+
+    expect(parsed.items[0]?.eventType).toBe("audit.trail.platform_read");
+    expect(parsed.items[1]).toEqual({ eventType: "__unrecognized__", raw: unknownEvent });
+  });
+
+  it("degrades a known event with a malformed payload", () => {
+    const malformedEvent = { ...platformReadEvent, actor: { kind: "USER" } };
+
+    const parsed = parsePlatformAuditTrailPage({
+      items: [malformedEvent],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]).toEqual({ eventType: "__unrecognized__", raw: malformedEvent });
   });
 
   it("accepts the generated anonymous actor discriminator", () => {
@@ -67,23 +83,23 @@ describe("parsePlatformAuditTrailPage", () => {
     expect(parsePlatformAuditTrailPage(page).items[0]?.eventType).toBe("audit.trail.platform_read");
   });
 
-  it("rejects an event with the wrong version", () => {
+  it("degrades an event with the wrong version", () => {
     const page = {
       items: [{ ...platformReadEvent, eventVersion: 2 }],
       nextCursor: null,
       hasMore: false,
     };
 
-    expect(() => parsePlatformAuditTrailPage(page)).toThrow();
+    expect(parsePlatformAuditTrailPage(page).items[0]?.eventType).toBe("__unrecognized__");
   });
 
-  it("rejects a Platform event carrying Company scope", () => {
+  it("degrades a Platform event carrying Company scope", () => {
     const page = {
       items: [{ ...platformReadEvent, scope: "COMPANY" }],
       nextCursor: null,
       hasMore: false,
     };
 
-    expect(() => parsePlatformAuditTrailPage(page)).toThrow();
+    expect(parsePlatformAuditTrailPage(page).items[0]?.eventType).toBe("__unrecognized__");
   });
 });
