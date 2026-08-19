@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
+  auditNamespace,
   DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
@@ -24,15 +26,13 @@ function isUnavailable(
   return event.eventType === "audit.event.unavailable";
 }
 
-function companyCell(value: string | null) {
-  return <td className="px-4 py-3">{companySubject(value)}</td>;
-}
-
-function companySubject(value: string | null) {
+function companyCell(value: string | null, platformLabel: string) {
   return (
-    <p className="max-w-44 truncate font-mono text-[11px] text-[var(--color-text-muted)]">
-      {value ?? "Platform"}
-    </p>
+    <td className="px-4 py-3">
+      <p className="max-w-44 truncate font-mono text-[11px] text-[var(--color-text-muted)]">
+        {value ?? platformLabel}
+      </p>
+    </td>
   );
 }
 
@@ -43,23 +43,24 @@ interface AdminAuditTableProps {
 }
 
 export function AdminAuditTable({ items }: AdminAuditTableProps) {
+  const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
   const [density, setDensity] = useState<AuditDensity>("comfortable");
   const expansion = useAuditRowExpansion();
 
   return (
     <div>
-      <AuditDensityControl density={density} locale={locale} onChange={setDensity} />
+      <AuditDensityControl density={density} onChange={setDensity} />
       <div className="scrollbar-calm overflow-x-auto">
         <table className="w-full min-w-[920px]">
           <thead>
             <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
               {[
-                ["Event", "w-[28%]"],
-                ["Actor", "w-[20%]"],
-                ["Subject", "w-[18%]"],
-                ["Company", "w-[18%]"],
-                ["When", "w-[16%]"],
+                [t("chrome.columnEvent"), "w-[28%]"],
+                [t("chrome.columnActor"), "w-[20%]"],
+                [t("chrome.columnSubject"), "w-[18%]"],
+                [t("chrome.columnCompany"), "w-[18%]"],
+                [t("chrome.columnWhen"), "w-[16%]"],
               ].map(([header, width]) => (
                 <th
                   key={header}
@@ -112,8 +113,8 @@ export function AdminAuditTable({ items }: AdminAuditTableProps) {
                   detailId={detailId}
                   columnCount={5}
                   locale={locale}
-                  subjectFallback={event.companyPublicId ?? "Platform"}
-                  companyCell={companyCell(event.companyPublicId)}
+                  subjectFallback={event.companyPublicId ?? t("chrome.platform")}
+                  companyCell={companyCell(event.companyPublicId, t("chrome.platform"))}
                   onToggle={toggle}
                 />
               );

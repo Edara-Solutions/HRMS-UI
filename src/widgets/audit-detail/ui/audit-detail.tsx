@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { SupportedLocale } from "@/shared/i18n";
 import { formatFullInstant, formatInstant } from "@/shared/lib/format-instant";
-import { getAuditCopy } from "../model/audit-copy";
 import {
   type AuditTarget,
   collectTransitions,
@@ -11,6 +11,12 @@ import {
   isFieldDiff,
   isInstantKey,
 } from "../model/audit-detail";
+import {
+  auditEnumLabel,
+  auditFieldLabel,
+  auditNamespace,
+  isAuditEnumField,
+} from "../model/audit-labels";
 
 interface AuditDetailProps {
   details: Record<string, unknown>;
@@ -36,13 +42,14 @@ function findTarget(value: unknown, targets: AuditTarget[]): AuditTarget | undef
 }
 
 function DetailValue({ field, value, targets, locale }: DetailValueProps) {
-  const copy = getAuditCopy(locale);
+  const { t } = useTranslation(auditNamespace);
+
   if (value === null || value === undefined || value === "") {
-    return <span className="text-[var(--color-text-faint)]">{copy.none}</span>;
+    return <span className="text-[var(--color-text-faint)]">{t("chrome.none")}</span>;
   }
 
   if (typeof value === "boolean") {
-    return <span>{value ? copy.yes : copy.no}</span>;
+    return <span>{value ? t("chrome.yes") : t("chrome.no")}</span>;
   }
 
   if (typeof value === "string" && isInstantKey(field)) {
@@ -64,41 +71,47 @@ function DetailValue({ field, value, targets, locale }: DetailValueProps) {
     );
   }
 
+  if (typeof value === "string" && isAuditEnumField(field)) {
+    return <span>{auditEnumLabel(t, field, value)}</span>;
+  }
+
   if (typeof value === "string" || typeof value === "number") return <span>{String(value)}</span>;
 
-  return <span className="text-[var(--color-text-faint)]">{copy.unableToDisplay}</span>;
+  return <span className="text-[var(--color-text-faint)]">{t("chrome.unableToDisplay")}</span>;
 }
 
+/**
+ * One before-to-after line. Both halves are read through the same field — they are two
+ * readings of one value, so a token that becomes words on the right must on the left too.
+ */
 function ValueTransition({
   label,
-  beforeKey,
-  afterKey,
+  field,
   before,
   after,
   targets,
   locale,
 }: {
   label: string;
-  beforeKey: string;
-  afterKey: string;
+  field: string;
   before: unknown;
   after: unknown;
   targets: AuditTarget[];
   locale: SupportedLocale;
 }) {
-  const copy = getAuditCopy(locale);
+  const { t } = useTranslation(auditNamespace);
   return (
     <div className="grid gap-1 sm:grid-cols-[minmax(120px,0.45fr)_1fr] sm:gap-4">
       <dt className="text-[12px] font-medium text-[var(--color-text-muted)]">{label}</dt>
       <dd className="flex min-w-0 items-center gap-2 text-[13px] text-[var(--color-text)]">
-        <DetailValue field={beforeKey} value={before} targets={targets} locale={locale} />
-        <span className="sr-only">{copy.changedTo}</span>
+        <DetailValue field={field} value={before} targets={targets} locale={locale} />
+        <span className="sr-only">{t("chrome.changedTo")}</span>
         <ArrowRight
           size={14}
           className="shrink-0 text-[var(--color-text-faint)] rtl:rotate-180"
           aria-hidden="true"
         />
-        <DetailValue field={afterKey} value={after} targets={targets} locale={locale} />
+        <DetailValue field={field} value={after} targets={targets} locale={locale} />
       </dd>
     </div>
   );
@@ -109,15 +122,15 @@ function FieldDiff({
   targets,
   locale,
 }: Pick<AuditDetailProps, "details" | "targets" | "locale">) {
+  const { t } = useTranslation(auditNamespace);
   if (!isFieldDiff(details)) return null;
   return (
     <dl className="space-y-3">
       {details.changes.map((change, index) => (
         <ValueTransition
           key={`${change.field}-${index}`}
-          label={humanizeAuditKey(change.field)}
-          beforeKey={change.field}
-          afterKey={change.field}
+          label={auditFieldLabel(t, change.field)}
+          field={change.field}
           before={change.before}
           after={change.after}
           targets={targets}
@@ -133,8 +146,8 @@ function ChangedFieldList({
   targets,
   locale,
 }: Pick<AuditDetailProps, "details" | "targets" | "locale">) {
+  const { t } = useTranslation(auditNamespace);
   if (!isChangedFieldList(details)) return null;
-  const copy = getAuditCopy(locale);
   const remainingDetails = Object.fromEntries(
     Object.entries(details).filter(([field]) => field !== "changedFields"),
   );
@@ -142,15 +155,15 @@ function ChangedFieldList({
     <div className="space-y-4">
       <div>
         <p className="mb-2 text-[12px] font-medium text-[var(--color-text-muted)]">
-          {copy.changedFields}
+          {t("chrome.changedFields")}
         </p>
-        <ul className="flex flex-wrap gap-2" aria-label={copy.changedFields}>
+        <ul className="flex flex-wrap gap-2" aria-label={t("chrome.changedFields")}>
           {details.changedFields.map((field) => (
             <li
               key={field}
               className="rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-1 text-[12px] text-[var(--color-text)]"
             >
-              {humanizeAuditKey(field)}
+              {auditFieldLabel(t, field)}
             </li>
           ))}
         </ul>
@@ -167,13 +180,14 @@ function ScalarBag({
   targets,
   locale,
 }: Pick<AuditDetailProps, "details" | "targets" | "locale">) {
+  const { t } = useTranslation(auditNamespace);
   const { transitions, consumedKeys } = collectTransitions(details);
   const scalarEntries = Object.entries(details).filter(([key]) => !consumedKeys.has(key));
 
   if (transitions.length === 0 && scalarEntries.length === 0) {
     return (
       <p className="text-[13px] text-[var(--color-text-muted)]">
-        {getAuditCopy(locale).noAdditionalDetails}
+        {t("chrome.noAdditionalDetails")}
       </p>
     );
   }
@@ -183,7 +197,10 @@ function ScalarBag({
       {transitions.map((transition) => (
         <ValueTransition
           key={`${transition.beforeKey}-${transition.afterKey}`}
-          {...transition}
+          label={auditFieldLabel(t, transition.afterKey)}
+          field={transition.afterKey}
+          before={transition.before}
+          after={transition.after}
           targets={targets}
           locale={locale}
         />
@@ -191,7 +208,7 @@ function ScalarBag({
       {scalarEntries.map(([field, value]) => (
         <div key={field} className="grid gap-1 sm:grid-cols-[minmax(120px,0.45fr)_1fr] sm:gap-4">
           <dt className="text-[12px] font-medium text-[var(--color-text-muted)]">
-            {humanizeAuditKey(field)}
+            {auditFieldLabel(t, field)}
           </dt>
           <dd className="min-w-0 break-words text-[13px] text-[var(--color-text)]">
             <DetailValue field={field} value={value} targets={targets} locale={locale} />
@@ -212,14 +229,14 @@ export function AuditDetail({
   traceId,
   origin,
 }: AuditDetailProps) {
+  const { t } = useTranslation(auditNamespace);
   const kind = getAuditDetailKind(details);
-  const copy = getAuditCopy(locale);
 
   return (
     <div data-audit-renderer={kind} className="space-y-4">
       <div>
         <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-          {copy.recordedAt}
+          {t("chrome.recordedAt")}
         </p>
         <p className="text-[13px] tabular-nums text-[var(--color-text)]">
           {formatFullInstant(occurredAt, locale)}
@@ -237,7 +254,7 @@ export function AuditDetail({
       {targets.length > 0 ? (
         <div>
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-            {copy.targets}
+            {t("chrome.targets")}
           </p>
           <ul className="space-y-1 text-[12px] text-[var(--color-text-muted)]">
             {targets.map((target) => (
@@ -253,16 +270,16 @@ export function AuditDetail({
       {origin ? (
         <div>
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-            {copy.origin}
+            {t("chrome.origin")}
           </p>
           <dl className="space-y-1 text-[12px] text-[var(--color-text-muted)]">
             <div className="flex gap-2">
-              <dt>{copy.ip}</dt>
-              <dd className="font-mono">{origin.ip ?? copy.none}</dd>
+              <dt>{t("chrome.ip")}</dt>
+              <dd className="font-mono">{origin.ip ?? t("chrome.none")}</dd>
             </div>
             <div className="flex gap-2">
-              <dt>{copy.userAgent}</dt>
-              <dd className="break-all font-mono">{origin.userAgent ?? copy.none}</dd>
+              <dt>{t("chrome.userAgent")}</dt>
+              <dd className="break-all font-mono">{origin.userAgent ?? t("chrome.none")}</dd>
             </div>
           </dl>
         </div>

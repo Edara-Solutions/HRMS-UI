@@ -8,6 +8,7 @@
 
 import { execFileSync } from "node:child_process";
 import { relative } from "node:path";
+import { reportAuditLabels } from "./check-audit-labels.mjs";
 import { derivedArtifacts } from "./contract-artifacts.mjs";
 import { frontendRoot, readProvenance } from "./contract-provenance.mjs";
 
@@ -41,6 +42,12 @@ try {
 }
 
 console.log(`contract artifacts up to date -> ${trackedPaths.join(", ")}`);
+
+// The key set is generated, but the labels behind it are hand-authored, so the drift
+// gate above cannot see a catalog event nobody has named yet.
+if (!reportAuditLabels()) {
+  process.exit(1);
+}
 
 function fail(message) {
   console.error(`\n${message}`);

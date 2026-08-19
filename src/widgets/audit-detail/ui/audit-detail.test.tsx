@@ -28,7 +28,7 @@ describe("AuditDetail", () => {
     const { container } = render(
       <AuditDetail
         {...baseProps}
-        details={{ changedFields: ["employeeCode", "status"], status: "ACTIVE" }}
+        details={{ changedFields: ["employeeCode", "status"], status: "IN_PROGRESS" }}
       />,
     );
 
@@ -36,20 +36,20 @@ describe("AuditDetail", () => {
       container.querySelector('[data-audit-renderer="changed-field-list"]'),
     ).toBeInTheDocument();
     expect(screen.getByText("Employee code")).toBeInTheDocument();
-    expect(screen.getByText("ACTIVE")).toBeInTheDocument();
+    expect(screen.getByText("In progress")).toBeInTheDocument();
   });
 
   it("collapses transition pairs into a single before-to-after line", () => {
     render(
       <AuditDetail
         {...baseProps}
-        details={{ previousStatus: "INVITED", status: "ACTIVE", reason: "Accepted" }}
+        details={{ previousStatus: "PENDING", status: "COMPLETED", reason: "Accepted" }}
       />,
     );
 
     expect(screen.getAllByText("Status")).toHaveLength(1);
-    expect(screen.getByText("INVITED")).toBeInTheDocument();
-    expect(screen.getByText("ACTIVE")).toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
   it("resolves entity references against targets", () => {

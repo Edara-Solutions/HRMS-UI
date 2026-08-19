@@ -60,13 +60,13 @@ describe("CompanyAuditPage", () => {
   it("reads the Company Audit Trail and lists its events", async () => {
     renderPage({ items: [profileUpdatedEvent] });
 
-    expect(await screen.findByText("Material updated")).toBeInTheDocument();
+    expect(await screen.findByText("Profile details changed")).toBeInTheDocument();
     expect(apiGetMock.mock.calls[0]?.[0]).toBe("company/audit-trail");
   });
 
   it("expands a row in place without requesting its already-loaded payload", async () => {
     renderPage({ items: [profileUpdatedEvent] });
-    const rowButton = await screen.findByRole("button", { name: /Material updated/ });
+    const rowButton = await screen.findByRole("button", { name: /Profile details changed/ });
     expect(apiGetMock).toHaveBeenCalledTimes(1);
 
     fireEvent.click(rowButton);

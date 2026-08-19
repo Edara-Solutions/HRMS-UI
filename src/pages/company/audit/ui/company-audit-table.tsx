@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
+  auditNamespace,
   DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
@@ -29,22 +31,23 @@ interface CompanyAuditTableProps {
 }
 
 export function CompanyAuditTable({ items }: CompanyAuditTableProps) {
+  const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
   const [density, setDensity] = useState<AuditDensity>("comfortable");
   const expansion = useAuditRowExpansion();
 
   return (
     <div>
-      <AuditDensityControl density={density} locale={locale} onChange={setDensity} />
+      <AuditDensityControl density={density} onChange={setDensity} />
       <div className="scrollbar-calm overflow-x-auto">
         <table className="w-full min-w-[720px]">
           <thead>
             <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
               {[
-                ["Event", "w-[34%]"],
-                ["Actor", "w-[24%]"],
-                ["Subject", "w-[24%]"],
-                ["When", "w-[18%]"],
+                [t("chrome.columnEvent"), "w-[34%]"],
+                [t("chrome.columnActor"), "w-[24%]"],
+                [t("chrome.columnSubject"), "w-[24%]"],
+                [t("chrome.columnWhen"), "w-[18%]"],
               ].map(([header, width]) => (
                 <th
                   key={header}
@@ -95,7 +98,7 @@ export function CompanyAuditTable({ items }: CompanyAuditTableProps) {
                   detailId={detailId}
                   columnCount={4}
                   locale={locale}
-                  subjectFallback="Company"
+                  subjectFallback={t("chrome.company")}
                   onToggle={toggle}
                 />
               );

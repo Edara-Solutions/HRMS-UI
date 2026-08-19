@@ -1,13 +1,14 @@
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { components } from "@/shared/api";
 import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Badge } from "@/shared/ui/badge";
-import { getAuditCopy } from "../model/audit-copy";
 import { humanizeAuditKey } from "../model/audit-detail";
+import { type AuditTranslate, auditNamespace } from "../model/audit-labels";
 import { AuditDetail } from "./audit-detail";
 
 export type AuditDensity = "comfortable" | "compact";
@@ -42,6 +43,7 @@ interface AuditEventRowProps {
   detailId: string;
   columnCount: number;
   locale: SupportedLocale;
+  /** Already-resolved text for a row whose event names no target. */
   subjectFallback: string;
   companyCell?: ReactNode;
   onToggle: () => void;
@@ -68,49 +70,35 @@ const eventTypeSchema = z.string();
 const eventVersionSchema = z.number().int();
 const occurredAtSchema = z.string().datetime({ offset: true });
 
-function eventName(eventType: string): { label: string; family: string } {
-  const parts = eventType.split(".");
-  return {
-    label: humanizeAuditKey(parts.at(-1) ?? eventType),
-    family: humanizeAuditKey(parts.slice(0, -1).join(" ")),
-  };
+/** The dotted prefix of an event type, read as a grouping line above the label. */
+function eventFamily(eventType: string): string {
+  return humanizeAuditKey(eventType.split(".").slice(0, -1).join(" "));
 }
 
-function actorText(
-  actor: AuditActor,
-  locale: SupportedLocale,
-): { primary: string; secondary: string } {
-  const copy = getAuditCopy(locale);
-  if (actor.kind === "ANONYMOUS") return { primary: copy.anonymous, secondary: "" };
+function actorText(actor: AuditActor, t: AuditTranslate): { primary: string; secondary: string } {
+  if (actor.kind === "ANONYMOUS") return { primary: t("chrome.anonymous"), secondary: "" };
   if (actor.kind === "ATTRIBUTION_FAILED") {
-    return { primary: copy.attributionFailed, secondary: "" };
+    return { primary: t("chrome.attributionFailed"), secondary: "" };
   }
-  if (actor.kind === "ERASED_USER") return { primary: copy.erasedIdentity, secondary: "" };
+  if (actor.kind === "ERASED_USER") return { primary: t("chrome.erasedIdentity"), secondary: "" };
   if (actor.kind === "SYSTEM") {
-    return { primary: humanizeAuditKey(actor.component), secondary: copy.system };
+    return { primary: humanizeAuditKey(actor.component), secondary: t("chrome.system") };
   }
   if ("publicId" in actor && actor.publicId) {
     return { primary: actor.publicId, secondary: humanizeAuditKey(actor.kind) };
   }
-  return { primary: copy.platformAdmin, secondary: copy.identityWithheld };
+  // The Company trail withholds the Platform Admin's identity, so the actor is a fixed
+  // client-side constant: there is no server field it could leak through.
+  return { primary: t("chrome.platformAdmin"), secondary: t("chrome.identityWithheld") };
 }
 
-function Subject({
-  event,
-  fallback,
-  locale,
-}: {
-  event: AuditEvent;
-  fallback: string;
-  locale: SupportedLocale;
-}) {
+function Subject({ event, fallback }: { event: AuditEvent; fallback: string }) {
   const target = event.targets[0];
+
   if (!target) {
-    const copy = getAuditCopy(locale);
-    const localizedFallback =
-      fallback === "Company" ? copy.company : fallback === "Platform" ? copy.platform : fallback;
-    return <span className="text-[var(--color-text-muted)]">{localizedFallback}</span>;
+    return <span className="text-[var(--color-text-muted)]">{fallback}</span>;
   }
+
   return (
     <div className="min-w-0">
       <p className="text-[13px] font-medium text-[var(--color-text)]">
@@ -138,10 +126,14 @@ export function AuditEventRow({
   companyCell,
   onToggle,
 }: AuditEventRowProps) {
-  const name = eventName(event.eventType);
-  const actor = actorText(event.actor, locale);
+  const { t, i18n } = useTranslation(auditNamespace);
+  // A known event with no authored label is a pure presentation gap: it renders as the
+  // raw event type in mono, visibly wrong beside the sentence-case labels around it. A
+  // namespace still in flight has no labels yet, which is a wait rather than a defect.
+  const loaded = i18n.hasResourceBundle(i18n.language, auditNamespace);
+  const labelled = !loaded || i18n.exists(event.eventType, { ns: auditNamespace });
+  const actor = actorText(event.actor, t);
   const failed = event.outcome === "FAILURE";
-  const copy = getAuditCopy(locale);
 
   return (
     <>
@@ -170,14 +162,19 @@ export function AuditEventRow({
             <span className="min-w-0">
               {density === "comfortable" ? (
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-                  {name.family}
+                  {eventFamily(event.eventType)}
                 </span>
               ) : null}
-              <span className="block text-[13px] font-medium text-[var(--color-text)]">
-                {name.label}
+              <span
+                className={cn(
+                  "block text-[13px] font-medium text-[var(--color-text)]",
+                  !labelled && "font-mono text-[12px]",
+                )}
+              >
+                {t(event.eventType)}
               </span>
             </span>
-            {failed ? <Badge variant="danger">{copy.failure}</Badge> : null}
+            {failed ? <Badge variant="danger">{t("chrome.failure")}</Badge> : null}
           </button>
         </td>
         <td className="px-4 py-3">
@@ -189,7 +186,7 @@ export function AuditEventRow({
           ) : null}
         </td>
         <td className="px-4 py-3">
-          <Subject event={event} fallback={subjectFallback} locale={locale} />
+          <Subject event={event} fallback={subjectFallback} />
         </td>
         {companyCell}
         <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
@@ -231,12 +228,12 @@ export function DegradedAuditEventRow({
   companyCell,
   onToggle,
 }: DegradedAuditEventRowProps) {
+  const { t } = useTranslation(auditNamespace);
   const parsed = degradedRecordSchema.safeParse(rawValue);
   const raw = parsed.success ? parsed.data : {};
   const eventType = eventTypeSchema.safeParse(raw.eventType);
   const eventVersion = eventVersionSchema.safeParse(raw.eventVersion);
   const occurredAt = occurredAtSchema.safeParse(raw.occurredAt);
-  const copy = getAuditCopy(locale);
 
   return (
     <>
@@ -256,28 +253,32 @@ export function DegradedAuditEventRow({
                 expanded && "rotate-180",
               )}
             />
-            <span className="font-medium text-[var(--color-text)]">{copy.unrecognizedEvent}</span>
-            <Badge variant="warning">{copy.portalGap}</Badge>
+            <span className="font-medium text-[var(--color-text)]">
+              {t("chrome.unrecognizedEvent")}
+            </span>
+            <Badge variant="warning">{t("chrome.portalGap")}</Badge>
           </button>
         </td>
         <EmptyCell />
         <EmptyCell />
         {companyCell}
         <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-          {occurredAt.success ? formatInstant(occurredAt.data, locale) : copy.unknownTime}
+          {occurredAt.success ? formatInstant(occurredAt.data, locale) : t("chrome.unknownTime")}
         </td>
       </tr>
       {expanded ? (
         <tr id={detailId} className="border-b border-[var(--color-border)]">
           <td colSpan={columnCount} className="border-s-2 border-[var(--color-warning)] px-10 py-4">
-            <p className="text-[13px] font-medium text-[var(--color-text)]">{copy.degradedTitle}</p>
+            <p className="text-[13px] font-medium text-[var(--color-text)]">
+              {t("chrome.degradedTitle")}
+            </p>
             <p className="mt-1 text-[12px] text-[var(--color-text-muted)]">
-              {copy.degradedDescription}
+              {t("chrome.degradedDescription")}
             </p>
             <footer className="mt-4 break-all border-t border-[var(--color-border)] pt-3 font-mono text-[11px] tabular-nums text-[var(--color-text-faint)]">
-              {eventType.success ? eventType.data : copy.unknownEvent} v
+              {eventType.success ? eventType.data : t("chrome.unknownEvent")} v
               {eventVersion.success ? eventVersion.data : "?"} ·{" "}
-              {occurredAt.success ? occurredAt.data : copy.unknownTime}
+              {occurredAt.success ? occurredAt.data : t("chrome.unknownTime")}
             </footer>
           </td>
         </tr>
@@ -291,11 +292,11 @@ export function UnavailableAuditEventRow({
   locale,
   companyCell,
 }: UnavailableAuditEventRowProps) {
-  const copy = getAuditCopy(locale);
+  const { t } = useTranslation(auditNamespace);
   return (
     <tr className="border-b border-[var(--color-border)]">
       <td className="border-s-2 border-[var(--color-warning)] px-4 py-3 font-medium text-[var(--color-text)]">
-        {copy.unavailableEvent}
+        {t("audit.event.unavailable")}
       </td>
       <EmptyCell />
       <EmptyCell />
