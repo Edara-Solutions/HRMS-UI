@@ -59,6 +59,7 @@ E2E does not run on every push because it starts a browser and a dev server. It 
 Blocking PR checks:
 
 - `bun install --frozen-lockfile`
+- `bun run openapi:check`
 - `bun run typecheck`
 - `bun run lint:ci`
 - `bun run test`
@@ -66,6 +67,19 @@ Blocking PR checks:
 - `bun run test:e2e`
 
 Pushes to `main` upload the verified `dist` folder as a short-lived artifact. This is not deployment; it is a deployable build output.
+
+## Contract Refresh
+
+`bun run openapi:check` proves the vendored OpenAPI snapshot and everything generated from it agree. It cannot prove the snapshot is current, because reproducing it needs the backend repository.
+
+`.github/workflows/contract-refresh.yml` covers that half on a schedule and on manual dispatch. It re-vendors from the backend branch recorded in `contracts/PRODUCING_REF` and, when anything changed, opens or updates a pull request against the integration branch carrying the new snapshot and every regenerated artifact.
+
+Staleness is a pull request rather than a failing check on purpose: a UI author cannot fix a stale backend contract from inside their branch, and a gate that blocks people for something they cannot fix is a gate that gets disabled. The auto-PR is both the notification and the test — full CI runs on it, so a breaking backend change surfaces as a red pull request.
+
+Two operational notes:
+
+- The workflow file must live on the default branch. `on: schedule` fires only from the default branch's copy, and a schedule that never fires looks exactly like no drift.
+- It needs a `CONTRACT_REFRESH_TOKEN` secret — a fine-grained PAT or GitHub App token with read access to `Edara-Solutions/HRMS_Back_End` plus contents and pull-requests write here. `GITHUB_TOKEN` cannot read the backend, and pull requests it creates do not start workflow runs. Without the secret the job fails loudly on its first step rather than reporting a clean contract.
 
 ## E2E Runner
 

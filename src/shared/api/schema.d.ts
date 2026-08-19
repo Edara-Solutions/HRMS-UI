@@ -78,6 +78,60 @@ export interface paths {
                         "application/json": components["schemas"]["PlatformAuditTrailPage"];
                     };
                 };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
             };
         };
         put?: never;
@@ -114,6 +168,60 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["CompanyAuditTrailPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
                     };
                 };
             };
@@ -572,45 +680,6 @@ export interface paths {
                 };
             };
         };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    action?: string;
-                    outcome?: "success" | "failure";
-                    targetPublicId?: string;
-                    page?: number;
-                    pageSize?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Default Response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -7847,6 +7916,9 @@ export interface components {
                 } | {
                     /** @enum {string} */
                     kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
                 };
                 traceId: string | null;
                 origin: {
@@ -7860,6 +7932,53 @@ export interface components {
                 details: {
                     companyPublicId: string | null;
                     scope: "PLATFORM" | "COMPANY" | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "privacy.identity.erased";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    subjectType: string;
                 };
             } | {
                 /** @enum {string} */
@@ -7893,6 +8012,9 @@ export interface components {
                 } | {
                     /** @enum {string} */
                     kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
                 };
                 traceId: string | null;
                 origin: {
@@ -7942,6 +8064,9 @@ export interface components {
                 } | {
                     /** @enum {string} */
                     kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
                 };
                 traceId: string | null;
                 origin: {
@@ -7956,6 +8081,2727 @@ export interface components {
                     beforeStatus: "INCOMPLETE" | "COMPLETE";
                     /** @enum {string} */
                     afterStatus: "COMPLETE";
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    name: string;
+                    companyCode: string;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "website" | "addressLine" | "isActive";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.restored";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.frozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unfrozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.suspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unsuspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    reason: string;
+                    note: string | null;
+                    effectiveFrom: string;
+                    effectiveUntil: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.denied";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    operation: "read" | "write" | "onboarding";
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_skipped";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.activation.activated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    activatedAt: string | null;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_extended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousTrialEndDate: string;
+                    trialEndDate: string;
+                    reason: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_expired";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    trialEndDate: string;
+                    expiredAt: string;
+                    accessMode: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    changedFields: string[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    source: string;
+                    status: string;
+                    companySizeRange: string;
+                    hasPrimaryContact: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.attempt_recorded";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    source: string;
+                    status: string;
+                    numberOfAttempts: number;
+                    rejoined: boolean;
+                    unarchived: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changedFields: string[];
+                    status: string;
+                    numberOfAttempts: number;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.archived";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.unarchived";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.added";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    isPrimary: boolean;
+                    hasEmail: boolean;
+                    hasPhone: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changedFields: string[];
+                    isPrimary: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    wasPrimary: boolean;
+                    replacementContactPublicId: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.requested";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.plan_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousPlanPublicId: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.rejected";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.approved";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    planPublicId: string;
+                    companyCode: string;
+                    trialEndDate: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.delivery.cancelled";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousStatus: string;
+                    reason: string;
+                    emailTypeKey: string;
+                    context: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.delivery.retry_requested";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousStatus: string;
+                    reason: string;
+                    emailTypeKey: string;
+                    context: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.sending.paused";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    context: string;
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.sending.resumed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    context: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.assigned";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    templateRevisionKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.migrated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    fromRevisionKey: string;
+                    toRevisionKey: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    familyId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: Record<string, never>;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    familyId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: Record<string, never>;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.rejected";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    surface: string;
+                    reason: string;
                 };
             } | {
                 /** @enum {string} */
@@ -7997,6 +10843,9 @@ export interface components {
                 } | {
                     /** @enum {string} */
                     kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
                 };
                 traceId: string | null;
                 targets: {
@@ -8036,6 +10885,9 @@ export interface components {
                 } | {
                     /** @enum {string} */
                     kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
                 };
                 traceId: string | null;
                 targets: {
@@ -8046,6 +10898,1179 @@ export interface components {
                     beforeStatus: "INCOMPLETE" | "COMPLETE";
                     /** @enum {string} */
                     afterStatus: "COMPLETE";
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    name: string;
+                    companyCode: string;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "website" | "addressLine" | "isActive";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.restored";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.frozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unfrozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.suspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unsuspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    reason: string;
+                    note: string | null;
+                    effectiveFrom: string;
+                    effectiveUntil: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.denied";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    operation: "read" | "write" | "onboarding";
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_skipped";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.activation.activated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    activatedAt: string | null;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_extended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    previousTrialEndDate: string;
+                    trialEndDate: string;
+                    reason: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_expired";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    trialEndDate: string;
+                    expiredAt: string;
+                    accessMode: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    changedFields: string[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.assigned";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    templateRevisionKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.migrated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    fromRevisionKey: string;
+                    toRevisionKey: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    familyId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: Record<string, never>;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
                 };
             } | {
                 /** @enum {string} */

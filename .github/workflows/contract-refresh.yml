@@ -1,0 +1,154 @@
+name: Contract refresh
+
+# Detects that contracts/openapi.json has fallen behind the backend branch it
+# tracks. Staleness is deliberately a pull request rather than a build failure: a
+# UI author cannot fix a stale backend contract from inside their branch, and the
+# auto-PR is both the notification and the test — it runs the full CI suite, so a
+# breaking backend change surfaces as a red pull request instead of a quietly
+# green repository.
+#
+# `on: schedule` fires only from the workflow file as it exists on the default
+# branch, so this file must live on `main` even while everything it refreshes
+# lives on the integration branch below. Retarget both by editing INTEGRATION_BRANCH
+# here and contracts/PRODUCING_REF there, in the same change.
+
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-refresh
+  cancel-in-progress: false
+
+env:
+  BUN_VERSION: 1.3.14
+  BACKEND_REPOSITORY: Edara-Solutions/HRMS_Back_End
+  INTEGRATION_BRANCH: feature/logging-audit
+  REFRESH_BRANCH: chore/contract-refresh
+  REFRESH_AUTHOR: edara-contract-refresh
+  REFRESH_EMAIL: contract-refresh@edara-solutions.noreply.github.com
+
+jobs:
+  refresh:
+    name: Re-vendor the backend contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Require the cross-repository token
+        env:
+          CONTRACT_REFRESH_TOKEN: ${{ secrets.CONTRACT_REFRESH_TOKEN }}
+        run: |
+          if [ -n "$CONTRACT_REFRESH_TOKEN" ]; then exit 0; fi
+          echo "::error::CONTRACT_REFRESH_TOKEN is unset. GITHUB_TOKEN cannot read $BACKEND_REPOSITORY, so drift cannot be detected. Add a fine-grained PAT with read access to $BACKEND_REPOSITORY plus contents and pull-requests write on this repository."
+          exit 1
+
+      - name: Checkout the frontend integration branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.INTEGRATION_BRANCH }}
+          token: ${{ secrets.CONTRACT_REFRESH_TOKEN }}
+          fetch-depth: 0
+          path: ui
+
+      - name: Read the tracked backend ref
+        id: provenance
+        working-directory: ui
+        run: echo "ref=$(cat contracts/PRODUCING_REF)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout the backend contract
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.BACKEND_REPOSITORY }}
+          ref: ${{ steps.provenance.outputs.ref }}
+          token: ${{ secrets.CONTRACT_REFRESH_TOKEN }}
+          sparse-checkout: openapi.json
+          sparse-checkout-cone-mode: false
+          path: backend
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ui
+        run: bun install --frozen-lockfile
+
+      - name: Re-vendor and regenerate
+        working-directory: ui
+        env:
+          BACKEND_REF: ${{ steps.provenance.outputs.ref }}
+        run: bun run openapi:gen
+
+      # Scoped to the paths openapi:gen writes, so a stray file elsewhere in the
+      # workspace cannot open a spurious refresh pull request.
+      - name: Detect drift
+        id: drift
+        working-directory: ui
+        run: |
+          if [ -z "$(git status --porcelain -- contracts src)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report a current contract
+        if: steps.drift.outputs.changed == 'false'
+        env:
+          PRODUCING_REF: ${{ steps.provenance.outputs.ref }}
+        run: |
+          echo "No drift: the vendored contract already matches $PRODUCING_REF." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update the refresh pull request
+        if: steps.drift.outputs.changed == 'true'
+        working-directory: ui
+        env:
+          GH_TOKEN: ${{ secrets.CONTRACT_REFRESH_TOKEN }}
+          PRODUCING_REF: ${{ steps.provenance.outputs.ref }}
+        run: |
+          git config user.name "$REFRESH_AUTHOR"
+          git config user.email "$REFRESH_EMAIL"
+          git checkout -b "$REFRESH_BRANCH"
+          git add --all -- contracts src
+          git commit --message "chore(contract): re-vendor the backend OpenAPI snapshot"
+
+          # The refresh branch is rebuilt from the integration branch every run, so
+          # pushing it is always a force. Refuse when someone has pushed their own
+          # work onto it rather than silently discarding their commits.
+          if [ -n "$(git ls-remote --heads origin "$REFRESH_BRANCH")" ]; then
+            git fetch --depth=1 origin "$REFRESH_BRANCH"
+            author="$(git log -1 --format=%ae FETCH_HEAD)"
+            if [ "$author" != "$REFRESH_EMAIL" ]; then
+              echo "::error::$REFRESH_BRANCH is tipped by a commit from $author. Refusing to force-push over it — resolve that branch by hand, then re-run."
+              exit 1
+            fi
+          fi
+          git push --force origin "$REFRESH_BRANCH"
+
+          producing_commit="$(cat contracts/PRODUCING_COMMIT)"
+          summary="Re-vendored from \`$PRODUCING_REF\` at \`$producing_commit\`."
+          {
+            echo "$summary"
+            echo
+            echo "This pull request carries the new snapshot and every artifact regenerated from it."
+            echo "Read the regenerated validator diff: added union arms are new audit events, and removed or changed arms are a breaking backend change."
+            echo "CI on this pull request is the test."
+          } > pr-body.md
+
+          # Closing this pull request does not settle the drift, so a later run opens
+          # it again. Landing it, or pinning PRODUCING_REF elsewhere, is what stops it.
+          title="chore(contract): re-vendor the backend OpenAPI snapshot"
+          open_pr="$(gh pr list --head "$REFRESH_BRANCH" --base "$INTEGRATION_BRANCH" --state open --json number --jq '.[].number')"
+          if [ -z "$open_pr" ]; then
+            gh pr create --base "$INTEGRATION_BRANCH" --head "$REFRESH_BRANCH" --title "$title" --body-file pr-body.md
+          else
+            gh pr edit "$open_pr" --title "$title" --body-file pr-body.md
+          fi
+          rm pr-body.md
+
+          echo "$summary" >> "$GITHUB_STEP_SUMMARY"
