@@ -16,6 +16,13 @@ describe("vendored OpenAPI contract", () => {
     expect(commit).toMatch(/^[0-9a-f]{40}$/);
   });
 
+  // `openapi:check` owns the well-formedness rule; this only pins that a branch was recorded.
+  it("records the backend branch the snapshot tracks, not a detached HEAD", () => {
+    const ref = readContract("PRODUCING_REF").trim();
+    expect(ref).not.toBe("");
+    expect(ref).not.toBe("HEAD");
+  });
+
   it("exposes both Audit Trail canonical routes the Admin Portal depends on", () => {
     const doc = JSON.parse(readContract("openapi.json")) as {
       paths: Record<string, unknown>;

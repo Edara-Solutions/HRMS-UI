@@ -1,55 +1,12 @@
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { auditRuntimeContracts } from "./contract-artifacts.mjs";
+import { frontendRoot, openApiPath } from "./contract-provenance.mjs";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const frontendRoot = resolve(here, "..");
-const openApiPath = join(frontendRoot, "contracts", "openapi.json");
 const temporaryDirectory = mkdtempSync(join(tmpdir(), "audit-validators-"));
 const generatedClientPath = join(temporaryDirectory, "openapi-client.ts");
-
-const contracts = [
-  {
-    schemaName: "PlatformAuditTrailPage",
-    eventName: "PlatformAuditTrailEvent",
-    itemName: "PlatformAuditTrailItem",
-    unrecognizedName: "UnrecognizedPlatformAuditTrailEvent",
-    envelopeName: "platformAuditTrailPageEnvelopeSchema",
-    parserName: "parsePlatformAuditTrailPage",
-    itemParserName: "parsePlatformAuditTrailItem",
-    outputPath: join(
-      frontendRoot,
-      "src",
-      "pages",
-      "admin",
-      "audit",
-      "api",
-      "audit-runtime-contract.ts",
-    ),
-  },
-  {
-    schemaName: "CompanyAuditTrailPage",
-    eventName: "CompanyAuditTrailEvent",
-    itemName: "CompanyAuditTrailItem",
-    unrecognizedName: "UnrecognizedCompanyAuditTrailEvent",
-    envelopeName: "companyAuditTrailPageEnvelopeSchema",
-    parserName: "parseCompanyAuditTrailPage",
-    itemParserName: "parseCompanyAuditTrailItem",
-    rationale:
-      "Company projections intentionally omit Platform Admin identifiers so company readers only learn that Edara acted.",
-    outputPath: join(
-      frontendRoot,
-      "src",
-      "pages",
-      "company",
-      "audit",
-      "api",
-      "audit-runtime-contract.ts",
-    ),
-  },
-];
 
 try {
   execFileSync(
@@ -68,7 +25,7 @@ try {
 
   const generatedClient = readFileSync(generatedClientPath, "utf8");
 
-  for (const contract of contracts) {
+  for (const contract of auditRuntimeContracts) {
     const { eventOptions, envelopeFields } = extractPageSchema(
       generatedClient,
       contract.schemaName,
@@ -82,7 +39,13 @@ try {
 
   execFileSync(
     process.execPath,
-    ["x", "biome", "format", "--write", ...contracts.map(({ outputPath }) => outputPath)],
+    [
+      "x",
+      "biome",
+      "format",
+      "--write",
+      ...auditRuntimeContracts.map(({ outputPath }) => outputPath),
+    ],
     { cwd: frontendRoot, stdio: "inherit" },
   );
 } finally {
