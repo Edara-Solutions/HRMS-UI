@@ -5,6 +5,8 @@ import { auditEnumFields } from "./audit-enum-fields";
 /** The namespace holding every audit label: events, payload fields, and page chrome. */
 export const auditNamespace = "audit";
 
+const enumFields = new Set(auditEnumFields);
+
 export type AuditTranslate = TFunction<typeof auditNamespace>;
 
 /**
@@ -17,7 +19,7 @@ export function auditFieldLabel(t: AuditTranslate, field: string): string {
 
 /** Whether the contract closes this field to a fixed set of values. */
 export function isAuditEnumField(field: string): boolean {
-  return Object.hasOwn(auditEnumFields, field);
+  return enumFields.has(field);
 }
 
 /**

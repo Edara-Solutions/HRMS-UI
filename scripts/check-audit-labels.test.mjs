@@ -14,6 +14,10 @@ function readLocale(locale) {
   );
 }
 
+function diff(resources) {
+  return diffAuditLabelKeys({ expected, enums: manifest.enums, resources, reference: "en" });
+}
+
 describe("audit label check", () => {
   it("passes for the shipped resources", () => {
     expect(checkAuditLabels()).toEqual([]);
@@ -23,16 +27,30 @@ describe("audit label check", () => {
     const en = readLocale("en");
     delete en["auth.session.started"];
 
-    const failures = diffAuditLabelKeys({ expected, resources: { en, ar: readLocale("ar") } });
+    const failures = diff({ en, ar: readLocale("ar") });
 
-    expect(failures.join("\n")).toContain("auth.session.started");
+    expect(failures.join(" ")).toContain("auth.session.started");
   });
 
-  it("fails on a label for something the contract no longer emits", () => {
+  it("fails on a label for an event the contract no longer emits", () => {
     const en = { ...readLocale("en"), "company.lifecycle.renamed": "Company renamed" };
 
-    const failures = diffAuditLabelKeys({ expected, resources: { en, ar: readLocale("ar") } });
+    const failures = diff({ en, ar: readLocale("ar") });
 
-    expect(failures.join("\n")).toContain("company.lifecycle.renamed");
+    expect(failures.join(" ")).toContain("company.lifecycle.renamed");
+  });
+
+  it("fails on an override for an enum value the contract no longer emits", () => {
+    const en = { ...readLocale("en"), "enum.stepType.SET_PAYROLL": "Payroll" };
+
+    const failures = diff({ en, ar: readLocale("ar") });
+
+    expect(failures.join(" ")).toContain("enum.stepType.SET_PAYROLL");
+  });
+
+  it("measures locale parity on the base key, so Arabic can add its own plural forms", () => {
+    const ar = { ...readLocale("ar"), "chrome.eventCount_few": "{{count}} events" };
+
+    expect(diff({ en: readLocale("en"), ar })).toEqual([]);
   });
 });

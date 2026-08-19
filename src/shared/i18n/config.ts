@@ -16,8 +16,9 @@ void i18next
     supportedLngs: supportedLocales,
     defaultNS: "common",
     ns: ["common", "auth", "audit"],
-    // Audit labels are keyed by the event type itself, so a missing one renders as
-    // `auth.session.started` rather than as nested lookup through its dots.
+    // Every namespace here keys resources flat. Audit labels are keyed by the event type
+    // itself, whose dots would otherwise read as a nested lookup — so a missing label
+    // renders as `auth.session.started` rather than resolving to nothing.
     keySeparator: false,
     interpolation: {
       escapeValue: false,

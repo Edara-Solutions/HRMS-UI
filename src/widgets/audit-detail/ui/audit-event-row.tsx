@@ -128,8 +128,10 @@ export function AuditEventRow({
 }: AuditEventRowProps) {
   const { t, i18n } = useTranslation(auditNamespace);
   // A known event with no authored label is a pure presentation gap: it renders as the
-  // raw event type in mono, visibly wrong beside the sentence-case labels around it.
-  const labelled = i18n.exists(event.eventType, { ns: auditNamespace });
+  // raw event type in mono, visibly wrong beside the sentence-case labels around it. A
+  // namespace still in flight has no labels yet, which is a wait rather than a defect.
+  const loaded = i18n.hasResourceBundle(i18n.language, auditNamespace);
+  const labelled = !loaded || i18n.exists(event.eventType, { ns: auditNamespace });
   const actor = actorText(event.actor, t);
   const failed = event.outcome === "FAILURE";
 

@@ -26,13 +26,30 @@ export function collectAuditLabelKeys() {
   const fields = new Set();
   const enums = new Map();
 
+  function walk(schema, key) {
+    if (!schema || typeof schema !== "object") return;
+
+    for (const branch of schema.anyOf ?? schema.oneOf ?? schema.allOf ?? []) walk(branch, key);
+    if (schema.enum && key) {
+      const values = enums.get(key) ?? new Set();
+      for (const value of schema.enum) values.add(value);
+      enums.set(key, values);
+    }
+    if (schema.type === "array") walk(schema.items, key);
+
+    for (const [property, child] of Object.entries(schema.properties ?? {})) {
+      if (!structuralDetailKeys.has(property)) fields.add(property);
+      walk(child, property);
+    }
+  }
+
   for (const schemaName of auditPageSchemas) {
     const page = schemas[schemaName];
     if (!page) throw new Error(`Contract is missing ${schemaName}`);
 
     for (const event of page.properties.items.items.anyOf) {
       events.add(event.properties.eventType.enum[0]);
-      collectDetails(event.properties.details, fields, enums);
+      walk(event.properties.details, null);
     }
   }
 
@@ -44,27 +61,4 @@ export function collectAuditLabelKeys() {
     fields: [...fields].sort().map((field) => `field.${field}`),
     enums: Object.fromEntries([...enums].sort().map(([key, values]) => [key, [...values].sort()])),
   };
-}
-
-function collectDetails(schema, fields, enums) {
-  walk(schema, null, fields, enums);
-}
-
-function walk(schema, key, fields, enums) {
-  if (!schema || typeof schema !== "object") return;
-
-  for (const branch of schema.anyOf ?? schema.oneOf ?? schema.allOf ?? []) {
-    walk(branch, key, fields, enums);
-  }
-  if (schema.enum && key) {
-    const values = enums.get(key) ?? new Set();
-    for (const value of schema.enum) values.add(value);
-    enums.set(key, values);
-  }
-  if (schema.type === "array") walk(schema.items, key, fields, enums);
-
-  for (const [property, child] of Object.entries(schema.properties ?? {})) {
-    if (!structuralDetailKeys.has(property)) fields.add(property);
-    walk(child, property, fields, enums);
-  }
 }

@@ -6,21 +6,14 @@
  * here renders through the enum formatter, so a value the contract adds later reads as
  * words rather than as a raw token.
  */
-export const auditEnumFields: Record<string, readonly string[]> = {
-  afterStatus: ["COMPLETE"],
-  beforeStatus: ["COMPLETE", "INCOMPLETE"],
-  effectiveMode: ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-  mode: ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-  operation: ["onboarding", "read", "write"],
-  previousMode: ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-  scope: ["COMPANY", "PLATFORM"],
-  status: ["COMPLETED", "IN_PROGRESS", "PENDING", "SKIPPED"],
-  stepType: [
-    "SET_BRANCHES",
-    "SET_COMPANY_PROFILE",
-    "SET_DEPARTMENTS",
-    "SET_JOBS",
-    "SET_ROLES",
-    "SET_SHIFTS",
-  ],
-};
+export const auditEnumFields: readonly string[] = [
+  "afterStatus",
+  "beforeStatus",
+  "effectiveMode",
+  "mode",
+  "operation",
+  "previousMode",
+  "scope",
+  "status",
+  "stepType",
+];
