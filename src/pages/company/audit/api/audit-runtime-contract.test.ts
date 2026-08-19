@@ -62,14 +62,29 @@ describe("parseCompanyAuditTrailPage", () => {
     expect(parsed.items[0]?.eventType).toBe("audit.event.unavailable");
   });
 
-  it("rejects an item whose eventType is outside the generated union", () => {
-    expect(() =>
-      parseCompanyAuditTrailPage({
-        items: [{ ...profileUpdatedEvent, eventType: "company.profile.invented" }],
-        nextCursor: null,
-        hasMore: false,
-      }),
-    ).toThrow();
+  it("degrades an unknown event while preserving its raw payload and valid siblings", () => {
+    const unknownEvent = { ...profileUpdatedEvent, eventType: "company.profile.invented" };
+
+    const parsed = parseCompanyAuditTrailPage({
+      items: [profileUpdatedEvent, unknownEvent],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]?.eventType).toBe("company.profile.material_updated");
+    expect(parsed.items[1]).toEqual({ eventType: "__unrecognized__", raw: unknownEvent });
+  });
+
+  it("degrades a known event with a malformed payload", () => {
+    const malformedEvent = { ...profileUpdatedEvent, actor: { kind: "USER" } };
+
+    const parsed = parseCompanyAuditTrailPage({
+      items: [malformedEvent],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]).toEqual({ eventType: "__unrecognized__", raw: malformedEvent });
   });
 
   it("accepts a Platform Admin actor reported without an identity", () => {
@@ -86,24 +101,24 @@ describe("parseCompanyAuditTrailPage", () => {
     "scope",
     "companyPublicId",
     "origin",
-  ])("rejects an event carrying the Platform-only %s field", (platformOnlyField) => {
-    expect(() =>
-      parseCompanyAuditTrailPage({
-        items: [{ ...profileUpdatedEvent, [platformOnlyField]: "PLATFORM" }],
-        nextCursor: null,
-        hasMore: false,
-      }),
-    ).toThrow();
+  ])("degrades an event carrying the Platform-only %s field", (platformOnlyField) => {
+    const parsed = parseCompanyAuditTrailPage({
+      items: [{ ...profileUpdatedEvent, [platformOnlyField]: "PLATFORM" }],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]?.eventType).toBe("__unrecognized__");
   });
 
-  it("rejects an event stored under an unsupported version", () => {
-    expect(() =>
-      parseCompanyAuditTrailPage({
-        items: [{ ...profileUpdatedEvent, eventVersion: 2 }],
-        nextCursor: null,
-        hasMore: false,
-      }),
-    ).toThrow();
+  it("degrades an event stored under an unsupported version", () => {
+    const parsed = parseCompanyAuditTrailPage({
+      items: [{ ...profileUpdatedEvent, eventVersion: 2 }],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]?.eventType).toBe("__unrecognized__");
   });
 
   it("rejects a page missing the hasMore indicator", () => {
@@ -112,21 +127,21 @@ describe("parseCompanyAuditTrailPage", () => {
     ).toThrow();
   });
 
-  it("rejects a Platform Admin actor carrying a public identifier", () => {
-    expect(() =>
-      parseCompanyAuditTrailPage({
-        items: [
-          {
-            ...profileUpdatedEvent,
-            actor: {
-              kind: "PLATFORM_ADMIN",
-              publicId: "550e8400-e29b-41d4-a716-446655440000",
-            },
+  it("degrades a Platform Admin actor carrying a public identifier", () => {
+    const parsed = parseCompanyAuditTrailPage({
+      items: [
+        {
+          ...profileUpdatedEvent,
+          actor: {
+            kind: "PLATFORM_ADMIN",
+            publicId: "550e8400-e29b-41d4-a716-446655440000",
           },
-        ],
-        nextCursor: null,
-        hasMore: false,
-      }),
-    ).toThrow();
+        },
+      ],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    expect(parsed.items[0]?.eventType).toBe("__unrecognized__");
   });
 });

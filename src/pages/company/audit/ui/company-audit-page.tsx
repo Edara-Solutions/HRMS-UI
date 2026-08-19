@@ -3,28 +3,38 @@ import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
-import { type CompanyAuditTrailEvent, useCompanyAuditTrail } from "../api/audit";
+import { type CompanyAuditTrailItem, useCompanyAuditTrail } from "../api/audit";
 
-type UnavailableEvent = Extract<CompanyAuditTrailEvent, { eventType: "audit.event.unavailable" }>;
+type UnavailableEvent = Extract<CompanyAuditTrailItem, { eventType: "audit.event.unavailable" }>;
 
-function isUnavailable(event: CompanyAuditTrailEvent): event is UnavailableEvent {
+function isUnrecognized(
+  event: CompanyAuditTrailItem,
+): event is Extract<CompanyAuditTrailItem, { eventType: "__unrecognized__" }> {
+  return event.eventType === "__unrecognized__";
+}
+
+function isUnavailable(event: CompanyAuditTrailItem): event is UnavailableEvent {
   return event.eventType === "audit.event.unavailable";
 }
 
-function eventLabel(event: CompanyAuditTrailEvent): string {
+function eventLabel(event: CompanyAuditTrailItem): string {
+  if (isUnrecognized(event)) return "Unrecognized event";
   return isUnavailable(event) ? "Unavailable event" : event.eventType;
 }
 
-function eventOutcome(event: CompanyAuditTrailEvent): "SUCCESS" | "FAILURE" | null {
+function eventOutcome(event: CompanyAuditTrailItem): "SUCCESS" | "FAILURE" | null {
+  if (isUnrecognized(event)) return null;
   return isUnavailable(event) ? null : event.outcome;
 }
 
-function eventActor(event: CompanyAuditTrailEvent): string {
+function eventActor(event: CompanyAuditTrailItem): string {
+  if (isUnrecognized(event)) return "—";
   if (isUnavailable(event)) return "—";
   return event.actor.kind.replace("_", " ").toLowerCase();
 }
 
-function eventOccurredAt(event: CompanyAuditTrailEvent): string {
+function eventOccurredAt(event: CompanyAuditTrailItem): string {
+  if (isUnrecognized(event)) return "—";
   return new Date(event.occurredAt).toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -33,7 +43,7 @@ function eventOccurredAt(event: CompanyAuditTrailEvent): string {
   });
 }
 
-function AuditTable({ items }: { items: CompanyAuditTrailEvent[] }) {
+function AuditTable({ items }: { items: CompanyAuditTrailItem[] }) {
   return (
     <div className="scrollbar-calm overflow-x-auto">
       <table className="w-full min-w-[640px]">
@@ -54,7 +64,7 @@ function AuditTable({ items }: { items: CompanyAuditTrailEvent[] }) {
             const outcome = eventOutcome(event);
             return (
               <tr
-                key={`${event.eventType}-${event.occurredAt}-${index}`}
+                key={`${event.eventType}-${eventOccurredAt(event)}-${index}`}
                 className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
               >
                 <td className="px-4 py-3">

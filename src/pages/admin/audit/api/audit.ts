@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
-import { parsePlatformAuditTrailPage } from "./audit-runtime-contract";
+import {
+  type PlatformAuditTrailItem,
+  parsePlatformAuditTrailPage,
+  type PlatformAuditTrailPage as RuntimePlatformAuditTrailPage,
+} from "./audit-runtime-contract";
 
-export type PlatformAuditTrailEvent =
-  components["schemas"]["PlatformAuditTrailPage"]["items"][number];
-export type PlatformAuditTrailPage = components["schemas"]["PlatformAuditTrailPage"];
+export type { PlatformAuditTrailItem };
+export type PlatformAuditTrailPage = RuntimePlatformAuditTrailPage;
 
 export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";
 

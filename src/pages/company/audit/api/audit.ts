@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
-import { parseCompanyAuditTrailPage } from "./audit-runtime-contract";
+import {
+  type CompanyAuditTrailItem,
+  parseCompanyAuditTrailPage,
+  type CompanyAuditTrailPage as RuntimeCompanyAuditTrailPage,
+} from "./audit-runtime-contract";
 
-export type CompanyAuditTrailEvent =
-  components["schemas"]["CompanyAuditTrailPage"]["items"][number];
-export type CompanyAuditTrailPage = components["schemas"]["CompanyAuditTrailPage"];
+export type { CompanyAuditTrailItem };
+export type CompanyAuditTrailPage = RuntimeCompanyAuditTrailPage;
 
 /**
  * Paging inputs for the Company Audit Trail. The Company route derives its scope from the
