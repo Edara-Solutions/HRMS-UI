@@ -35,7 +35,9 @@ const profileUpdatedEvent: CompanyAuditTrailItem = {
   details: { changes: [{ field: "name", before: "Northwind", after: "Northwind Egypt" }] },
 };
 
-function renderPage(page: Partial<CompanyAuditTrailPage> = {}) {
+function renderPage(
+  page: Partial<Omit<CompanyAuditTrailPage, "items">> & { items?: unknown[] } = {},
+) {
   apiGetMock.mockReturnValue({
     json: () => Promise.resolve({ items: [], nextCursor: null, hasMore: false, ...page }),
   });
@@ -58,8 +60,63 @@ describe("CompanyAuditPage", () => {
   it("reads the Company Audit Trail and lists its events", async () => {
     renderPage({ items: [profileUpdatedEvent] });
 
-    expect(await screen.findByText("company.profile.material_updated")).toBeInTheDocument();
+    expect(await screen.findByText("Material updated")).toBeInTheDocument();
     expect(apiGetMock.mock.calls[0]?.[0]).toBe("company/audit-trail");
+  });
+
+  it("expands a row in place without requesting its already-loaded payload", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    const rowButton = await screen.findByRole("button", { name: /Material updated/ });
+    expect(apiGetMock).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(rowButton);
+
+    expect(screen.getByText("Northwind")).toBeInTheDocument();
+    expect(screen.getByText("Northwind Egypt")).toBeInTheDocument();
+    expect(screen.getByText(/company\.profile\.material_updated v1/)).toBeInTheDocument();
+    expect(apiGetMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("reserves outcome emphasis for failures", async () => {
+    renderPage({ items: [{ ...profileUpdatedEvent, outcome: "FAILURE" }] });
+
+    const failure = await screen.findByText("Failure");
+    expect(failure).toBeInTheDocument();
+    expect(failure.closest("td")).toHaveClass("border-s-2", "border-[var(--color-danger)]");
+    expect(screen.queryByText("Success")).not.toBeInTheDocument();
+  });
+
+  it("keeps an unrecognized record in the sequence and identifies the portal gap", async () => {
+    renderPage({
+      items: [
+        {
+          ...profileUpdatedEvent,
+          eventType: "company.profile.future_event",
+        },
+      ],
+    });
+
+    expect(await screen.findByText("Unrecognized event")).toBeInTheDocument();
+    expect(screen.getByText("Portal gap")).toBeInTheDocument();
+    expect(screen.getByText("1 event")).toBeInTheDocument();
+    expect(screen.queryByText("Failure")).not.toBeInTheDocument();
+  });
+
+  it("preserves a valid timestamp when another field makes the record unrecognized", async () => {
+    renderPage({
+      items: [{ ...profileUpdatedEvent, actor: { kind: "USER" } }],
+    });
+
+    expect(await screen.findByText("Unrecognized event")).toBeInTheDocument();
+    expect(screen.getByText(/13 Aug/)).toBeInTheDocument();
+    expect(screen.queryByText("Unknown time")).not.toBeInTheDocument();
+  });
+
+  it("keeps the subject identifier visible in compact density", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: "Compact" }));
+
+    expect(screen.getByText("profile-1")).toBeInTheDocument();
   });
 
   it("tells the reader when the Company has no recorded events", async () => {

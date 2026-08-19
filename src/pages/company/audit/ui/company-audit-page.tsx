@@ -1,100 +1,9 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
-import { type CompanyAuditTrailItem, useCompanyAuditTrail } from "../api/audit";
-
-type UnavailableEvent = Extract<CompanyAuditTrailItem, { eventType: "audit.event.unavailable" }>;
-
-function isUnrecognized(
-  event: CompanyAuditTrailItem,
-): event is Extract<CompanyAuditTrailItem, { eventType: "__unrecognized__" }> {
-  return event.eventType === "__unrecognized__";
-}
-
-function isUnavailable(event: CompanyAuditTrailItem): event is UnavailableEvent {
-  return event.eventType === "audit.event.unavailable";
-}
-
-function eventLabel(event: CompanyAuditTrailItem): string {
-  if (isUnrecognized(event)) return "Unrecognized event";
-  return isUnavailable(event) ? "Unavailable event" : event.eventType;
-}
-
-function eventOutcome(event: CompanyAuditTrailItem): "SUCCESS" | "FAILURE" | null {
-  if (isUnrecognized(event)) return null;
-  return isUnavailable(event) ? null : event.outcome;
-}
-
-function eventActor(event: CompanyAuditTrailItem): string {
-  if (isUnrecognized(event)) return "—";
-  if (isUnavailable(event)) return "—";
-  return event.actor.kind.replace("_", " ").toLowerCase();
-}
-
-function eventOccurredAt(event: CompanyAuditTrailItem): string {
-  if (isUnrecognized(event)) return "—";
-  return new Date(event.occurredAt).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function AuditTable({ items }: { items: CompanyAuditTrailItem[] }) {
-  return (
-    <div className="scrollbar-calm overflow-x-auto">
-      <table className="w-full min-w-[640px]">
-        <thead>
-          <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
-            {["Event", "Actor", "Outcome", "Timestamp"].map((header) => (
-              <th
-                key={header}
-                className="px-4 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]"
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((event, index) => {
-            const outcome = eventOutcome(event);
-            return (
-              <tr
-                key={`${event.eventType}-${eventOccurredAt(event)}-${index}`}
-                className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
-              >
-                <td className="px-4 py-3">
-                  <code className="text-[12.5px] font-mono text-[var(--color-text)]">
-                    {eventLabel(event)}
-                  </code>
-                </td>
-                <td className="px-4 py-3 text-[12.5px] text-[var(--color-text-muted)]">
-                  {eventActor(event)}
-                </td>
-                <td className="px-4 py-3">
-                  {outcome ? (
-                    <Badge variant={outcome === "SUCCESS" ? "success" : "danger"}>
-                      {outcome === "SUCCESS" ? "Success" : "Failure"}
-                    </Badge>
-                  ) : (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {eventOccurredAt(event)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import { useCompanyAuditTrail } from "../api/audit";
+import { CompanyAuditTable } from "./company-audit-table";
 
 function EmptyState({ message, action }: { message: string; action?: React.ReactNode }) {
   return (
@@ -154,7 +63,7 @@ export function CompanyAuditPage() {
           ) : items.length === 0 ? (
             <EmptyState message="No audit events" />
           ) : (
-            <AuditTable items={items} />
+            <CompanyAuditTable items={items} />
           )}
         </CardContent>
         {items.length > 0 && (
