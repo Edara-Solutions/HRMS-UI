@@ -15,7 +15,10 @@ void i18next
     fallbackLng: defaultLocale,
     supportedLngs: supportedLocales,
     defaultNS: "common",
-    ns: ["common", "auth"],
+    ns: ["common", "auth", "audit"],
+    // Audit labels are keyed by the event type itself, so a missing one renders as
+    // `auth.session.started` rather than as nested lookup through its dots.
+    keySeparator: false,
     interpolation: {
       escapeValue: false,
     },
@@ -24,6 +27,9 @@ void i18next
     },
     saveMissing: import.meta.env.DEV,
     returnNull: false,
+    // A namespace still in flight renders its keys instead of suspending, which is the
+    // same honest fallback a missing label gets and needs no boundary to catch it.
+    react: { useSuspense: false },
   });
 
 export { i18next };

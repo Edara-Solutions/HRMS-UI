@@ -1,19 +1,18 @@
-import type { SupportedLocale } from "@/shared/i18n";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/ui/button";
-import { getAuditCopy } from "../model/audit-copy";
+import { auditNamespace } from "../model/audit-labels";
 import type { AuditDensity } from "./audit-event-row";
 
 interface AuditDensityControlProps {
   density: AuditDensity;
-  locale: SupportedLocale;
   onChange: (density: AuditDensity) => void;
 }
 
-export function AuditDensityControl({ density, locale, onChange }: AuditDensityControlProps) {
-  const copy = getAuditCopy(locale);
+export function AuditDensityControl({ density, onChange }: AuditDensityControlProps) {
+  const { t } = useTranslation(auditNamespace);
   return (
     <div className="flex items-center justify-end gap-1 border-b border-[var(--color-border)] px-3 py-2">
-      <span className="me-1 text-[11px] text-[var(--color-text-faint)]">{copy.density}</span>
+      <span className="me-1 text-[11px] text-[var(--color-text-faint)]">{t("chrome.density")}</span>
       {(["comfortable", "compact"] as const).map((option) => (
         <Button
           key={option}
@@ -22,7 +21,7 @@ export function AuditDensityControl({ density, locale, onChange }: AuditDensityC
           pressed={density === option}
           onClick={() => onChange(option)}
         >
-          {copy[option]}
+          {t(`chrome.${option}`)}
         </Button>
       ))}
     </div>

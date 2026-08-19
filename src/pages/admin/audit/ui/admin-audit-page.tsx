@@ -1,12 +1,15 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
+import { auditNamespace } from "@/widgets/audit-detail";
 import { usePlatformAuditTrail } from "../api/audit";
 import { AdminAuditTable } from "./admin-audit-table";
 
 export function AdminAuditPage() {
+  const { t } = useTranslation(auditNamespace);
   const { cursor, limit, companyPublicId, scope } = useSearch({
     from: "/admin/audit/",
   });
@@ -54,10 +57,10 @@ export function AdminAuditPage() {
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
-            Audit log
+            {t("chrome.title")}
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Platform Audit Trail · retained event history
+            {t("chrome.platformSubtitle")}
           </p>
         </div>
       </div>
@@ -71,14 +74,18 @@ export function AdminAuditPage() {
             pressed={scope === s}
             onClick={() => setScopeFilter(s)}
           >
-            {s === "" ? "All scopes" : s === "PLATFORM" ? "Platform" : "Company"}
+            {s === ""
+              ? t("chrome.scopeAll")
+              : s === "PLATFORM"
+                ? t("chrome.scopePlatform")
+                : t("chrome.scopeCompany")}
           </Button>
         ))}
 
         <div className="relative w-full sm:ms-auto sm:max-w-xs">
           <Input
             type="text"
-            placeholder="Company public id (UUID)"
+            placeholder={t("chrome.companyFilterPlaceholder")}
             defaultValue={companyPublicId ?? ""}
             onChange={(event) => {
               const value = event.target.value.trim();
@@ -100,23 +107,25 @@ export function AdminAuditPage() {
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Shield size={32} className="text-[var(--color-text-faint)]" />
               <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                Loading audit trail…
+                {t("chrome.loading")}
               </p>
             </div>
           ) : query.isError ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Shield size={32} className="text-[var(--color-text-faint)]" />
               <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                Audit trail could not be loaded
+                {t("chrome.loadFailed")}
               </p>
               <Button intent="utility" size="sm" onClick={() => query.refetch()}>
-                Retry
+                {t("chrome.retry")}
               </Button>
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 text-center">
               <Shield size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">No audit events</p>
+              <p className="text-sm font-medium text-[var(--color-text-muted)]">
+                {t("chrome.empty")}
+              </p>
             </div>
           ) : (
             <AdminAuditTable items={items} />
@@ -124,7 +133,7 @@ export function AdminAuditPage() {
         </CardContent>
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            {items.length} event{items.length === 1 ? "" : "s"}
+            {t("chrome.eventCount", { count: items.length })}
           </span>
           <div className="flex items-center gap-1">
             {cursor && (
@@ -133,8 +142,8 @@ export function AdminAuditPage() {
                 size="iconXs"
                 className="btn-nav-prev"
                 onClick={goBackToFirstPage}
-                aria-label="First page"
-                title="First page"
+                aria-label={t("chrome.firstPage")}
+                title={t("chrome.firstPage")}
               >
                 <ChevronLeft size={14} />
               </Button>
@@ -145,8 +154,8 @@ export function AdminAuditPage() {
                 size="iconXs"
                 className="btn-nav-next"
                 onClick={loadMore}
-                aria-label="Load more"
-                title="Load more"
+                aria-label={t("chrome.loadMore")}
+                title={t("chrome.loadMore")}
               >
                 <ChevronRight size={14} />
               </Button>

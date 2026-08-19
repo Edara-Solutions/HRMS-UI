@@ -16,7 +16,6 @@ export interface FieldChange {
 }
 
 export interface Transition {
-  label: string;
   beforeKey: string;
   afterKey: string;
   before: unknown;
@@ -89,7 +88,6 @@ export function collectTransitions(details: Record<string, unknown>): {
     if (!(afterKey in details)) continue;
 
     transitions.push({
-      label: humanizeAuditKey(suffix),
       beforeKey,
       afterKey,
       before,

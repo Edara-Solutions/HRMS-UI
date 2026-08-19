@@ -1,7 +1,9 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
+import { auditNamespace } from "@/widgets/audit-detail";
 import { useCompanyAuditTrail } from "../api/audit";
 import { CompanyAuditTable } from "./company-audit-table";
 
@@ -16,6 +18,7 @@ function EmptyState({ message, action }: { message: string; action?: React.React
 }
 
 export function CompanyAuditPage() {
+  const { t } = useTranslation(auditNamespace);
   const { cursor, limit } = useSearch({ from: "/company/audit/" });
   const navigate = useNavigate({ from: "/company/audit/" });
   const query = useCompanyAuditTrail({ cursor, limit });
@@ -41,27 +44,27 @@ export function CompanyAuditPage() {
   return (
     <div className="mx-auto max-w-[1480px]">
       <div className="mb-6">
-        <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Audit log</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Your company's retained event history
-        </p>
+        <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
+          {t("chrome.title")}
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">{t("chrome.companySubtitle")}</p>
       </div>
 
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           {query.isPending ? (
-            <EmptyState message="Loading audit trail…" />
+            <EmptyState message={t("chrome.loading")} />
           ) : query.isError ? (
             <EmptyState
-              message="Audit trail could not be loaded"
+              message={t("chrome.loadFailed")}
               action={
                 <Button intent="utility" size="sm" onClick={() => query.refetch()}>
-                  Retry
+                  {t("chrome.retry")}
                 </Button>
               }
             />
           ) : items.length === 0 ? (
-            <EmptyState message="No audit events" />
+            <EmptyState message={t("chrome.empty")} />
           ) : (
             <CompanyAuditTable items={items} />
           )}
@@ -69,7 +72,7 @@ export function CompanyAuditPage() {
         {items.length > 0 && (
           <div className="flex items-center justify-between gap-3 border-t border-[var(--color-border)] px-4 py-3">
             <span className="text-xs text-[var(--color-text-muted)]">
-              {items.length} event{items.length === 1 ? "" : "s"}
+              {t("chrome.eventCount", { count: items.length })}
             </span>
             <div className="flex items-center gap-1">
               {cursor && (
@@ -78,8 +81,8 @@ export function CompanyAuditPage() {
                   size="iconXs"
                   className="btn-nav-prev"
                   onClick={goToLatestEvents}
-                  aria-label="Latest events"
-                  title="Latest events"
+                  aria-label={t("chrome.latestEvents")}
+                  title={t("chrome.latestEvents")}
                 >
                   <ChevronLeft size={14} />
                 </Button>
@@ -90,8 +93,8 @@ export function CompanyAuditPage() {
                   size="iconXs"
                   className="btn-nav-next"
                   onClick={goToOlderEvents}
-                  aria-label="Older events"
-                  title="Older events"
+                  aria-label={t("chrome.olderEvents")}
+                  title={t("chrome.olderEvents")}
                 >
                   <ChevronRight size={14} />
                 </Button>

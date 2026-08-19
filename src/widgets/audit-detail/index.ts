@@ -1,4 +1,11 @@
 export { humanizeAuditKey } from "./model/audit-detail";
+export {
+  type AuditTranslate,
+  auditEnumLabel,
+  auditFieldLabel,
+  auditNamespace,
+  isAuditEnumField,
+} from "./model/audit-labels";
 export { keyAuditRecords, useAuditRowExpansion } from "./model/use-audit-row-expansion";
 export { AuditDensityControl } from "./ui/audit-density-control";
 export { AuditDetail } from "./ui/audit-detail";
