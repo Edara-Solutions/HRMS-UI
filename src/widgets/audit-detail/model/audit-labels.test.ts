@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { auditNamespace } from "@/features/audit-filters";
 import { i18next } from "@/shared/i18n";
-import { auditEnumLabel, auditFieldLabel, auditNamespace, isAuditEnumField } from "./audit-labels";
+import { auditEnumLabel, auditFieldLabel, isAuditEnumField } from "./audit-labels";
 
 const t = i18next.getFixedT("en", auditNamespace);
 

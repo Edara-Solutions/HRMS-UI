@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { auditNamespace } from "@/features/audit-filters";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
-  auditNamespace,
   DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
@@ -28,9 +28,10 @@ function isUnavailable(
 
 interface CompanyAuditTableProps {
   items: CompanyAuditTrailItem[];
+  onActorSelect: (actorPublicId: string) => void;
 }
 
-export function CompanyAuditTable({ items }: CompanyAuditTableProps) {
+export function CompanyAuditTable({ items, onActorSelect }: CompanyAuditTableProps) {
   const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
   const [density, setDensity] = useState<AuditDensity>("comfortable");
@@ -98,6 +99,7 @@ export function CompanyAuditTable({ items }: CompanyAuditTableProps) {
                   detailId={detailId}
                   columnCount={4}
                   locale={locale}
+                  onActorSelect={onActorSelect}
                   subjectFallback={t("chrome.company")}
                   onToggle={toggle}
                 />

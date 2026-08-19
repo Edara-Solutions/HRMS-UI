@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "@/shared/lib/cn";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle" | "link" | "nav";
@@ -60,6 +60,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconOnly?: boolean;
   /** Controlled pressed state for toggle (sets aria-pressed + pressed styling) */
   pressed?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const variantClassName: Record<ButtonVariant, string> = {
@@ -119,6 +120,7 @@ export function Button({
   pressed,
   children,
   disabled,
+  ref,
   ...props
 }: ButtonProps) {
   const defaults = intent ? intentDefaults[intent] : undefined;
@@ -130,6 +132,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type="button"
       className={cn(
         "relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] leading-none transition-[background-color,border-color,color,box-shadow,scale,translate] duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] active:translate-y-px active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",

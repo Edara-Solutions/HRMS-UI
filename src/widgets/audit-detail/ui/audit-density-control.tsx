@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { auditNamespace } from "@/features/audit-filters";
 import { Button } from "@/shared/ui/button";
-import { auditNamespace } from "../model/audit-labels";
 import type { AuditDensity } from "./audit-event-row";
 
 interface AuditDensityControlProps {

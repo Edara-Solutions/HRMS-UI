@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
-import { fetchCompanyAuditTrail } from "./audit";
+import { companyAuditEventTypes, fetchCompanyAuditTrail } from "./audit";
 
 const page: components["schemas"]["CompanyAuditTrailPage"] = {
   items: [
@@ -22,17 +22,38 @@ const page: components["schemas"]["CompanyAuditTrailPage"] = {
   hasMore: true,
 };
 
+describe("companyAuditEventTypes", () => {
+  it("offers the COMPANY-audience subset of the catalog and no Platform-only type", () => {
+    expect(companyAuditEventTypes).toHaveLength(32);
+    expect(companyAuditEventTypes).toContain("company.lifecycle.created");
+    expect(
+      companyAuditEventTypes.some((eventType) => eventType.startsWith("platform_admin.")),
+    ).toBe(false);
+    expect(companyAuditEventTypes).not.toContain("audit.trail.platform_read");
+  });
+
+  it("leaves the projection's own placeholder out of the filterable set", () => {
+    expect(companyAuditEventTypes).not.toContain("audit.event.unavailable");
+  });
+});
+
 describe("fetchCompanyAuditTrail", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it("calls the Company route and forwards only cursor and limit", async () => {
+  it("calls the Company route and forwards its paging and filter inputs", async () => {
     const get = mockAuditResponse(page);
 
-    await fetchCompanyAuditTrail({ cursor: "opaque-prev", limit: 25 });
+    await fetchCompanyAuditTrail({
+      cursor: "opaque-prev",
+      limit: 25,
+      actorPublicId: "550e8400-e29b-41d4-a716-446655440000",
+    });
 
     const call = get.mock.calls[0];
     expect(call?.[0]).toBe("company/audit-trail");
-    expect(call?.[1]).toMatchObject({ searchParams: { cursor: "opaque-prev", limit: "25" } });
+    expect(requestedSearch(get)).toBe(
+      "cursor=opaque-prev&limit=25&actorPublicId=550e8400-e29b-41d4-a716-446655440000",
+    );
   });
 
   it("asks for the first page when no paging input is given", async () => {
@@ -40,7 +61,7 @@ describe("fetchCompanyAuditTrail", () => {
 
     await fetchCompanyAuditTrail({});
 
-    expect(get.mock.calls[0]?.[1]).toMatchObject({ searchParams: {} });
+    expect(requestedSearch(get)).toBe("");
   });
 
   it("returns the parsed page with the opaque cursor preserved", async () => {
@@ -59,6 +80,12 @@ describe("fetchCompanyAuditTrail", () => {
     await expect(fetchCompanyAuditTrail({})).rejects.toThrow();
   });
 });
+
+/** The mock's arguments are untyped by construction; the fetcher always passes this shape. */
+function requestedSearch(get: ReturnType<typeof mockAuditResponse>): string {
+  const options = get.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
+  return options.searchParams.toString();
+}
 
 function mockAuditResponse(response: unknown) {
   // Ky's response exposes more methods than this network-seam test exercises.

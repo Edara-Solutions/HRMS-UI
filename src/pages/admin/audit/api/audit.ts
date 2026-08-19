@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import {
+  type AuditTrailFilters,
+  appendAuditFilterParams,
+  filterableAuditEventTypes,
+} from "@/features/audit-filters";
 import { apiClient } from "@/shared/api";
 import {
+  PlatformAuditTrailEvent,
   type PlatformAuditTrailItem,
   parsePlatformAuditTrailPage,
   type PlatformAuditTrailPage as RuntimePlatformAuditTrailPage,
@@ -11,12 +17,15 @@ export type PlatformAuditTrailPage = RuntimePlatformAuditTrailPage;
 
 export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";
 
-export interface PlatformAuditTrailParams {
+export interface PlatformAuditTrailParams extends AuditTrailFilters {
   cursor?: string;
   limit?: number;
   companyPublicId?: string;
   scope?: PlatformAuditTrailScope;
 }
+
+/** Every event type the Platform trail admits, read off the generated contract. */
+export const platformAuditEventTypes = filterableAuditEventTypes(PlatformAuditTrailEvent.options);
 
 export const auditTrailKeys = {
   all: ["audit-trail"] as const,
@@ -26,11 +35,12 @@ export const auditTrailKeys = {
 export async function fetchPlatformAuditTrail(
   params: PlatformAuditTrailParams,
 ): Promise<PlatformAuditTrailPage> {
-  const searchParams: Record<string, string> = {};
-  if (params.cursor) searchParams.cursor = params.cursor;
-  if (params.limit) searchParams.limit = String(params.limit);
-  if (params.companyPublicId) searchParams.companyPublicId = params.companyPublicId;
-  if (params.scope) searchParams.scope = params.scope;
+  const searchParams = new URLSearchParams();
+  if (params.cursor) searchParams.set("cursor", params.cursor);
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.companyPublicId) searchParams.set("companyPublicId", params.companyPublicId);
+  if (params.scope) searchParams.set("scope", params.scope);
+  appendAuditFilterParams(searchParams, params);
 
   const response: unknown = await apiClient.get("platform/audit-trail", { searchParams }).json();
 

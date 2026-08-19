@@ -56,14 +56,6 @@ export function getAuditDetailKind(details: Record<string, unknown>): AuditDetai
   return "scalar-bag";
 }
 
-export function humanizeAuditKey(value: string): string {
-  const words = value
-    .replace(/[-_.]+/g, " ")
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .toLowerCase();
-  return words.charAt(0).toUpperCase() + words.slice(1);
-}
-
 function lowerFirst(value: string): string {
   return value.charAt(0).toLowerCase() + value.slice(1);
 }

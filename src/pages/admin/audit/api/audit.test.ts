@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { components } from "@/shared/api";
 import { apiClient } from "@/shared/api";
-import { fetchPlatformAuditTrail } from "./audit";
+import { fetchPlatformAuditTrail, platformAuditEventTypes } from "./audit";
 
 type PlatformEvent = components["schemas"]["PlatformAuditTrailPage"]["items"][number];
 
@@ -27,6 +27,14 @@ const page: components["schemas"]["PlatformAuditTrailPage"] = {
   hasMore: true,
 };
 
+describe("platformAuditEventTypes", () => {
+  it("offers every catalog event the Platform trail admits, and only those", () => {
+    expect(platformAuditEventTypes).toHaveLength(60);
+    expect(platformAuditEventTypes).toContain("audit.trail.platform_read");
+    expect(platformAuditEventTypes).not.toContain("audit.event.unavailable");
+  });
+});
+
 describe("fetchPlatformAuditTrail", () => {
   afterEach(() => vi.restoreAllMocks());
 
@@ -37,9 +45,20 @@ describe("fetchPlatformAuditTrail", () => {
 
     const call = get.mock.calls[0];
     expect(call?.[0]).toBe("platform/audit-trail");
-    expect(call?.[1]).toMatchObject({
-      searchParams: { cursor: "opaque-prev", limit: "25", scope: "PLATFORM" },
+    expect(requestedSearch(get)).toBe("cursor=opaque-prev&limit=25&scope=PLATFORM");
+  });
+
+  it("repeats the event type once per selected value alongside the other filters", async () => {
+    const get = mockAuditResponse(page);
+
+    await fetchPlatformAuditTrail({
+      outcome: "FAILURE",
+      eventType: ["auth.session.started", "auth.session.ended"],
     });
+
+    expect(requestedSearch(get)).toBe(
+      "outcome=FAILURE&eventType=auth.session.started&eventType=auth.session.ended",
+    );
   });
 
   it("returns the parsed page with the opaque cursor preserved", async () => {
@@ -57,6 +76,12 @@ describe("fetchPlatformAuditTrail", () => {
     await expect(fetchPlatformAuditTrail({})).rejects.toThrow();
   });
 });
+
+/** The mock's arguments are untyped by construction; the fetcher always passes this shape. */
+function requestedSearch(get: ReturnType<typeof mockAuditResponse>): string {
+  const options = get.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
+  return options.searchParams.toString();
+}
 
 function mockAuditResponse(response: unknown) {
   // Ky's response exposes more methods than this network-seam test exercises.
