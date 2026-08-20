@@ -20,7 +20,7 @@ const permissionActions = [
   "companies:email-settings:update",
   "sending-domains:read",
   "sending-domains:manage",
-  "audit:read",
+  "audit-events:read",
   "REQUEST_LEAD_CONVERSION",
   "AUTO_APPROVE_LEAD_CONVERSION",
   "APPROVE_LEAD_CONVERSION_REQUEST",
