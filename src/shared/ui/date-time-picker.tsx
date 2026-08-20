@@ -44,8 +44,27 @@ const localeTags: Record<SupportedLocale, string> = {
   ar: "ar-SA-u-ca-gregory",
 };
 
+// Building an `Intl.DateTimeFormat` is expensive, and this component builds four of them on
+// every keystroke in the minute field. They depend on nothing but the locale, so they are
+// built once per locale and kept.
+const formatters = new Map<string, Intl.DateTimeFormat>();
+
+function formatterFor(
+  locale: SupportedLocale,
+  name: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${locale}:${name}`;
+  const cached = formatters.get(key);
+  if (cached) return cached;
+
+  const created = new Intl.DateTimeFormat(localeTags[locale], options);
+  formatters.set(key, created);
+  return created;
+}
+
 function chosenInstantText(value: string, locale: SupportedLocale): string {
-  return new Intl.DateTimeFormat(localeTags[locale], {
+  return formatterFor(locale, "instant", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -55,12 +74,19 @@ function chosenInstantText(value: string, locale: SupportedLocale): string {
   }).format(new Date(value));
 }
 
+const weekdayNamesByLocale = new Map<SupportedLocale, string[]>();
+
 function weekdayNames(locale: SupportedLocale): string[] {
-  const formatter = new Intl.DateTimeFormat(localeTags[locale], { weekday: "short" });
+  const cached = weekdayNamesByLocale.get(locale);
+  if (cached) return cached;
+
+  const formatter = formatterFor(locale, "weekday", { weekday: "short" });
   // 1 January 2024 was a Monday, and the grid starts its week there.
-  return Array.from({ length: 7 }, (_unused, index) =>
+  const names = Array.from({ length: 7 }, (_unused, index) =>
     formatter.format(new Date(2024, 0, 1 + index)),
   );
+  weekdayNamesByLocale.set(locale, names);
+  return names;
 }
 
 function toTwelveHour(hour: number): number {
@@ -117,11 +143,10 @@ export function DateTimePicker({
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const selectedKey = draft ? toDateKey(draft) : undefined;
   const todayKey = toDateKey(new Date());
-  const monthLabel = new Intl.DateTimeFormat(localeTags[locale], {
-    month: "long",
-    year: "numeric",
-  }).format(month);
-  const dayLabels = new Intl.DateTimeFormat(localeTags[locale], { dateStyle: "full" });
+  const monthLabel = formatterFor(locale, "month", { month: "long", year: "numeric" }).format(
+    month,
+  );
+  const dayLabels = formatterFor(locale, "day", { dateStyle: "full" });
 
   function defaultDraft(): Date {
     const nextDraft = new Date();

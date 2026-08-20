@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import { auditNamespace } from "../model/audit-text";
 
 interface AuditFilterPopoverProps {
@@ -93,9 +94,13 @@ export function AuditFilterPopover({
       >
         <span>{label}</span>
         {active ? (
-          <span className="ms-1.5 max-w-44 truncate font-semibold text-[var(--color-text)]">
-            {summary}
-          </span>
+          // The chip is the trigger and already focusable, so the clipped summary inside it
+          // offers its full value on hover without adding a second tab stop.
+          <TruncatedText
+            text={summary}
+            focusable={false}
+            className="ms-1.5 max-w-44 font-semibold text-[var(--color-text)]"
+          />
         ) : null}
       </Button>
 

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import { buildAuditEventTaxonomy } from "../model/audit-event-taxonomy";
 import { auditGroupLabel, auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
@@ -109,9 +110,11 @@ export function AuditEventTypePicker({
                             checked={selectedCount === family.eventTypes.length}
                             partial={selectedCount > 0}
                           />
-                          <span className="flex-1 truncate text-[13px] font-medium text-[var(--color-text)]">
-                            {auditGroupLabel(t, family.family)}
-                          </span>
+                          <TruncatedText
+                            text={auditGroupLabel(t, family.family)}
+                            focusable={false}
+                            className="flex-1 text-[13px] font-medium text-[var(--color-text)]"
+                          />
                           <span className="text-[11px] tabular-nums text-[var(--color-text-faint)]">
                             {family.eventTypes.length}
                           </span>
@@ -126,9 +129,11 @@ export function AuditEventTypePicker({
                                 onClick={() => toggleEventType(eventType)}
                               >
                                 <SelectionMark checked={selectedTypes.has(eventType)} />
-                                <span className="truncate text-[12px] text-[var(--color-text-muted)]">
-                                  {t(eventType)}
-                                </span>
+                                <TruncatedText
+                                  text={t(eventType)}
+                                  focusable={false}
+                                  className="text-[12px] text-[var(--color-text-muted)]"
+                                />
                               </button>
                             </li>
                           ))}

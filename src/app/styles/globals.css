@@ -223,6 +223,20 @@ select {
   }
 }
 
+/* ─── Tooltip ──────────────────────────────────────────────────────────────
+   Appears where a value is clipped. Opacity only — it is already placed at the
+   trigger, so movement would only draw the eye away from the words it carries.
+─────────────────────────────────────────────────────────────────────────── */
+.tooltip-panel {
+  animation: tooltip-panel-in var(--motion-fast) var(--motion-easing);
+}
+
+@keyframes tooltip-panel-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* Layered so component-level focus-visible utilities (Input, Select, Textarea) can override this default. */
 @layer base {
   :focus-visible {
