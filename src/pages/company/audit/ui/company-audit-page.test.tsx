@@ -241,6 +241,38 @@ describe("CompanyAuditPage filters", () => {
     }
   });
 
+  it("takes the window from the date picker as an instant with an explicit offset", async () => {
+    searchState.cursor = "opaque-current";
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /When/ }));
+
+    const panel = screen.getByRole("group", { name: "When" });
+    fireEvent.click(within(panel).getByRole("button", { name: "From" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply date" }));
+
+    const nextSearch = readNavigatedSearch();
+    expect(nextSearch.occurredFrom).toMatch(/Z$/);
+    expect(Number.isNaN(Date.parse(nextSearch.occurredFrom))).toBe(false);
+    expect(nextSearch.cursor).toBeUndefined();
+  });
+
+  it("offers a relative window without hiding one behind a default", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /When/ }));
+
+    expect(apiGetMock.mock.calls[0]?.[1]).toBeDefined();
+    const { searchParams } = apiGetMock.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
+    expect(searchParams.has("occurredFrom")).toBe(false);
+
+    fireEvent.click(
+      within(screen.getByRole("group", { name: "When" })).getByRole("button", {
+        name: "Last 7 days",
+      }),
+    );
+
+    expect(readNavigatedSearch().occurredFrom).toMatch(/Z$/);
+  });
+
   it("filters to the actor a reader clicks in a row", async () => {
     searchState.cursor = "opaque-current";
     renderPage({ items: [profileUpdatedEvent] });

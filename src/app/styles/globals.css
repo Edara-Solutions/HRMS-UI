@@ -207,6 +207,22 @@ select {
   transform: translateX(2px);
 }
 
+/* ─── Filter popover panel ─────────────────────────────────────────────────
+   Floating panels scale in from the chip that opened them rather than from
+   their own middle, so the panel reads as coming out of its trigger. Opacity
+   and transform only; the reduced-motion block below flattens it to a cut.
+─────────────────────────────────────────────────────────────────────────── */
+.popover-panel {
+  animation: popover-panel-in var(--motion-base) var(--motion-easing);
+}
+
+@keyframes popover-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
 /* Layered so component-level focus-visible utilities (Input, Select, Textarea) can override this default. */
 @layer base {
   :focus-visible {

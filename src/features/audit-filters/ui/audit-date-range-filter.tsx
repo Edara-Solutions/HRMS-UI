@@ -2,14 +2,11 @@ import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
+import { DateTimePicker, type DateTimePickerText } from "@/shared/ui/date-time-picker";
 import {
   type AuditDatePreset,
   auditDatePresets,
   auditPresetRange,
-  fromDateTimeLocalValue,
-  toDateTimeLocalValue,
 } from "../model/audit-date-range";
 import { auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
@@ -39,8 +36,32 @@ export function AuditDateRangeFilter({
 }: AuditDateRangeFilterProps) {
   const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
-  const fromId = `${id}-from`;
-  const toId = `${id}-to`;
+  const pickerText: Partial<DateTimePickerText> = {
+    description: t("chrome.filterPickerDescription"),
+    placeholder: t("chrome.filterPickerPlaceholder"),
+    hour: t("chrome.filterPickerHour"),
+    minute: t("chrome.filterPickerMinute"),
+    minuteHint: t("chrome.filterPickerMinuteHint"),
+    period: t("chrome.filterPickerPeriod"),
+    previousMonth: t("chrome.filterPickerPreviousMonth"),
+    nextMonth: t("chrome.filterPickerNextMonth"),
+    clear: t("chrome.filterClearSelection"),
+    cancel: t("chrome.filterPickerCancel"),
+    apply: t("chrome.filterPickerApply"),
+  };
+
+  function rangeSummary(): string | undefined {
+    if (occurredFrom && occurredTo) {
+      return `${formatInstant(occurredFrom, locale)} – ${formatInstant(occurredTo, locale)}`;
+    }
+    if (occurredFrom) {
+      return t("chrome.filterSince", { instant: formatInstant(occurredFrom, locale) });
+    }
+    if (occurredTo) {
+      return t("chrome.filterBefore", { instant: formatInstant(occurredTo, locale) });
+    }
+    return undefined;
+  }
 
   return (
     <AuditFilterPopover
@@ -50,47 +71,43 @@ export function AuditDateRangeFilter({
       onClear={() => onChange({ occurredFrom: undefined, occurredTo: undefined })}
     >
       {() => (
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap gap-1.5">
-            {auditDatePresets.map((preset) => (
-              <Button
-                key={preset}
-                variant="ghost"
-                size="xs"
-                onClick={() => onChange(auditPresetRange(preset))}
-              >
-                {t(presetLabelKeys[preset])}
-              </Button>
-            ))}
+        <div className="flex flex-col gap-4">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
+              {t("chrome.filterQuickRanges")}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {auditDatePresets.map((preset) => (
+                <Button
+                  key={preset}
+                  variant="secondary"
+                  size="xs"
+                  onClick={() => onChange(auditPresetRange(preset))}
+                >
+                  {t(presetLabelKeys[preset])}
+                </Button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={fromId}>{t("chrome.filterFrom")}</Label>
-            <Input
-              id={fromId}
-              type="datetime-local"
-              value={toDateTimeLocalValue(occurredFrom)}
-              onChange={(event) =>
-                onChange({
-                  occurredFrom: fromDateTimeLocalValue(event.target.value),
-                  occurredTo,
-                })
-              }
+          <div className="flex flex-col gap-3 border-t border-[var(--color-border)] pt-3">
+            <DateTimePicker
+              id={`${id}-from`}
+              label={t("chrome.filterFrom")}
+              value={occurredFrom}
+              boundary="from"
+              locale={locale}
+              text={pickerText}
+              onChange={(nextFrom) => onChange({ occurredFrom: nextFrom, occurredTo })}
             />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor={toId}>{t("chrome.filterTo")}</Label>
-            <Input
-              id={toId}
-              type="datetime-local"
-              value={toDateTimeLocalValue(occurredTo)}
-              onChange={(event) =>
-                onChange({
-                  occurredFrom,
-                  occurredTo: fromDateTimeLocalValue(event.target.value),
-                })
-              }
+            <DateTimePicker
+              id={`${id}-to`}
+              label={t("chrome.filterTo")}
+              value={occurredTo}
+              boundary="to"
+              locale={locale}
+              text={pickerText}
+              onChange={(nextTo) => onChange({ occurredFrom, occurredTo: nextTo })}
             />
             <p className="text-[11px] text-[var(--color-text-muted)]">
               {t("chrome.filterRangeIsHalfOpen")}
@@ -100,14 +117,4 @@ export function AuditDateRangeFilter({
       )}
     </AuditFilterPopover>
   );
-
-  function rangeSummary(): string | undefined {
-    if (occurredFrom && occurredTo) {
-      return `${formatInstant(occurredFrom, locale)} – ${formatInstant(occurredTo, locale)}`;
-    }
-    if (occurredFrom)
-      return t("chrome.filterSince", { instant: formatInstant(occurredFrom, locale) });
-    if (occurredTo) return t("chrome.filterBefore", { instant: formatInstant(occurredTo, locale) });
-    return undefined;
-  }
 }

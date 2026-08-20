@@ -174,7 +174,6 @@
   "chrome.unknownEvent": "unknown event",
   "chrome.unknownTime": "Unknown time",
   "chrome.filters": "Filters",
-  "chrome.filterAny": "Any",
   "chrome.clearNamedFilter": "Clear {{filter}} filter",
   "chrome.filterClearAll": "Clear filters",
   "chrome.filterClearSelection": "Clear selection",
@@ -203,5 +202,18 @@
   "chrome.filterSearching": "Searching…",
   "chrome.filterNoMatches": "No matches",
   "chrome.filterTypeToSearch": "Type at least two letters",
-  "chrome.filterOptionsUnavailable": "Options unavailable"
+  "chrome.filterOptionsUnavailable": "Options unavailable",
+  "chrome.filterActiveCount_one": "{{count}} filter",
+  "chrome.filterActiveCount_other": "{{count}} filters",
+  "chrome.filterQuickRanges": "Quick ranges",
+  "chrome.filterPickerDescription": "Select the date and time this Audit Trail filter uses.",
+  "chrome.filterPickerPlaceholder": "Choose date and time",
+  "chrome.filterPickerHour": "Hour",
+  "chrome.filterPickerMinute": "Minute",
+  "chrome.filterPickerMinuteHint": "00-59",
+  "chrome.filterPickerPeriod": "AM / PM",
+  "chrome.filterPickerPreviousMonth": "Previous month",
+  "chrome.filterPickerNextMonth": "Next month",
+  "chrome.filterPickerCancel": "Cancel",
+  "chrome.filterPickerApply": "Apply date"
 }
