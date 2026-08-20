@@ -17,6 +17,7 @@ export {
   applyAuditFilterChange,
   auditOutcomes,
   clearedAuditFilters,
+  countAuditFilters,
   hasAuditFilters,
 } from "./model/audit-filters";
 export {

@@ -41,14 +41,22 @@ export function appendAuditFilterParams(
   for (const eventType of filters.eventType ?? []) searchParams.append("eventType", eventType);
 }
 
+/**
+ * How many of the shared filters carry a value. A date range counts once however many of its
+ * two bounds are set, because a reader set one window, not two filters.
+ */
+export function countAuditFilters(filters: AuditTrailFilters): number {
+  const set = [
+    Boolean(filters.occurredFrom || filters.occurredTo),
+    Boolean(filters.actorPublicId),
+    Boolean(filters.eventType?.length),
+    Boolean(filters.outcome),
+  ];
+  return set.filter(Boolean).length;
+}
+
 export function hasAuditFilters(filters: AuditTrailFilters): boolean {
-  return Boolean(
-    filters.occurredFrom ||
-      filters.occurredTo ||
-      filters.actorPublicId ||
-      filters.outcome ||
-      filters.eventType?.length,
-  );
+  return countAuditFilters(filters) > 0;
 }
 
 /** Every shared filter cleared at once — spread into a change so each key is really dropped. */

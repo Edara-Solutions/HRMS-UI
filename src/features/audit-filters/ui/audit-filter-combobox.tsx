@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Input } from "@/shared/ui/input";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import { auditNamespace } from "../model/audit-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
 
@@ -112,13 +113,17 @@ export function AuditFilterCombobox({
                   }}
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] text-[var(--color-text)]">
-                      {option.label}
-                    </span>
+                    <TruncatedText
+                      text={option.label}
+                      focusable={false}
+                      className="text-[13px] text-[var(--color-text)]"
+                    />
                     {option.hint ? (
-                      <span className="block truncate text-[11px] text-[var(--color-text-faint)]">
-                        {option.hint}
-                      </span>
+                      <TruncatedText
+                        text={option.hint}
+                        focusable={false}
+                        className="text-[11px] text-[var(--color-text-faint)]"
+                      />
                     ) : null}
                   </span>
                   {option.value === value ? (

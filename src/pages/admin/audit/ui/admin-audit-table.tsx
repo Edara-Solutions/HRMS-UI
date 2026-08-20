@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { auditNamespace } from "@/features/audit-filters";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import {
   type AuditDensity,
   AuditDensityControl,
@@ -29,9 +30,10 @@ function isUnavailable(
 function companyCell(value: string | null, platformLabel: string) {
   return (
     <td className="px-4 py-3">
-      <p className="max-w-44 truncate font-mono text-[11px] text-[var(--color-text-muted)]">
-        {value ?? platformLabel}
-      </p>
+      <TruncatedText
+        text={value ?? platformLabel}
+        className="max-w-44 font-mono text-[11px] text-[var(--color-text-muted)]"
+      />
     </td>
   );
 }

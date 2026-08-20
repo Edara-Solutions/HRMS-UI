@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { cn } from "@/shared/lib/cn";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import { AuditFilterPopover } from "./audit-filter-popover";
 
 export interface AuditFilterChoiceOption<TValue extends string> {
@@ -51,7 +52,7 @@ export function AuditFilterChoice<TValue extends string>({
                 close();
               }}
             >
-              <span className="flex-1 truncate">{option.label}</span>
+              <TruncatedText text={option.label} focusable={false} className="flex-1" />
               {option.value === value ? (
                 <Check size={13} className="shrink-0 text-[var(--color-primary)]" />
               ) : null}

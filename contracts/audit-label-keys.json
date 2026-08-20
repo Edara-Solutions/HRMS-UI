@@ -120,14 +120,49 @@
     "field.website"
   ],
   "enums": {
-    "afterStatus": ["COMPLETE"],
-    "beforeStatus": ["COMPLETE", "INCOMPLETE"],
-    "effectiveMode": ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-    "mode": ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-    "operation": ["onboarding", "read", "write"],
-    "previousMode": ["BLOCKED", "FROZEN", "MAINTENANCE", "NORMAL", "READ_ONLY"],
-    "scope": ["COMPANY", "PLATFORM"],
-    "status": ["COMPLETED", "IN_PROGRESS", "PENDING", "SKIPPED"],
+    "afterStatus": [
+      "COMPLETE"
+    ],
+    "beforeStatus": [
+      "COMPLETE",
+      "INCOMPLETE"
+    ],
+    "effectiveMode": [
+      "BLOCKED",
+      "FROZEN",
+      "MAINTENANCE",
+      "NORMAL",
+      "READ_ONLY"
+    ],
+    "mode": [
+      "BLOCKED",
+      "FROZEN",
+      "MAINTENANCE",
+      "NORMAL",
+      "READ_ONLY"
+    ],
+    "operation": [
+      "onboarding",
+      "read",
+      "write"
+    ],
+    "previousMode": [
+      "BLOCKED",
+      "FROZEN",
+      "MAINTENANCE",
+      "NORMAL",
+      "READ_ONLY"
+    ],
+    "scope": [
+      "COMPANY",
+      "PLATFORM"
+    ],
+    "status": [
+      "COMPLETED",
+      "IN_PROGRESS",
+      "PENDING",
+      "SKIPPED"
+    ],
     "stepType": [
       "SET_BRANCHES",
       "SET_COMPANY_PROFILE",

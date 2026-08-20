@@ -15,6 +15,7 @@
       "!.agents",
       "!.claude",
       "!contracts/openapi.json",
+      "!contracts/audit-label-keys.json",
       "!src/routeTree.gen.ts",
       "!src/shared/api/schema.d.ts",
       "!src/shared/api/lead-contract.d.ts"

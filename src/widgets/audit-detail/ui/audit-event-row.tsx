@@ -13,6 +13,7 @@ import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Badge } from "@/shared/ui/badge";
+import { TruncatedText } from "@/shared/ui/truncated-text";
 import { AuditDetail } from "./audit-detail";
 
 export type AuditDensity = "comfortable" | "compact";
@@ -110,10 +111,39 @@ function Subject({ event, fallback }: { event: AuditEvent; fallback: string }) {
       <p className="text-[13px] font-medium text-[var(--color-text)]">
         {humanizeAuditKey(target.targetType)}
       </p>
-      <p className="max-w-52 truncate font-mono text-[11px] text-[var(--color-text-faint)]">
-        {target.publicId}
-      </p>
+      <TruncatedText
+        text={target.publicId}
+        className="max-w-52 font-mono text-[11px] text-[var(--color-text-faint)]"
+      />
     </div>
+  );
+}
+
+/**
+ * The row's disclosure. A bare chevron reads as decoration; giving it a tile that answers to
+ * the row's hover and holds a tint while open makes it look like the control it is, without
+ * spending colour on a row that is merely sitting there.
+ */
+function DisclosureTile({ expanded }: { expanded: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex size-[22px] shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-transparent text-[var(--color-text-faint)]",
+        "transition-[background-color,border-color,color] duration-[var(--motion-fast)] ease-[var(--motion-easing)]",
+        "group-hover/row:border-[var(--color-border)] group-hover/row:bg-[var(--color-surface)] group-hover/row:text-[var(--color-text-muted)]",
+        expanded &&
+          "border-[color-mix(in_srgb,var(--color-primary)_25%,transparent)] bg-[var(--color-primary-soft)] text-[var(--color-primary)] group-hover/row:border-[color-mix(in_srgb,var(--color-primary)_25%,transparent)] group-hover/row:bg-[var(--color-primary-soft)] group-hover/row:text-[var(--color-primary)]",
+      )}
+    >
+      <ChevronDown
+        size={13}
+        className={cn(
+          "transition-transform duration-[var(--motion-fast)] ease-[var(--motion-easing)]",
+          expanded && "rotate-180",
+        )}
+      />
+    </span>
   );
 }
 
@@ -126,22 +156,26 @@ interface ActorCellProps {
 }
 
 function ActorCell({ actor, actorPublicId, density, filterLabel, onActorSelect }: ActorCellProps) {
-  const nameClassName = "block max-w-52 truncate text-[13px] font-medium";
+  const nameClassName = "max-w-52 text-[13px] font-medium";
 
   return (
     <>
       {actorPublicId && onActorSelect ? (
+        // The button's own name already carries the actor in full, so the clipped line
+        // inside it needs no tab stop of its own.
         <button
           type="button"
-          title={filterLabel}
           aria-label={`${filterLabel}: ${actor.primary}`}
           className="rounded-[var(--radius-sm)] text-start text-[var(--color-text)] underline-offset-4 transition-colors hover:text-[var(--color-primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
           onClick={() => onActorSelect(actorPublicId)}
         >
-          <span className={nameClassName}>{actor.primary}</span>
+          <TruncatedText text={actor.primary} focusable={false} className={nameClassName} />
         </button>
       ) : (
-        <span className={cn(nameClassName, "text-[var(--color-text)]")}>{actor.primary}</span>
+        <TruncatedText
+          text={actor.primary}
+          className={cn(nameClassName, "text-[var(--color-text)]")}
+        />
       )}
       {density === "comfortable" ? (
         <p className="text-[11px] text-[var(--color-text-faint)]">{actor.secondary}</p>
@@ -178,7 +212,7 @@ export function AuditEventRow({
 
   return (
     <>
-      <tr className="border-b border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface-2)]">
+      <tr className="group/row border-b border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface-2)]">
         <td
           className={cn(
             "px-4",
@@ -193,13 +227,7 @@ export function AuditEventRow({
             aria-controls={detailId}
             onClick={onToggle}
           >
-            <ChevronDown
-              size={14}
-              className={cn(
-                "shrink-0 text-[var(--color-text-faint)] transition-transform duration-[var(--motion-fast)] ease-[var(--motion-easing)]",
-                expanded && "rotate-180",
-              )}
-            />
+            <DisclosureTile expanded={expanded} />
             <span className="min-w-0">
               {density === "comfortable" ? (
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
@@ -281,7 +309,7 @@ export function DegradedAuditEventRow({
 
   return (
     <>
-      <tr className="border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-warning-soft)_30%,transparent)]">
+      <tr className="group/row border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-warning-soft)_30%,transparent)]">
         <td className="border-s-2 border-[var(--color-warning)] px-4 py-3">
           <button
             type="button"
@@ -290,13 +318,7 @@ export function DegradedAuditEventRow({
             aria-controls={detailId}
             onClick={onToggle}
           >
-            <ChevronDown
-              size={14}
-              className={cn(
-                "shrink-0 text-[var(--color-text-faint)] transition-transform duration-[var(--motion-fast)] ease-[var(--motion-easing)]",
-                expanded && "rotate-180",
-              )}
-            />
+            <DisclosureTile expanded={expanded} />
             <span className="font-medium text-[var(--color-text)]">
               {t("chrome.unrecognizedEvent")}
             </span>

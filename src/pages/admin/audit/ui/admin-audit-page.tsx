@@ -90,7 +90,7 @@ export function AdminAuditPage() {
         onClearAll={() =>
           changeFilters({ ...clearedAuditFilters, companyPublicId: undefined, scope: undefined })
         }
-        slottedFiltersActive={Boolean(search.companyPublicId || search.scope)}
+        slottedFilterCount={[search.companyPublicId, search.scope].filter(Boolean).length}
         companyFilter={
           <AuditFilterCombobox
             id="admin-audit-company"
