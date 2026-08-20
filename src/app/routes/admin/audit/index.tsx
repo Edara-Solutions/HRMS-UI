@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { auditPageSize } from "@/features/audit-filters";
 import { AdminAuditPage, platformAuditEventTypes } from "@/pages/admin/audit";
 
 const platformEventTypes = new Set(platformAuditEventTypes);
@@ -9,7 +10,7 @@ const platformEventTypes = new Set(platformAuditEventTypes);
 // else would be answered with a 400 rather than a page.
 const adminAuditSearchSchema = z.object({
   cursor: z.string().max(500).optional().catch(undefined),
-  limit: z.coerce.number().int().min(1).max(100).catch(50),
+  limit: z.coerce.number().int().min(1).max(100).catch(auditPageSize),
   companyPublicId: z.string().uuid().optional().catch(undefined),
   scope: z.enum(["PLATFORM", "COMPANY"]).optional().catch(undefined),
   occurredFrom: z.string().datetime({ offset: true }).optional().catch(undefined),

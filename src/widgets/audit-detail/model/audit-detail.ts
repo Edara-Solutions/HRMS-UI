@@ -1,11 +1,6 @@
-import type { components } from "@/shared/api";
+import type { CatalogAuditTarget } from "./audit-catalog";
 
-type PlatformAuditEvent = Exclude<
-  components["schemas"]["PlatformAuditTrailPage"]["items"][number],
-  { eventType: "audit.event.unavailable" }
->;
-
-export type AuditTarget = PlatformAuditEvent["targets"][number];
+export type AuditTarget = CatalogAuditTarget;
 
 export type AuditDetailKind = "field-diff" | "changed-field-list" | "scalar-bag";
 

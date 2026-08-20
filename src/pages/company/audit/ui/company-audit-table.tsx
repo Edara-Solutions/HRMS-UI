@@ -94,6 +94,7 @@ export function CompanyAuditTable({ items, onActorSelect }: CompanyAuditTablePro
                 <AuditEventRow
                   key={rowKey}
                   event={event}
+                  portal="company"
                   density={density}
                   expanded={expanded}
                   detailId={detailId}

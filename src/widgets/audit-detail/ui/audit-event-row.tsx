@@ -1,48 +1,45 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, TriangleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import {
-  type AuditTranslate,
-  auditGroupLabel,
-  auditNamespace,
-  humanizeAuditKey,
-} from "@/features/audit-filters";
-import type { components } from "@/shared/api";
+import { type AuditTranslate, auditGroupLabel, auditNamespace } from "@/features/audit-filters";
 import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { formatInstant } from "@/shared/lib/format-instant";
 import { Badge } from "@/shared/ui/badge";
 import { TruncatedText } from "@/shared/ui/truncated-text";
+import type { CatalogAuditEvent, PlatformAuditEvent } from "../model/audit-catalog";
+import {
+  type AuditActorIdentity,
+  type AuditActorPresentation,
+  type AuditPortal,
+  type AuditTargetIdentity,
+  presentAuditActor,
+  presentAuditTarget,
+} from "../model/audit-identity";
 import { AuditDetail } from "./audit-detail";
+import { AuditTargetName } from "./audit-target-name";
 
 export type AuditDensity = "comfortable" | "compact";
-
-type PlatformAuditEvent = Exclude<
-  components["schemas"]["PlatformAuditTrailPage"]["items"][number],
-  { eventType: "audit.event.unavailable" }
->;
-type CompanyAuditEvent = Exclude<
-  components["schemas"]["CompanyAuditTrailPage"]["items"][number],
-  { eventType: "audit.event.unavailable" }
->;
-type CatalogAuditEvent = PlatformAuditEvent | CompanyAuditEvent;
-type AuditActor = CatalogAuditEvent["actor"];
 
 interface AuditEvent {
   eventType: CatalogAuditEvent["eventType"];
   eventVersion: CatalogAuditEvent["eventVersion"];
   occurredAt: string;
   outcome: "SUCCESS" | "FAILURE";
-  actor: CatalogAuditEvent["actor"];
+  // Identity is read through the widened shapes rather than the generated arms: every arm is
+  // assignable to them, and the resolved names land here without the row changing again.
+  actor: AuditActorIdentity;
   traceId: string | null;
-  targets: CatalogAuditEvent["targets"];
+  targets: AuditTargetIdentity[];
   details: CatalogAuditEvent["details"];
   origin?: PlatformAuditEvent["origin"];
 }
 
 interface AuditEventRowProps {
   event: AuditEvent;
+  /** Decides which targets this reader can navigate to; the Company portal offers none. */
+  portal: AuditPortal;
   density: AuditDensity;
   expanded: boolean;
   detailId: string;
@@ -82,39 +79,27 @@ function eventFamily(eventType: string, t: AuditTranslate): string {
   return auditGroupLabel(t, eventType.split(".").slice(0, -1).join("."));
 }
 
-function actorText(actor: AuditActor, t: AuditTranslate): { primary: string; secondary: string } {
-  if (actor.kind === "ANONYMOUS") return { primary: t("chrome.anonymous"), secondary: "" };
-  if (actor.kind === "ATTRIBUTION_FAILED") {
-    return { primary: t("chrome.attributionFailed"), secondary: "" };
-  }
-  if (actor.kind === "ERASED_USER") return { primary: t("chrome.erasedIdentity"), secondary: "" };
-  if (actor.kind === "SYSTEM") {
-    return { primary: humanizeAuditKey(actor.component), secondary: t("chrome.system") };
-  }
-  if ("publicId" in actor && actor.publicId) {
-    return { primary: actor.publicId, secondary: humanizeAuditKey(actor.kind) };
-  }
-  // The Company trail withholds the Platform Admin's identity, so the actor is a fixed
-  // client-side constant: there is no server field it could leak through.
-  return { primary: t("chrome.platformAdmin"), secondary: t("chrome.identityWithheld") };
-}
-
-function Subject({ event, fallback }: { event: AuditEvent; fallback: string }) {
+function Subject({
+  event,
+  portal,
+  fallback,
+}: {
+  event: AuditEvent;
+  portal: AuditPortal;
+  fallback: string;
+}) {
   const target = event.targets[0];
 
   if (!target) {
     return <span className="text-[var(--color-text-muted)]">{fallback}</span>;
   }
 
+  const presented = presentAuditTarget(target, portal);
+
   return (
     <div className="min-w-0">
-      <p className="text-[13px] font-medium text-[var(--color-text)]">
-        {humanizeAuditKey(target.targetType)}
-      </p>
-      <TruncatedText
-        text={target.publicId}
-        className="max-w-52 font-mono text-[11px] text-[var(--color-text-faint)]"
-      />
+      <p className="text-[13px] font-medium text-[var(--color-text)]">{presented.typeLabel}</p>
+      <AuditTargetName target={presented} />
     </div>
   );
 }
@@ -148,35 +133,63 @@ function DisclosureTile({ expanded }: { expanded: boolean }) {
 }
 
 interface ActorCellProps {
-  actor: { primary: string; secondary: string };
-  actorPublicId: string | undefined;
+  actor: AuditActorPresentation;
   density: AuditDensity;
   filterLabel: string;
   onActorSelect?: (actorPublicId: string) => void;
 }
 
-function ActorCell({ actor, actorPublicId, density, filterLabel, onActorSelect }: ActorCellProps) {
-  const nameClassName = "max-w-52 text-[13px] font-medium";
+/**
+ * The mark that keeps the unnamed actor states apart. An id that did not resolve is a quiet
+ * fact; a missing attribution is a defect in the recording, so it carries the warning tone
+ * rather than reading as one more legitimate actor category.
+ */
+function ActorMark({ state, t }: { state: AuditActorPresentation["state"]; t: AuditTranslate }) {
+  if (state === "unresolved") {
+    return <Badge variant="default">{t("chrome.unresolved")}</Badge>;
+  }
+  if (state === "attribution-failed") {
+    return (
+      <Badge variant="warn" className="gap-1">
+        <TriangleAlert size={11} aria-hidden="true" />
+        {t("chrome.defect")}
+      </Badge>
+    );
+  }
+  return null;
+}
+
+function ActorCell({ actor, density, filterLabel, onActorSelect }: ActorCellProps) {
+  const { t } = useTranslation(auditNamespace);
+  const filterable = actor.filterablePublicId;
+  const nameClassName = cn(
+    "max-w-52 text-[13px] font-medium",
+    // An unresolved actor is an identifier, and an identifier reads as one.
+    actor.state === "unresolved" && "font-mono text-[12px]",
+  );
 
   return (
     <>
-      {actorPublicId && onActorSelect ? (
-        // The button's own name already carries the actor in full, so the clipped line
-        // inside it needs no tab stop of its own.
-        <button
-          type="button"
-          aria-label={`${filterLabel}: ${actor.primary}`}
-          className="rounded-[var(--radius-sm)] text-start text-[var(--color-text)] underline-offset-4 transition-colors hover:text-[var(--color-primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
-          onClick={() => onActorSelect(actorPublicId)}
-        >
-          <TruncatedText text={actor.primary} focusable={false} className={nameClassName} />
-        </button>
-      ) : (
-        <TruncatedText
-          text={actor.primary}
-          className={cn(nameClassName, "text-[var(--color-text)]")}
-        />
-      )}
+      <div className="flex min-w-0 items-center gap-1.5">
+        {filterable && onActorSelect ? (
+          // The button's own name already carries the actor in full, so the clipped line
+          // inside it needs no tab stop of its own.
+          <button
+            type="button"
+            aria-label={`${filterLabel}: ${actor.primary}`}
+            className="min-w-0 rounded-[var(--radius-sm)] text-start text-[var(--color-text)] underline-offset-4 transition-colors hover:text-[var(--color-primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+            onClick={() => onActorSelect(filterable)}
+          >
+            <TruncatedText text={actor.primary} focusable={false} className={nameClassName} />
+          </button>
+        ) : (
+          <TruncatedText
+            text={actor.primary}
+            className={cn(nameClassName, "text-[var(--color-text)]")}
+          />
+        )}
+        <ActorMark state={actor.state} t={t} />
+      </div>
       {density === "comfortable" ? (
         <p className="text-[11px] text-[var(--color-text-faint)]">{actor.secondary}</p>
       ) : null}
@@ -190,6 +203,7 @@ function EmptyCell() {
 
 export function AuditEventRow({
   event,
+  portal,
   density,
   expanded,
   detailId,
@@ -206,8 +220,7 @@ export function AuditEventRow({
   // namespace still in flight has no labels yet, which is a wait rather than a defect.
   const loaded = i18n.hasResourceBundle(i18n.language, auditNamespace);
   const labelled = !loaded || i18n.exists(event.eventType, { ns: auditNamespace });
-  const actor = actorText(event.actor, t);
-  const actorPublicId = "publicId" in event.actor ? event.actor.publicId : undefined;
+  const actor = presentAuditActor(event.actor, t);
   const failed = event.outcome === "FAILURE";
 
   return (
@@ -251,14 +264,13 @@ export function AuditEventRow({
               from the actor search once soft-delete drops their Company, but their rows are not. */}
           <ActorCell
             actor={actor}
-            actorPublicId={actorPublicId}
             density={density}
             filterLabel={t("chrome.filterByThisActor")}
             onActorSelect={onActorSelect}
           />
         </td>
         <td className="px-4 py-3">
-          <Subject event={event} fallback={subjectFallback} />
+          <Subject event={event} portal={portal} fallback={subjectFallback} />
         </td>
         {companyCell}
         <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
@@ -277,6 +289,7 @@ export function AuditEventRow({
             <AuditDetail
               details={event.details}
               targets={event.targets}
+              portal={portal}
               occurredAt={event.occurredAt}
               locale={locale}
               eventKey={event.eventType}

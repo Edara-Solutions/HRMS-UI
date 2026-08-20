@@ -1,3 +1,9 @@
+/**
+ * Rows per page on both trails. The trails page by opaque cursor, so this is the size each
+ * cursor was cut at — changing it changes what the next cursor returns, not just the layout.
+ */
+export const auditPageSize = 25;
+
 export const auditOutcomes = ["SUCCESS", "FAILURE"] as const;
 
 export type AuditOutcome = (typeof auditOutcomes)[number];

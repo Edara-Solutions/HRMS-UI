@@ -23,3 +23,8 @@ export function humanizeAuditKey(value: string): string {
 export function auditGroupLabel(t: AuditTranslate, group: string): string {
   return t(`chrome.group.${group}`, { defaultValue: humanizeAuditKey(group) });
 }
+
+/** The head of an identifier, for a cell that must show which id it has without showing all of it. */
+export function shortAuditIdentifier(publicId: string): string {
+  return `${publicId.slice(0, 8)}…`;
+}

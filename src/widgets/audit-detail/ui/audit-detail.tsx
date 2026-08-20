@@ -11,11 +11,19 @@ import {
   isFieldDiff,
   isInstantKey,
 } from "../model/audit-detail";
+import {
+  type AuditPortal,
+  type AuditTargetIdentity,
+  presentAuditTarget,
+} from "../model/audit-identity";
 import { auditEnumLabel, auditFieldLabel, isAuditEnumField } from "../model/audit-labels";
+import { AuditTargetName } from "./audit-target-name";
 
 interface AuditDetailProps {
   details: Record<string, unknown>;
-  targets: AuditTarget[];
+  targets: AuditTargetIdentity[];
+  /** Decides which targets this reader can navigate to; the Company portal offers none. */
+  portal: AuditPortal;
   occurredAt: string;
   locale: SupportedLocale;
   eventKey: string;
@@ -217,6 +225,7 @@ function ScalarBag({
 export function AuditDetail({
   details,
   targets,
+  portal,
   occurredAt,
   locale,
   eventKey,
@@ -252,12 +261,18 @@ export function AuditDetail({
             {t("chrome.targets")}
           </p>
           <ul className="space-y-1 text-[12px] text-[var(--color-text-muted)]">
-            {targets.map((target) => (
-              <li key={`${target.targetType}-${target.publicId}`}>
-                {humanizeAuditKey(target.targetType)} ·{" "}
-                <span className="font-mono">{target.publicId}</span>
-              </li>
-            ))}
+            {targets.map((target) => {
+              const presented = presentAuditTarget(target, portal);
+              return (
+                <li
+                  key={`${target.targetType}-${target.publicId}`}
+                  className="flex min-w-0 items-center gap-1.5"
+                >
+                  {presented.typeLabel} ·
+                  <AuditTargetName target={presented} className="max-w-80" />
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : null}

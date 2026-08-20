@@ -16,6 +16,7 @@ export {
   appendAuditFilterParams,
   applyAuditFilterChange,
   auditOutcomes,
+  auditPageSize,
   clearedAuditFilters,
   countAuditFilters,
   hasAuditFilters,
@@ -25,6 +26,7 @@ export {
   auditGroupLabel,
   auditNamespace,
   humanizeAuditKey,
+  shortAuditIdentifier,
 } from "./model/audit-text";
 export { AuditFilterBar } from "./ui/audit-filter-bar";
 export { AuditFilterChoice } from "./ui/audit-filter-choice";

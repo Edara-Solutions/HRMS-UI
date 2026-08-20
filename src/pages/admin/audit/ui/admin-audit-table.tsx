@@ -111,6 +111,7 @@ export function AdminAuditTable({ items, onActorSelect }: AdminAuditTableProps) 
                 <AuditEventRow
                   key={rowKey}
                   event={event}
+                  portal="admin"
                   density={density}
                   expanded={expanded}
                   detailId={detailId}
