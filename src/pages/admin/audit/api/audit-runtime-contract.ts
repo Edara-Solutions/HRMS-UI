@@ -17,12 +17,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -46,13 +48,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           companyPublicId: z.union([z.string(), z.null()]),
           scope: z.union([z.literal("PLATFORM"), z.literal("COMPANY"), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -68,12 +80,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -97,8 +111,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ subjectType: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -114,12 +138,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -143,7 +169,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           changes: z.array(
@@ -162,6 +196,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           ),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -177,12 +213,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -206,13 +244,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           beforeStatus: z.union([z.literal("INCOMPLETE"), z.literal("COMPLETE")]),
           afterStatus: z.literal("COMPLETE"),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -228,12 +276,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -257,7 +307,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           name: z.string(),
@@ -265,6 +323,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           lifecycleStatus: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -280,12 +340,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -309,7 +371,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           changes: z.array(
@@ -329,6 +399,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           ),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -344,12 +416,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -373,8 +447,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -390,12 +474,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -419,8 +505,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -436,12 +532,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -465,8 +563,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -482,12 +590,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -511,8 +621,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -528,12 +648,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -557,8 +679,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -574,12 +706,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -603,8 +737,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -620,12 +764,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -649,7 +795,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           previousMode: z.union([
@@ -672,6 +826,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           effectiveUntil: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -687,12 +843,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -716,7 +874,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           effectiveMode: z.union([
@@ -730,6 +896,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           lifecycleStatus: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -745,12 +913,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -774,7 +944,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           stepType: z.union([
@@ -794,6 +972,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           isRequired: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -809,12 +989,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -838,7 +1020,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           stepType: z.union([
@@ -858,6 +1048,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           isRequired: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -873,12 +1065,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -902,7 +1096,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           stepType: z.union([
@@ -922,6 +1124,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           isRequired: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -937,12 +1141,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -966,13 +1172,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           activatedAt: z.union([z.string(), z.null()]),
           lifecycleStatus: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -988,12 +1204,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1017,7 +1235,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           previousTrialEndDate: z.string(),
@@ -1026,6 +1252,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           planPublicId: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1041,12 +1269,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1070,7 +1300,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           trialEndDate: z.string(),
@@ -1079,6 +1317,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           planPublicId: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1094,12 +1334,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1123,13 +1365,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           employeeCode: z.union([z.string(), z.null()]),
           status: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1145,12 +1397,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1174,13 +1428,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           employeeCode: z.union([z.string(), z.null()]),
           changedFields: z.array(z.string()),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1196,12 +1460,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1225,8 +1491,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ employeeCode: z.union([z.string(), z.null()]) }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1242,12 +1518,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1271,7 +1549,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           source: z.string(),
@@ -1280,6 +1566,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           hasPrimaryContact: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1295,12 +1583,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1324,7 +1614,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           source: z.string(),
@@ -1334,6 +1632,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           unarchived: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1349,12 +1649,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1378,7 +1680,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           changedFields: z.array(z.string()),
@@ -1386,6 +1696,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           numberOfAttempts: z.number().int(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1401,12 +1713,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1430,8 +1744,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ status: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1447,12 +1771,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1476,8 +1802,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ status: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1493,12 +1829,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1522,8 +1860,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ status: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1539,12 +1887,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1568,7 +1918,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           isPrimary: z.boolean(),
@@ -1576,6 +1934,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           hasPhone: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1591,12 +1951,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1620,13 +1982,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           changedFields: z.array(z.string()),
           isPrimary: z.boolean(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1642,12 +2014,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1671,13 +2045,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           wasPrimary: z.boolean(),
           replacementContactPublicId: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1693,12 +2077,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1722,8 +2108,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ planPublicId: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1739,12 +2135,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1768,13 +2166,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           previousPlanPublicId: z.string(),
           planPublicId: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1790,12 +2198,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1819,8 +2229,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.string(), planPublicId: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1836,12 +2256,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1865,7 +2287,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           planPublicId: z.string(),
@@ -1873,6 +2303,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           trialEndDate: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1888,12 +2320,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1917,7 +2351,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           previousStatus: z.string(),
@@ -1926,6 +2368,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           context: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1941,12 +2385,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -1970,7 +2416,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           previousStatus: z.string(),
@@ -1979,6 +2433,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           context: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -1994,12 +2450,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2023,8 +2481,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ context: z.string(), reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2040,12 +2508,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2069,8 +2539,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ context: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2086,12 +2566,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2115,13 +2597,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           emailTypeKey: z.string(),
           templateRevisionKey: z.string(),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2137,12 +2629,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2166,8 +2660,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ emailTypeKey: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2183,12 +2687,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2212,7 +2718,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           emailTypeKey: z.string(),
@@ -2221,6 +2735,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           reason: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2236,12 +2752,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2265,7 +2783,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           clientType: z.string(),
@@ -2273,6 +2799,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           reason: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2288,12 +2816,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2317,8 +2847,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2334,12 +2874,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2363,8 +2905,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2380,12 +2932,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2409,8 +2963,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ familyId: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2426,12 +2990,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2455,8 +3021,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ usedTemporaryCredentials: z.boolean() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2472,12 +3048,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2501,8 +3079,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({}).partial().strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2518,12 +3106,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2547,8 +3137,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reissued: z.boolean() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2564,12 +3164,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2593,13 +3195,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           clientType: z.string(),
           reason: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2615,12 +3227,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2644,7 +3258,15 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           clientType: z.string(),
@@ -2652,6 +3274,8 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           reason: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2667,12 +3291,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2696,8 +3322,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2713,12 +3349,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2742,8 +3380,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2759,12 +3407,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2788,8 +3438,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ familyId: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2805,12 +3465,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2834,8 +3496,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ usedTemporaryCredentials: z.boolean() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2851,12 +3523,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2880,8 +3554,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({}).partial().strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2897,12 +3581,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2926,8 +3612,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ reissued: z.boolean() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2943,12 +3639,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -2972,13 +3670,23 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z
         .object({
           clientType: z.string(),
           reason: z.union([z.string(), z.null()]),
         })
         .strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z
@@ -2994,12 +3702,14 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           .object({
             kind: z.literal("USER"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
           .object({
             kind: z.literal("PLATFORM_ADMIN"),
             publicId: z.string().uuid(),
+            name: z.union([z.string(), z.null()]),
           })
           .strict(),
         z
@@ -3023,8 +3733,18 @@ export const PlatformAuditTrailEvent = z.discriminatedUnion("eventType", [
           userAgent: z.union([z.string(), z.null()]),
         })
         .strict(),
-      targets: z.array(z.object({ targetType: z.string(), publicId: z.string() }).strict()),
+      targets: z.array(
+        z
+          .object({
+            targetType: z.string(),
+            publicId: z.string(),
+            name: z.union([z.string(), z.null()]).optional(),
+          })
+          .strict(),
+      ),
       details: z.object({ surface: z.string(), reason: z.string() }).strict(),
+      recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+      recordedAt: z.string().datetime({ offset: true }),
     })
     .strict(),
   z

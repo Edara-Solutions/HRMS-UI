@@ -60,7 +60,13 @@ export interface paths {
                 query?: {
                     cursor?: string;
                     limit?: number;
+                    occurredFrom?: string;
+                    occurredTo?: string;
+                    actorPublicId?: string;
+                    outcome?: "SUCCESS" | "FAILURE";
+                    eventType?: ("audit.trail.platform_read" | "privacy.identity.erased" | "company.profile.material_updated" | "company.profile.completed" | "company.lifecycle.created" | "company.lifecycle.updated" | "company.lifecycle.deleted" | "company.lifecycle.restored" | "company.lifecycle.frozen" | "company.lifecycle.unfrozen" | "company.lifecycle.suspended" | "company.lifecycle.unsuspended" | "company.access-policy.changed" | "company.access-policy.denied" | "company.setup.step_started" | "company.setup.step_completed" | "company.setup.step_skipped" | "company.activation.activated" | "company.subscription.trial_extended" | "company.subscription.trial_expired" | "user.lifecycle.created" | "user.lifecycle.updated" | "user.lifecycle.deleted" | "lead.lifecycle.created" | "lead.lifecycle.attempt_recorded" | "lead.lifecycle.updated" | "lead.lifecycle.archived" | "lead.lifecycle.unarchived" | "lead.lifecycle.deleted" | "lead.contact.added" | "lead.contact.updated" | "lead.contact.removed" | "lead.conversion.requested" | "lead.conversion.plan_changed" | "lead.conversion.rejected" | "lead.conversion.approved" | "email.delivery.cancelled" | "email.delivery.retry_requested" | "email.sending.paused" | "email.sending.resumed" | "email.template_assignment.assigned" | "email.template_assignment.removed" | "email.template_assignment.migrated" | "auth.session.started" | "auth.session.ended" | "auth.session.revoked" | "auth.session.refreshed" | "auth.credential.password_changed" | "auth.credential.reset_forced" | "auth.invitation.issued" | "auth.invitation.accepted" | "platform_admin.session.started" | "platform_admin.session.ended" | "platform_admin.session.revoked" | "platform_admin.session.refreshed" | "platform_admin.credential.password_changed" | "platform_admin.credential.reset_forced" | "platform_admin.invitation.issued" | "platform_admin.invitation.accepted" | "auth.session.rejected")[];
                     companyPublicId?: string;
+                    traceId?: string;
                     scope?: "PLATFORM" | "COMPANY";
                 };
                 header?: never;
@@ -154,6 +160,11 @@ export interface paths {
                 query?: {
                     cursor?: string;
                     limit?: number;
+                    occurredFrom?: string;
+                    occurredTo?: string;
+                    actorPublicId?: string;
+                    outcome?: "SUCCESS" | "FAILURE";
+                    eventType?: ("company.profile.material_updated" | "company.profile.completed" | "company.lifecycle.created" | "company.lifecycle.updated" | "company.lifecycle.deleted" | "company.lifecycle.restored" | "company.lifecycle.frozen" | "company.lifecycle.unfrozen" | "company.lifecycle.suspended" | "company.lifecycle.unsuspended" | "company.access-policy.changed" | "company.access-policy.denied" | "company.setup.step_started" | "company.setup.step_completed" | "company.setup.step_skipped" | "company.activation.activated" | "company.subscription.trial_extended" | "company.subscription.trial_expired" | "user.lifecycle.created" | "user.lifecycle.updated" | "user.lifecycle.deleted" | "email.template_assignment.assigned" | "email.template_assignment.removed" | "email.template_assignment.migrated" | "auth.session.started" | "auth.session.ended" | "auth.session.revoked" | "auth.session.refreshed" | "auth.credential.password_changed" | "auth.credential.reset_forced" | "auth.invitation.issued" | "auth.invitation.accepted")[];
                 };
                 header?: never;
                 path?: never;
@@ -168,6 +179,196 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["CompanyAuditTrailPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/audit-trail/actors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    query: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            name: string;
+                        }[];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/audit-trail/actors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    query: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            name: string;
+                        }[];
                     };
                 };
                 /** @description Default Response */
@@ -7901,11 +8102,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -7928,11 +8131,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     companyPublicId: string | null;
                     scope: "PLATFORM" | "COMPANY" | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "privacy.identity.erased";
@@ -7949,11 +8156,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -7976,10 +8185,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     subjectType: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.profile.material_updated";
@@ -7997,11 +8210,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8024,6 +8239,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changes: {
@@ -8032,6 +8248,9 @@ export interface components {
                         after: string | null;
                     }[];
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.profile.completed";
@@ -8049,11 +8268,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8076,12 +8297,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     beforeStatus: "INCOMPLETE" | "COMPLETE";
                     /** @enum {string} */
                     afterStatus: "COMPLETE";
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.created";
@@ -8099,11 +8324,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8126,12 +8353,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     name: string;
                     companyCode: string;
                     lifecycleStatus: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.updated";
@@ -8149,11 +8380,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8176,6 +8409,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changes: {
@@ -8184,6 +8418,9 @@ export interface components {
                         after: string | null;
                     }[];
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.deleted";
@@ -8201,11 +8438,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8228,10 +8467,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.restored";
@@ -8249,11 +8492,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8276,10 +8521,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.frozen";
@@ -8297,11 +8546,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8324,10 +8575,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.unfrozen";
@@ -8345,11 +8600,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8372,10 +8629,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.suspended";
@@ -8393,11 +8654,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8420,10 +8683,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.lifecycle.unsuspended";
@@ -8441,11 +8708,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8468,10 +8737,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.access-policy.changed";
@@ -8489,11 +8762,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8516,6 +8791,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
@@ -8525,6 +8801,9 @@ export interface components {
                     effectiveFrom: string;
                     effectiveUntil: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.access-policy.denied";
@@ -8542,11 +8821,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8569,12 +8850,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
                     operation: "read" | "write" | "onboarding";
                     lifecycleStatus: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.setup.step_started";
@@ -8592,11 +8877,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8619,12 +8906,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
                     status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
                     isRequired: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.setup.step_completed";
@@ -8642,11 +8933,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8669,12 +8962,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
                     status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
                     isRequired: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.setup.step_skipped";
@@ -8692,11 +8989,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8719,12 +9018,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
                     status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
                     isRequired: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.activation.activated";
@@ -8742,11 +9045,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8769,11 +9074,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     activatedAt: string | null;
                     lifecycleStatus: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.subscription.trial_extended";
@@ -8791,11 +9100,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8818,6 +9129,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousTrialEndDate: string;
@@ -8825,6 +9137,9 @@ export interface components {
                     reason: string;
                     planPublicId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "company.subscription.trial_expired";
@@ -8842,11 +9157,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8869,6 +9186,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     trialEndDate: string;
@@ -8876,6 +9194,9 @@ export interface components {
                     accessMode: string;
                     planPublicId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "user.lifecycle.created";
@@ -8893,11 +9214,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8920,11 +9243,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
                     status: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "user.lifecycle.updated";
@@ -8942,11 +9269,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -8969,11 +9298,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
                     changedFields: string[];
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "user.lifecycle.deleted";
@@ -8991,11 +9324,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9018,10 +9353,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.created";
@@ -9038,11 +9377,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9065,6 +9406,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     source: string;
@@ -9072,6 +9414,9 @@ export interface components {
                     companySizeRange: string;
                     hasPrimaryContact: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.attempt_recorded";
@@ -9088,11 +9433,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9115,6 +9462,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     source: string;
@@ -9123,6 +9471,9 @@ export interface components {
                     rejoined: boolean;
                     unarchived: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.updated";
@@ -9139,11 +9490,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9166,12 +9519,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changedFields: string[];
                     status: string;
                     numberOfAttempts: number;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.archived";
@@ -9188,11 +9545,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9215,10 +9574,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     status: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.unarchived";
@@ -9235,11 +9598,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9262,10 +9627,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     status: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.lifecycle.deleted";
@@ -9282,11 +9651,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9309,10 +9680,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     status: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.contact.added";
@@ -9329,11 +9704,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9356,12 +9733,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     isPrimary: boolean;
                     hasEmail: boolean;
                     hasPhone: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.contact.updated";
@@ -9378,11 +9759,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9405,11 +9788,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changedFields: string[];
                     isPrimary: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.contact.removed";
@@ -9426,11 +9813,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9453,11 +9842,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     wasPrimary: boolean;
                     replacementContactPublicId: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.conversion.requested";
@@ -9474,11 +9867,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9501,10 +9896,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     planPublicId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.conversion.plan_changed";
@@ -9521,11 +9920,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9548,11 +9949,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousPlanPublicId: string;
                     planPublicId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.conversion.rejected";
@@ -9569,11 +9974,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9596,11 +10003,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
                     planPublicId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "lead.conversion.approved";
@@ -9617,11 +10028,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9644,12 +10057,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     planPublicId: string;
                     companyCode: string;
                     trialEndDate: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.delivery.cancelled";
@@ -9666,11 +10083,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9693,6 +10112,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousStatus: string;
@@ -9700,6 +10120,9 @@ export interface components {
                     emailTypeKey: string;
                     context: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.delivery.retry_requested";
@@ -9716,11 +10139,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9743,6 +10168,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousStatus: string;
@@ -9750,6 +10176,9 @@ export interface components {
                     emailTypeKey: string;
                     context: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.sending.paused";
@@ -9766,11 +10195,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9793,11 +10224,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     context: string;
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.sending.resumed";
@@ -9814,11 +10249,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9841,10 +10278,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     context: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.template_assignment.assigned";
@@ -9862,11 +10303,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9889,11 +10332,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
                     templateRevisionKey: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.template_assignment.removed";
@@ -9911,11 +10358,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9938,10 +10387,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "email.template_assignment.migrated";
@@ -9959,11 +10412,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -9986,6 +10441,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
@@ -9993,6 +10449,9 @@ export interface components {
                     toRevisionKey: string;
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.session.started";
@@ -10010,11 +10469,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10037,12 +10498,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;
                     usedTemporaryCredentials: boolean;
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.session.ended";
@@ -10060,11 +10525,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10087,10 +10554,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.session.revoked";
@@ -10108,11 +10579,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10135,10 +10608,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.session.refreshed";
@@ -10156,11 +10633,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10183,10 +10662,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     familyId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.credential.password_changed";
@@ -10204,11 +10687,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10231,10 +10716,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     usedTemporaryCredentials: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.credential.reset_forced";
@@ -10252,11 +10741,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10279,8 +10770,12 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: Record<string, never>;
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.invitation.issued";
@@ -10298,11 +10793,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10325,10 +10822,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reissued: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.invitation.accepted";
@@ -10346,11 +10847,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10373,11 +10876,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.session.started";
@@ -10394,11 +10901,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10421,12 +10930,16 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;
                     usedTemporaryCredentials: boolean;
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.session.ended";
@@ -10443,11 +10956,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10470,10 +10985,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.session.revoked";
@@ -10490,11 +11009,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10517,10 +11038,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.session.refreshed";
@@ -10537,11 +11062,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10564,10 +11091,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     familyId: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.credential.password_changed";
@@ -10584,11 +11115,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10611,10 +11144,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     usedTemporaryCredentials: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.credential.reset_forced";
@@ -10631,11 +11168,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10658,8 +11197,12 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: Record<string, never>;
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.invitation.issued";
@@ -10676,11 +11219,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10703,10 +11248,14 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reissued: boolean;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "platform_admin.invitation.accepted";
@@ -10723,11 +11272,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10750,11 +11301,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;
                     reason: string | null;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "auth.session.rejected";
@@ -10771,11 +11326,13 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "SYSTEM";
@@ -10798,11 +11355,15 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     surface: string;
                     reason: string;
                 };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
             } | {
                 /** @enum {string} */
                 eventType: "audit.event.unavailable";
@@ -10830,6 +11391,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -10851,6 +11413,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changes: {
@@ -10872,6 +11435,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -10893,6 +11457,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     beforeStatus: "INCOMPLETE" | "COMPLETE";
@@ -10912,6 +11477,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -10933,6 +11499,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     name: string;
@@ -10952,6 +11519,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -10973,6 +11541,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     changes: {
@@ -10994,6 +11563,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11015,6 +11585,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11032,6 +11603,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11053,6 +11625,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11070,6 +11643,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11091,6 +11665,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11108,6 +11683,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11129,6 +11705,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11146,6 +11723,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11167,6 +11745,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11184,6 +11763,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11205,6 +11785,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string | null;
@@ -11222,6 +11803,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11243,6 +11825,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
@@ -11265,6 +11848,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11286,6 +11870,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
@@ -11305,6 +11890,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11326,6 +11912,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
@@ -11345,6 +11932,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11366,6 +11954,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
@@ -11385,6 +11974,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11406,6 +11996,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
@@ -11425,6 +12016,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11446,6 +12038,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     activatedAt: string | null;
@@ -11464,6 +12057,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11485,6 +12079,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     previousTrialEndDate: string;
@@ -11505,6 +12100,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11526,6 +12122,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     trialEndDate: string;
@@ -11546,6 +12143,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11567,6 +12165,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
@@ -11585,6 +12184,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11606,6 +12206,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
@@ -11624,6 +12225,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11645,6 +12247,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     employeeCode: string | null;
@@ -11662,6 +12265,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11683,6 +12287,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
@@ -11701,6 +12306,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11722,6 +12328,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
@@ -11739,6 +12346,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11760,6 +12368,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     emailTypeKey: string;
@@ -11780,6 +12389,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11801,6 +12411,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;
@@ -11820,6 +12431,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11841,6 +12453,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
@@ -11858,6 +12471,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11879,6 +12493,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reason: string;
@@ -11896,6 +12511,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11917,6 +12533,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     familyId: string;
@@ -11934,6 +12551,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11955,6 +12573,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     usedTemporaryCredentials: boolean;
@@ -11972,6 +12591,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -11993,6 +12613,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: Record<string, never>;
             } | {
@@ -12008,6 +12629,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -12029,6 +12651,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     reissued: boolean;
@@ -12046,6 +12669,7 @@ export interface components {
                     kind: "USER";
                     /** Format: uuid */
                     publicId: string;
+                    name: string | null;
                 } | {
                     /** @enum {string} */
                     kind: "PLATFORM_ADMIN";
@@ -12067,6 +12691,7 @@ export interface components {
                 targets: {
                     targetType: string;
                     publicId: string;
+                    name?: string | null;
                 }[];
                 details: {
                     clientType: string;

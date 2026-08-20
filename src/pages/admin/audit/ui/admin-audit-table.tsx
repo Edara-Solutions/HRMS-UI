@@ -14,6 +14,7 @@ import {
   useAuditRowExpansion,
 } from "@/widgets/audit-detail";
 import type { PlatformAuditTrailItem } from "../api/audit";
+import { AdminAuditEventInsight } from "./admin-audit-event-insight";
 
 function isUnrecognized(
   event: PlatformAuditTrailItem,
@@ -43,9 +44,10 @@ const emptyCompanyCell = <td className="px-4 py-3 text-[var(--color-text-faint)]
 interface AdminAuditTableProps {
   items: PlatformAuditTrailItem[];
   onActorSelect: (actorPublicId: string) => void;
+  onTraceSelect: (traceId: string) => void;
 }
 
-export function AdminAuditTable({ items, onActorSelect }: AdminAuditTableProps) {
+export function AdminAuditTable({ items, onActorSelect, onTraceSelect }: AdminAuditTableProps) {
   const { t } = useTranslation(auditNamespace);
   const locale = usePreferencesStore((state) => state.locale);
   const [density, setDensity] = useState<AuditDensity>("comfortable");
@@ -118,6 +120,16 @@ export function AdminAuditTable({ items, onActorSelect }: AdminAuditTableProps) 
                   columnCount={5}
                   locale={locale}
                   onActorSelect={onActorSelect}
+                  onTraceSelect={onTraceSelect}
+                  detailAside={
+                    <AdminAuditEventInsight
+                      eventType={event.eventType}
+                      occurredAt={event.occurredAt}
+                      recordingBinding={event.recordingBinding}
+                      recordedAt={event.recordedAt}
+                      locale={locale}
+                    />
+                  }
                   subjectFallback={event.companyPublicId ?? t("chrome.platform")}
                   companyCell={companyCell(event.companyPublicId, t("chrome.platform"))}
                   onToggle={toggle}

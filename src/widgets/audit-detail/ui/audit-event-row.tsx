@@ -48,9 +48,13 @@ interface AuditEventRowProps {
   /** Already-resolved text for a row whose event names no target. */
   subjectFallback: string;
   companyCell?: ReactNode;
+  /** What this portal knows about the event beyond the row; the Company portal knows nothing extra. */
+  detailAside?: ReactNode;
   onToggle: () => void;
   /** Offered only where the trail can filter by actor; absent leaves the cell as plain text. */
   onActorSelect?: (actorPublicId: string) => void;
+  /** Offered only where the trail can filter by trace; absent leaves the id as plain text. */
+  onTraceSelect?: (traceId: string) => void;
 }
 
 interface DegradedAuditEventRowProps {
@@ -211,8 +215,10 @@ export function AuditEventRow({
   locale,
   subjectFallback,
   companyCell,
+  detailAside,
   onToggle,
   onActorSelect,
+  onTraceSelect,
 }: AuditEventRowProps) {
   const { t, i18n } = useTranslation(auditNamespace);
   // A known event with no authored label is a pure presentation gap: it renders as the
@@ -296,6 +302,8 @@ export function AuditEventRow({
               eventVersion={event.eventVersion}
               traceId={event.traceId}
               origin={event.origin}
+              aside={detailAside}
+              onTraceSelect={onTraceSelect}
             />
           </td>
         </tr>

@@ -1,11 +1,12 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { BookOpen, ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AuditFilterBar,
   AuditFilterChoice,
   AuditFilterCombobox,
+  AuditFilterTag,
   applyAuditFilterChange,
   auditFilterComboboxState,
   auditNamespace,
@@ -71,13 +72,24 @@ export function AdminAuditPage() {
 
   return (
     <div className="mx-auto max-w-[1480px]">
-      <div className="mb-6">
-        <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
-          {t("chrome.title")}
-        </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          {t("chrome.platformSubtitle")}
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
+            {t("chrome.title")}
+          </h1>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+            {t("chrome.platformSubtitle")}
+          </p>
+        </div>
+        {/* The catalog answers "what is this event?" for a reader choosing filters, so it sits
+            beside the trail rather than behind a menu. */}
+        <Link
+          to="/admin/audit/catalog"
+          className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-[12.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:border-[color-mix(in_srgb,var(--color-border)_45%,var(--color-primary))] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
+        >
+          <BookOpen size={14} aria-hidden="true" />
+          {t("chrome.catalogLink")}
+        </Link>
       </div>
 
       <AuditFilterBar
@@ -88,9 +100,16 @@ export function AdminAuditPage() {
         searchActors={searchPlatformAuditActors}
         onChange={changeFilters}
         onClearAll={() =>
-          changeFilters({ ...clearedAuditFilters, companyPublicId: undefined, scope: undefined })
+          changeFilters({
+            ...clearedAuditFilters,
+            companyPublicId: undefined,
+            scope: undefined,
+            traceId: undefined,
+          })
         }
-        slottedFilterCount={[search.companyPublicId, search.scope].filter(Boolean).length}
+        slottedFilterCount={
+          [search.companyPublicId, search.scope, search.traceId].filter(Boolean).length
+        }
         companyFilter={
           <AuditFilterCombobox
             id="admin-audit-company"
@@ -116,6 +135,16 @@ export function AdminAuditPage() {
             onChange={(scope) => changeFilters({ scope })}
           />
         }
+        clickedFilter={
+          search.traceId ? (
+            <AuditFilterTag
+              label={t("chrome.filterTrace")}
+              value={search.traceId}
+              mono
+              onClear={() => changeFilters({ traceId: undefined })}
+            />
+          ) : undefined
+        }
       />
 
       <Card className="overflow-hidden">
@@ -137,6 +166,7 @@ export function AdminAuditPage() {
             <AdminAuditTable
               items={items}
               onActorSelect={(actorPublicId) => changeFilters({ actorPublicId })}
+              onTraceSelect={(traceId) => changeFilters({ traceId })}
             />
           )}
         </CardContent>

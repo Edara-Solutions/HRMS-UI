@@ -22,6 +22,8 @@ export interface PlatformAuditTrailParams extends AuditTrailFilters {
   limit?: number;
   companyPublicId?: string;
   scope?: PlatformAuditTrailScope;
+  /** Platform-only: everything else the system recorded under one request. */
+  traceId?: string;
 }
 
 /** Every event type the Platform trail admits, read off the generated contract. */
@@ -40,6 +42,7 @@ export async function fetchPlatformAuditTrail(
   if (params.limit) searchParams.set("limit", String(params.limit));
   if (params.companyPublicId) searchParams.set("companyPublicId", params.companyPublicId);
   if (params.scope) searchParams.set("scope", params.scope);
+  if (params.traceId) searchParams.set("traceId", params.traceId);
   appendAuditFilterParams(searchParams, params);
 
   const response: unknown = await apiClient.get("platform/audit-trail", { searchParams }).json();

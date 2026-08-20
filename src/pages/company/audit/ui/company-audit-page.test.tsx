@@ -29,7 +29,7 @@ const profileUpdatedEvent: CompanyAuditTrailItem = {
   eventVersion: 1,
   occurredAt: "2026-08-13T10:00:00.000Z",
   outcome: "SUCCESS",
-  actor: { kind: "USER", publicId: "550e8400-e29b-41d4-a716-446655440000" },
+  actor: { kind: "USER", publicId: "550e8400-e29b-41d4-a716-446655440000", name: "Layla Hassan" },
   traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
   targets: [{ targetType: "company-profile", publicId: "profile-1" }],
   details: { changes: [{ field: "name", before: "Northwind", after: "Northwind Egypt" }] },

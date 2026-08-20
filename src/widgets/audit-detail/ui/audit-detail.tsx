@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { auditNamespace, humanizeAuditKey } from "@/features/audit-filters";
 import type { SupportedLocale } from "@/shared/i18n";
@@ -30,6 +31,13 @@ interface AuditDetailProps {
   eventVersion: number;
   traceId?: string | null;
   origin?: { ip: string | null; userAgent: string | null };
+  /**
+   * Anything this portal knows about the event beyond the row itself. The Platform Admin
+   * fills it with recording provenance and catalog semantics; the Company portal has neither.
+   */
+  aside?: ReactNode;
+  /** Offered only where the trail can filter by trace; absent leaves the id as plain text. */
+  onTraceSelect?: (traceId: string) => void;
 }
 
 interface DetailValueProps {
@@ -222,6 +230,33 @@ function ScalarBag({
   );
 }
 
+/**
+ * The trace as everything else that happened in one request. Where the trail can filter by
+ * it, the id is the click-through — the highest-value move an investigator makes from a row.
+ */
+function TraceReference({
+  traceId,
+  onSelect,
+}: {
+  traceId: string;
+  onSelect?: (traceId: string) => void;
+}) {
+  const { t } = useTranslation(auditNamespace);
+  if (!onSelect) return <span>{t("chrome.trace", { traceId })}</span>;
+
+  return (
+    <button
+      type="button"
+      className="rounded-[var(--radius-sm)] underline-offset-4 transition-colors hover:text-[var(--color-primary)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+      aria-label={t("chrome.filterByThisTrace")}
+      title={t("chrome.filterByThisTrace")}
+      onClick={() => onSelect(traceId)}
+    >
+      {t("chrome.trace", { traceId })}
+    </button>
+  );
+}
+
 export function AuditDetail({
   details,
   targets,
@@ -232,6 +267,8 @@ export function AuditDetail({
   eventVersion,
   traceId,
   origin,
+  aside,
+  onTraceSelect,
 }: AuditDetailProps) {
   const { t } = useTranslation(auditNamespace);
   const kind = getAuditDetailKind(details);
@@ -240,20 +277,27 @@ export function AuditDetail({
     <div data-audit-renderer={kind} className="space-y-4">
       <div>
         <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
-          {t("chrome.recordedAt")}
+          {t("chrome.occurredAt")}
         </p>
         <p className="text-[13px] tabular-nums text-[var(--color-text)]">
           {formatFullInstant(occurredAt, locale)}
         </p>
       </div>
 
-      {kind === "field-diff" ? (
-        <FieldDiff details={details} targets={targets} locale={locale} />
-      ) : kind === "changed-field-list" ? (
-        <ChangedFieldList details={details} targets={targets} locale={locale} />
-      ) : (
-        <ScalarBag details={details} targets={targets} locale={locale} />
-      )}
+      {aside}
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
+          {t("chrome.whatChanged")}
+        </p>
+        {kind === "field-diff" ? (
+          <FieldDiff details={details} targets={targets} locale={locale} />
+        ) : kind === "changed-field-list" ? (
+          <ChangedFieldList details={details} targets={targets} locale={locale} />
+        ) : (
+          <ScalarBag details={details} targets={targets} locale={locale} />
+        )}
+      </div>
 
       {targets.length > 0 ? (
         <div>
@@ -297,7 +341,12 @@ export function AuditDetail({
 
       <footer className="break-all border-t border-[var(--color-border)] pt-3 font-mono text-[11px] tabular-nums text-[var(--color-text-faint)]">
         {eventKey} v{eventVersion} · {occurredAt}
-        {traceId ? ` · trace ${traceId}` : ""}
+        {traceId ? (
+          <>
+            {" · "}
+            <TraceReference traceId={traceId} onSelect={onTraceSelect} />
+          </>
+        ) : null}
       </footer>
     </div>
   );

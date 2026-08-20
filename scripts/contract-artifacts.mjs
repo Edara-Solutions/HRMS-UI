@@ -48,6 +48,11 @@ export const auditLabelArtifacts = {
   ),
 };
 
+/** The Audit Event metadata table scripts/generate-audit-catalog.mjs renders. */
+export const auditCatalogArtifact = {
+  metadataPath: join(frontendRoot, "src", "shared", "audit-catalog", "audit-event-catalog.ts"),
+};
+
 /** Each generated artifact, paired with the package script that reproduces it. */
 export const derivedArtifacts = [
   {
@@ -61,5 +66,9 @@ export const derivedArtifacts = [
   {
     generator: "audit:labels",
     outputs: [auditLabelArtifacts.manifestPath, auditLabelArtifacts.enumFieldsPath],
+  },
+  {
+    generator: "audit:catalog",
+    outputs: [auditCatalogArtifact.metadataPath],
   },
 ];

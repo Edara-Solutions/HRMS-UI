@@ -16,6 +16,7 @@ const adminAuditSearchSchema = z.object({
   occurredFrom: z.string().datetime({ offset: true }).optional().catch(undefined),
   occurredTo: z.string().datetime({ offset: true }).optional().catch(undefined),
   actorPublicId: z.string().uuid().optional().catch(undefined),
+  traceId: z.string().min(1).max(64).optional().catch(undefined),
   outcome: z.enum(["SUCCESS", "FAILURE"]).optional().catch(undefined),
   eventType: z
     .array(z.string())

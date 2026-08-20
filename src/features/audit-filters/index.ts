@@ -35,3 +35,4 @@ export {
   type AuditFilterOption,
   auditFilterComboboxState,
 } from "./ui/audit-filter-combobox";
+export { AuditFilterTag } from "./ui/audit-filter-tag";

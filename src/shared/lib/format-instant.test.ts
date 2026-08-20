@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatFullInstant, formatInstant } from "./format-instant";
+import type { SupportedLocale } from "@/shared/i18n";
+import { formatElapsed, formatFullInstant, formatInstant } from "./format-instant";
 
 function localInstant(year: number, month: number, day: number, hour: number, minute = 0): string {
   return new Date(year, month, day, hour, minute).toISOString();
@@ -42,5 +43,36 @@ describe("formatFullInstant", () => {
 
     expect(formatted).toMatch(/9:12:00 am/);
     expect(formatted.replace("9:12:00 am", "")).toMatch(/[A-Za-z]{2,}/);
+  });
+});
+
+describe("formatElapsed", () => {
+  const occurredAt = "2026-08-12T09:30:00.000Z";
+
+  function elapsed(milliseconds: number, locale: SupportedLocale = "en") {
+    return formatElapsed(
+      occurredAt,
+      new Date(Date.parse(occurredAt) + milliseconds).toISOString(),
+      locale,
+    );
+  }
+
+  it("stays quiet below a second, where the gap says nothing about the recording", () => {
+    expect(elapsed(0)).toBeNull();
+    expect(elapsed(999)).toBeNull();
+    expect(elapsed(-5_000)).toBeNull();
+  });
+
+  it("names the gap in the largest unit that still counts whole", () => {
+    expect(elapsed(4_000)).toBe("4 seconds");
+    expect(elapsed(1_000)).toBe("1 second");
+    expect(elapsed(90_000)).toBe("1 minute");
+    expect(elapsed(3 * 3_600_000)).toBe("3 hours");
+    expect(elapsed(50 * 3_600_000)).toBe("2 days");
+  });
+
+  it("answers with nothing when either instant is unreadable", () => {
+    expect(formatElapsed("not-an-instant", occurredAt, "en")).toBeNull();
+    expect(formatElapsed(occurredAt, "not-an-instant", "en")).toBeNull();
   });
 });

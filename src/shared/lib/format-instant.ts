@@ -90,3 +90,44 @@ export function formatFullInstant(value: string, locale: SupportedLocale): strin
 
   return `${datePart}, ${timePart}`;
 }
+
+/** Below this the gap between two instants is clock noise rather than a fact about the recording. */
+const elapsedFloorMilliseconds = 1_000;
+
+const elapsedUnits: readonly {
+  unit: "day" | "hour" | "minute" | "second";
+  milliseconds: number;
+}[] = [
+  { unit: "day", milliseconds: 86_400_000 },
+  { unit: "hour", milliseconds: 3_600_000 },
+  { unit: "minute", milliseconds: 60_000 },
+  { unit: "second", milliseconds: 1_000 },
+];
+
+/**
+ * How long `later` came after `earlier`, in the largest unit that still counts whole — "4
+ * seconds", "2 days". `null` means there is nothing worth saying: the gap is under a second,
+ * runs backwards, or one of the two instants is unreadable.
+ */
+export function formatElapsed(
+  earlier: string,
+  later: string,
+  locale: SupportedLocale,
+): string | null {
+  const from = parseInstant(earlier);
+  const to = parseInstant(later);
+  if (!from || !to) return null;
+
+  const elapsed = to.getTime() - from.getTime();
+  if (elapsed < elapsedFloorMilliseconds) return null;
+
+  const scale =
+    elapsedUnits.find(({ milliseconds }) => elapsed >= milliseconds) ?? elapsedUnits.at(-1);
+  if (!scale) return null;
+
+  return new Intl.NumberFormat(localeTags[locale], {
+    style: "unit",
+    unit: scale.unit,
+    unitDisplay: "long",
+  }).format(Math.floor(elapsed / scale.milliseconds));
+}

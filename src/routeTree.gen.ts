@@ -37,6 +37,7 @@ import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads
 import { Route as AdminEmailSendingRouteImport } from "./app/routes/admin/email/sending"
 import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
 import { Route as AdminConversionRequestsPublicIdRouteImport } from "./app/routes/admin/conversion-requests/$publicId"
+import { Route as AdminAuditCatalogRouteImport } from "./app/routes/admin/audit/catalog"
 import { Route as AdminCompaniesPublicIdRouteRouteImport } from "./app/routes/admin/companies/$publicId/route"
 import { Route as AdminCompaniesPublicIdIndexRouteImport } from "./app/routes/admin/companies/$publicId/index"
 import { Route as AdminCompaniesPublicIdEmailSettingsRouteImport } from "./app/routes/admin/companies/$publicId/email-settings"
@@ -184,6 +185,11 @@ const AdminConversionRequestsPublicIdRoute =
     path: "/conversion-requests/$publicId",
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const AdminAuditCatalogRoute = AdminAuditCatalogRouteImport.update({
+  id: "/audit/catalog",
+  path: "/audit/catalog",
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCompaniesPublicIdRouteRoute =
   AdminCompaniesPublicIdRouteRouteImport.update({
     id: "/$publicId",
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
+  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   "/change-password": typeof ChangePasswordIndexRoute
   "/forbidden": typeof ForbiddenIndexRoute
   "/login": typeof LoginIndexRoute
+  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
@@ -279,6 +287,7 @@ export interface FileRoutesById {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/login/": typeof LoginIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
+  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
@@ -314,6 +323,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/login/"
     | "/admin/companies/$publicId"
+    | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | "/change-password"
     | "/forbidden"
     | "/login"
+    | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/login/"
     | "/admin/companies/$publicId"
+    | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
@@ -606,6 +618,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminConversionRequestsPublicIdRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    "/admin/audit/catalog": {
+      id: "/admin/audit/catalog"
+      path: "/audit/catalog"
+      fullPath: "/admin/audit/catalog"
+      preLoaderRoute: typeof AdminAuditCatalogRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     "/admin/companies/$publicId": {
       id: "/admin/companies/$publicId"
       path: "/$publicId"
@@ -679,6 +698,7 @@ interface AdminRouteRouteChildren {
   AdminCompaniesRouteRoute: typeof AdminCompaniesRouteRouteWithChildren
   AdminLeadsRouteRoute: typeof AdminLeadsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminAuditCatalogRoute: typeof AdminAuditCatalogRoute
   AdminConversionRequestsPublicIdRoute: typeof AdminConversionRequestsPublicIdRoute
   AdminEmailDeliveriesRoute: typeof AdminEmailDeliveriesRoute
   AdminEmailSendingRoute: typeof AdminEmailSendingRoute
@@ -694,6 +714,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCompaniesRouteRoute: AdminCompaniesRouteRouteWithChildren,
   AdminLeadsRouteRoute: AdminLeadsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminAuditCatalogRoute: AdminAuditCatalogRoute,
   AdminConversionRequestsPublicIdRoute: AdminConversionRequestsPublicIdRoute,
   AdminEmailDeliveriesRoute: AdminEmailDeliveriesRoute,
   AdminEmailSendingRoute: AdminEmailSendingRoute,
