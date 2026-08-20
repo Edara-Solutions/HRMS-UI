@@ -33,6 +33,7 @@ describe("audit detail catalog coverage", () => {
       const { container, unmount } = render(
         <AuditDetail
           details={details}
+          portal="admin"
           targets={[]}
           occurredAt="2026-08-18T09:12:34.000Z"
           locale="en"

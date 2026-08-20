@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDebouncedValue } from "@/shared/lib/use-debounced-value";
 import type { AuditActorMatch } from "../model/audit-filters";
-import { auditNamespace } from "../model/audit-text";
+import { auditNamespace, shortAuditIdentifier } from "../model/audit-text";
 import { AuditFilterCombobox, auditFilterComboboxState } from "./audit-filter-combobox";
 
 interface AuditActorFilterProps {
@@ -56,7 +56,7 @@ export function AuditActorFilter({
       // A shared link carries the identifier alone; naming it again would need a lookup the
       // trail does not have, so the chip shows the identifier it is honestly filtering by.
       summary={
-        actorPublicId ? (nameFor(actorPublicId) ?? shortIdentifier(actorPublicId)) : undefined
+        actorPublicId ? (nameFor(actorPublicId) ?? shortAuditIdentifier(actorPublicId)) : undefined
       }
       value={actorPublicId}
       state={enabled ? auditFilterComboboxState(matches) : "prompt"}
@@ -72,8 +72,4 @@ export function AuditActorFilter({
       onClear={() => onChange(undefined)}
     />
   );
-}
-
-function shortIdentifier(publicId: string): string {
-  return `${publicId.slice(0, 8)}…`;
 }
