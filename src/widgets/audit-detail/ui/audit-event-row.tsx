@@ -49,7 +49,7 @@ interface AuditEventRowProps {
   subjectFallback: string;
   companyCell?: ReactNode;
   /** What this portal knows about the event beyond the row; the Company portal knows nothing extra. */
-  detailAside?: ReactNode;
+  insight?: ReactNode;
   onToggle: () => void;
   /** Offered only where the trail can filter by actor; absent leaves the cell as plain text. */
   onActorSelect?: (actorPublicId: string) => void;
@@ -215,7 +215,7 @@ export function AuditEventRow({
   locale,
   subjectFallback,
   companyCell,
-  detailAside,
+  insight,
   onToggle,
   onActorSelect,
   onTraceSelect,
@@ -302,7 +302,7 @@ export function AuditEventRow({
               eventVersion={event.eventVersion}
               traceId={event.traceId}
               origin={event.origin}
-              aside={detailAside}
+              insight={insight}
               onTraceSelect={onTraceSelect}
             />
           </td>

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { auditGroupLabel, auditNamespace, auditPageSize } from "@/features/audit-filters";
 import { type AuditEventMetadata, auditEventCatalog } from "@/shared/audit-catalog";
@@ -15,18 +15,24 @@ function familyOf(eventType: string): string {
   return eventType.split(".").slice(0, -1).join(".");
 }
 
-function groupByFamily(
-  events: readonly AuditEventMetadata[],
-): { family: string; events: AuditEventMetadata[] }[] {
+interface AuditEventFamilyGroup {
+  family: string;
+  events: AuditEventMetadata[];
+}
+
+function groupByFamily(events: readonly AuditEventMetadata[]): AuditEventFamilyGroup[] {
   const families = new Map<string, AuditEventMetadata[]>();
   for (const event of events) {
     const family = familyOf(event.eventType);
-    families.set(family, [...(families.get(family) ?? []), event]);
+    const members = families.get(family);
+    if (members) members.push(event);
+    else families.set(family, [event]);
   }
   return [...families].map(([family, members]) => ({ family, events: members }));
 }
 
-function matches(event: AuditEventMetadata, query: string): boolean {
+/** Whether a reader searching for these words meant this event — its name or its description. */
+function describesEvent(event: AuditEventMetadata, query: string): boolean {
   if (query.length === 0) return true;
   const needle = query.toLowerCase();
   return (
@@ -35,7 +41,32 @@ function matches(event: AuditEventMetadata, query: string): boolean {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/**
+ * Every catalog value a reader sees, keyed by the value itself. One map per field keeps the
+ * page free of a ternary cascade that would have to be read to be trusted.
+ */
+const catalogLabelKeys = {
+  scope: { PLATFORM: "chrome.scopePlatform", COMPANY: "chrome.scopeCompany" },
+  audience: { PLATFORM: "chrome.audiencePlatform", COMPANY: "chrome.audienceCompany" },
+  outcomePolicy: {
+    SUCCESS_ONLY: "chrome.outcomePolicySuccessOnly",
+    ALLOW_FAILURE: "chrome.outcomePolicyAllowFailure",
+  },
+  personalData: { none: "chrome.personalDataNone", erase: "chrome.personalDataErase" },
+  lifecycle: { ACTIVE: "chrome.lifecycleActive", DEPRECATED: "chrome.lifecycleDeprecatedShort" },
+} as const satisfies {
+  [Field in keyof Omit<AuditEventMetadata, "eventType" | "description">]: Record<
+    AuditEventMetadata[Field],
+    string
+  >;
+};
+
+interface CatalogFieldProps {
+  label: string;
+  children: ReactNode;
+}
+
+function CatalogField({ label, children }: CatalogFieldProps) {
   return (
     <div>
       <dt className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
@@ -46,7 +77,11 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function CatalogEntry({ event }: { event: AuditEventMetadata }) {
+interface CatalogEntryProps {
+  event: AuditEventMetadata;
+}
+
+function CatalogEntry({ event }: CatalogEntryProps) {
   const { t } = useTranslation(auditNamespace);
   const labelled = t(event.eventType);
 
@@ -64,25 +99,22 @@ function CatalogEntry({ event }: { event: AuditEventMetadata }) {
       <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-[var(--color-text-muted)]">
         {event.description}
       </p>
-      <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-        <Field label={t("chrome.catalogScope")}>
-          {event.scope === "PLATFORM" ? t("chrome.scopePlatform") : t("chrome.scopeCompany")}
-        </Field>
-        <Field label={t("chrome.catalogAudience")}>
-          {event.audience === "PLATFORM"
-            ? t("chrome.audiencePlatform")
-            : t("chrome.audienceCompany")}
-        </Field>
-        <Field label={t("chrome.catalogOutcomePolicy")}>
-          {event.outcomePolicy === "SUCCESS_ONLY"
-            ? t("chrome.outcomePolicySuccessOnly")
-            : t("chrome.outcomePolicyAllowFailure")}
-        </Field>
-        <Field label={t("chrome.catalogPersonalData")}>
-          {event.personalData === "erase"
-            ? t("chrome.personalDataErase")
-            : t("chrome.personalDataNone")}
-        </Field>
+      <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-5">
+        <CatalogField label={t("chrome.catalogScope")}>
+          {t(catalogLabelKeys.scope[event.scope])}
+        </CatalogField>
+        <CatalogField label={t("chrome.catalogAudience")}>
+          {t(catalogLabelKeys.audience[event.audience])}
+        </CatalogField>
+        <CatalogField label={t("chrome.catalogOutcomePolicy")}>
+          {t(catalogLabelKeys.outcomePolicy[event.outcomePolicy])}
+        </CatalogField>
+        <CatalogField label={t("chrome.catalogLifecycle")}>
+          {t(catalogLabelKeys.lifecycle[event.lifecycle])}
+        </CatalogField>
+        <CatalogField label={t("chrome.catalogPersonalData")}>
+          {t(catalogLabelKeys.personalData[event.personalData])}
+        </CatalogField>
       </dl>
     </li>
   );
@@ -99,7 +131,7 @@ export function AdminAuditCatalogPage() {
   const query = useDebouncedValue(search, 200);
 
   const families = useMemo(
-    () => groupByFamily(auditEventCatalog.filter((event) => matches(event, query))),
+    () => groupByFamily(auditEventCatalog.filter((event) => describesEvent(event, query))),
     [query],
   );
   const matchCount = families.reduce((total, { events }) => total + events.length, 0);

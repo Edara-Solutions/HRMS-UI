@@ -32,10 +32,10 @@ interface AuditDetailProps {
   traceId?: string | null;
   origin?: { ip: string | null; userAgent: string | null };
   /**
-   * Anything this portal knows about the event beyond the row itself. The Platform Admin
-   * fills it with recording provenance and catalog semantics; the Company portal has neither.
+   * What this portal knows about the event beyond the row itself. The Platform Admin fills it
+   * with recording provenance and catalog semantics; the Company portal has neither.
    */
-  aside?: ReactNode;
+  insight?: ReactNode;
   /** Offered only where the trail can filter by trace; absent leaves the id as plain text. */
   onTraceSelect?: (traceId: string) => void;
 }
@@ -230,17 +230,16 @@ function ScalarBag({
   );
 }
 
+interface TraceReferenceProps {
+  traceId: string;
+  onSelect?: (traceId: string) => void;
+}
+
 /**
  * The trace as everything else that happened in one request. Where the trail can filter by
  * it, the id is the click-through — the highest-value move an investigator makes from a row.
  */
-function TraceReference({
-  traceId,
-  onSelect,
-}: {
-  traceId: string;
-  onSelect?: (traceId: string) => void;
-}) {
+function TraceReference({ traceId, onSelect }: TraceReferenceProps) {
   const { t } = useTranslation(auditNamespace);
   if (!onSelect) return <span>{t("chrome.trace", { traceId })}</span>;
 
@@ -267,7 +266,7 @@ export function AuditDetail({
   eventVersion,
   traceId,
   origin,
-  aside,
+  insight,
   onTraceSelect,
 }: AuditDetailProps) {
   const { t } = useTranslation(auditNamespace);
@@ -284,7 +283,7 @@ export function AuditDetail({
         </p>
       </div>
 
-      {aside}
+      {insight}
 
       <div>
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">

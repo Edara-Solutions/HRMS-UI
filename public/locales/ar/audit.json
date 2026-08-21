@@ -264,5 +264,7 @@
   "chrome.outcomePolicyAllowFailure": "نجاح أو إخفاق",
   "chrome.personalDataNone": "لا شيء معلن",
   "chrome.personalDataErase": "قابلة للمحو عند الطلب",
-  "chrome.whatChanged": "ما الذي تغيّر"
+  "chrome.whatChanged": "ما الذي تغيّر",
+  "chrome.lifecycleActive": "نشِط",
+  "chrome.catalogLifecycle": "دورة الحياة"
 }

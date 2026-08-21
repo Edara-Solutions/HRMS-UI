@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { TruncatedText } from "@/shared/ui/truncated-text";
+import { auditChipActiveClassName, auditChipClassName } from "../model/audit-chip";
 import { auditNamespace } from "../model/audit-text";
 
 interface AuditFilterTagProps {
@@ -13,9 +14,6 @@ interface AuditFilterTagProps {
   mono?: boolean;
   onClear: () => void;
 }
-
-const tagBase =
-  "h-8 border border-[color-mix(in_srgb,var(--color-primary)_30%,transparent)] bg-[var(--color-primary-soft)] px-2.5 text-[12.5px] font-medium text-[var(--color-primary)]";
 
 /**
  * A filter with no picker behind it — one a reader arrived at by clicking a value in the
@@ -29,7 +27,8 @@ export function AuditFilterTag({ label, value, mono = false, onClear }: AuditFil
     <span className="inline-flex items-center">
       <span
         className={cn(
-          tagBase,
+          auditChipClassName,
+          auditChipActiveClassName,
           "inline-flex items-center rounded-s-[var(--radius-sm)] border-e-0 py-0",
         )}
       >
@@ -44,7 +43,7 @@ export function AuditFilterTag({ label, value, mono = false, onClear }: AuditFil
         variant="secondary"
         size="sm"
         iconOnly
-        className={cn(tagBase, "rounded-s-none px-1.5")}
+        className={cn(auditChipClassName, auditChipActiveClassName, "rounded-s-none px-1.5")}
         aria-label={t("chrome.clearNamedFilter", { filter: label })}
         title={t("chrome.clearNamedFilter", { filter: label })}
         onClick={onClear}

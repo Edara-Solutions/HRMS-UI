@@ -1,27 +1,30 @@
 import { AlertTriangle, FileText, ShieldCheck } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { auditNamespace } from "@/features/audit-filters";
 import { auditEventMetadata } from "@/shared/audit-catalog";
 import type { SupportedLocale } from "@/shared/i18n";
 import { formatElapsed, formatFullInstant } from "@/shared/lib/format-instant";
+import type { AuditRecordingBinding } from "../api/audit";
 
-interface AdminAuditEventInsightProps {
-  eventType: string;
+interface AuditProvenanceProps {
   occurredAt: string;
-  recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+  recordingBinding: AuditRecordingBinding;
   recordedAt: string;
   locale: SupportedLocale;
 }
 
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: React.ReactNode;
+interface AdminAuditEventInsightProps extends AuditProvenanceProps {
+  eventType: string;
+}
+
+interface InsightSectionProps {
+  icon: ReactNode;
   title: string;
-  children: React.ReactNode;
-}) {
+  children: ReactNode;
+}
+
+function InsightSection({ icon, title, children }: InsightSectionProps) {
   return (
     <section className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
       <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)]">
@@ -33,29 +36,39 @@ function Section({
   );
 }
 
+const bindingLabelKeys: Record<AuditRecordingBinding, string> = {
+  TRANSACTIONAL: "chrome.bindingTransactional",
+  STANDALONE: "chrome.bindingStandalone",
+};
+
 /**
- * What the system knows about the event that the row itself cannot say: how the record came
- * to exist, and what the catalog means by this event type. Both are Edara's own machinery, so
- * this belongs to the Platform Admin alone and never reaches a Company's trail.
+ * How the record came to exist. The binding is the difference between evidence and a report,
+ * so it is spelled out rather than badged, and the lag is stated as a sentence rather than
+ * left as two timestamps the reader has to subtract.
  */
-function Provenance({
+function AuditProvenance({
   occurredAt,
   recordingBinding,
   recordedAt,
   locale,
-}: Omit<AdminAuditEventInsightProps, "eventType">) {
+}: AuditProvenanceProps) {
   const { t } = useTranslation(auditNamespace);
-  const transactional = recordingBinding === "TRANSACTIONAL";
   // Below a second the gap is clock noise; above it, a STANDALONE write drifting is a signal.
   const lag = formatElapsed(occurredAt, recordedAt, locale);
 
   return (
-    <Section
-      icon={transactional ? <ShieldCheck size={12} /> : <AlertTriangle size={12} />}
+    <InsightSection
+      icon={
+        recordingBinding === "TRANSACTIONAL" ? (
+          <ShieldCheck size={12} />
+        ) : (
+          <AlertTriangle size={12} />
+        )
+      }
       title={t("chrome.provenance")}
     >
       <p className="text-[13px] text-[var(--color-text)]">
-        {transactional ? t("chrome.bindingTransactional") : t("chrome.bindingStandalone")}
+        {t(bindingLabelKeys[recordingBinding])}
       </p>
       {lag ? (
         <p className="mt-1 text-[12px] text-[var(--color-text-muted)]">
@@ -65,17 +78,22 @@ function Provenance({
       <p className="mt-2 text-[11px] tabular-nums text-[var(--color-text-faint)]">
         {t("chrome.recordedAt")} · {formatFullInstant(recordedAt, locale)}
       </p>
-    </Section>
+    </InsightSection>
   );
 }
 
-function AboutThisEvent({ eventType }: { eventType: string }) {
+interface AboutThisEventProps {
+  eventType: string;
+}
+
+/** What the catalog means by this event type, in place beside the row that raised the question. */
+function AboutThisEvent({ eventType }: AboutThisEventProps) {
   const { t } = useTranslation(auditNamespace);
   const metadata = auditEventMetadata(eventType);
   if (!metadata) return null;
 
   return (
-    <Section icon={<FileText size={12} />} title={t("chrome.aboutThisEvent")}>
+    <InsightSection icon={<FileText size={12} />} title={t("chrome.aboutThisEvent")}>
       <p className="text-[13px] text-[var(--color-text)]">{metadata.description}</p>
       {metadata.lifecycle !== "ACTIVE" ? (
         // Retained history still carries events nobody emits any more, and a reader looking
@@ -91,10 +109,15 @@ function AboutThisEvent({ eventType }: { eventType: string }) {
           {t("chrome.outcomeSuccessOnly")}
         </p>
       ) : null}
-    </Section>
+    </InsightSection>
   );
 }
 
+/**
+ * What the system knows about the event that the row itself cannot say. Both halves describe
+ * Edara's own machinery and internal catalog, so this belongs to the Platform Admin alone and
+ * never reaches a Company's trail.
+ */
 export function AdminAuditEventInsight({
   eventType,
   occurredAt,
@@ -105,7 +128,7 @@ export function AdminAuditEventInsight({
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <AboutThisEvent eventType={eventType} />
-      <Provenance
+      <AuditProvenance
         occurredAt={occurredAt}
         recordingBinding={recordingBinding}
         recordedAt={recordedAt}

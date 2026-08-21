@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { TruncatedText } from "@/shared/ui/truncated-text";
+import { auditChipActiveClassName, auditChipClassName } from "../model/audit-chip";
 import { auditNamespace } from "../model/audit-text";
 
 interface AuditFilterPopoverProps {
@@ -15,12 +16,6 @@ interface AuditFilterPopoverProps {
   children: (close: () => void) => ReactNode;
   onClear?: () => void;
 }
-
-const chipBase =
-  "h-8 border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-[12.5px] font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]";
-
-const chipActive =
-  "border-[color-mix(in_srgb,var(--color-primary)_30%,transparent)] bg-[var(--color-primary-soft)] text-[var(--color-primary)] hover:bg-[color-mix(in_srgb,var(--color-primary-soft)_92%,var(--color-primary))] hover:text-[var(--color-primary)]";
 
 /**
  * One filter, one object: a chip that names the filter, shows the value once it has one, and
@@ -78,7 +73,11 @@ export function AuditFilterPopover({
         ref={triggerRef}
         variant="secondary"
         size="sm"
-        className={cn(chipBase, active && chipActive, clearable && "rounded-e-none border-e-0")}
+        className={cn(
+          auditChipClassName,
+          active && auditChipActiveClassName,
+          clearable && "rounded-e-none border-e-0",
+        )}
         aria-expanded={open}
         aria-controls={panelId}
         trailingIcon={
@@ -109,7 +108,7 @@ export function AuditFilterPopover({
           variant="secondary"
           size="sm"
           iconOnly
-          className={cn(chipBase, chipActive, "rounded-s-none px-1.5")}
+          className={cn(auditChipClassName, auditChipActiveClassName, "rounded-s-none px-1.5")}
           aria-label={t("chrome.clearNamedFilter", { filter: label })}
           title={t("chrome.clearNamedFilter", { filter: label })}
           onClick={onClear}

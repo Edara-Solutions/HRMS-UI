@@ -26,6 +26,12 @@ describe("AdminAuditCatalogPage", () => {
       screen.getByText("An authorized Platform Admin read the Platform Audit Trail."),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Personal data").length).toBe(auditEventCatalog.length);
+    // Lifecycle is stated for every event, not only for the deprecated ones: a reader has to
+    // be able to tell "still emitted" from "history only" without inferring it from silence.
+    expect(screen.getAllByText("Lifecycle").length).toBe(auditEventCatalog.length);
+    expect(screen.getAllByText("Active").length).toBe(
+      auditEventCatalog.filter((event) => event.lifecycle === "ACTIVE").length,
+    );
   });
 
   it("explains what an event type means to someone choosing it as a filter", () => {

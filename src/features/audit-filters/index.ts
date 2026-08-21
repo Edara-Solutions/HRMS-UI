@@ -1,3 +1,4 @@
+export { auditChipActiveClassName, auditChipClassName } from "./model/audit-chip";
 export {
   type AuditDatePreset,
   auditDatePresets,

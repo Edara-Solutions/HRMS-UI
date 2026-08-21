@@ -252,5 +252,7 @@
   "chrome.outcomePolicyAllowFailure": "Success or failure",
   "chrome.personalDataNone": "None declared",
   "chrome.personalDataErase": "Erasable on request",
-  "chrome.whatChanged": "What changed"
+  "chrome.whatChanged": "What changed",
+  "chrome.lifecycleActive": "Active",
+  "chrome.catalogLifecycle": "Lifecycle"
 }

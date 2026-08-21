@@ -13,6 +13,15 @@ import {
 } from "./audit-runtime-contract";
 
 export type { PlatformAuditTrailItem };
+
+/**
+ * How the audit row was written, read off the generated contract so the two cannot drift.
+ * Every available Platform arm carries it, so the first one names the union for all of them.
+ */
+export type AuditRecordingBinding = Extract<
+  PlatformAuditTrailItem,
+  { recordingBinding: string }
+>["recordingBinding"];
 export type PlatformAuditTrailPage = RuntimePlatformAuditTrailPage;
 
 export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";

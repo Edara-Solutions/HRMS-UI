@@ -121,8 +121,8 @@ export function formatElapsed(
   const elapsed = to.getTime() - from.getTime();
   if (elapsed < elapsedFloorMilliseconds) return null;
 
-  const scale =
-    elapsedUnits.find(({ milliseconds }) => elapsed >= milliseconds) ?? elapsedUnits.at(-1);
+  // The floor above is the smallest unit's own size, so some scale always matches.
+  const scale = elapsedUnits.find(({ milliseconds }) => elapsed >= milliseconds);
   if (!scale) return null;
 
   return new Intl.NumberFormat(localeTags[locale], {

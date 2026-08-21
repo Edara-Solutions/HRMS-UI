@@ -121,7 +121,7 @@ export function AdminAuditTable({ items, onActorSelect, onTraceSelect }: AdminAu
                   locale={locale}
                   onActorSelect={onActorSelect}
                   onTraceSelect={onTraceSelect}
-                  detailAside={
+                  insight={
                     <AdminAuditEventInsight
                       eventType={event.eventType}
                       occurredAt={event.occurredAt}

@@ -8,10 +8,12 @@ import {
   AuditFilterCombobox,
   AuditFilterTag,
   applyAuditFilterChange,
+  auditChipClassName,
   auditFilterComboboxState,
   auditNamespace,
   clearedAuditFilters,
 } from "@/features/audit-filters";
+import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import {
@@ -85,7 +87,10 @@ export function AdminAuditPage() {
             beside the trail rather than behind a menu. */}
         <Link
           to="/admin/audit/catalog"
-          className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-[12.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:border-[color-mix(in_srgb,var(--color-border)_45%,var(--color-primary))] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]"
+          className={cn(
+            auditChipClassName,
+            "inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] transition-colors",
+          )}
         >
           <BookOpen size={14} aria-hidden="true" />
           {t("chrome.catalogLink")}
