@@ -28,6 +28,8 @@ interface AuditFilterBarProps {
   companyFilter?: ReactNode;
   /** The Admin trail's scope narrowing; every row a Company can see is COMPANY-scope. */
   scopeFilter?: ReactNode;
+  /** A filter a reader arrived at by clicking a value in the trail, shown only while it is set. */
+  clickedFilter?: ReactNode;
   /** How many slotted filters carry a value, so the count and "clear" speak for those too. */
   slottedFilterCount?: number;
 }
@@ -52,6 +54,7 @@ export function AuditFilterBar({
   onClearAll,
   companyFilter,
   scopeFilter,
+  clickedFilter,
   slottedFilterCount = 0,
 }: AuditFilterBarProps) {
   const { t } = useTranslation(auditNamespace);
@@ -104,6 +107,7 @@ export function AuditFilterBar({
         onChange={(outcome) => onChange({ outcome })}
       />
       {scopeFilter}
+      {clickedFilter}
 
       {activeCount > 0 ? (
         <div className="flex items-center gap-2 ms-auto">

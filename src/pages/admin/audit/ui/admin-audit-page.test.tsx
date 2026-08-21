@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { PlatformAuditTrailItem, PlatformAuditTrailPage } from "../api/audit";
 import { AdminAuditPage } from "./admin-audit-page";
@@ -10,7 +11,16 @@ const searchState = vi.hoisted(() => ({ limit: 50 }) as Record<string, unknown>)
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
-  return { ...actual, useNavigate: () => navigateMock, useSearch: () => searchState };
+  const { createElement } = await import("react");
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+    useSearch: () => searchState,
+    // The page renders outside a router here, and `Link` needs one; the anchor is enough to
+    // assert the catalog is reachable without standing a whole route tree up.
+    Link: ({ to, children, ...props }: { to: string; children: ReactNode }) =>
+      createElement("a", { href: to, ...props }, children),
+  };
 });
 
 // `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch rejects as
@@ -27,11 +37,17 @@ const platformReadEvent: PlatformAuditTrailItem = {
   scope: "PLATFORM",
   companyPublicId: null,
   outcome: "SUCCESS",
-  actor: { kind: "PLATFORM_ADMIN", publicId: "550e8400-e29b-41d4-a716-446655440000" },
+  actor: {
+    kind: "PLATFORM_ADMIN",
+    publicId: "550e8400-e29b-41d4-a716-446655440000",
+    name: "Nadia Fahmy",
+  },
   traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
   origin: { ip: "203.0.113.10", userAgent: null },
   targets: [{ targetType: "audit-trail", publicId: "platform" }],
   details: { companyPublicId: null, scope: null },
+  recordingBinding: "STANDALONE",
+  recordedAt: "2026-08-13T10:00:04.000Z",
 };
 
 const companyOptionsPage = {
@@ -133,6 +149,32 @@ describe("AdminAuditPage filters", () => {
       cursor: undefined,
       actorPublicId: "22222222-2222-4222-8222-222222222222",
     });
+  });
+
+  // "Everything else that happened in this request" is the move an investigator makes from a
+  // row, so the trace has to become a filter rather than a string to copy out by hand.
+  it("turns the trace on an expanded row into the filter that gathers its request", async () => {
+    renderPage({ items: [platformReadEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /Audit trail viewed/ }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Filter by this trace" }));
+
+    expect(readNavigatedSearch()).toEqual({
+      limit: 50,
+      cursor: undefined,
+      traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
+    });
+  });
+
+  it("shows the recording provenance and the catalog's own words on the expanded row", async () => {
+    renderPage({ items: [platformReadEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: /Audit trail viewed/ }));
+
+    expect(screen.getByText("Recorded separately, after the change")).toBeInTheDocument();
+    expect(screen.getByText("Recorded 4 seconds later")).toBeInTheDocument();
+    expect(
+      screen.getByText("An authorized Platform Admin read the Platform Audit Trail."),
+    ).toBeInTheDocument();
   });
 
   it("carries the URL's filters into the request and never a cursor minted before them", async () => {

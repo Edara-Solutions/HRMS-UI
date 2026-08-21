@@ -20,9 +20,10 @@
     "prepare": "bun scripts/install-hooks.mjs",
     "audit:validators": "bun scripts/generate-audit-validators.mjs",
     "audit:labels": "bun scripts/generate-audit-label-keys.mjs",
+    "audit:catalog": "bun scripts/generate-audit-catalog.mjs",
     "openapi:vendor": "bun run scripts/vendor-openapi.mjs",
     "openapi:types": "openapi-typescript contracts/openapi.json -o src/shared/api/schema.d.ts",
-    "openapi:gen": "bun run openapi:vendor && bun run openapi:types && bun run audit:validators && bun run audit:labels",
+    "openapi:gen": "bun run openapi:vendor && bun run openapi:types && bun run audit:validators && bun run audit:labels && bun run audit:catalog",
     "openapi:check": "bun run scripts/check-contract-drift.mjs",
     "doctor": "react-doctor ."
   },
