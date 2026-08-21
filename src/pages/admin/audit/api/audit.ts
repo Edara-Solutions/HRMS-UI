@@ -33,6 +33,10 @@ export interface PlatformAuditTrailParams extends AuditTrailFilters {
   scope?: PlatformAuditTrailScope;
   /** Platform-only: everything else the system recorded under one request. */
   traceId?: string;
+  targetType?: string;
+  targetPublicId?: string;
+  view?: "table" | "timeline";
+  lens?: "chronological" | "person" | "entity";
 }
 
 /** Every event type the Platform trail admits, read off the generated contract. */

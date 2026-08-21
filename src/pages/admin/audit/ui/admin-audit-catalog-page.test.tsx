@@ -12,8 +12,14 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     // The page renders outside a router here; an anchor is enough to assert the way back.
     Link: ({ to, children, ...props }: { to: string; children: ReactNode }) =>
       createElement("a", { href: to, ...props }, children),
+    useSearch: () => ({}),
+    useNavigate: () => vi.fn(),
   };
 });
+
+vi.mock("../api/audit-companies", () => ({
+  useAuditCompanyOptions: () => ({ data: [], isPending: false, isError: false }),
+}));
 
 afterEach(cleanup);
 
