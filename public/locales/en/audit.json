@@ -254,5 +254,16 @@
   "chrome.personalDataErase": "Erasable on request",
   "chrome.whatChanged": "What changed",
   "chrome.lifecycleActive": "Active",
-  "chrome.catalogLifecycle": "Lifecycle"
+  "chrome.catalogLifecycle": "Lifecycle",
+  "chrome.catalogActors": "Recorded by",
+  "chrome.catalogViewLive": "View live occurrences",
+  "chrome.catalogLensAll": "All companies",
+  "chrome.actorUser": "A signed-in user",
+  "chrome.actorSystem": "The system on its own schedule",
+  "chrome.actorAnonymous": "An unauthenticated caller",
+  "chrome.viewTable": "Table",
+  "chrome.viewTimeline": "Timeline",
+  "chrome.lensPerson": "By person",
+  "chrome.lensEntity": "By entity",
+  "chrome.lensNoTarget": "No specific target"
 }

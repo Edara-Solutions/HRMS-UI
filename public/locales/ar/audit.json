@@ -266,5 +266,16 @@
   "chrome.personalDataErase": "قابلة للمحو عند الطلب",
   "chrome.whatChanged": "ما الذي تغيّر",
   "chrome.lifecycleActive": "نشِط",
-  "chrome.catalogLifecycle": "دورة الحياة"
+  "chrome.catalogLifecycle": "دورة الحياة",
+  "chrome.catalogActors": "يُسجَّل بواسطة",
+  "chrome.catalogViewLive": "عرض الأحداث الفعلية",
+  "chrome.catalogLensAll": "كل الشركات",
+  "chrome.actorUser": "مستخدِم مسجِّل للدخول",
+  "chrome.actorSystem": "النظام تلقائيًا",
+  "chrome.actorAnonymous": "متصل غير مصادق",
+  "chrome.viewTable": "جدول",
+  "chrome.viewTimeline": "خط زمني",
+  "chrome.lensPerson": "حسب الشخص",
+  "chrome.lensEntity": "حسب الكيان",
+  "chrome.lensNoTarget": "بدون هدف محدد"
 }

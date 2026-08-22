@@ -18,6 +18,10 @@ const adminAuditSearchSchema = z.object({
   actorPublicId: z.string().uuid().optional().catch(undefined),
   traceId: z.string().min(1).max(64).optional().catch(undefined),
   outcome: z.enum(["SUCCESS", "FAILURE"]).optional().catch(undefined),
+  targetType: z.string().min(1).max(64).optional().catch(undefined),
+  targetPublicId: z.string().min(1).max(64).optional().catch(undefined),
+  view: z.enum(["table", "timeline"]).optional().catch(undefined),
+  lens: z.enum(["chronological", "person", "entity"]).optional().catch(undefined),
   eventType: z
     .array(z.string())
     .transform((eventTypes) => eventTypes.filter((eventType) => platformEventTypes.has(eventType)))

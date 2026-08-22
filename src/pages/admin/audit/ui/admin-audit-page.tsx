@@ -25,6 +25,7 @@ import {
 import { searchPlatformAuditActors } from "../api/audit-actors";
 import { useAuditCompanyOptions } from "../api/audit-companies";
 import { AdminAuditTable } from "./admin-audit-table";
+import { AdminAuditTimeline } from "./admin-audit-timeline";
 
 const scopes: readonly PlatformAuditTrailScope[] = ["PLATFORM", "COMPANY"];
 
@@ -54,6 +55,7 @@ export function AdminAuditPage() {
   const items = page?.items ?? [];
   const hasMore = page?.hasMore ?? false;
   const nextCursor = page?.nextCursor ?? null;
+  const view = search.view ?? "table";
   const selectedCompany = companyOptions.data?.find(
     (company) => company.value === search.companyPublicId,
   );
@@ -154,6 +156,60 @@ export function AdminAuditPage() {
 
       <Card className="overflow-hidden">
         <CardContent className="p-0">
+          <div className="flex flex-wrap items-center gap-3 border-b border-[var(--color-border)] px-4 py-2">
+            <div className="flex items-center gap-1">
+              {(["timeline", "table"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={view === mode}
+                  onClick={() => changeFilters({ view: mode === "table" ? undefined : mode })}
+                  className={cn(
+                    "rounded-[var(--radius-sm)] px-2.5 py-1 text-[12px] font-medium transition-colors duration-150 ease-out",
+                    view === mode
+                      ? "bg-[var(--color-surface-2)] text-[var(--color-text)]"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+                  )}
+                >
+                  {t(mode === "table" ? "chrome.viewTable" : "chrome.viewTimeline")}
+                </button>
+              ))}
+            </div>
+            {view === "timeline" ? (
+              <div
+                role="group"
+                aria-label={t("chrome.viewTimeline")}
+                className="flex items-center gap-1 border-s border-[var(--color-border)] ps-3"
+              >
+                {(["chronological", "person", "entity"] as const).map((lensOption) => (
+                  <button
+                    key={lensOption}
+                    type="button"
+                    aria-pressed={(search.lens ?? "chronological") === lensOption}
+                    onClick={() =>
+                      changeFilters({
+                        lens: lensOption === "chronological" ? undefined : lensOption,
+                      })
+                    }
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[11.5px] font-medium transition-colors duration-150 ease-out",
+                      (search.lens ?? "chronological") === lensOption
+                        ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                        : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+                    )}
+                  >
+                    {t(
+                      lensOption === "person"
+                        ? "chrome.lensPerson"
+                        : lensOption === "entity"
+                          ? "chrome.lensEntity"
+                          : "chrome.viewTimeline",
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
           {query.isPending ? (
             <EmptyState message={t("chrome.loading")} />
           ) : query.isError ? (
@@ -167,6 +223,12 @@ export function AdminAuditPage() {
             />
           ) : items.length === 0 ? (
             <EmptyState message={t("chrome.empty")} />
+          ) : view === "timeline" ? (
+            <AdminAuditTimeline
+              items={items}
+              lens={search.lens ?? "chronological"}
+              onTraceSelect={(traceId) => changeFilters({ traceId })}
+            />
           ) : (
             <AdminAuditTable
               items={items}

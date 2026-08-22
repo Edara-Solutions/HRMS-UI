@@ -24,6 +24,19 @@ function annotation(arm, key, eventType) {
   return value;
 }
 
+/** The declared recording identities; an empty or missing array is a broken catalog, not an empty list. */
+function actorsAnnotation(arm, eventType) {
+  const value = arm["x-audit-actors"];
+  if (
+    !Array.isArray(value) ||
+    value.length === 0 ||
+    !value.every((kind) => typeof kind === "string" && kind.length > 0)
+  ) {
+    throw new Error(`Contract arm ${eventType} is missing the x-audit-actors annotation`);
+  }
+  return [...value].sort();
+}
+
 /**
  * Every catalog event, keyed by event type. Audience is not annotated: an event is readable
  * by a Company exactly when the Company page schema carries an arm for it, which is the same
@@ -44,6 +57,7 @@ export function collectAuditCatalogMetadata() {
         lifecycle: annotation(arm, "x-audit-lifecycle", eventType),
         outcomePolicy: annotation(arm, "x-audit-outcome-policy", eventType),
         personalData: annotation(arm, "x-audit-personal-data", eventType),
+        actors: actorsAnnotation(arm, eventType),
         scope: arm.properties.scope.enum[0],
         audience: companyEventTypes.has(eventType) ? "COMPANY" : "PLATFORM",
       };
@@ -71,6 +85,15 @@ export interface AuditEventMetadata {
   outcomePolicy: "SUCCESS_ONLY" | "ALLOW_FAILURE";
   /** Whether the event carries personal data an erasure request must reach. */
   personalData: "none" | "erase";
+  /** The only Audit Actor kinds that can ever be attributed to this event (ADR-0005). */
+  actors: readonly (
+    | "USER"
+    | "PLATFORM_ADMIN"
+    | "SYSTEM"
+    | "ANONYMOUS"
+    | "ATTRIBUTION_FAILED"
+    | "ERASED_USER"
+  )[];
   scope: "PLATFORM" | "COMPANY";
   /** Who may read it — a COMPANY event reaches the tenant's own trail as well. */
   audience: "PLATFORM" | "COMPANY";
