@@ -7,8 +7,8 @@ import { z } from "zod";
 import { mapHttpStatusToAppError } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
-import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { useChangePassword } from "../api/change-password";
 
 function changePasswordErrorMessage(error: unknown): string {
@@ -92,9 +92,8 @@ export function ChangePasswordForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="currentPassword">Current password</Label>
-        <Input
+        <PasswordInput
           id="currentPassword"
-          type="password"
           autoComplete="current-password"
           aria-invalid={!!errors.currentPassword}
           {...register("currentPassword")}
@@ -106,9 +105,8 @@ export function ChangePasswordForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="newPassword">New password</Label>
-        <Input
+        <PasswordInput
           id="newPassword"
-          type="password"
           autoComplete="new-password"
           aria-invalid={!!errors.newPassword}
           {...register("newPassword")}
@@ -120,9 +118,8 @@ export function ChangePasswordForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirm new password</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
           autoComplete="new-password"
           aria-invalid={!!errors.confirmPassword}
           {...register("confirmPassword")}
