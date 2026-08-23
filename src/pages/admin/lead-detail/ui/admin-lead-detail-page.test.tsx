@@ -348,7 +348,7 @@ describe("AdminLeadDetailPage", () => {
       }
       if (path === "plans/public") return jsonResponse({ data: [] });
       if (path === "leads/lead-1/sending-domain") {
-        return errorResponse(404, { error: "No sending domain provisioned for this lead" });
+        return errorResponse(404, { detail: "No sending domain provisioned for this lead" });
       }
       if (path === "leads/lead-1/sending-domain/readiness") {
         return jsonResponse({ ready: false, reason: "NOT_PROVISIONED" });

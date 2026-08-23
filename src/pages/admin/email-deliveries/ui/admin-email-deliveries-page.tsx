@@ -1,7 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { HTTPError } from "ky";
 import {
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
@@ -20,6 +19,7 @@ import { cn } from "@/shared/lib/cn";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardTitle } from "@/shared/ui/card";
+import { DateTimePicker } from "@/shared/ui/date-time-picker";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Input } from "@/shared/ui/input";
@@ -43,8 +43,6 @@ import {
 import { SearchableFilterSelect } from "./searchable-filter-select";
 
 type DeliveryAction = "retry" | "cancel";
-type DateBoundary = "from" | "to";
-
 interface DeliveryFilterDraft {
   companyPublicId: string;
   context: EmailContext | undefined;
@@ -64,24 +62,14 @@ const DELIVERY_STATUSES: DeliveryStatus[] = [
   "CANCELLED",
 ];
 const EMAIL_CONTEXTS: EmailContext[] = ["EDARA", "COMPANY"];
-const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
   timeStyle: "short",
 });
-const FILTER_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: true,
-});
-const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  year: "numeric",
-});
-const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", { dateStyle: "full" });
+
+const DELIVERY_PICKER_TEXT = {
+  description: "Select the date and time used by this delivery-history filter.",
+};
 
 const STATUS_BADGE_VARIANTS: Readonly<
   Record<DeliveryStatus, "default" | "info" | "success" | "warning" | "danger">
@@ -104,27 +92,6 @@ function humanize(value: string): string {
 function formatDate(value: string | null): string {
   if (!value) return "–";
   return DATE_TIME_FORMATTER.format(new Date(value));
-}
-
-function formatFilterDate(value: string | undefined): string {
-  if (!value) return "Choose date and time";
-  return FILTER_DATE_FORMATTER.format(new Date(value));
-}
-
-function toTwelveHour(hour: number): number {
-  return hour % 12 || 12;
-}
-
-function timePeriod(hour: number): "AM" | "PM" {
-  return hour < 12 ? "AM" : "PM";
-}
-
-function toDateKey(value: Date): string {
-  return [
-    value.getFullYear(),
-    String(value.getMonth() + 1).padStart(2, "0"),
-    String(value.getDate()).padStart(2, "0"),
-  ].join("-");
 }
 
 function fromSearch(search: {
@@ -193,276 +160,6 @@ function TimelineStageIcon({ stage }: { stage: string }) {
     return <CircleX size={16} className="text-[var(--color-text-muted)]" aria-hidden="true" />;
   }
   return <Clock3 size={14} className="text-[var(--color-primary)]" aria-hidden="true" />;
-}
-
-interface DateTimePickerProps {
-  id: string;
-  label: string;
-  value: string | undefined;
-  boundary: DateBoundary;
-  onChange: (nextValue: string | undefined) => void;
-}
-
-function DateTimePicker({ id, label, value, boundary, onChange }: DateTimePickerProps) {
-  const { titleId, descriptionId } = useDialogIds();
-  const initialDraft = value ? new Date(value) : new Date();
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<Date | undefined>(initialDraft);
-  const [minuteInput, setMinuteInput] = useState(() => String(initialDraft.getMinutes()));
-  const [month, setMonth] = useState(
-    () => new Date(initialDraft.getFullYear(), initialDraft.getMonth(), 1),
-  );
-  const firstWeekday = (month.getDay() + 6) % 7;
-  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const selectedKey = draft ? toDateKey(draft) : undefined;
-  const todayKey = toDateKey(new Date());
-
-  function defaultDraft(): Date {
-    const nextDraft = new Date();
-    nextDraft.setHours(boundary === "from" ? 0 : 23, boundary === "from" ? 0 : 59, 0, 0);
-    return nextDraft;
-  }
-
-  function openPicker() {
-    const nextDraft = value ? new Date(value) : defaultDraft();
-    setDraft(nextDraft);
-    setMinuteInput(String(nextDraft.getMinutes()));
-    setMonth(new Date(nextDraft.getFullYear(), nextDraft.getMonth(), 1));
-    setOpen(true);
-  }
-
-  function selectDay(day: number) {
-    setDraft(
-      (current) =>
-        new Date(
-          month.getFullYear(),
-          month.getMonth(),
-          day,
-          (current ?? defaultDraft()).getHours(),
-          (current ?? defaultDraft()).getMinutes(),
-        ),
-    );
-  }
-
-  function updateHour(nextValue: string) {
-    setDraft((current) => {
-      const source = current ?? defaultDraft();
-      const next = new Date(source);
-      const hour = Number(nextValue);
-      const period = timePeriod(source.getHours());
-      next.setHours(period === "AM" ? (hour === 12 ? 0 : hour) : hour === 12 ? 12 : hour + 12);
-      return next;
-    });
-  }
-
-  function updateMinutes(nextValue: string) {
-    if (!/^\d{0,2}$/.test(nextValue)) return;
-    setMinuteInput(nextValue);
-    if (nextValue === "") return;
-    const minutes = Number(nextValue);
-    if (minutes > 59) return;
-    setDraft((current) => {
-      const next = new Date(current ?? defaultDraft());
-      next.setMinutes(minutes);
-      return next;
-    });
-  }
-
-  function updatePeriod(period: "AM" | "PM") {
-    setDraft((current) => {
-      const source = current ?? defaultDraft();
-      const next = new Date(source);
-      const hour = toTwelveHour(source.getHours());
-      next.setHours(period === "AM" ? (hour === 12 ? 0 : hour) : hour === 12 ? 12 : hour + 12);
-      return next;
-    });
-  }
-
-  const monthLabel = MONTH_LABEL_FORMATTER.format(month);
-
-  return (
-    <div className="min-h-[74px]">
-      <Label htmlFor={id}>{label}</Label>
-      <Button
-        id={id}
-        type="button"
-        variant="secondary"
-        size="md"
-        className="mt-1.5 w-full justify-start font-normal"
-        leadingIcon={<CalendarDays size={15} aria-hidden="true" />}
-        onClick={openPicker}
-      >
-        <span className={value ? "text-[var(--color-text)]" : "text-[var(--color-text-faint)]"}>
-          {formatFilterDate(value)}
-        </span>
-      </Button>
-      <span className="mt-1 block min-h-5" aria-hidden="true" />
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        titleId={titleId}
-        descriptionId={descriptionId}
-        className="max-w-[440px] p-6"
-      >
-        <DialogTitle id={titleId} className="tracking-[-0.02em]">
-          {label}
-        </DialogTitle>
-        <DialogDescription id={descriptionId}>
-          Select the date and time used by this delivery-history filter.
-        </DialogDescription>
-        <div className="mt-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
-          <div className="flex items-center justify-between gap-2">
-            <Button
-              variant="ghost"
-              size="iconXs"
-              aria-label="Previous month"
-              onClick={() =>
-                setMonth((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1))
-              }
-            >
-              <ChevronLeft size={15} />
-            </Button>
-            <p className="text-[13px] font-semibold tracking-tight text-[var(--color-text)]">
-              {monthLabel}
-            </p>
-            <Button
-              variant="ghost"
-              size="iconXs"
-              aria-label="Next month"
-              onClick={() =>
-                setMonth((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))
-              }
-            >
-              <ChevronRight size={15} />
-            </Button>
-          </div>
-          <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
-            {WEEKDAYS.map((day) => (
-              <span key={day}>{day}</span>
-            ))}
-          </div>
-          <div className="mt-2 grid grid-cols-7 gap-1.5" role="grid" aria-label={monthLabel}>
-            {Array.from({ length: firstWeekday + daysInMonth }, (_, index) => {
-              if (index < firstWeekday) return <span key={`blank-${index}`} />;
-              const day = index - firstWeekday + 1;
-              const date = new Date(month.getFullYear(), month.getMonth(), day);
-              const dateKey = toDateKey(date);
-              const selected = dateKey === selectedKey;
-              return (
-                <button
-                  key={dateKey}
-                  type="button"
-                  className={cn(
-                    "mx-auto flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[13px] tabular-nums transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
-                    selected
-                      ? "bg-[var(--color-primary-fill)] font-semibold text-[var(--color-on-primary)]"
-                      : "font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]",
-                    dateKey === todayKey && !selected && "ring-1 ring-[var(--color-primary)]",
-                  )}
-                  onClick={() => selectDay(day)}
-                  aria-pressed={selected}
-                  aria-label={FULL_DATE_FORMATTER.format(date)}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-3">
-          <div>
-            <Label className="block text-xs" htmlFor={`${id}-hour`}>
-              Hour
-            </Label>
-            <Select
-              value={draft ? String(toTwelveHour(draft.getHours())) : ""}
-              onValueChange={updateHour}
-            >
-              <SelectTrigger id={`${id}-hour`} className="mt-1.5">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, index) => index + 1).map((hour) => (
-                  <SelectItem key={hour} value={String(hour)}>
-                    {String(hour).padStart(2, "0")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="block text-xs" htmlFor={`${id}-minute`}>
-              Minute
-            </Label>
-            <Input
-              id={`${id}-minute`}
-              className="mt-1.5 tabular-nums"
-              value={minuteInput}
-              inputMode="numeric"
-              maxLength={2}
-              placeholder="00"
-              aria-describedby={`${id}-minute-hint`}
-              onChange={(event) => updateMinutes(event.target.value)}
-              onBlur={() => {
-                if (minuteInput === "" && draft) setMinuteInput(String(draft.getMinutes()));
-              }}
-            />
-            <span
-              id={`${id}-minute-hint`}
-              className="mt-1 block text-[11px] text-[var(--color-text-faint)]"
-            >
-              00–59
-            </span>
-          </div>
-          <div>
-            <Label className="block text-xs" htmlFor={`${id}-period`}>
-              AM / PM
-            </Label>
-            <Select
-              value={draft ? timePeriod(draft.getHours()) : ""}
-              onValueChange={(nextValue) => {
-                if (nextValue === "AM" || nextValue === "PM") updatePeriod(nextValue);
-              }}
-            >
-              <SelectTrigger id={`${id}-period`} className="mt-1.5">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="AM">AM</SelectItem>
-                <SelectItem value="PM">PM</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setDraft(undefined);
-              setMinuteInput("");
-            }}
-          >
-            Clear
-          </Button>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                onChange(draft?.toISOString());
-                setOpen(false);
-              }}
-            >
-              Apply date
-            </Button>
-          </div>
-        </div>
-      </Dialog>
-    </div>
-  );
 }
 
 interface DeliveryDetailProps {
@@ -1157,6 +854,7 @@ export function AdminEmailDeliveriesPage() {
                 label="Created from"
                 value={draft.createdFrom}
                 boundary="from"
+                text={DELIVERY_PICKER_TEXT}
                 onChange={(createdFrom) => updateDraft({ createdFrom })}
               />
               <DateTimePicker
@@ -1164,6 +862,7 @@ export function AdminEmailDeliveriesPage() {
                 label="Created to"
                 value={draft.createdTo}
                 boundary="to"
+                text={DELIVERY_PICKER_TEXT}
                 onChange={(createdTo) => updateDraft({ createdTo })}
               />
             </div>

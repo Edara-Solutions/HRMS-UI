@@ -183,7 +183,7 @@ describe("CompanyProfilePage", () => {
   it("maps backend field feedback without discarding the user's draft", async () => {
     apiPatchMock.mockReturnValue(
       errorResponse(422, {
-        error: "Profile validation failed.",
+        detail: "Profile validation failed.",
         fieldErrors: { email: "Enter a valid company email." },
       }),
     );

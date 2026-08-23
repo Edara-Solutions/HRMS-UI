@@ -1,19 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AdminAuditPage } from "@/pages/admin/audit";
+import { auditPageSize } from "@/features/audit-filters";
+import { AdminAuditPage, platformAuditEventTypes } from "@/pages/admin/audit";
 
-const auditOutcomes = ["success", "failure"] as const;
+const platformEventTypes = new Set(platformAuditEventTypes);
 
+// A filtered trail has to be shareable and back-button-safe, so every filter is search state.
+// The event types are narrowed to the ones this contract admits: a link carrying anything
+// else would be answered with a 400 rather than a page.
 const adminAuditSearchSchema = z.object({
-  q: z
-    .preprocess(
-      (value) => (typeof value === "string" && value.trim() ? value.trim() : undefined),
-      z.string().max(120).optional(),
-    )
+  cursor: z.string().max(500).optional().catch(undefined),
+  limit: z.coerce.number().int().min(1).max(100).catch(auditPageSize),
+  companyPublicId: z.string().uuid().optional().catch(undefined),
+  scope: z.enum(["PLATFORM", "COMPANY"]).optional().catch(undefined),
+  occurredFrom: z.string().datetime({ offset: true }).optional().catch(undefined),
+  occurredTo: z.string().datetime({ offset: true }).optional().catch(undefined),
+  actorPublicId: z.string().uuid().optional().catch(undefined),
+  traceId: z.string().min(1).max(64).optional().catch(undefined),
+  outcome: z.enum(["SUCCESS", "FAILURE"]).optional().catch(undefined),
+  targetType: z.string().min(1).max(64).optional().catch(undefined),
+  targetPublicId: z.string().min(1).max(64).optional().catch(undefined),
+  view: z.enum(["table", "timeline"]).optional().catch(undefined),
+  lens: z.enum(["chronological", "person", "entity"]).optional().catch(undefined),
+  eventType: z
+    .array(z.string())
+    .transform((eventTypes) => eventTypes.filter((eventType) => platformEventTypes.has(eventType)))
+    .optional()
     .catch(undefined),
-  outcome: z.enum(auditOutcomes).optional().catch(undefined),
-  page: z.coerce.number().int().min(1).catch(1),
-  pageSize: z.coerce.number().int().min(1).max(100).catch(10),
 });
 
 export const Route = createFileRoute("/admin/audit/")({

@@ -9,8 +9,8 @@ import { mapHttpStatusToAppError, readBackendErrorMessage } from "@/shared/api";
 import { useAcceptInvitation } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
-import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PasswordInput } from "@/shared/ui/password-input";
 
 const INVALID_INVITATION_MESSAGE =
   "This invitation link is invalid, expired, already used, or revoked. Ask your HR administrator or Edara support for a new invitation.";
@@ -119,9 +119,8 @@ export function AcceptInvitationPage() {
       <Form onSubmit={handleSubmit(onSubmit)} className="mt-6">
         <div className="space-y-1.5">
           <Label htmlFor="newPassword">New password</Label>
-          <Input
+          <PasswordInput
             id="newPassword"
-            type="password"
             autoComplete="new-password"
             aria-invalid={!!errors.newPassword}
             disabled={!token}
@@ -134,9 +133,8 @@ export function AcceptInvitationPage() {
 
         <div className="space-y-1.5">
           <Label htmlFor="confirmPassword">Confirm new password</Label>
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
             autoComplete="new-password"
             aria-invalid={!!errors.confirmPassword}
             disabled={!token}

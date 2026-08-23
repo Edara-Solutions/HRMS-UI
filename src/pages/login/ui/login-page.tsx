@@ -9,6 +9,7 @@ import { isAdminConsoleEnabled, useLogin } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PasswordInput } from "@/shared/ui/password-input";
 
 const loginSchema = z.object({
   companyCode: z
@@ -139,9 +140,8 @@ export function LoginPage() {
                   Forgot password?
                 </Button>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 aria-invalid={!!errors.password}

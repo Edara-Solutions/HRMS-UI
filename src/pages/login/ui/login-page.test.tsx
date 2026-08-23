@@ -123,7 +123,7 @@ describe("LoginPage", () => {
   });
 
   it("maps a generic credential-mismatch response (422, generic backend message) to the enumeration-safe copy", async () => {
-    loginPostMock.mockReturnValue(await rejectedWith(422, { error: "Invalid credentials" }));
+    loginPostMock.mockReturnValue(await rejectedWith(422, { detail: "Invalid credentials" }));
 
     renderPage();
     await fillAndSubmit("EDARA", "EDA-001", "wrong-password");
@@ -158,7 +158,7 @@ describe("LoginPage", () => {
   it("surfaces the distinct, actionable lockout message returned by the backend", async () => {
     loginPostMock.mockReturnValue(
       await rejectedWith(403, {
-        error: "Account locked. Please wait or contact your HR administrator.",
+        detail: "Account locked. Please wait or contact your HR administrator.",
       }),
     );
 
@@ -173,7 +173,7 @@ describe("LoginPage", () => {
   it("surfaces the distinct, password-independent disabled-account message returned by the backend", async () => {
     loginPostMock.mockReturnValue(
       await rejectedWith(403, {
-        error: "This account can't sign in. Please contact your HR administrator.",
+        detail: "This account can't sign in. Please contact your HR administrator.",
       }),
     );
 
@@ -188,7 +188,7 @@ describe("LoginPage", () => {
   it("surfaces the distinct expired-invitation message returned by the backend", async () => {
     loginPostMock.mockReturnValue(
       await rejectedWith(422, {
-        error: "Your invitation has expired. Please ask your HR administrator for a new one.",
+        detail: "Your invitation has expired. Please ask your HR administrator for a new one.",
       }),
     );
 
@@ -203,7 +203,7 @@ describe("LoginPage", () => {
   });
 
   it("maps a 429 to the rate-limit copy", async () => {
-    loginPostMock.mockReturnValue(await rejectedWith(429, { error: "Too many requests" }));
+    loginPostMock.mockReturnValue(await rejectedWith(429, { detail: "Too many requests" }));
 
     renderPage();
     await fillAndSubmit("EDARA", "EDA-001", "S3curePass!");
@@ -214,7 +214,7 @@ describe("LoginPage", () => {
   });
 
   it("maps a 5xx / network failure to the generic system-error copy", async () => {
-    loginPostMock.mockReturnValue(await rejectedWith(500, { error: "Internal Server Error" }));
+    loginPostMock.mockReturnValue(await rejectedWith(500, { detail: "Internal Server Error" }));
 
     renderPage();
     await fillAndSubmit("EDARA", "EDA-001", "S3curePass!");
