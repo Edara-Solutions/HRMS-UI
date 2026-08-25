@@ -12,8 +12,10 @@
       "earlier": "Earlier"
     },
     "showOlder": "Show older",
+    "markAllRead": "Mark all read",
     "loading": "Loading notifications…",
-    "error": "Notifications could not be loaded."
+    "error": "Notifications could not be loaded.",
+    "actionError": "That didn't go through. Try again."
   },
   "values": {
     "decision": {

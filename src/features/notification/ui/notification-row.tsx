@@ -10,6 +10,7 @@ import {
   type NotificationTone,
 } from "../model/notification-catalog";
 import { resolveNotificationCopy } from "../model/notification-copy";
+import type { NotificationRowState } from "../model/notification-read-state";
 
 const toneClassName: Record<NotificationTone, string> = {
   info: "bg-[var(--color-info-soft)] text-[var(--color-info)]",
@@ -19,18 +20,41 @@ const toneClassName: Record<NotificationTone, string> = {
 
 const rowClassName = "flex w-full items-start gap-2.5 px-4 py-2.5 text-start";
 
-const unseenRowClassName =
-  "bg-[color-mix(in_srgb,var(--color-primary-soft)_55%,var(--color-surface))]";
+/** The whole unseen-to-read visual arc in one table: wash, tile, title, body. */
+const stateClassName: Record<
+  NotificationRowState,
+  { row: string; tile: string; title: string; body: string }
+> = {
+  unseen: {
+    row: "bg-[color-mix(in_srgb,var(--color-primary-soft)_55%,var(--color-surface))]",
+    tile: "",
+    title: "text-[var(--color-text)]",
+    body: "text-[var(--color-text-muted)]",
+  },
+  settled: {
+    row: "",
+    tile: "",
+    title: "text-[var(--color-text)]",
+    body: "text-[var(--color-text-muted)]",
+  },
+  read: {
+    row: "",
+    tile: "opacity-70",
+    title: "text-[var(--color-text-muted)]",
+    body: "text-[var(--color-text-faint)]",
+  },
+};
 
 interface NotificationRowProps {
   item: NotificationFeedItem;
-  /** Closes the panel once a clickable row has navigated. */
-  onNavigate: () => void;
+  state: NotificationRowState;
+  /** Marks the row read and closes the panel; only clickable rows can reach it. */
+  onActivate: () => void;
 }
 
-export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
+export function NotificationRow({ item, state, onActivate }: NotificationRowProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
-  const locale = usePreferencesStore((state) => state.locale);
+  const locale = usePreferencesStore((preferences) => preferences.locale);
   const navigate = useNavigate();
 
   const entry = NOTIFICATION_CATALOG.get(item.typeKey);
@@ -42,11 +66,11 @@ export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
 
   const route = entry.route?.(item.subject) ?? null;
   const Icon = entry.icon;
-  const unseen = item.seenAt === null;
+  const presentation = stateClassName[state];
 
   const content = (
     <>
-      {unseen ? (
+      {state === "unseen" ? (
         <span
           aria-hidden="true"
           className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--color-primary)]"
@@ -57,15 +81,18 @@ export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
         className={cn(
           "flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-md)]",
           toneClassName[entry.tone],
+          presentation.tile,
         )}
       >
         <Icon size={14} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-medium leading-snug text-[var(--color-text)]">
+        <span
+          className={cn("block truncate text-[13px] font-medium leading-snug", presentation.title)}
+        >
           {copy.title}
         </span>
-        <span className="mt-0.5 block truncate text-xs leading-snug text-[var(--color-text-muted)]">
+        <span className={cn("mt-0.5 block truncate text-xs leading-snug", presentation.body)}>
           {copy.body}
         </span>
       </span>
@@ -79,16 +106,16 @@ export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
   );
 
   if (!route) {
-    return <li className={cn(rowClassName, unseen && unseenRowClassName)}>{content}</li>;
+    return <li className={cn(rowClassName, presentation.row)}>{content}</li>;
   }
 
   return (
-    <li className={cn(unseen && unseenRowClassName)}>
+    <li className={presentation.row}>
       <button
         type="button"
         onClick={() => {
+          onActivate();
           navigateTo(navigate, route);
-          onNavigate();
         }}
         className={cn(
           rowClassName,

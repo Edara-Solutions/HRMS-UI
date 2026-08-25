@@ -50,6 +50,15 @@ async function requestUnreadCount(tier: NotificationTier, etag: string | undefin
   }
 }
 
+/**
+ * Drops a tier's conditional-GET entry so the next count fetch is unconditional. A seen/read write
+ * changes the count, and revalidating against the pre-write ETag would hand the badge its
+ * pre-write value straight back.
+ */
+export function forgetUnreadCountRevision(tier: NotificationTier) {
+  cacheByTier.delete(tier);
+}
+
 export async function fetchUnreadNotificationCount(
   tier: NotificationTier,
 ): Promise<UnreadNotificationCount> {
