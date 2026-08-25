@@ -16,7 +16,7 @@ export const TOAST_DURATION_MS: Record<ToastTone, number | null> = {
 };
 
 /** Beyond this the stack stops growing and older toasts collapse into the "+N earlier" pill. */
-export const MAX_VISIBLE_TOASTS = 3;
+const MAX_VISIBLE_TOASTS = 3;
 
 export interface ToastRequest {
   readonly typeKey: string;
