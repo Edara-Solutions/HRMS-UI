@@ -1,0 +1,62 @@
+{
+  "panel": {
+    "title": "الإشعارات",
+    "unread": "{{count}} غير مقروء",
+    "empty": {
+      "title": "لا جديد لديك",
+      "hint": "تظهر هنا الإشعارات المتعلقة بموظفيك والموافقات وحسابك."
+    },
+    "buckets": {
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "earlier": "سابقاً"
+    },
+    "showOlder": "عرض الأقدم",
+    "loading": "جارٍ تحميل الإشعارات…",
+    "error": "تعذّر تحميل الإشعارات."
+  },
+  "values": {
+    "decision": {
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    }
+  },
+  "notifications": {
+    "platform": {
+      "lead-created": {
+        "title": "عميل محتمل جديد",
+        "body": "انضم عميل محتمل جديد إلى القائمة وهو جاهز للمراجعة."
+      },
+      "conversion-requested": {
+        "title": "طلب تحويل جديد",
+        "body": "هناك شركة في انتظار قرارك بشأن التحويل."
+      },
+      "company-activated": {
+        "title": "تم تفعيل الشركة",
+        "body": "شركتك الآن مفعّلة على إدارة."
+      },
+      "conversion-decided": {
+        "title": "طلب التحويل {{decision}}",
+        "body": "قامت إدارة بمراجعة طلب التحويل الخاص بك."
+      },
+      "announcement": {
+        "title": "إعلان",
+        "body": "تم نشر إعلان جديد."
+      }
+    },
+    "company": {
+      "subscription-changed": {
+        "title": "تم تحديث الاشتراك",
+        "body": "خطتك الآن {{planName}} ({{status}})."
+      },
+      "role-assigned": {
+        "title": "تم إسناد دور",
+        "body": "تم منحك دور {{roleName}}."
+      },
+      "user-joined": {
+        "title": "انضم عضو جديد",
+        "body": "تم قبول دعوة وانضم عضو جديد إلى شركتك."
+      }
+    }
+  }
+}

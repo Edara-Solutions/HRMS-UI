@@ -1,0 +1,62 @@
+{
+  "panel": {
+    "title": "Notifications",
+    "unread": "{{count}} unread",
+    "empty": {
+      "title": "You're all caught up",
+      "hint": "Notifications about your people, approvals and account land here."
+    },
+    "buckets": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "earlier": "Earlier"
+    },
+    "showOlder": "Show older",
+    "loading": "Loading notifications…",
+    "error": "Notifications could not be loaded."
+  },
+  "values": {
+    "decision": {
+      "approved": "approved",
+      "rejected": "rejected"
+    }
+  },
+  "notifications": {
+    "platform": {
+      "lead-created": {
+        "title": "New lead registered",
+        "body": "A new lead joined the pipeline and is ready for review."
+      },
+      "conversion-requested": {
+        "title": "Conversion request submitted",
+        "body": "A company is waiting for your conversion decision."
+      },
+      "company-activated": {
+        "title": "Company activated",
+        "body": "Your company is now active on Edara."
+      },
+      "conversion-decided": {
+        "title": "Conversion request {{decision}}",
+        "body": "Edara has reviewed your conversion request."
+      },
+      "announcement": {
+        "title": "Announcement",
+        "body": "A new announcement was published."
+      }
+    },
+    "company": {
+      "subscription-changed": {
+        "title": "Subscription updated",
+        "body": "Your plan is now {{planName}} ({{status}})."
+      },
+      "role-assigned": {
+        "title": "Role assigned",
+        "body": "You were granted the {{roleName}} role."
+      },
+      "user-joined": {
+        "title": "New member joined",
+        "body": "An invitation was accepted and a new member joined your company."
+      }
+    }
+  }
+}

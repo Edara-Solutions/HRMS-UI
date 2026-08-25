@@ -15,7 +15,7 @@ void i18next
     fallbackLng: defaultLocale,
     supportedLngs: supportedLocales,
     defaultNS: "common",
-    ns: ["common", "auth"],
+    ns: ["common", "auth", "notification"],
     interpolation: {
       escapeValue: false,
     },
@@ -24,6 +24,9 @@ void i18next
     },
     saveMissing: import.meta.env.DEV,
     returnNull: false,
+    // No Suspense boundary wraps the app shell, so a namespace that is still loading must
+    // fall through to the key rather than suspend the header out of the page.
+    react: { useSuspense: false },
   });
 
 export { i18next };
