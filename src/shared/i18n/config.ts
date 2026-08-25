@@ -15,7 +15,7 @@ void i18next
     fallbackLng: defaultLocale,
     supportedLngs: supportedLocales,
     defaultNS: "common",
-    ns: ["common", "auth"],
+    ns: ["common", "auth", "notification"],
     interpolation: {
       escapeValue: false,
     },

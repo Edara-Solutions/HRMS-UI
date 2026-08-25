@@ -46,8 +46,8 @@ describe("fetchUnreadNotificationCount", () => {
   });
 
   it("reads the platform mount and lets the server cadence header win", async () => {
-    const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
-      countResponse({ unreadCount: 8 }, { etag: '"pa:2:5"', "x-poll-interval": "10" }),
+    const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
+      async () => countResponse({ unreadCount: 8 }, { etag: '"pa:2:5"', "x-poll-interval": "10" }),
     );
     vi.stubGlobal("fetch", fetchMock);
 

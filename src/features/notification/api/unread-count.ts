@@ -27,10 +27,7 @@ interface CachedUnreadCount {
 
 const NOT_MODIFIED = 304;
 
-/**
- * Revision ETags are per identity, so each tier keeps its own. Nothing outside this module
- * touches the cache — conditional-request mechanics stay behind `fetchUnreadNotificationCount`.
- */
+/** Revision ETags are per identity, so each tier keeps its own. */
 const cacheByTier = new Map<NotificationTier, CachedUnreadCount>();
 
 function unreadCountPath(tier: NotificationTier) {

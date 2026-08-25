@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "@/shared/lib/cn";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "subtle" | "link" | "nav";
@@ -60,6 +60,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconOnly?: boolean;
   /** Controlled pressed state for toggle (sets aria-pressed + pressed styling) */
   pressed?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const variantClassName: Record<ButtonVariant, string> = {
