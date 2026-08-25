@@ -1,7 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
+import { useClippedText } from "@/shared/lib/use-clipped-text";
+import { Tooltip } from "@/shared/ui/tooltip";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import { formatRelativeTime } from "../lib/relative-time";
 import {
@@ -56,9 +59,13 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
   const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((preferences) => preferences.locale);
   const navigate = useNavigate();
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const bodyRef = useRef<HTMLSpanElement>(null);
 
   const entry = NOTIFICATION_CATALOG.get(item.typeKey);
   const copy = resolveNotificationCopy(item, t, locale);
+  const titleClipped = useClippedText(titleRef, copy?.title ?? "");
+  const bodyClipped = useClippedText(bodyRef, copy?.body ?? "");
 
   if (!entry || !copy) {
     return null;
@@ -86,16 +93,30 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
       >
         <Icon size={14} />
       </span>
-      <span className="min-w-0 flex-1">
+      <Tooltip
+        content={
+          <span className="block">
+            <span className="block font-semibold">{copy.title}</span>
+            <span className="mt-0.5 block font-normal">{copy.body}</span>
+          </span>
+        }
+        disabled={!titleClipped && !bodyClipped}
+        placement="below"
+        className="min-w-0 flex-1"
+      >
         <span
+          ref={titleRef}
           className={cn("block truncate text-[13px] font-medium leading-snug", presentation.title)}
         >
           {copy.title}
         </span>
-        <span className={cn("mt-0.5 block truncate text-xs leading-snug", presentation.body)}>
+        <span
+          ref={bodyRef}
+          className={cn("mt-0.5 block truncate text-xs leading-snug", presentation.body)}
+        >
           {copy.body}
         </span>
-      </span>
+      </Tooltip>
       <time
         dateTime={item.createdAt}
         className="shrink-0 pt-0.5 text-[11px] tabular-nums text-[var(--color-text-faint)]"
