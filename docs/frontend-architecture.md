@@ -22,7 +22,8 @@ slices on the same layer, never upward.
 app       → routing, providers, global styles, route guards. No business logic.
 pages     → one slice per screen. Owns its UI, forms, modals, data-fetching hooks.
 widgets   → large composite blocks reused across many pages. Today: app shell only.
-features  → a reusable user interaction used in 2+ places. Today: auth forms only.
+features  → a reusable user interaction used in 2+ places. Today: auth forms and
+            the Audit Trail filter bar, which both portals render.
 shared    → infrastructure with NO business logic: ui kit, lib, api client,
             auth/session, i18n, config, charts. Organised by segment, no slices.
 ```
@@ -61,6 +62,7 @@ src/
     app-shell/
   features/
     auth/
+    audit-filters/     # the filter bar both Audit Trails render
   shared/
     ui/  lib/  charts/
     api/               # ky client, query-client, error-mapper, generated schema.d.ts

@@ -48,6 +48,409 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/platform/audit-trail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    cursor?: string;
+                    limit?: number;
+                    occurredFrom?: string;
+                    occurredTo?: string;
+                    actorPublicId?: string;
+                    outcome?: "SUCCESS" | "FAILURE";
+                    targetType?: string;
+                    targetPublicId?: string;
+                    eventType?: ("audit.trail.platform_read" | "privacy.identity.erased" | "company.profile.material_updated" | "company.profile.completed" | "company.lifecycle.created" | "company.lifecycle.updated" | "company.lifecycle.deleted" | "company.lifecycle.restored" | "company.lifecycle.frozen" | "company.lifecycle.unfrozen" | "company.lifecycle.suspended" | "company.lifecycle.unsuspended" | "company.access-policy.changed" | "company.access-policy.denied" | "company.setup.step_started" | "company.setup.step_completed" | "company.setup.step_skipped" | "company.activation.activated" | "company.subscription.trial_extended" | "company.subscription.trial_expired" | "user.lifecycle.created" | "user.lifecycle.updated" | "user.lifecycle.deleted" | "lead.lifecycle.created" | "lead.lifecycle.attempt_recorded" | "lead.lifecycle.updated" | "lead.lifecycle.archived" | "lead.lifecycle.unarchived" | "lead.lifecycle.deleted" | "lead.contact.added" | "lead.contact.updated" | "lead.contact.removed" | "lead.conversion.requested" | "lead.conversion.plan_changed" | "lead.conversion.rejected" | "lead.conversion.approved" | "email.delivery.cancelled" | "email.delivery.retry_requested" | "email.sending.paused" | "email.sending.resumed" | "email.template_assignment.assigned" | "email.template_assignment.removed" | "email.template_assignment.migrated" | "auth.session.started" | "auth.session.started" | "auth.session.ended" | "auth.session.revoked" | "auth.session.refreshed" | "auth.credential.password_changed" | "auth.credential.reset_forced" | "auth.invitation.issued" | "auth.invitation.accepted" | "platform_admin.session.started" | "platform_admin.session.started" | "platform_admin.session.ended" | "platform_admin.session.revoked" | "platform_admin.session.refreshed" | "platform_admin.credential.password_changed" | "platform_admin.credential.reset_forced" | "platform_admin.invitation.issued" | "platform_admin.invitation.accepted" | "auth.session.rejected")[];
+                    companyPublicId?: string;
+                    traceId?: string;
+                    scope?: "PLATFORM" | "COMPANY";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlatformAuditTrailPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/audit-trail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    cursor?: string;
+                    limit?: number;
+                    occurredFrom?: string;
+                    occurredTo?: string;
+                    actorPublicId?: string;
+                    outcome?: "SUCCESS" | "FAILURE";
+                    targetType?: string;
+                    targetPublicId?: string;
+                    eventType?: ("company.profile.material_updated" | "company.profile.completed" | "company.lifecycle.created" | "company.lifecycle.updated" | "company.lifecycle.deleted" | "company.lifecycle.restored" | "company.lifecycle.frozen" | "company.lifecycle.unfrozen" | "company.lifecycle.suspended" | "company.lifecycle.unsuspended" | "company.access-policy.changed" | "company.access-policy.denied" | "company.setup.step_started" | "company.setup.step_completed" | "company.setup.step_skipped" | "company.activation.activated" | "company.subscription.trial_extended" | "company.subscription.trial_expired" | "user.lifecycle.created" | "user.lifecycle.updated" | "user.lifecycle.deleted" | "email.template_assignment.assigned" | "email.template_assignment.removed" | "email.template_assignment.migrated" | "auth.session.started" | "auth.session.started" | "auth.session.ended" | "auth.session.revoked" | "auth.session.refreshed" | "auth.credential.password_changed" | "auth.credential.reset_forced" | "auth.invitation.issued" | "auth.invitation.accepted")[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompanyAuditTrailPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/audit-trail/actors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    query: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            name: string;
+                        }[];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/audit-trail/actors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    query: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            name: string;
+                        }[];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -499,45 +902,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    action?: string;
-                    outcome?: "success" | "failure";
-                    targetPublicId?: string;
-                    page?: number;
-                    pageSize?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Default Response */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/auth/force-reset/{publicId}": {
         parameters: {
             query?: never;
@@ -690,14 +1054,14 @@ export interface paths {
                 query?: {
                     status?: string;
                     source?: string;
-                    ownerUserId?: number;
                     country?: string;
                     createdFrom?: string;
                     createdTo?: string;
                     search?: string;
+                    isArchived?: boolean;
                     page?: number;
                     pageSize?: number;
-                    sort?: "createdAtAsc" | "createdAtDesc";
+                    sort?: "createdAtAsc" | "createdAtDesc" | "lastAttemptAtAsc" | "lastAttemptAtDesc";
                 };
                 header?: never;
                 path?: never;
@@ -721,7 +1085,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -732,7 +1104,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -756,9 +1136,8 @@ export interface paths {
                         country?: string;
                         city?: string;
                         source: components["schemas"]["LeadSource"];
-                        status: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "WON_CONVERTED" | "LOST";
+                        status: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "LOST";
                         lostReason?: components["schemas"]["LostReason"] | null;
-                        ownerUserId?: number | null;
                         primaryContact?: {
                             name?: string;
                             /** Format: email */
@@ -787,7 +1166,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -798,7 +1185,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -844,7 +1239,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -855,7 +1258,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -888,7 +1299,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -899,7 +1318,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -926,10 +1353,8 @@ export interface paths {
                         country?: string | null;
                         city?: string | null;
                         source?: components["schemas"]["LeadSource"];
-                        status?: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "WON_CONVERTED" | "LOST";
+                        status?: "NEW" | "WRONG_NUMBER" | "NO_ANSWER" | "FOLLOWING_UP" | "CONTACTED" | "QUALIFIED" | "NOT_QUALIFIED" | "NOT_INTERESTED" | "DEMO_SCHEDULED" | "WAITING_QUOTATION" | "QUOTATION_SENT" | "TRIAL_STARTED" | "NEGOTIATION" | "LOST";
                         lostReason?: components["schemas"]["LostReason"] | null;
-                        ownerUserId?: number | null;
-                        allowStatusOverride?: boolean;
                     };
                 };
             };
@@ -950,7 +1375,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -961,12 +1394,245 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
             };
         };
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/conversion-eligibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadConversionEligibility"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadWithContacts"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leads/{publicId}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeadWithContacts"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/leads/{publicId}/contacts": {
@@ -1016,7 +1682,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1027,7 +1701,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1075,7 +1757,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1086,7 +1776,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1132,7 +1830,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1143,87 +1849,20 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
             };
         };
-        trace?: never;
-    };
-    "/api/v1/leads/{publicId}/convert": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    publicId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        phoneNumber: string;
-                        name?: string;
-                        country?: string;
-                        website?: string;
-                        logo?: string;
-                        addressLine?: string;
-                        ownerFirstName: string;
-                        ownerLastName: string;
-                        /** Format: email */
-                        ownerEmail: string;
-                        ownerLocale?: "en" | "ar";
-                    };
-                };
-            };
-            responses: {
-                /** @description Default Response */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ConvertedCompany"];
-                    };
-                };
-                /** @description Default Response */
-                "4XX": {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                        };
-                    };
-                };
-                /** @description Default Response */
-                "5XX": {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                        };
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/api/v1/leads/{publicId}/activities": {
@@ -1263,7 +1902,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1274,7 +1921,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1315,7 +1970,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1326,7 +1989,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1374,7 +2045,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1385,12 +2064,1855 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    status?: "PENDING" | "APPROVED" | "REJECTED";
+                    createdFrom?: string;
+                    createdTo?: string;
+                    page?: number;
+                    pageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        leadPublicId: string;
+                        /** Format: uuid */
+                        planPublicId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/immediate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Create a PENDING request, then approve it with the same setup and trial contract as manual approval. Approval failure leaves the PENDING request available for review. */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        leadPublicId: string;
+                        /** Format: uuid */
+                        planPublicId: string;
+                        /** @description Supported values are presets 1, 2, and 3, or -1 for a custom checklist. Semantic validation runs after the PENDING request is committed. */
+                        templateKey: number;
+                        /** @description Custom checklist items are validated by the shared setup resolver after the PENDING request is committed. */
+                        setupSteps?: unknown[];
+                        trialEndDate?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        planPublicId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            /** @description Select one backend preset, or use templateKey -1 with custom setupSteps. Failure example: templateKey 1 with setupSteps [] is rejected before provisioning. */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Supported values are presets 1, 2, and 3, or -1 for a custom checklist. Semantic validation runs after the PENDING request is committed. */
+                        templateKey: number;
+                        /** @description Custom checklist items are validated by the shared setup resolver after the PENDING request is committed. */
+                        setupSteps?: unknown[];
+                        trialEndDate?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/onboarding-delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}/onboarding-delivery/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lead-conversion-requests/{publicId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/access-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            policy: {
+                                publicId: string | null;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                                reason: string | null;
+                                note: string | null;
+                                effectiveFrom: string | null;
+                                effectiveUntil: string | null;
+                                changedByUserId: number | null;
+                                createdAt: string | null;
+                                updatedAt: string | null;
+                                source: "policy" | "legacy_site_status" | "default";
+                            };
+                            effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                            /** Format: date-time */
+                            effectiveAt: string;
+                            isCurrentlyEffective: boolean;
+                            isExpired: boolean;
+                            legacyMapping: string | null;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                        reason: string;
+                        note?: string | null;
+                        /** Format: date-time */
+                        effectiveFrom: string;
+                        effectiveUntil?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            publicId: string | null;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                            reason: string | null;
+                            note: string | null;
+                            effectiveFrom: string | null;
+                            effectiveUntil: string | null;
+                            changedByUserId: number | null;
+                            createdAt: string | null;
+                            updatedAt: string | null;
+                            source: "policy" | "legacy_site_status" | "default";
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            lifecycleStatus: "ONBOARDING" | "ACTIVE" | "SUSPENDED" | "CLOSED";
+                            activatedAt: string | null;
+                            canActivate: boolean;
+                            unmetRequirements: {
+                                code: "OWNER_ONBOARDING_INCOMPLETE" | "COMPANY_PROFILE_INCOMPLETE" | "REQUIRED_SETUP_INCOMPLETE" | "ACCESS_POLICY_RESTRICTS_ACTIVATION" | "SUBSCRIPTION_NOT_ACTIVATABLE";
+                                message: string;
+                                details: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            subscription: {
+                                /** Format: uuid */
+                                publicId: string;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                status: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                /** Format: date-time */
+                                startDate: string;
+                                endDate: string | null;
+                                /** Format: date-time */
+                                initialTrialEndDate: string;
+                                /** Format: date-time */
+                                trialEndDate: string;
+                                note: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            history: {
+                                /** Format: uuid */
+                                publicId: string;
+                                type: "TRIAL_STARTED" | "TRIAL_EXTENDED" | "TRIAL_EXPIRED";
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                oldStatus: ("TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED") | null;
+                                newStatus: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                oldTrialEndDate: string | null;
+                                /** Format: date-time */
+                                newTrialEndDate: string;
+                                actorUserId: number | null;
+                                reason: string | null;
+                                /** Format: date-time */
+                                occurredAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/subscription/trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        trialEndDate: string;
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            subscription: {
+                                /** Format: uuid */
+                                publicId: string;
+                                /** Format: uuid */
+                                companyPublicId: string;
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                status: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                /** Format: date-time */
+                                startDate: string;
+                                endDate: string | null;
+                                /** Format: date-time */
+                                initialTrialEndDate: string;
+                                /** Format: date-time */
+                                trialEndDate: string;
+                                note: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                            history: {
+                                /** Format: uuid */
+                                publicId: string;
+                                type: "TRIAL_STARTED" | "TRIAL_EXTENDED" | "TRIAL_EXPIRED";
+                                plan: {
+                                    /** Format: uuid */
+                                    publicId: string;
+                                    name: string;
+                                    duration: number;
+                                };
+                                oldStatus: ("TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED") | null;
+                                newStatus: "TRIAL" | "ACTIVE" | "FROZEN" | "CANCELLED" | "EXPIRED";
+                                oldTrialEndDate: string | null;
+                                /** Format: date-time */
+                                newTrialEndDate: string;
+                                actorUserId: number | null;
+                                reason: string | null;
+                                /** Format: date-time */
+                                occurredAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/company-subscriptions/expire-trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            expiredCount: number;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            name: string;
+                            logoUrl: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            country: string | null;
+                            city: string | null;
+                            addressLine: string | null;
+                            taxNumber: string | null;
+                            commercialNumber: string | null;
+                            status: "INCOMPLETE" | "COMPLETE";
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name?: string;
+                        logoUrl?: string | null;
+                        email?: string | null;
+                        phone?: string | null;
+                        country?: string | null;
+                        city?: string | null;
+                        addressLine?: string | null;
+                        taxNumber?: string | null;
+                        commercialNumber?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            name: string;
+                            logoUrl: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            country: string | null;
+                            city: string | null;
+                            addressLine: string | null;
+                            taxNumber: string | null;
+                            commercialNumber: string | null;
+                            status: "INCOMPLETE" | "COMPLETE";
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            companyPublicId: string;
+                            templateVersion: number;
+                            steps: {
+                                /** Format: uuid */
+                                publicId: string;
+                                stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                                status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                                isRequired: boolean;
+                                sequence: number;
+                                templateVersion: number;
+                                dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                                startedAt: string | null;
+                                completedAt: string | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/setup/{stepPublicId}/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                    stepPublicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            publicId: string;
+                            stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                            isRequired: boolean;
+                            sequence: number;
+                            templateVersion: number;
+                            dependencies: ("SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS")[];
+                            startedAt: string | null;
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1430,7 +3952,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1441,7 +3971,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1481,7 +4019,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1492,7 +4038,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1540,7 +4094,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1551,7 +4113,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1597,7 +4167,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1608,7 +4186,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1656,7 +4242,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1667,7 +4261,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1707,7 +4309,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1718,7 +4328,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1766,7 +4384,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1777,7 +4403,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1823,7 +4457,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1834,7 +4476,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1882,7 +4532,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -1893,13 +4551,171 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{publicId}/email-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompanyEmailSettings"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    publicId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        displayName: string;
+                        /** Format: uri */
+                        logoUrl?: string;
+                        primaryColor: string;
+                        onPrimaryColor: string;
+                        footerIdentity: string;
+                        senderLocalPart: string;
+                        /** Format: email */
+                        replyToEmail: string;
+                        defaultLocale: "en" | "ar";
+                        defaultTimeZone: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompanyEmailSettings"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -2094,6 +4910,1392 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/v1/company/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    since?: string;
+                    limit?: number;
+                    unreadOnly?: boolean;
+                    cursor?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationFeedPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/notifications/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        ids: number[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationSeenResult"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationUnreadCount"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        id?: number;
+                        /** @enum {boolean} */
+                        all?: true;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    since?: string;
+                    limit?: number;
+                    unreadOnly?: boolean;
+                    cursor?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationFeedPage"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notifications/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        ids: number[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationSeenResult"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationUnreadCount"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        id?: number;
+                        /** @enum {boolean} */
+                        all?: true;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/notification-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationSettingsView"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company/notification-settings/{typeKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    typeKey: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        override: {
+                            /** @enum {string} */
+                            selectorKind: "role";
+                            selectorRef: string;
+                        } | {
+                            /** @enum {string} */
+                            selectorKind: "permission";
+                            selectorRef: string;
+                        } | {
+                            selectorKind: "platform_admins" | "blast";
+                        } | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notification-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotificationSettingsView"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/notification-settings/{typeKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    typeKey: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        override: {
+                            /** @enum {string} */
+                            selectorKind: "role";
+                            selectorRef: string;
+                        } | {
+                            /** @enum {string} */
+                            selectorKind: "permission";
+                            selectorRef: string;
+                        } | {
+                            selectorKind: "platform_admins" | "blast";
+                        } | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/platform/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            items: {
+                                /** Format: uuid */
+                                publicId: string;
+                                status: "scheduled" | "dispatching" | "sent" | "failed";
+                                scheduledFor: string | null;
+                                dispatchedAt: string | null;
+                                message: {
+                                    en: {
+                                        title: string;
+                                        body: string;
+                                    };
+                                    ar: {
+                                        title: string;
+                                        body: string;
+                                    };
+                                };
+                                companiesReached: number;
+                                recipientsReached: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        message: {
+                            en: {
+                                title: string;
+                                body: string;
+                            };
+                            ar: {
+                                title: string;
+                                body: string;
+                            };
+                        };
+                        companies: string[];
+                        /** Format: date-time */
+                        scheduledFor?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies/{publicId}/freeze": {
         parameters: {
             query?: never;
@@ -2138,7 +6340,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2149,7 +6359,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2205,7 +6423,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2216,7 +6442,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2272,7 +6506,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2283,7 +6525,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2339,7 +6589,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2350,7 +6608,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2406,7 +6672,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2417,7 +6691,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -2445,7 +6727,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2519,7 +6801,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2558,7 +6840,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2653,7 +6935,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode: string;
-                    billingInterval: string;
+                    billingInterval: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                 };
                 header?: never;
@@ -2694,7 +6976,7 @@ export interface paths {
                     countryCode?: string;
                     regionCode?: string;
                     currencyCode?: string;
-                    billingInterval?: string;
+                    billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                     intervalCount?: number;
                     isActive?: boolean;
                 };
@@ -2732,7 +7014,8 @@ export interface paths {
                         regionCode?: string | null;
                         currencyCode: string;
                         amountMinor: number;
-                        billingInterval: string;
+                        /** @enum {string} */
+                        billingInterval: "monthly" | "quarterly" | "biannual" | "annually";
                         /** @default 1 */
                         intervalCount?: number;
                         isActive?: boolean;
@@ -2822,7 +7105,8 @@ export interface paths {
                         regionCode?: string | null;
                         currencyCode?: string;
                         amountMinor?: number;
-                        billingInterval?: string;
+                        /** @enum {string} */
+                        billingInterval?: "monthly" | "quarterly" | "biannual" | "annually";
                         intervalCount?: number;
                         isActive?: boolean;
                     };
@@ -3602,7 +7886,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3613,7 +7905,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3661,7 +7961,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3672,7 +7980,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3720,7 +8036,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3731,7 +8055,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3782,7 +8114,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3793,7 +8133,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3841,7 +8189,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3852,7 +8208,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3860,6 +8224,163 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/email-template-variants/{key}/removal-readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TemplateVariantRemovalReadiness"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/email-template-variants/{key}/migrate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        toRevisionKey?: string;
+                        reason?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TemplateMigrationResult"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -3911,7 +8432,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3922,7 +8451,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3968,7 +8505,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -3979,7 +8524,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4020,7 +8573,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4031,7 +8592,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4079,7 +8648,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4090,7 +8667,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4136,7 +8721,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4147,7 +8740,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4204,7 +8805,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4215,7 +8824,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4263,7 +8880,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4274,7 +8899,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4330,7 +8963,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4341,7 +8982,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4395,7 +9044,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4406,7 +9063,244 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingStatusResponse"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending/{context}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    context: components["schemas"]["EmailContext"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingContextStatus"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/emails/sending/{context}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    context: components["schemas"]["EmailContext"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendingContextStatus"];
+                    };
+                };
+                /** @description Default Response */
+                "4XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                "5XX": {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri-reference */
+                            type: string;
+                            title: string;
+                            status: number;
+                            detail: string;
+                            /** Format: uri-reference */
+                            instance: string;
+                            traceId: string;
+                            invalidParams?: string[];
                         };
                     };
                 };
@@ -4428,7 +9322,15 @@ export interface components {
             timestamp?: string;
         };
         ErrorEnvelope: {
-            error: string;
+            /** Format: uri-reference */
+            type: string;
+            title: string;
+            status: number;
+            detail: string;
+            /** Format: uri-reference */
+            instance: string;
+            traceId: string;
+            invalidParams?: string[];
         };
         PageMeta: {
             /** @enum {string} */
@@ -4457,6 +9359,9 @@ export interface components {
             lostReason: components["schemas"]["LostReason"] | null;
             isConverted: boolean;
             numberOfAttempts: number;
+            /** Format: date-time */
+            lastAttemptAt: string;
+            isArchived: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -4492,10 +9397,21 @@ export interface components {
             lead: components["schemas"]["Lead"];
             contacts: components["schemas"]["LeadContact"][];
         };
+        LeadConversionEligibilityReason: {
+            code: "LEAD_ARCHIVED" | "LEAD_ALREADY_CONVERTED" | "STATUS_NOT_CONVERTIBLE" | "PRIMARY_CONTACT_MISSING" | "PRIMARY_CONTACT_NAME_REQUIRED" | "PRIMARY_CONTACT_EMAIL_REQUIRED";
+            message: string;
+        };
+        LeadConversionEligibility: {
+            isEligible: boolean;
+            reasons: components["schemas"]["LeadConversionEligibilityReason"][];
+            primaryContact: components["schemas"]["LeadContact"] | null;
+        };
         LeadDetails: {
             lead: components["schemas"]["Lead"];
             contacts: components["schemas"]["LeadContact"][];
             activities: components["schemas"]["LeadActivity"][];
+            primaryContact: components["schemas"]["LeadContact"] | null;
+            conversionEligibility: components["schemas"]["LeadConversionEligibility"];
         };
         LeadCreateResult: {
             lead: components["schemas"]["Lead"];
@@ -4511,23 +9427,6 @@ export interface components {
         LeadActivityListResponse: {
             items: components["schemas"]["LeadActivity"][];
             meta: components["schemas"]["PageMeta"];
-        };
-        ConvertedCompany: {
-            /** Format: uuid */
-            publicId: string;
-            logo: string | null;
-            name: string;
-            website: string | null;
-            phoneNumber: string;
-            country: string;
-            companyCode: string;
-            isActive: boolean;
-            addressLine: string | null;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            deletedAt: string | null;
         };
         EmailContext: "EDARA" | "COMPANY";
         EmailLocale: "en" | "ar";
@@ -4599,6 +9498,19 @@ export interface components {
             context: components["schemas"]["EmailContext"];
             payloadVersion: number;
             supportedLocales: components["schemas"]["EmailLocale"][];
+            deprecated: boolean;
+        };
+        TemplateMigrationResult: {
+            fromRevisionKey: string;
+            toRevisionKey: string | null;
+            emailTypeKey: string;
+            migratedCount: number;
+        };
+        TemplateVariantRemovalReadiness: {
+            revisionKey: string;
+            activeAssignments: number;
+            pendingMessages: number;
+            removable: boolean;
         };
         TestSendResponse: {
             /** Format: uuid */
@@ -4630,6 +9542,12 @@ export interface components {
             lastFailureKind: string | null;
             providerMessageId: string | null;
             companyId: number | null;
+            company: {
+                /** Format: uuid */
+                publicId: string;
+                name: string;
+                code: string;
+            } | null;
             businessReference: string;
             /** Format: date-time */
             createdAt: string;
@@ -4639,6 +9557,16 @@ export interface components {
         DeliveryListResponse: {
             items: components["schemas"]["DeliveryRecordResponse"][];
             meta: components["schemas"]["PageMeta"];
+        };
+        SendingContextStatus: {
+            context: components["schemas"]["EmailContext"];
+            paused: boolean;
+            reason: string | null;
+            updatedBy: number | null;
+            updatedAt: string | null;
+        };
+        SendingStatusResponse: {
+            items: components["schemas"]["SendingContextStatus"][];
         };
         DnsRecordKind: "OWNERSHIP_TXT" | "DKIM" | "RETURN_PATH";
         DnsCheckStatus: "PENDING" | "VERIFIED" | "FAILED";
@@ -4685,6 +9613,4859 @@ export interface components {
         CompanyEmailReadiness: {
             ready: boolean;
             reason?: components["schemas"]["CompanyEmailReadinessReason"];
+        };
+        CompanyEmailSettings: {
+            displayName: string;
+            /** Format: uri */
+            logoUrl?: string;
+            primaryColor: string;
+            onPrimaryColor: string;
+            footerIdentity: string;
+            senderLocalPart: string;
+            /** Format: email */
+            replyToEmail: string;
+            defaultLocale: "en" | "ar";
+            defaultTimeZone: string;
+        } & {
+            sendingDomain: string | null;
+            senderVerified: boolean;
+        };
+        PlatformAuditTrailPage: {
+            items: ({
+                /** @enum {string} */
+                eventType: "audit.trail.platform_read";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    companyPublicId: string | null;
+                    scope: "PLATFORM" | "COMPANY" | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "privacy.identity.erased";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    subjectType: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.material_updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "taxNumber" | "commercialNumber";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    beforeStatus: "INCOMPLETE" | "COMPLETE";
+                    /** @enum {string} */
+                    afterStatus: "COMPLETE";
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    name: string;
+                    companyCode: string;
+                    lifecycleStatus: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "website" | "addressLine" | "isActive";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.restored";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.frozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unfrozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.suspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unsuspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    reason: string;
+                    note: string | null;
+                    effectiveFrom: string;
+                    effectiveUntil: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.denied";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    operation: "read" | "write" | "onboarding";
+                    lifecycleStatus: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_skipped";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.activation.activated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    activatedAt: string | null;
+                    lifecycleStatus: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_extended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousTrialEndDate: string;
+                    trialEndDate: string;
+                    reason: string;
+                    planPublicId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_expired";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    trialEndDate: string;
+                    expiredAt: string;
+                    accessMode: string;
+                    planPublicId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    status: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    changedFields: string[];
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    source: string;
+                    status: string;
+                    companySizeRange: string;
+                    hasPrimaryContact: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.attempt_recorded";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    source: string;
+                    status: string;
+                    numberOfAttempts: number;
+                    rejoined: boolean;
+                    unarchived: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changedFields: string[];
+                    status: string;
+                    numberOfAttempts: number;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.archived";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    status: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.unarchived";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    status: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    status: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.added";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    isPrimary: boolean;
+                    hasEmail: boolean;
+                    hasPhone: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changedFields: string[];
+                    isPrimary: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.contact.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    wasPrimary: boolean;
+                    replacementContactPublicId: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.requested";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    planPublicId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.plan_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousPlanPublicId: string;
+                    planPublicId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.rejected";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                    planPublicId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "lead.conversion.approved";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    planPublicId: string;
+                    companyCode: string;
+                    trialEndDate: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.delivery.cancelled";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousStatus: string;
+                    reason: string;
+                    emailTypeKey: string;
+                    context: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.delivery.retry_requested";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousStatus: string;
+                    reason: string;
+                    emailTypeKey: string;
+                    context: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.sending.paused";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    context: string;
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.sending.resumed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    context: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.assigned";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    templateRevisionKey: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.migrated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    fromRevisionKey: string;
+                    toRevisionKey: string;
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 2;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                    ipAddress: string | null;
+                    country: string | null;
+                    city: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    familyId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: Record<string, never>;
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "COMPANY";
+                /** Format: uuid */
+                companyPublicId: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.started";
+                /** @enum {number} */
+                eventVersion: 2;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                    ipAddress: string | null;
+                    country: string | null;
+                    city: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    familyId: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: Record<string, never>;
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "platform_admin.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.rejected";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                scope: "PLATFORM";
+                companyPublicId: null;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                origin: {
+                    ip: string | null;
+                    userAgent: string | null;
+                };
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    surface: string;
+                    reason: string;
+                };
+                recordingBinding: "TRANSACTIONAL" | "STANDALONE";
+                /** Format: date-time */
+                recordedAt: string;
+            } | {
+                /** @enum {string} */
+                eventType: "audit.event.unavailable";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                reason: "UNSUPPORTED_OR_DAMAGED";
+            })[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        CompanyAuditTrailPage: {
+            items: ({
+                /** @enum {string} */
+                eventType: "company.profile.material_updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "taxNumber" | "commercialNumber";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.profile.completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    beforeStatus: "INCOMPLETE" | "COMPLETE";
+                    /** @enum {string} */
+                    afterStatus: "COMPLETE";
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    name: string;
+                    companyCode: string;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    changes: {
+                        field: "name" | "country" | "website" | "addressLine" | "isActive";
+                        before: string | null;
+                        after: string | null;
+                    }[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.restored";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.frozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unfrozen";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.suspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.lifecycle.unsuspended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    mode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    reason: string;
+                    note: string | null;
+                    effectiveFrom: string;
+                    effectiveUntil: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.access-policy.denied";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    effectiveMode: "NORMAL" | "READ_ONLY" | "FROZEN" | "BLOCKED" | "MAINTENANCE";
+                    operation: "read" | "write" | "onboarding";
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_completed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.setup.step_skipped";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    stepType: "SET_COMPANY_PROFILE" | "SET_ROLES" | "SET_JOBS" | "SET_BRANCHES" | "SET_SHIFTS" | "SET_DEPARTMENTS";
+                    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+                    isRequired: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.activation.activated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    activatedAt: string | null;
+                    lifecycleStatus: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_extended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    previousTrialEndDate: string;
+                    trialEndDate: string;
+                    reason: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "company.subscription.trial_expired";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    trialEndDate: string;
+                    expiredAt: string;
+                    accessMode: string;
+                    planPublicId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.created";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    status: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.updated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                    changedFields: string[];
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "user.lifecycle.deleted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    employeeCode: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.assigned";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    templateRevisionKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.removed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "email.template_assignment.migrated";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    emailTypeKey: string;
+                    fromRevisionKey: string;
+                    toRevisionKey: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.started";
+                /** @enum {number} */
+                eventVersion: 2;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    usedTemporaryCredentials: boolean;
+                    reason: string | null;
+                    ipAddress: string | null;
+                    country: string | null;
+                    city: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.ended";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.revoked";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reason: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.session.refreshed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    familyId: string;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.password_changed";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    usedTemporaryCredentials: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.credential.reset_forced";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: Record<string, never>;
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.issued";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    reissued: boolean;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "auth.invitation.accepted";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                outcome: "SUCCESS" | "FAILURE";
+                actor: {
+                    /** @enum {string} */
+                    kind: "USER";
+                    /** Format: uuid */
+                    publicId: string;
+                    name: string | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "PLATFORM_ADMIN";
+                } | {
+                    /** @enum {string} */
+                    kind: "SYSTEM";
+                    component: "EMAIL_WORKER" | "SCHEDULER" | "SCRIPT";
+                } | {
+                    /** @enum {string} */
+                    kind: "ANONYMOUS";
+                } | {
+                    /** @enum {string} */
+                    kind: "ATTRIBUTION_FAILED";
+                } | {
+                    /** @enum {string} */
+                    kind: "ERASED_USER";
+                };
+                traceId: string | null;
+                targets: {
+                    targetType: string;
+                    publicId: string;
+                    name?: string | null;
+                }[];
+                details: {
+                    clientType: string;
+                    reason: string | null;
+                };
+            } | {
+                /** @enum {string} */
+                eventType: "audit.event.unavailable";
+                /** @enum {number} */
+                eventVersion: 1;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                reason: "UNSUPPORTED_OR_DAMAGED";
+            })[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        NotificationFeedItem: {
+            id: number;
+            scope: "company" | "platform";
+            typeKey: string;
+            typeVersion: number;
+            importance: "high" | "normal";
+            params: {
+                [key: string]: unknown;
+            };
+            actor: {
+                kind: "user" | "platform_admin";
+                /** Format: uuid */
+                publicId: string;
+            } | {
+                /** @enum {string} */
+                kind: "system";
+            };
+            subject: {
+                type: string;
+                publicId: string;
+            } | null;
+            /** Format: date-time */
+            createdAt: string;
+            seenAt: string | null;
+            readAt: string | null;
+        };
+        NotificationFeedPage: {
+            items: components["schemas"]["NotificationFeedItem"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        NotificationSeenResult: {
+            seenCount: number;
+        };
+        NotificationUnreadCount: {
+            unreadCount: number;
+        };
+        NotificationSettingsItem: {
+            typeKey: string;
+            typeVersion: number;
+            importance: "high" | "normal";
+            scope: "company" | "platform";
+            override: {
+                selectorKind: "role" | "permission" | "platform_admins" | "blast";
+                selectorRef?: string;
+            } | null;
+        };
+        NotificationSettingsView: {
+            items: components["schemas"]["NotificationSettingsItem"][];
         };
     };
     responses: never;

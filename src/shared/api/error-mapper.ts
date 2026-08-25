@@ -22,12 +22,9 @@ const BACKEND_GENERIC_MESSAGE = "Invalid credentials";
 export async function readBackendErrorMessage(response: Response): Promise<string | null> {
   try {
     const body: unknown = await response.json();
-    return body !== null &&
-      typeof body === "object" &&
-      "error" in body &&
-      typeof body.error === "string"
-      ? body.error
-      : null;
+    if (body === null || typeof body !== "object") return null;
+    if ("detail" in body && typeof body.detail === "string") return body.detail;
+    return null;
   } catch {
     return null;
   }

@@ -9,6 +9,7 @@ import { useAdminLogin } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PasswordInput } from "@/shared/ui/password-input";
 
 const ADMIN_CREDENTIAL_MISMATCH_MESSAGE = "Invalid email or password.";
 
@@ -124,9 +125,8 @@ export function AdminLoginPage() {
                   Forgot password?
                 </Button>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 aria-invalid={!!errors.password}

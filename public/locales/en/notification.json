@@ -1,69 +1,35 @@
 {
-  "panel": {
-    "title": "Notifications",
-    "unread": "{{count}} unread",
-    "empty": {
-      "title": "You're all caught up",
-      "hint": "Notifications about your people, approvals and account land here."
-    },
-    "buckets": {
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "earlier": "Earlier"
-    },
-    "showOlder": "Show older",
-    "markAllRead": "Mark all read",
-    "loading": "Loading notifications…",
-    "error": "Notifications could not be loaded.",
-    "actionError": "That didn't go through. Try again."
-  },
-  "toast": {
-    "region": "Recent notifications",
-    "dismiss": "Dismiss notification",
-    "earlier": "+{{count}} earlier"
-  },
-  "values": {
-    "decision": {
-      "approved": "approved",
-      "rejected": "rejected"
-    }
-  },
-  "notifications": {
-    "platform": {
-      "lead-created": {
-        "title": "New lead registered",
-        "body": "A new lead joined the pipeline and is ready for review."
-      },
-      "conversion-requested": {
-        "title": "Conversion request submitted",
-        "body": "A company is waiting for your conversion decision."
-      },
-      "company-activated": {
-        "title": "Company activated",
-        "body": "Your company is now active on Edara."
-      },
-      "conversion-decided": {
-        "title": "Conversion request {{decision}}",
-        "body": "Edara has reviewed your conversion request."
-      },
-      "announcement": {
-        "title": "Announcement",
-        "body": "A new announcement was published."
-      }
-    },
-    "company": {
-      "subscription-changed": {
-        "title": "Subscription updated",
-        "body": "Your plan is now {{planName}} ({{status}})."
-      },
-      "role-assigned": {
-        "title": "Role assigned",
-        "body": "You were granted the {{roleName}} role."
-      },
-      "user-joined": {
-        "title": "New member joined",
-        "body": "An invitation was accepted and a new member joined your company."
-      }
-    }
-  }
+  "panel.title": "Notifications",
+  "panel.unread": "{{count}} unread",
+  "panel.empty.title": "You're all caught up",
+  "panel.empty.hint": "Notifications about your people, approvals and account land here.",
+  "panel.buckets.today": "Today",
+  "panel.buckets.yesterday": "Yesterday",
+  "panel.buckets.earlier": "Earlier",
+  "panel.showOlder": "Show older",
+  "panel.markAllRead": "Mark all read",
+  "panel.loading": "Loading notifications…",
+  "panel.error": "Notifications could not be loaded.",
+  "panel.actionError": "That didn't go through. Try again.",
+  "toast.region": "Recent notifications",
+  "toast.dismiss": "Dismiss notification",
+  "toast.earlier": "+{{count}} earlier",
+  "values.decision.approved": "approved",
+  "values.decision.rejected": "rejected",
+  "notifications.platform.lead-created.title": "New lead registered",
+  "notifications.platform.lead-created.body": "A new lead joined the pipeline and is ready for review.",
+  "notifications.platform.conversion-requested.title": "Conversion request submitted",
+  "notifications.platform.conversion-requested.body": "A company is waiting for your conversion decision.",
+  "notifications.platform.company-activated.title": "Company activated",
+  "notifications.platform.company-activated.body": "Your company is now active on Edara.",
+  "notifications.platform.conversion-decided.title": "Conversion request {{decision}}",
+  "notifications.platform.conversion-decided.body": "Edara has reviewed your conversion request.",
+  "notifications.platform.announcement.title": "Announcement",
+  "notifications.platform.announcement.body": "A new announcement was published.",
+  "notifications.company.subscription-changed.title": "Subscription updated",
+  "notifications.company.subscription-changed.body": "Your plan is now {{planName}} ({{status}}).",
+  "notifications.company.role-assigned.title": "Role assigned",
+  "notifications.company.role-assigned.body": "You were granted the {{roleName}} role.",
+  "notifications.company.user-joined.title": "New member joined",
+  "notifications.company.user-joined.body": "An invitation was accepted and a new member joined your company."
 }

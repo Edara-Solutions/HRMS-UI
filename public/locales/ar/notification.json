@@ -1,69 +1,35 @@
 {
-  "panel": {
-    "title": "الإشعارات",
-    "unread": "{{count}} غير مقروء",
-    "empty": {
-      "title": "لا جديد لديك",
-      "hint": "تظهر هنا الإشعارات المتعلقة بموظفيك والموافقات وحسابك."
-    },
-    "buckets": {
-      "today": "اليوم",
-      "yesterday": "أمس",
-      "earlier": "سابقاً"
-    },
-    "showOlder": "عرض الأقدم",
-    "markAllRead": "تعليم الكل كمقروء",
-    "loading": "جارٍ تحميل الإشعارات…",
-    "error": "تعذّر تحميل الإشعارات.",
-    "actionError": "لم تتم العملية. حاول مجدداً."
-  },
-  "toast": {
-    "region": "أحدث الإشعارات",
-    "dismiss": "إغلاق الإشعار",
-    "earlier": "+{{count}} سابق"
-  },
-  "values": {
-    "decision": {
-      "approved": "مقبول",
-      "rejected": "مرفوض"
-    }
-  },
-  "notifications": {
-    "platform": {
-      "lead-created": {
-        "title": "عميل محتمل جديد",
-        "body": "انضم عميل محتمل جديد إلى القائمة وهو جاهز للمراجعة."
-      },
-      "conversion-requested": {
-        "title": "طلب تحويل جديد",
-        "body": "هناك شركة في انتظار قرارك بشأن التحويل."
-      },
-      "company-activated": {
-        "title": "تم تفعيل الشركة",
-        "body": "شركتك الآن مفعّلة على إدارة."
-      },
-      "conversion-decided": {
-        "title": "طلب التحويل {{decision}}",
-        "body": "قامت إدارة بمراجعة طلب التحويل الخاص بك."
-      },
-      "announcement": {
-        "title": "إعلان",
-        "body": "تم نشر إعلان جديد."
-      }
-    },
-    "company": {
-      "subscription-changed": {
-        "title": "تم تحديث الاشتراك",
-        "body": "خطتك الآن {{planName}} ({{status}})."
-      },
-      "role-assigned": {
-        "title": "تم إسناد دور",
-        "body": "تم منحك دور {{roleName}}."
-      },
-      "user-joined": {
-        "title": "انضم عضو جديد",
-        "body": "تم قبول دعوة وانضم عضو جديد إلى شركتك."
-      }
-    }
-  }
+  "panel.title": "الإشعارات",
+  "panel.unread": "{{count}} غير مقروء",
+  "panel.empty.title": "لا جديد لديك",
+  "panel.empty.hint": "تظهر هنا الإشعارات المتعلقة بموظفيك والموافقات وحسابك.",
+  "panel.buckets.today": "اليوم",
+  "panel.buckets.yesterday": "أمس",
+  "panel.buckets.earlier": "سابقاً",
+  "panel.showOlder": "عرض الأقدم",
+  "panel.markAllRead": "تعليم الكل كمقروء",
+  "panel.loading": "جارٍ تحميل الإشعارات…",
+  "panel.error": "تعذّر تحميل الإشعارات.",
+  "panel.actionError": "لم تتم العملية. حاول مجدداً.",
+  "toast.region": "أحدث الإشعارات",
+  "toast.dismiss": "إغلاق الإشعار",
+  "toast.earlier": "+{{count}} سابق",
+  "values.decision.approved": "مقبول",
+  "values.decision.rejected": "مرفوض",
+  "notifications.platform.lead-created.title": "عميل محتمل جديد",
+  "notifications.platform.lead-created.body": "انضم عميل محتمل جديد إلى القائمة وهو جاهز للمراجعة.",
+  "notifications.platform.conversion-requested.title": "طلب تحويل جديد",
+  "notifications.platform.conversion-requested.body": "هناك شركة في انتظار قرارك بشأن التحويل.",
+  "notifications.platform.company-activated.title": "تم تفعيل الشركة",
+  "notifications.platform.company-activated.body": "شركتك الآن مفعّلة على إدارة.",
+  "notifications.platform.conversion-decided.title": "طلب التحويل {{decision}}",
+  "notifications.platform.conversion-decided.body": "قامت إدارة بمراجعة طلب التحويل الخاص بك.",
+  "notifications.platform.announcement.title": "إعلان",
+  "notifications.platform.announcement.body": "تم نشر إعلان جديد.",
+  "notifications.company.subscription-changed.title": "تم تحديث الاشتراك",
+  "notifications.company.subscription-changed.body": "خطتك الآن {{planName}} ({{status}}).",
+  "notifications.company.role-assigned.title": "تم إسناد دور",
+  "notifications.company.role-assigned.body": "تم منحك دور {{roleName}}.",
+  "notifications.company.user-joined.title": "انضم عضو جديد",
+  "notifications.company.user-joined.body": "تم قبول دعوة وانضم عضو جديد إلى شركتك."
 }

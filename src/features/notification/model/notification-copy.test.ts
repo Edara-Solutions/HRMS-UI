@@ -43,6 +43,8 @@ describe("resolveNotificationCopy", () => {
       fallbackLng: "en",
       ns: ["notification"],
       defaultNS: "notification",
+      // The app keys every namespace flat, so its copy resolves the same way here.
+      keySeparator: false,
       interpolation: { escapeValue: false },
       resources: {
         en: { notification: readCopy("en") },
