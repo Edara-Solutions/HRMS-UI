@@ -19,7 +19,7 @@ import { z } from "zod";
 
 export type NotificationImportance = "high" | "normal";
 
-/** Semantic status colour for the row tile. Importance plays no part in panel presentation. */
+/** Semantic status colour for the row tile. */
 export type NotificationTone = "info" | "success" | "warning";
 
 /** The verified routes a row may navigate to; one member per click-through in the catalog. */
@@ -32,7 +32,7 @@ export interface NotificationSubject {
   readonly publicId: string;
 }
 
-interface NotificationTypeEntry {
+export interface NotificationTypeEntry {
   readonly importance: NotificationImportance;
   readonly tone: NotificationTone;
   readonly icon: LucideIcon;
@@ -63,7 +63,7 @@ export const announcementParamsSchema = z.object({
 
 export const ANNOUNCEMENT_TYPE_KEY = "platform.announcement";
 
-function entry(
+function catalogEntry(
   typeKey: string,
   definition: Omit<NotificationTypeEntry, "copyKey" | "paramsSchema"> &
     Partial<Pick<NotificationTypeEntry, "paramsSchema">>,
@@ -79,26 +79,26 @@ function entry(
 }
 
 export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = new Map([
-  entry("platform.lead-created", {
+  catalogEntry("platform.lead-created", {
     importance: "normal",
     tone: "info",
     icon: UserPlus,
     route: () => ({ to: "/admin/leads" }),
   }),
-  entry("platform.conversion-requested", {
+  catalogEntry("platform.conversion-requested", {
     importance: "high",
     tone: "warning",
     icon: ArrowRightLeft,
     route: (subject) =>
       subject ? { to: "/admin/conversion-requests/$publicId", publicId: subject.publicId } : null,
   }),
-  entry("platform.company-activated", {
+  catalogEntry("platform.company-activated", {
     importance: "normal",
     tone: "success",
     icon: Building2,
     route: null,
   }),
-  entry("platform.conversion-decided", {
+  catalogEntry("platform.conversion-decided", {
     importance: "normal",
     tone: "info",
     icon: ClipboardCheck,
@@ -106,33 +106,31 @@ export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = 
     enumParams: ["decision"],
     route: null,
   }),
-  entry(ANNOUNCEMENT_TYPE_KEY, {
+  catalogEntry(ANNOUNCEMENT_TYPE_KEY, {
     importance: "normal",
     tone: "info",
     icon: Megaphone,
     paramsSchema: announcementParamsSchema,
     route: null,
   }),
-  entry("company.subscription-changed", {
+  catalogEntry("company.subscription-changed", {
     importance: "high",
     tone: "warning",
     icon: CreditCard,
     paramsSchema: z.object({ planName: z.string(), status: z.string() }),
     route: () => ({ to: "/company/dashboard" }),
   }),
-  entry("company.role-assigned", {
+  catalogEntry("company.role-assigned", {
     importance: "high",
     tone: "success",
     icon: ShieldCheck,
     paramsSchema: z.object({ roleName: z.string() }),
     route: () => ({ to: "/company/profile" }),
   }),
-  entry("company.user-joined", {
+  catalogEntry("company.user-joined", {
     importance: "normal",
     tone: "success",
     icon: Users,
     route: null,
   }),
 ]);
-
-export type { NotificationTypeEntry };

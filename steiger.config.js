@@ -138,9 +138,9 @@ export default defineConfig([
     },
   },
   {
-    // The notification center is deliberately one slice both portals' shells mount
-    // (HRMS-UI#53). The app-shell widget being its only consumer is the point, not a
-    // smell — merging it there would bury portal-agnostic notification logic in a layout block.
+    // Documented exemption to docs/frontend-architecture.md §3: the notification center is one
+    // slice both portals' shells mount (HRMS-UI#53), so app-shell is its only consumer by design.
+    // Merging it there would bury portal-agnostic notification logic in a layout widget.
     files: ["./src/features/notification/**"],
     rules: {
       "fsd/insignificant-slice": "off",

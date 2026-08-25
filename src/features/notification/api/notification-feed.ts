@@ -39,9 +39,6 @@ type NotificationFeedPage = z.infer<typeof feedPageSchema>;
 /** Page-size contract: default 20, server maximum 50. */
 const PAGE_LIMIT = 20;
 
-/** Reopening within this window reuses the cached pages and catches up with a delta instead. */
-const FEED_STALE_TIME_MS = 30_000;
-
 interface FeedQuery {
   readonly cursor?: string | null;
   readonly since?: string;
@@ -72,6 +69,8 @@ function dedupeById(items: readonly NotificationFeedItem[]): NotificationFeedIte
     byId.set(item.id, item);
   }
 
+  // Sorting the freshly built array in place; nothing shared is mutated. `.toSorted` would
+  // need an ES2023 lib bump.
   return [...byId.values()].sort(
     (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt),
   );
@@ -94,7 +93,9 @@ export function useNotificationFeed(open: boolean) {
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: open && tier !== null,
-    staleTime: FEED_STALE_TIME_MS,
+    // Cached pages never go stale on their own; the delta below is what catches them up, so a
+    // reopen does not refetch every page it already holds.
+    staleTime: Number.POSITIVE_INFINITY,
     select: (data) => dedupeById(data.pages.flatMap((page) => page.items)),
   });
 
@@ -105,10 +106,13 @@ export function useNotificationFeed(open: boolean) {
 
     let cancelled = false;
 
-    void fetchNotificationFeed(tier, { since: newestCreatedAt }).then((delta) => {
-      if (cancelled || delta.items.length === 0) return;
-      prependDelta(queryClient, delta.items);
-    });
+    fetchNotificationFeed(tier, { since: newestCreatedAt })
+      .then((delta) => {
+        if (cancelled || delta.items.length === 0) return;
+        prependDelta(queryClient, delta.items);
+      })
+      // A failed catch-up leaves the cached rows standing; the next open tries again.
+      .catch(() => {});
 
     return () => {
       cancelled = true;
@@ -127,7 +131,7 @@ function prependDelta(
   queryClient.setQueryData(
     notificationKeys.list(null),
     (current: { pages: NotificationFeedPage[]; pageParams: unknown[] } | undefined) => {
-      if (!current) return current;
+      if (!current || current.pages.length === 0) return current;
 
       const [head, ...rest] = current.pages;
 

@@ -29,7 +29,7 @@ interface NotificationRowProps {
 }
 
 export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
-  const { t } = useTranslation("notification");
+  const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((state) => state.locale);
   const navigate = useNavigate();
 
@@ -46,12 +46,12 @@ export function NotificationRow({ item, onNavigate }: NotificationRowProps) {
 
   const content = (
     <>
-      {unseen && (
+      {unseen ? (
         <span
           aria-hidden="true"
           className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--color-primary)]"
         />
-      )}
+      ) : null}
       <span
         aria-hidden="true"
         className={cn(

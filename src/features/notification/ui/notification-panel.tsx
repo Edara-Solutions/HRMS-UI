@@ -17,7 +17,7 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ open, panelId, panelRef, onClose }: NotificationPanelProps) {
-  const { t } = useTranslation("notification");
+  const { t } = useTranslation("notification", { useSuspense: false });
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useNotificationFeed(open);
 
@@ -35,7 +35,7 @@ export function NotificationPanel({ open, panelId, panelRef, onClose }: Notifica
       aria-hidden={!open}
       className={cn(
         "absolute top-[calc(100%+8px)] end-0 z-40 flex max-h-[min(560px,calc(100dvh-88px))] w-[384px] max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-md)] outline-none",
-        // Scales out of the bell it hangs from, and leaves faster than it arrives.
+        // Scales out of the bell it hangs from; exit is shorter than entry.
         "origin-top transition-[transform,opacity,visibility] ease-[var(--motion-easing)] ltr:origin-top-right rtl:origin-top-left",
         open
           ? "visible translate-y-0 scale-100 opacity-100 duration-[var(--motion-base)]"
@@ -49,11 +49,11 @@ export function NotificationPanel({ open, panelId, panelRef, onClose }: Notifica
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {isPending && <PanelMessage>{t("panel.loading")}</PanelMessage>}
-        {isError && <PanelMessage>{t("panel.error")}</PanelMessage>}
-        {!isPending && !isError && items.length === 0 && (
+        {isPending ? <PanelMessage>{t("panel.loading")}</PanelMessage> : null}
+        {isError ? <PanelMessage>{t("panel.error")}</PanelMessage> : null}
+        {!isPending && !isError && items.length === 0 ? (
           <EmptyFeed title={t("panel.empty.title")} hint={t("panel.empty.hint")} />
-        )}
+        ) : null}
 
         {RECENCY_BUCKETS.map((bucket) => (
           <BucketSection
@@ -66,7 +66,7 @@ export function NotificationPanel({ open, panelId, panelRef, onClose }: Notifica
         ))}
       </div>
 
-      {hasNextPage && (
+      {hasNextPage ? (
         <footer className="shrink-0 border-t border-[var(--color-border)] p-2">
           <Button
             variant="ghost"
@@ -77,7 +77,7 @@ export function NotificationPanel({ open, panelId, panelRef, onClose }: Notifica
             {t("panel.showOlder")}
           </Button>
         </footer>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -111,13 +111,22 @@ function BucketSection({ bucket, label, items, onNavigate }: BucketSectionProps)
   );
 }
 
-function PanelMessage({ children }: { children: string }) {
+interface PanelMessageProps {
+  children: string;
+}
+
+function PanelMessage({ children }: PanelMessageProps) {
   return (
     <p className="px-4 py-8 text-center text-[13px] text-[var(--color-text-muted)]">{children}</p>
   );
 }
 
-function EmptyFeed({ title, hint }: { title: string; hint: string }) {
+interface EmptyFeedProps {
+  title: string;
+  hint: string;
+}
+
+function EmptyFeed({ title, hint }: EmptyFeedProps) {
   return (
     <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
       <span

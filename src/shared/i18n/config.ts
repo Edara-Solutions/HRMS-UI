@@ -24,9 +24,6 @@ void i18next
     },
     saveMissing: import.meta.env.DEV,
     returnNull: false,
-    // No Suspense boundary wraps the app shell, so a namespace that is still loading must
-    // fall through to the key rather than suspend the header out of the page.
-    react: { useSuspense: false },
   });
 
 export { i18next };
