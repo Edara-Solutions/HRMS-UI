@@ -80,7 +80,7 @@ function catalogEntry(
 
 export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = new Map([
   catalogEntry("platform.lead-created", {
-    importance: "normal",
+    importance: "high",
     tone: "info",
     icon: UserPlus,
     route: () => ({ to: "/admin/leads" }),
