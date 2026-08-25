@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { z } from "zod";
 import { apiClient } from "@/shared/api";
+import { recordPresentedNotifications } from "../model/notification-arrivals";
 import { notificationKeys } from "../model/notification-keys";
 import { type NotificationTier, useNotificationTier } from "../model/notification-tier";
 
@@ -44,7 +45,7 @@ interface FeedQuery {
   readonly since?: string;
 }
 
-async function fetchNotificationFeed(
+export async function fetchNotificationFeed(
   tier: NotificationTier,
   query: FeedQuery = {},
 ): Promise<NotificationFeedPage> {
@@ -88,7 +89,13 @@ export function useNotificationFeed(open: boolean) {
     queryKey: notificationKeys.list(null),
     queryFn: ({ pageParam }) => {
       if (!tier) throw new Error("Notification tier requires a session");
-      return fetchNotificationFeed(tier, { cursor: pageParam });
+
+      return fetchNotificationFeed(tier, { cursor: pageParam }).then((page) => {
+        // Rows the panel has delivered count as presented, so the arrival watcher can never
+        // announce one of them later.
+        recordPresentedNotifications(page.items);
+        return page;
+      });
     },
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -109,6 +116,9 @@ export function useNotificationFeed(open: boolean) {
     fetchNotificationFeed(tier, { since: newestCreatedAt })
       .then((delta) => {
         if (cancelled || delta.items.length === 0) return;
+
+        // A reopen delta is presentation too: the watcher must not toast what the panel just showed.
+        recordPresentedNotifications(delta.items);
         prependDelta(queryClient, delta.items);
       })
       // A failed catch-up leaves the cached rows standing; the next open tries again.

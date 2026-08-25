@@ -14,6 +14,9 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   apiClient: { get: apiGetMock, post: apiPostMock },
 }));
 
+// Arrival watching is its own concern with its own suite; the toaster tests exercise presentation.
+vi.mock("../lib/use-notification-arrivals", () => ({ useNotificationArrivals: () => {} }));
+
 const testI18n = i18next.createInstance();
 
 const infoToast: ToastRequest = { typeKey: "platform.lead-created" };
