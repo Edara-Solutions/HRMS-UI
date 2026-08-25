@@ -17,6 +17,11 @@
     "error": "تعذّر تحميل الإشعارات.",
     "actionError": "لم تتم العملية. حاول مجدداً."
   },
+  "toast": {
+    "region": "أحدث الإشعارات",
+    "dismiss": "إغلاق الإشعار",
+    "earlier": "+{{count}} سابق"
+  },
   "values": {
     "decision": {
       "approved": "مقبول",

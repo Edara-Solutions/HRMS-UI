@@ -17,6 +17,11 @@
     "error": "Notifications could not be loaded.",
     "actionError": "That didn't go through. Try again."
   },
+  "toast": {
+    "region": "Recent notifications",
+    "dismiss": "Dismiss notification",
+    "earlier": "+{{count}} earlier"
+  },
   "values": {
     "decision": {
       "approved": "approved",
