@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Check } from "lucide-react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
@@ -21,7 +22,16 @@ const toneClassName: Record<NotificationTone, string> = {
   warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
 };
 
-const rowClassName = "flex w-full items-start gap-2.5 px-4 py-2.5 text-start";
+const rowClassName = "flex w-full items-start gap-2.5 text-start";
+
+/** How much air a row takes: the dropdowns stay compact, the sheet reads as a triage list. */
+const densityClassName = {
+  compact: "px-4 py-2.5",
+  roomy: "px-5 py-3.5",
+} as const;
+
+/** Room at the inline end for the mark-read control, so it never sits on top of the time. */
+const markReadRowClassName = "pe-11";
 
 /** The whole unseen-to-read visual arc in one table: wash, tile, title, body. */
 const stateClassName: Record<
@@ -53,9 +63,22 @@ interface NotificationRowProps {
   state: NotificationRowState;
   /** Marks the row read and closes the panel; only clickable rows can reach it. */
   onActivate: () => void;
+  /**
+   * Marks this row read on its own, without opening it. Absent in the panel, where a row is
+   * read by activation alone; present in the shapes built for triage, which is also the only
+   * individual read path a row with nowhere to navigate has.
+   */
+  onMarkRead?: () => void;
+  density?: keyof typeof densityClassName;
 }
 
-export function NotificationRow({ item, state, onActivate }: NotificationRowProps) {
+export function NotificationRow({
+  item,
+  state,
+  onActivate,
+  onMarkRead,
+  density = "compact",
+}: NotificationRowProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((preferences) => preferences.locale);
   const navigate = useNavigate();
@@ -126,12 +149,25 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
     </>
   );
 
+  // Only an unread row has anything to mark, and the control is a sibling of the row button
+  // rather than a child of it, because a button cannot hold another button.
+  const markRead =
+    onMarkRead && state !== "read" ? (
+      <MarkReadControl label={t("row.markRead")} onMarkRead={onMarkRead} />
+    ) : null;
+  const rowPadding = cn(densityClassName[density], markRead && markReadRowClassName);
+
   if (!route) {
-    return <li className={cn(rowClassName, presentation.row)}>{content}</li>;
+    return (
+      <li className={cn("group relative", presentation.row)}>
+        <div className={cn(rowClassName, rowPadding)}>{content}</div>
+        {markRead}
+      </li>
+    );
   }
 
   return (
-    <li className={presentation.row}>
+    <li className={cn("group relative", presentation.row)}>
       <button
         type="button"
         onClick={() => {
@@ -140,12 +176,37 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
         }}
         className={cn(
           rowClassName,
+          rowPadding,
           "cursor-pointer transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] hover:bg-[var(--color-surface-2)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-primary)]",
         )}
       >
         {content}
       </button>
+      {markRead}
     </li>
+  );
+}
+
+interface MarkReadControlProps {
+  label: string;
+  onMarkRead: () => void;
+}
+
+/**
+ * Quiet until wanted: the control is always in the tab order and announced, and only its
+ * opacity waits for a pointer or focus to arrive.
+ */
+function MarkReadControl({ label, onMarkRead }: MarkReadControlProps) {
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      onClick={onMarkRead}
+      className="absolute end-2 top-1/2 flex size-7 cursor-pointer -translate-y-1/2 items-center justify-center rounded-[var(--radius-md)] border border-transparent text-[var(--color-text-faint)] opacity-0 transition-[opacity,color,background-color,border-color] duration-[var(--motion-fast)] ease-[var(--motion-easing)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] group-hover:opacity-100 group-focus-within:opacity-100"
+    >
+      <Check size={14} aria-hidden="true" />
+    </button>
   );
 }
 

@@ -50,7 +50,11 @@ const session: AuthSession = {
   user: baseUser,
 };
 
-const now = new Date();
+/**
+ * A fixed midday "now": the recency buckets are calendar days, so a suite that reads the real
+ * clock puts its rows in different buckets when it runs a few minutes either side of midnight.
+ */
+const now = new Date("2026-08-25T12:00:00Z");
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 60 * 60 * 1000).toISOString();
 
 const leadRow: NotificationFeedItem = {
@@ -147,10 +151,12 @@ describe("NotificationBell", () => {
   });
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"], now, shouldAdvanceTime: true });
     useAuthStore.setState({ session, status: "authenticated" });
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     vi.clearAllMocks();
     useBulkReadCursor.setState({ cursorAt: null });
