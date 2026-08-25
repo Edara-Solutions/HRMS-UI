@@ -1,4 +1,5 @@
-import { Bell, HelpCircle, Search } from "lucide-react";
+import { HelpCircle, Search } from "lucide-react";
+import { NotificationBell } from "@/features/notification";
 import { useAuthStore } from "@/shared/auth";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -32,16 +33,7 @@ export function Header() {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <div className="relative">
-          <Button
-            intent="toggle"
-            size="iconSm"
-            aria-label="Notifications"
-            leadingIcon={<Bell size={16} />}
-            iconOnly
-          />
-          <span className="pointer-events-none absolute end-1.5 top-1.5 size-1.5 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-bg)]" />
-        </div>
+        <NotificationBell />
 
         <Button
           intent="toggle"

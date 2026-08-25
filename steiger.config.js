@@ -137,4 +137,13 @@ export default defineConfig([
       "edara/no-entities-layer": "error",
     },
   },
+  {
+    // The notification center is deliberately one slice both portals' shells mount
+    // (HRMS-UI#53). The app-shell widget being its only consumer is the point, not a
+    // smell — merging it there would bury portal-agnostic notification logic in a layout block.
+    files: ["./src/features/notification/**"],
+    rules: {
+      "fsd/insignificant-slice": "off",
+    },
+  },
 ]);
