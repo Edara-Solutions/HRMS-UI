@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { useClippedText } from "@/shared/lib/use-clipped-text";
+import { Button } from "@/shared/ui/button";
 import { Tooltip } from "@/shared/ui/tooltip";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import { formatRelativeTime } from "../lib/relative-time";
@@ -25,10 +26,12 @@ const toneClassName: Record<NotificationTone, string> = {
 const rowClassName = "flex w-full items-start gap-2.5 text-start";
 
 /** How much air a row takes: the dropdowns stay compact, the sheet reads as a triage list. */
-const densityClassName = {
+export type NotificationRowDensity = "compact" | "roomy";
+
+const densityClassName: Record<NotificationRowDensity, string> = {
   compact: "px-4 py-2.5",
   roomy: "px-5 py-3.5",
-} as const;
+};
 
 /** Room at the inline end for the mark-read control, so it never sits on top of the time. */
 const markReadRowClassName = "pe-11";
@@ -69,7 +72,7 @@ interface NotificationRowProps {
    * individual read path a row with nowhere to navigate has.
    */
   onMarkRead?: () => void;
-  density?: keyof typeof densityClassName;
+  density?: NotificationRowDensity;
 }
 
 export function NotificationRow({
@@ -198,15 +201,16 @@ interface MarkReadControlProps {
  */
 function MarkReadControl({ label, onMarkRead }: MarkReadControlProps) {
   return (
-    <button
-      type="button"
+    <Button
+      intent="toggle"
+      size="iconXs"
       title={label}
       aria-label={label}
       onClick={onMarkRead}
-      className="absolute end-2 top-1/2 flex size-7 cursor-pointer -translate-y-1/2 items-center justify-center rounded-[var(--radius-md)] border border-transparent text-[var(--color-text-faint)] opacity-0 transition-[opacity,color,background-color,border-color] duration-[var(--motion-fast)] ease-[var(--motion-easing)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)] group-hover:opacity-100 group-focus-within:opacity-100"
-    >
-      <Check size={14} aria-hidden="true" />
-    </button>
+      leadingIcon={<Check size={14} />}
+      iconOnly
+      className="absolute end-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+    />
   );
 }
 

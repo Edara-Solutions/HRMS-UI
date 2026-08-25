@@ -6,7 +6,7 @@ interface NotificationStylePreviewProps {
 }
 
 const stageClassName =
-  "relative h-[68px] w-full overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)]";
+  "relative h-16 w-full overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)]";
 
 const surfaceClassName =
   "rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)]";
@@ -20,7 +20,7 @@ export function NotificationStylePreview({ style }: NotificationStylePreviewProp
   if (style === "sheet") {
     return (
       <div aria-hidden="true" className={stageClassName}>
-        <div className="absolute inset-0 bg-[color-mix(in_srgb,var(--color-text)_18%,transparent)]" />
+        <div className="absolute inset-0 bg-[var(--color-overlay)]" />
         <div
           className={cn(
             "absolute inset-y-1.5 end-1.5 w-1/2 p-1.5",
@@ -29,6 +29,7 @@ export function NotificationStylePreview({ style }: NotificationStylePreviewProp
           )}
         >
           <PreviewHeading />
+          <PreviewRow lines={2} />
           <PreviewRow lines={2} />
           <PreviewRow lines={2} muted />
         </div>
@@ -40,10 +41,10 @@ export function NotificationStylePreview({ style }: NotificationStylePreviewProp
     return (
       <div aria-hidden="true" className={stageClassName}>
         <div className={cn("absolute inset-x-1.5 top-1.5 bottom-1.5 p-1.5", surfaceClassName)}>
-          <div className="flex gap-1">
-            <span className="h-2 w-6 rounded-full bg-[var(--color-primary-fill)]" />
-            <span className="h-2 w-6 rounded-full bg-[var(--color-surface-2)]" />
-          </div>
+          <span className="flex w-fit gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] p-0.5">
+            <span className="h-2 w-6 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)]" />
+            <span className="h-2 w-6" />
+          </span>
           <div className="mt-1.5 flex flex-col gap-1">
             <PreviewRow lines={1} />
             <PreviewRow lines={1} />
@@ -66,6 +67,7 @@ export function NotificationStylePreview({ style }: NotificationStylePreviewProp
       >
         <PreviewHeading />
         <PreviewRow lines={2} />
+        <PreviewRow lines={2} />
         <PreviewRow lines={2} muted />
       </div>
     </div>
@@ -86,7 +88,7 @@ function PreviewRow({ lines, muted = false }: PreviewRowProps) {
     <span className="flex items-start gap-1">
       <span
         className={cn(
-          "mt-px size-2 shrink-0 rounded-[2px]",
+          "mt-px size-2 shrink-0 rounded-[var(--radius-sm)]",
           muted ? "bg-[var(--color-surface-2)]" : "bg-[var(--color-primary-soft)]",
         )}
       />

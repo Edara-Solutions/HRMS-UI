@@ -30,5 +30,14 @@ unread-count endpoint. Never derived from the feed cache.
 (compact dropdown, no recency grouping, All/Unread chips). A presentation
 preference; it changes how the list renders, never what it contains.
 
+**Shape** — one of the three renderings of the notification list the **list
+style** selects: `panel`, `sheet`, `flat`. Shapes differ only in chrome and
+grouping; the feed, the lifecycle writes, and what a row means are the same in
+all three.
+
+**Center view** — what the open shape is currently showing: the `feed`, or the
+`settings` style picker swapped in over it. The view outlives a shape change,
+so picking a style leaves the picker open inside the new shape.
+
 **Recency bucket** — the Today / Yesterday / Earlier grouping used by the panel
 and sheet shapes. The flat shape deliberately has none.

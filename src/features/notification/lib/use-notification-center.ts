@@ -30,6 +30,8 @@ export interface NotificationCenter {
   readonly isFetchingNextPage: boolean;
   readonly isMarkingAllRead: boolean;
   readonly fetchNextPage: () => void;
+  /** Reading a row by opening it: an already-read row owes the server nothing. */
+  readonly activate: (row: NotificationRowModel) => void;
   readonly markRead: (id: number) => void;
   readonly markAllRead: (onSuccess: () => void) => void;
 }
@@ -82,6 +84,9 @@ export function useNotificationCenter(open: boolean): NotificationCenter {
     isFetchingNextPage,
     isMarkingAllRead: markAllRead.isPending,
     fetchNextPage: () => void fetchNextPage(),
+    activate: (row) => {
+      if (row.state !== "read") markRead.mutate(row.item.id);
+    },
     markRead: (id) => markRead.mutate(id),
     markAllRead: (onSuccess) => markAllRead.mutate(undefined, { onSuccess }),
   };

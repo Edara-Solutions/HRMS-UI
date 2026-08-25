@@ -1,15 +1,22 @@
 import { Bell } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { type ComponentType, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type NotificationListStyle, usePreferencesStore } from "@/shared/config";
 import { Button } from "@/shared/ui/button";
 import { useUnreadNotificationCount } from "../api/unread-count";
+import { useNotificationCenter } from "../lib/use-notification-center";
 import type { NotificationCenterView, NotificationShapeProps } from "../model/notification-shape";
 import { NotificationFlat } from "./notification-flat";
 import { NotificationPanel } from "./notification-panel";
 import { NotificationSheet } from "./notification-sheet";
 
 const BADGE_COUNT_CAP = 99;
+
+const shapeComponent: Record<NotificationListStyle, ComponentType<NotificationShapeProps>> = {
+  panel: NotificationPanel,
+  sheet: NotificationSheet,
+  flat: NotificationFlat,
+};
 
 export function NotificationBell() {
   const { t } = useTranslation("notification", { useSuspense: false });
@@ -21,8 +28,10 @@ export function NotificationBell() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const overlayId = useId();
 
+  const center = useNotificationCenter(open);
   const unreadCount = data?.unreadCount ?? 0;
   const label = t("panel.title");
+  const Shape = shapeComponent[listStyle];
 
   function close() {
     setOpen(false);
@@ -33,6 +42,7 @@ export function NotificationBell() {
   // around it, which is what makes the choice something the reader can see rather than guess.
   const shapeProps: NotificationShapeProps = {
     open,
+    center,
     overlayId,
     overlayRef,
     triggerRef: bellRef,
@@ -54,7 +64,10 @@ export function NotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={overlayId}
-        onClick={() => (open ? close() : setOpen(true))}
+        onClick={() => {
+          if (open) close();
+          else setOpen(true);
+        }}
         leadingIcon={<Bell size={16} />}
         iconOnly
       />
@@ -67,25 +80,9 @@ export function NotificationBell() {
         </span>
       ) : null}
 
-      <NotificationCenterShape listStyle={listStyle} {...shapeProps} />
+      <Shape {...shapeProps} />
     </div>
   );
-}
-
-interface NotificationCenterShapeProps extends NotificationShapeProps {
-  listStyle: NotificationListStyle;
-}
-
-function NotificationCenterShape({ listStyle, ...shape }: NotificationCenterShapeProps) {
-  if (listStyle === "sheet") {
-    return <NotificationSheet {...shape} />;
-  }
-
-  if (listStyle === "flat") {
-    return <NotificationFlat {...shape} />;
-  }
-
-  return <NotificationPanel {...shape} />;
 }
 
 function formatBadgeCount(count: number) {

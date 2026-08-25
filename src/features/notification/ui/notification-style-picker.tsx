@@ -1,11 +1,11 @@
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { type KeyboardEvent, useEffect, useRef } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type NotificationListStyle, usePreferencesStore } from "@/shared/config";
 import { getDirection } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { nextRovingChoice } from "../lib/roving-choice";
+import { focusRovingChoice, nextRovingChoice } from "../lib/roving-choice";
 import { NOTIFICATION_LIST_STYLES } from "../model/notification-list-style";
 import { NotificationStylePreview } from "./notification-style-preview";
 
@@ -20,25 +20,29 @@ export function NotificationStylePicker({ onBack }: NotificationStylePickerProps
   const selected = usePreferencesStore((preferences) => preferences.notificationListStyle);
   const setStyle = usePreferencesStore((preferences) => preferences.setNotificationListStyle);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = useState(selected);
 
   const direction = getDirection(locale);
   const BackIcon = direction === "rtl" ? ArrowRight : ArrowLeft;
 
-  // The picker is remounted by the very choice it applies — the shape around it changes — so
-  // it takes focus back to the chosen option, and arrow keys keep walking where they left off.
+  // Choosing a style rebuilds the shape around the picker, taking the focused option with it,
+  // so the remounted picker puts focus back where the reader left it.
   useEffect(() => {
-    focusOption(optionsRef.current, selected);
+    focusRovingChoice(optionsRef.current, selected);
   }, [selected]);
 
-  // Arrow keys walk the group, as they do in any radio group; the buttons themselves carry a
-  // roving tab stop so Tab leaves the group rather than stepping through it.
+  /**
+   * Arrows move the focus, and Enter or Space takes the option. Selection deliberately does
+   * not follow focus here as it would in a plain radio group: every choice rebuilds the whole
+   * center and is written to disk, which is too much to spend on passing over an option.
+   */
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const nextStyle = nextRovingChoice(event.key, direction, NOTIFICATION_LIST_STYLES, selected);
-    if (!nextStyle) return;
+    const next = nextRovingChoice(event.key, direction, NOTIFICATION_LIST_STYLES, focused);
+    if (!next) return;
 
     event.preventDefault();
-    setStyle(nextStyle);
-    focusOption(optionsRef.current, nextStyle);
+    setFocused(next);
+    focusRovingChoice(optionsRef.current, next);
   }
 
   return (
@@ -74,7 +78,11 @@ export function NotificationStylePicker({ onBack }: NotificationStylePickerProps
               name={t(`style.${style}.name`)}
               hint={t(`style.${style}.hint`)}
               selected={style === selected}
-              onSelect={() => setStyle(style)}
+              focused={style === focused}
+              onSelect={() => {
+                setFocused(style);
+                setStyle(style);
+              }}
             />
           ))}
         </div>
@@ -88,17 +96,19 @@ interface StyleOptionProps {
   name: string;
   hint: string;
   selected: boolean;
+  /** Holds the group's single tab stop, which the arrow keys move without choosing. */
+  focused: boolean;
   onSelect: () => void;
 }
 
-function StyleOption({ style, name, hint, selected, onSelect }: StyleOptionProps) {
+function StyleOption({ style, name, hint, selected, focused, onSelect }: StyleOptionProps) {
   return (
     <button
       type="button"
       role="radio"
-      data-style={style}
+      data-choice={style}
       aria-checked={selected}
-      tabIndex={selected ? 0 : -1}
+      tabIndex={focused ? 0 : -1}
       onClick={onSelect}
       className={cn(
         "flex w-full cursor-pointer flex-col gap-2 rounded-[var(--radius-md)] border p-2.5 text-start transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
@@ -125,8 +135,4 @@ function StyleOption({ style, name, hint, selected, onSelect }: StyleOptionProps
       </span>
     </button>
   );
-}
-
-function focusOption(options: HTMLDivElement | null, style: NotificationListStyle) {
-  options?.querySelector<HTMLButtonElement>(`[data-style="${style}"]`)?.focus();
 }

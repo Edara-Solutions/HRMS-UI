@@ -18,6 +18,11 @@ export function nextRovingChoice<T>(
   return options[(index + step + options.length) % options.length] ?? null;
 }
 
+/** Moves the group's single tab stop onto one option, which must carry `data-choice`. */
+export function focusRovingChoice(container: HTMLElement | null, choice: string) {
+  container?.querySelector<HTMLButtonElement>(`[data-choice="${choice}"]`)?.focus();
+}
+
 function arrowStep(key: string, direction: TextDirection): number {
   const forward = direction === "rtl" ? -1 : 1;
 

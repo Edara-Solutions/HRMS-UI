@@ -1,14 +1,14 @@
 import { useTranslation } from "react-i18next";
 import type { NotificationRowModel } from "../lib/use-notification-center";
 import { RECENCY_BUCKETS, type RecencyBucket, recencyBucketOf } from "../model/recency-bucket";
-import { NotificationRow } from "./notification-row";
+import { NotificationRow, type NotificationRowDensity } from "./notification-row";
 
 interface NotificationBucketListProps {
   rows: readonly NotificationRowModel[];
   onActivate: (row: NotificationRowModel) => void;
   /** Passed on to every row that can still be read; absent leaves rows without the control. */
   onMarkRead?: (row: NotificationRowModel) => void;
-  density?: "compact" | "roomy";
+  density?: NotificationRowDensity;
 }
 
 /** The feed under calendar-day headings — how the panel and the sheet both group their rows. */
@@ -43,7 +43,7 @@ interface BucketSectionProps {
   rows: readonly NotificationRowModel[];
   onActivate: (row: NotificationRowModel) => void;
   onMarkRead?: (row: NotificationRowModel) => void;
-  density?: "compact" | "roomy";
+  density?: NotificationRowDensity;
 }
 
 function BucketSection({

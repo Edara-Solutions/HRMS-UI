@@ -273,17 +273,22 @@ describe("notification style picker", () => {
     });
   });
 
-  it("walks the options with the arrow keys", async () => {
+  it("moves focus with the arrow keys and waits to be told before changing the style", async () => {
     stubEndpoints({ items: [unreadRow] });
     await openCenter("panel");
 
     fireEvent.click(screen.getByRole("button", { name: "Notification settings" }));
-    fireEvent.keyDown(screen.getByRole("radiogroup", { name: "List style" }), { key: "ArrowDown" });
+    const options = screen.getByRole("radiogroup", { name: "List style" });
+    fireEvent.keyDown(options, { key: "ArrowDown" });
+
+    const sheetOption = within(options).getByRole("radio", { name: /Sheet/ });
+    expect(sheetOption).toHaveFocus();
+    expect(sheetOption).toHaveAttribute("aria-checked", "false");
+    expect(usePreferencesStore.getState().notificationListStyle).toBe("panel");
+
+    fireEvent.click(sheetOption);
 
     expect(usePreferencesStore.getState().notificationListStyle).toBe("sheet");
-    // The choice rebuilt the picker inside the sheet, so the option to assert on is the new one.
-    const options = screen.getByRole("radiogroup", { name: "List style" });
-    expect(within(options).getByRole("radio", { name: /Sheet/ })).toHaveFocus();
   });
 
   it("returns to the feed from the picker's back control", async () => {

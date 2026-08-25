@@ -5,12 +5,12 @@ import { usePreferencesStore } from "@/shared/config";
 import { getDirection } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { nextRovingChoice } from "../lib/roving-choice";
-import { useNotificationCenter } from "../lib/use-notification-center";
+import { focusRovingChoice, nextRovingChoice } from "../lib/roving-choice";
 import { useOverlayDismiss } from "../lib/use-overlay-dismiss";
 import type { NotificationShapeProps } from "../model/notification-shape";
 import { NotificationFeedStatus } from "./notification-feed-status";
 import { NotificationLifecycleAlert } from "./notification-lifecycle-alert";
+import { NotificationOlderFooter } from "./notification-older-footer";
 import { NotificationRow } from "./notification-row";
 import { NotificationStylePicker } from "./notification-style-picker";
 
@@ -21,6 +21,7 @@ type FeedFilter = (typeof FEED_FILTERS)[number];
 /** The compact list: newest first, no day headings, and a filter for the unread pile. */
 export function NotificationFlat({
   open,
+  center,
   overlayId,
   overlayRef,
   triggerRef,
@@ -30,7 +31,6 @@ export function NotificationFlat({
 }: NotificationShapeProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((preferences) => preferences.locale);
-  const center = useNotificationCenter(open);
   const [filter, setFilter] = useState<FeedFilter>("all");
   const filtersRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +42,7 @@ export function NotificationFlat({
 
     event.preventDefault();
     setFilter(next);
-    filtersRef.current?.querySelector<HTMLButtonElement>(`[data-filter="${next}"]`)?.focus();
+    focusRovingChoice(filtersRef.current, next);
   }
 
   const rows =
@@ -126,7 +126,7 @@ export function NotificationFlat({
                   item={row.item}
                   state={row.state}
                   onActivate={() => {
-                    if (row.state !== "read") center.markRead(row.item.id);
+                    center.activate(row);
                     onClose();
                   }}
                   onMarkRead={() => center.markRead(row.item.id)}
@@ -135,18 +135,7 @@ export function NotificationFlat({
             </ul>
           </div>
 
-          {center.hasNextPage ? (
-            <footer className="shrink-0 border-t border-[var(--color-border)] p-2">
-              <Button
-                variant="ghost"
-                size="block"
-                isLoading={center.isFetchingNextPage}
-                onClick={center.fetchNextPage}
-              >
-                {t("panel.showOlder")}
-              </Button>
-            </footer>
-          ) : null}
+          <NotificationOlderFooter center={center} />
         </>
       )}
     </div>
@@ -166,7 +155,7 @@ function FilterSegment({ filter, label, selected, onSelect }: FilterSegmentProps
     <button
       type="button"
       role="radio"
-      data-filter={filter}
+      data-choice={filter}
       aria-checked={selected}
       tabIndex={selected ? 0 : -1}
       onClick={onSelect}

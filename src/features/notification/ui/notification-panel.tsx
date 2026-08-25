@@ -2,17 +2,18 @@ import { Settings2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
-import { useNotificationCenter } from "../lib/use-notification-center";
 import { useOverlayDismiss } from "../lib/use-overlay-dismiss";
 import type { NotificationShapeProps } from "../model/notification-shape";
 import { NotificationBucketList } from "./notification-bucket-list";
 import { NotificationFeedStatus } from "./notification-feed-status";
 import { NotificationLifecycleAlert } from "./notification-lifecycle-alert";
+import { NotificationOlderFooter } from "./notification-older-footer";
 import { NotificationStylePicker } from "./notification-style-picker";
 
 /** The anchored dropdown: the notification center for a quick glance without leaving the page. */
 export function NotificationPanel({
   open,
+  center,
   overlayId,
   overlayRef,
   triggerRef,
@@ -21,7 +22,6 @@ export function NotificationPanel({
   onViewChange,
 }: NotificationShapeProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
-  const center = useNotificationCenter(open);
 
   useOverlayDismiss({ open, overlayRef, triggerRef, onClose });
 
@@ -88,24 +88,13 @@ export function NotificationPanel({
             <NotificationBucketList
               rows={center.rows}
               onActivate={(row) => {
-                if (row.state !== "read") center.markRead(row.item.id);
+                center.activate(row);
                 onClose();
               }}
             />
           </div>
 
-          {center.hasNextPage ? (
-            <footer className="shrink-0 border-t border-[var(--color-border)] p-2">
-              <Button
-                variant="ghost"
-                size="block"
-                isLoading={center.isFetchingNextPage}
-                onClick={center.fetchNextPage}
-              >
-                {t("panel.showOlder")}
-              </Button>
-            </footer>
-          ) : null}
+          <NotificationOlderFooter center={center} />
         </>
       )}
     </div>
