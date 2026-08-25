@@ -34,7 +34,7 @@ const feedPageSchema = z.object({
 });
 
 export type NotificationFeedItem = z.infer<typeof feedItemSchema>;
-type NotificationFeedPage = z.infer<typeof feedPageSchema>;
+export type NotificationFeedPage = z.infer<typeof feedPageSchema>;
 
 /** Page-size contract: default 20, server maximum 50. */
 const PAGE_LIMIT = 20;
