@@ -2,6 +2,9 @@ import { type ReactNode, useCallback, useEffect, useId, useRef, useState } from 
 import { createPortal } from "react-dom";
 import { cn } from "@/shared/lib/cn";
 
+/** `auto` sits above the trigger and drops below only when the top of the window is in the way. */
+export type TooltipPlacement = "auto" | "below";
+
 interface TooltipProps {
   /** The words the tooltip shows. Nothing renders when this is empty. */
   content: ReactNode;
@@ -10,6 +13,7 @@ interface TooltipProps {
   disabled?: boolean;
   /** Adds a tab stop so a keyboard reaches this tooltip. Leave off inside a focusable parent. */
   focusable?: boolean;
+  placement?: TooltipPlacement;
   className?: string;
 }
 
@@ -38,6 +42,7 @@ export function Tooltip({
   children,
   disabled = false,
   focusable = false,
+  placement = "auto",
   className,
 }: TooltipProps) {
   const tooltipId = useId();
@@ -55,9 +60,13 @@ export function Tooltip({
     const tooltip = tooltipRef.current?.getBoundingClientRect();
     const width = tooltip?.width ?? 0;
     const height = tooltip?.height ?? 0;
-    // Above the trigger unless the trigger sits too near the top of the window.
+    // Above the trigger unless the trigger sits too near the top of the window — or unless
+    // the caller asked for below, which still flips up rather than run off the bottom.
     const above = trigger.top - height - OFFSET;
-    const top = above < VIEWPORT_MARGIN ? trigger.bottom + OFFSET : above;
+    const below = trigger.bottom + OFFSET;
+    const fitsBelow = below + height <= window.innerHeight - VIEWPORT_MARGIN;
+    const goesBelow = placement === "below" ? fitsBelow : above < VIEWPORT_MARGIN;
+    const top = goesBelow ? below : above;
     const centered = trigger.left + trigger.width / 2 - width / 2;
     const maxLeft = window.innerWidth - width - VIEWPORT_MARGIN;
 
@@ -65,7 +74,7 @@ export function Tooltip({
       top,
       left: Math.min(Math.max(centered, VIEWPORT_MARGIN), Math.max(maxLeft, VIEWPORT_MARGIN)),
     });
-  }, []);
+  }, [placement]);
 
   const hide = useCallback(() => {
     window.clearTimeout(openTimeout.current);

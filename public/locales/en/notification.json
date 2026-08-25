@@ -31,5 +31,20 @@
   "notifications.company.role-assigned.title": "Role assigned",
   "notifications.company.role-assigned.body": "You were granted the {{roleName}} role.",
   "notifications.company.user-joined.title": "New member joined",
-  "notifications.company.user-joined.body": "An invitation was accepted and a new member joined your company."
+  "notifications.company.user-joined.body": "An invitation was accepted and a new member joined your company.",
+  "row.markRead": "Mark as read",
+  "sheet.close": "Close notifications",
+  "filter.label": "Filter notifications",
+  "filter.all": "All",
+  "filter.unread": "Unread",
+  "picker.open": "Notification settings",
+  "picker.title": "List style",
+  "picker.back": "Back to notifications",
+  "picker.hint": "Choose how the notification center opens. The choice is kept on this device.",
+  "style.panel.name": "Panel",
+  "style.panel.hint": "A dropdown under the bell, grouped by day. Best for a quick glance.",
+  "style.sheet.name": "Sheet",
+  "style.sheet.hint": "A side sheet over the page, with roomier rows. Best for working through the feed.",
+  "style.flat.name": "Compact list",
+  "style.flat.hint": "Newest first with no day headings, filtered to All or Unread. Best for a busy feed."
 }

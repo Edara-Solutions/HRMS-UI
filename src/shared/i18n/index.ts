@@ -4,5 +4,5 @@ export {
   type SupportedLocale,
   supportedLocales,
 } from "./config";
-export { applyDocumentDirection, getDirection } from "./direction";
+export { applyDocumentDirection, getDirection, type TextDirection } from "./direction";
 export { LocaleRuntime } from "./locale-runtime";

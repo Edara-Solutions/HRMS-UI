@@ -130,6 +130,22 @@ describe("useNotificationArrivals", () => {
     expect(toast?.typeKey).toBe("company.role-assigned");
   });
 
+  it("announces a new Lead, the one platform arrival worth interrupting for", async () => {
+    feedGetMock
+      .mockReturnValueOnce(feedPage([historyItem()]))
+      .mockReturnValueOnce(
+        feedPage([feedItem(2, "platform.lead-created", "2026-08-25T09:30:00.000Z")]),
+      );
+
+    renderHook(() => useNotificationArrivals());
+    await settlePoll();
+
+    await focusTick();
+
+    const [toast] = useToastStore.getState().toasts;
+    expect(toast?.typeKey).toBe("platform.lead-created");
+  });
+
   it("lets a normal-importance arrival wait in the bell", async () => {
     feedGetMock
       .mockReturnValueOnce(feedPage([historyItem()]))

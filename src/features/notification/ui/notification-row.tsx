@@ -1,7 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Check } from "lucide-react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
+import { useClippedText } from "@/shared/lib/use-clipped-text";
+import { Button } from "@/shared/ui/button";
+import { Tooltip } from "@/shared/ui/tooltip";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import { formatRelativeTime } from "../lib/relative-time";
 import {
@@ -18,7 +23,18 @@ const toneClassName: Record<NotificationTone, string> = {
   warning: "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
 };
 
-const rowClassName = "flex w-full items-start gap-2.5 px-4 py-2.5 text-start";
+const rowClassName = "flex w-full items-start gap-2.5 text-start";
+
+/** How much air a row takes: the dropdowns stay compact, the sheet reads as a triage list. */
+export type NotificationRowDensity = "compact" | "roomy";
+
+const densityClassName: Record<NotificationRowDensity, string> = {
+  compact: "px-4 py-2.5",
+  roomy: "px-5 py-3.5",
+};
+
+/** Room at the inline end for the mark-read control, so it never sits on top of the time. */
+const markReadRowClassName = "pe-11";
 
 /** The whole unseen-to-read visual arc in one table: wash, tile, title, body. */
 const stateClassName: Record<
@@ -50,15 +66,32 @@ interface NotificationRowProps {
   state: NotificationRowState;
   /** Marks the row read and closes the panel; only clickable rows can reach it. */
   onActivate: () => void;
+  /**
+   * Marks this row read on its own, without opening it. Absent in the panel, where a row is
+   * read by activation alone; present in the shapes built for triage, which is also the only
+   * individual read path a row with nowhere to navigate has.
+   */
+  onMarkRead?: () => void;
+  density?: NotificationRowDensity;
 }
 
-export function NotificationRow({ item, state, onActivate }: NotificationRowProps) {
+export function NotificationRow({
+  item,
+  state,
+  onActivate,
+  onMarkRead,
+  density = "compact",
+}: NotificationRowProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((preferences) => preferences.locale);
   const navigate = useNavigate();
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const bodyRef = useRef<HTMLSpanElement>(null);
 
   const entry = NOTIFICATION_CATALOG.get(item.typeKey);
   const copy = resolveNotificationCopy(item, t, locale);
+  const titleClipped = useClippedText(titleRef, copy?.title ?? "");
+  const bodyClipped = useClippedText(bodyRef, copy?.body ?? "");
 
   if (!entry || !copy) {
     return null;
@@ -86,16 +119,30 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
       >
         <Icon size={14} />
       </span>
-      <span className="min-w-0 flex-1">
+      <Tooltip
+        content={
+          <span className="block">
+            <span className="block font-semibold">{copy.title}</span>
+            <span className="mt-0.5 block font-normal">{copy.body}</span>
+          </span>
+        }
+        disabled={!titleClipped && !bodyClipped}
+        placement="below"
+        className="min-w-0 flex-1"
+      >
         <span
+          ref={titleRef}
           className={cn("block truncate text-[13px] font-medium leading-snug", presentation.title)}
         >
           {copy.title}
         </span>
-        <span className={cn("mt-0.5 block truncate text-xs leading-snug", presentation.body)}>
+        <span
+          ref={bodyRef}
+          className={cn("mt-0.5 block truncate text-xs leading-snug", presentation.body)}
+        >
           {copy.body}
         </span>
-      </span>
+      </Tooltip>
       <time
         dateTime={item.createdAt}
         className="shrink-0 pt-0.5 text-[11px] tabular-nums text-[var(--color-text-faint)]"
@@ -105,12 +152,25 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
     </>
   );
 
+  // Only an unread row has anything to mark, and the control is a sibling of the row button
+  // rather than a child of it, because a button cannot hold another button.
+  const markRead =
+    onMarkRead && state !== "read" ? (
+      <MarkReadControl label={t("row.markRead")} onMarkRead={onMarkRead} />
+    ) : null;
+  const rowPadding = cn(densityClassName[density], markRead && markReadRowClassName);
+
   if (!route) {
-    return <li className={cn(rowClassName, presentation.row)}>{content}</li>;
+    return (
+      <li className={cn("group relative", presentation.row)}>
+        <div className={cn(rowClassName, rowPadding)}>{content}</div>
+        {markRead}
+      </li>
+    );
   }
 
   return (
-    <li className={presentation.row}>
+    <li className={cn("group relative", presentation.row)}>
       <button
         type="button"
         onClick={() => {
@@ -119,12 +179,38 @@ export function NotificationRow({ item, state, onActivate }: NotificationRowProp
         }}
         className={cn(
           rowClassName,
+          rowPadding,
           "cursor-pointer transition-colors duration-[var(--motion-fast)] ease-[var(--motion-easing)] hover:bg-[var(--color-surface-2)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-primary)]",
         )}
       >
         {content}
       </button>
+      {markRead}
     </li>
+  );
+}
+
+interface MarkReadControlProps {
+  label: string;
+  onMarkRead: () => void;
+}
+
+/**
+ * Quiet until wanted: the control is always in the tab order and announced, and only its
+ * opacity waits for a pointer or focus to arrive.
+ */
+function MarkReadControl({ label, onMarkRead }: MarkReadControlProps) {
+  return (
+    <Button
+      intent="toggle"
+      size="iconXs"
+      title={label}
+      aria-label={label}
+      onClick={onMarkRead}
+      leadingIcon={<Check size={14} />}
+      iconOnly
+      className="absolute end-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-[var(--motion-fast)] ease-[var(--motion-easing)] focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+    />
   );
 }
 
