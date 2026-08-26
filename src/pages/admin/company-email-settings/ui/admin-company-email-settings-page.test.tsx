@@ -111,6 +111,7 @@ function mockApi(
         context: "COMPANY",
         payloadVersion: 1,
         supportedLocales,
+        deprecated: false,
       });
     }
 

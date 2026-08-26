@@ -1,28 +1,61 @@
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
+import type { SupportedLocale } from "@/shared/i18n";
 import { type DateEdgeType, type DateEdgeValue, toDateEdgeValue } from "@/shared/lib/date-edge";
 import { Button } from "./button";
-import { CalendarGrid, EdgeDateTypeField, parseDateValue } from "./date-picker";
+import { CalendarGrid, dateFormatterFor, EdgeDateTypeField, parseDateValue } from "./date-picker";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "./dialog";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 
-const FILTER_DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: true,
-});
-
+/** Which end of a range this picker sets — the time an empty picker opens on. */
 export type DateTimeBoundary = "from" | "to";
 
-function formatDateTimeValue(value: string | undefined): string {
+/** Every word the picker renders, so a caller can hand it copy already in the reader's locale. */
+export interface DateTimePickerText {
+  description: string;
+  placeholder: string;
+  hour: string;
+  minute: string;
+  minuteHint: string;
+  period: string;
+  previousMonth: string;
+  nextMonth: string;
+  clear: string;
+  cancel: string;
+  apply: string;
+}
+
+const defaultText: DateTimePickerText = {
+  description: "Select the date and time for this field.",
+  placeholder: "Choose date and time",
+  hour: "Hour",
+  minute: "Minute",
+  minuteHint: "00-59",
+  period: "AM / PM",
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  clear: "Clear",
+  cancel: "Cancel",
+  apply: "Apply date",
+};
+
+function formatDateTimeValue(
+  value: string | undefined,
+  locale: SupportedLocale,
+  fallback: string,
+): string {
   const date = parseDateValue(value);
-  if (!date) return "Choose date and time";
-  return FILTER_DATE_TIME_FORMATTER.format(date);
+  if (!date) return fallback;
+  return dateFormatterFor(locale, "instant", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
 }
 
 function toTwelveHour(hour: number): number {
@@ -42,6 +75,10 @@ interface DateTimePickerProps {
   onEdgeDateTypeChange?: (nextValue: DateEdgeType) => void;
   onEdgeValueChange?: (nextValue: DateEdgeValue | undefined) => void;
   boundary?: DateTimeBoundary;
+  /** Which calendar the month, weekday and day names are spelled in. */
+  locale?: SupportedLocale;
+  /** Translated copy; anything left out keeps the English default. */
+  text?: Partial<DateTimePickerText>;
   description?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -56,12 +93,17 @@ export function DateTimePicker({
   onEdgeDateTypeChange,
   onEdgeValueChange,
   boundary = "from",
-  description = "Select the date and time for this field.",
-  placeholder = "Choose date and time",
+  locale = "en",
+  text,
+  description,
+  placeholder,
   disabled = false,
 }: DateTimePickerProps) {
   const { titleId, descriptionId } = useDialogIds();
-  const accessibleLabel = label ?? placeholder;
+  const copy = { ...defaultText, ...text };
+  const pickerDescription = description ?? copy.description;
+  const pickerPlaceholder = placeholder ?? copy.placeholder;
+  const accessibleLabel = label ?? pickerPlaceholder;
   const parsedValue = parseDateValue(value);
   const initialDraft = parsedValue ?? new Date();
   const [open, setOpen] = useState(false);
@@ -151,7 +193,7 @@ export function DateTimePicker({
         onClick={openPicker}
       >
         <span className={value ? "text-[var(--color-text)]" : "text-[var(--color-text-faint)]"}>
-          {value ? formatDateTimeValue(value) : placeholder}
+          {value ? formatDateTimeValue(value, locale, pickerPlaceholder) : pickerPlaceholder}
         </span>
       </Button>
       {label ? <span className="mt-1 block min-h-5" aria-hidden="true" /> : null}
@@ -165,19 +207,22 @@ export function DateTimePicker({
         <DialogTitle id={titleId} className="tracking-[-0.02em]">
           {accessibleLabel}
         </DialogTitle>
-        <DialogDescription id={descriptionId}>{description}</DialogDescription>
+        <DialogDescription id={descriptionId}>{pickerDescription}</DialogDescription>
         <div className="mt-5">
           <CalendarGrid
             month={month}
             selected={draft}
             onMonthChange={setMonth}
             onSelectDay={selectDay}
+            locale={locale}
+            previousMonthLabel={copy.previousMonth}
+            nextMonthLabel={copy.nextMonth}
           />
         </div>
         <div className="mt-5 grid grid-cols-3 gap-3">
           <div>
             <Label className="block text-xs" htmlFor={`${id}-hour`}>
-              Hour
+              {copy.hour}
             </Label>
             <Select
               value={draft ? String(toTwelveHour(draft.getHours())) : ""}
@@ -197,7 +242,7 @@ export function DateTimePicker({
           </div>
           <div>
             <Label className="block text-xs" htmlFor={`${id}-minute`}>
-              Minute
+              {copy.minute}
             </Label>
             <Input
               id={`${id}-minute`}
@@ -216,12 +261,12 @@ export function DateTimePicker({
               id={`${id}-minute-hint`}
               className="mt-1 block text-[11px] text-[var(--color-text-faint)]"
             >
-              00-59
+              {copy.minuteHint}
             </span>
           </div>
           <div>
             <Label className="block text-xs" htmlFor={`${id}-period`}>
-              AM / PM
+              {copy.period}
             </Label>
             <Select
               value={draft ? timePeriod(draft.getHours()) : ""}
@@ -253,11 +298,11 @@ export function DateTimePicker({
               setMinuteInput("");
             }}
           >
-            Clear
+            {copy.clear}
           </Button>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
-              Cancel
+              {copy.cancel}
             </Button>
             <Button
               size="sm"
@@ -272,7 +317,7 @@ export function DateTimePicker({
                 setOpen(false);
               }}
             >
-              Apply date
+              {copy.apply}
             </Button>
           </div>
         </div>

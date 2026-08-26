@@ -1,5 +1,6 @@
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import type { SupportedLocale } from "@/shared/i18n";
 import { cn } from "@/shared/lib/cn";
 import {
   allowEdgeDateChoice,
@@ -13,12 +14,45 @@ import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "./dialog";
 import { Label } from "./label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 
-const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  month: "long",
-  year: "numeric",
-});
-const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", { dateStyle: "full" });
+const localeTags: Record<SupportedLocale, string> = {
+  en: "en-GB",
+  ar: "ar-SA-u-ca-gregory",
+};
+
+// Building an `Intl.DateTimeFormat` is expensive, and a picker rebuilds these on every
+// keystroke in its minute field. They depend on nothing but the locale, so they are built
+// once per locale and kept.
+const formatters = new Map<string, Intl.DateTimeFormat>();
+
+export function dateFormatterFor(
+  locale: SupportedLocale,
+  name: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${locale}:${name}`;
+  const cached = formatters.get(key);
+  if (cached) return cached;
+
+  const created = new Intl.DateTimeFormat(localeTags[locale], options);
+  formatters.set(key, created);
+  return created;
+}
+
+const weekdayNamesByLocale = new Map<SupportedLocale, string[]>();
+
+function weekdayNames(locale: SupportedLocale): string[] {
+  const cached = weekdayNamesByLocale.get(locale);
+  if (cached) return cached;
+
+  const formatter = dateFormatterFor(locale, "weekday", { weekday: "short" });
+  // 1 January 2024 was a Monday, and the grid starts its week there.
+  const names = Array.from({ length: 7 }, (_, index) =>
+    formatter.format(new Date(2024, 0, 1 + index)),
+  );
+  weekdayNamesByLocale.set(locale, names);
+  return names;
+}
+
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
   month: "short",
@@ -63,14 +97,30 @@ export interface CalendarGridProps {
   selected: Date | undefined;
   onMonthChange: (month: Date) => void;
   onSelectDay: (day: number) => void;
+  /** Which calendar the month, weekday and day names are spelled in. */
+  locale?: SupportedLocale;
+  previousMonthLabel?: string;
+  nextMonthLabel?: string;
 }
 
-export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: CalendarGridProps) {
+export function CalendarGrid({
+  month,
+  selected,
+  onMonthChange,
+  onSelectDay,
+  locale = "en",
+  previousMonthLabel = "Previous month",
+  nextMonthLabel = "Next month",
+}: CalendarGridProps) {
   const firstWeekday = (month.getDay() + 6) % 7;
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const selectedKey = selected ? toDateKey(selected) : undefined;
   const todayKey = toDateKey(new Date());
-  const monthLabel = MONTH_LABEL_FORMATTER.format(month);
+  const monthLabel = dateFormatterFor(locale, "month", {
+    month: "long",
+    year: "numeric",
+  }).format(month);
+  const dayLabels = dateFormatterFor(locale, "day", { dateStyle: "full" });
 
   return (
     <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4">
@@ -78,7 +128,7 @@ export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: Ca
         <Button
           variant="ghost"
           size="iconXs"
-          aria-label="Previous month"
+          aria-label={previousMonthLabel}
           onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
         >
           <ChevronLeft size={15} />
@@ -89,14 +139,14 @@ export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: Ca
         <Button
           variant="ghost"
           size="iconXs"
-          aria-label="Next month"
+          aria-label={nextMonthLabel}
           onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
         >
           <ChevronRight size={15} />
         </Button>
       </div>
       <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
-        {WEEKDAYS.map((day) => (
+        {weekdayNames(locale).map((day) => (
           <span key={day}>{day}</span>
         ))}
       </div>
@@ -120,7 +170,7 @@ export function CalendarGrid({ month, selected, onMonthChange, onSelectDay }: Ca
               )}
               onClick={() => onSelectDay(day)}
               aria-pressed={selectedDay}
-              aria-label={FULL_DATE_FORMATTER.format(date)}
+              aria-label={dayLabels.format(date)}
             >
               {day}
             </button>

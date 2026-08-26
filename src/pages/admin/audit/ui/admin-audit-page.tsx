@@ -1,312 +1,271 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Search, Shield } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { BookOpen, ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  AuditFilterBar,
+  AuditFilterChoice,
+  AuditFilterCombobox,
+  AuditFilterTag,
+  applyAuditFilterChange,
+  auditChipClassName,
+  auditFilterComboboxState,
+  auditNamespace,
+  clearedAuditFilters,
+} from "@/features/audit-filters";
+import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import type { AuditEntry, AuditOutcome } from "../api/audit";
-import { dummyAuditEntries } from "../api/audit-fixtures";
+import {
+  type PlatformAuditTrailParams,
+  type PlatformAuditTrailScope,
+  platformAuditEventTypes,
+  usePlatformAuditTrail,
+} from "../api/audit";
+import { searchPlatformAuditActors } from "../api/audit-actors";
+import { useAuditCompanyOptions } from "../api/audit-companies";
+import { AdminAuditTable } from "./admin-audit-table";
+import { AdminAuditTimeline } from "./admin-audit-timeline";
 
-// ─── Outcome badge ─────────────────────────────────────────────────────────────
+const scopes: readonly PlatformAuditTrailScope[] = ["PLATFORM", "COMPANY"];
 
-function OutcomeBadge({ outcome }: { outcome: AuditOutcome }) {
+interface EmptyStateProps {
+  message: string;
+  action?: ReactNode;
+}
+
+function EmptyState({ message, action }: EmptyStateProps) {
   return (
-    <Badge variant={outcome === "success" ? "success" : "danger"}>
-      {outcome === "success" ? "Success" : "Failure"}
-    </Badge>
+    <div className="flex flex-col items-center gap-2 py-16 text-center">
+      <Shield size={32} className="text-[var(--color-text-faint)]" />
+      <p className="text-sm font-medium text-[var(--color-text-muted)]">{message}</p>
+      {action}
+    </div>
   );
 }
-
-// ─── Module badge ──────────────────────────────────────────────────────────────
-
-const MODULE_VARIANT: Record<string, "primary" | "info" | "warning" | "default"> = {
-  auth: "primary",
-  users: "info",
-  rbac: "warning",
-};
-
-function ModuleBadge({ module }: { module: string }) {
-  const variant = MODULE_VARIANT[module] ?? "default";
-  return <Badge variant={variant}>{module}</Badge>;
-}
-
-// ─── Table ─────────────────────────────────────────────────────────────────────
-
-function AuditTable({ items }: { items: AuditEntry[] }) {
-  return (
-    <>
-      <div className="divide-y divide-[var(--color-border)] lg:hidden">
-        {items.map((entry) => (
-          <article
-            key={`${entry.action}-${entry.createdAt}-${entry.targetPublicId ?? "system"}`}
-            className="p-4"
-          >
-            <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
-              <div className="min-w-0">
-                <code className="break-all text-[12.5px] font-mono text-[var(--color-text)]">
-                  {entry.action}
-                </code>
-                <p className="mt-1 text-xs tabular-nums text-[var(--color-text-muted)]">
-                  {new Date(entry.createdAt).toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <ModuleBadge module={entry.module} />
-                <OutcomeBadge outcome={entry.outcome} />
-              </div>
-            </div>
-
-            <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-xs min-[520px]:grid-cols-2">
-              <div>
-                <dt className="text-[var(--color-text-faint)]">Target type</dt>
-                <dd className="mt-0.5 text-[var(--color-text-muted)]">{entry.targetType ?? "-"}</dd>
-              </div>
-              <div>
-                <dt className="text-[var(--color-text-faint)]">Target ID</dt>
-                <dd className="mt-0.5 break-all font-mono text-[var(--color-text-muted)]">
-                  {entry.targetPublicId ?? "-"}
-                </dd>
-              </div>
-            </dl>
-
-            <Button intent="utility" className="mt-4 w-full min-[520px]:w-auto">
-              Details
-            </Button>
-          </article>
-        ))}
-      </div>
-
-      <div className="scrollbar-calm hidden overflow-x-auto lg:block">
-        <table className="w-full min-w-[760px]">
-          <thead>
-            <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
-              {["Action", "Module", "Target type", "Target ID", "Outcome", "Timestamp", ""].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] ${
-                      h === "" ? "text-end" : "text-start"
-                    }`}
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((entry) => (
-              <tr
-                key={`${entry.action}-${entry.createdAt}-${entry.targetPublicId ?? "system"}`}
-                className="border-b border-[var(--color-border)] transition-colors last:border-b-0 hover:bg-[var(--color-surface-2)]"
-              >
-                {/* Action */}
-                <td className="px-4 py-3">
-                  <code className="text-[12.5px] font-mono text-[var(--color-text)]">
-                    {entry.action}
-                  </code>
-                </td>
-
-                {/* Module */}
-                <td className="px-4 py-3">
-                  <ModuleBadge module={entry.module} />
-                </td>
-
-                {/* Target type */}
-                <td className="px-4 py-3 text-[12.5px] text-[var(--color-text-muted)]">
-                  {entry.targetType ?? <span className="text-[var(--color-text-faint)]">–</span>}
-                </td>
-
-                {/* Target ID */}
-                <td className="max-w-[140px] truncate px-4 py-3 text-[11.5px] font-mono text-[var(--color-text-muted)]">
-                  {entry.targetPublicId ?? (
-                    <span className="text-[var(--color-text-faint)]">–</span>
-                  )}
-                </td>
-
-                {/* Outcome */}
-                <td className="px-4 py-3">
-                  <OutcomeBadge outcome={entry.outcome} />
-                </td>
-
-                {/* Timestamp */}
-                <td className="px-4 py-3 text-[12.5px] tabular-nums text-[var(--color-text-muted)]">
-                  {new Date(entry.createdAt).toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-
-                {/* Metadata drawer trigger */}
-                <td className="px-4 py-3 text-end">
-                  <Button intent="utility" size="xs">
-                    Details
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export function AdminAuditPage() {
-  const { page, pageSize, q, outcome } = useSearch({ from: "/admin/audit/" });
+  const { t } = useTranslation(auditNamespace);
+  const search = useSearch({ from: "/admin/audit/" });
   const navigate = useNavigate({ from: "/admin/audit/" });
-  const query = q ?? "";
-  const outcomeFilter = outcome ?? "";
+  const query = usePlatformAuditTrail(search);
+  const companyOptions = useAuditCompanyOptions();
 
-  function setQuery(nextQuery: string) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        q: nextQuery || undefined,
-        page: 1,
-      }),
-    });
+  const page = query.data;
+  const items = page?.items ?? [];
+  const hasMore = page?.hasMore ?? false;
+  const nextCursor = page?.nextCursor ?? null;
+  const view = search.view ?? "table";
+  const selectedCompany = companyOptions.data?.find(
+    (company) => company.value === search.companyPublicId,
+  );
+
+  /** Every filter change goes through here, which is what guarantees the cursor is dropped. */
+  function changeFilters(change: Partial<PlatformAuditTrailParams>) {
+    void navigate({ search: (previous) => applyAuditFilterChange(previous, change) });
   }
 
-  function setOutcomeFilter(nextOutcome: AuditOutcome | "") {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        outcome: nextOutcome || undefined,
-        page: 1,
-      }),
-    });
+  function loadMore() {
+    if (!nextCursor) return;
+    void navigate({ search: (previous) => ({ ...previous, cursor: nextCursor }) });
   }
 
-  function setPage(nextPage: number) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        page: nextPage,
-      }),
-    });
+  function goBackToFirstPage() {
+    void navigate({ search: ({ cursor: _cursor, ...rest }) => rest });
   }
-
-  const filtered = dummyAuditEntries.filter((entry) => {
-    if (outcomeFilter && entry.outcome !== outcomeFilter) return false;
-    if (query) {
-      const loweredQuery = query.toLowerCase();
-      return (
-        entry.action.toLowerCase().includes(loweredQuery) ||
-        entry.module.toLowerCase().includes(loweredQuery) ||
-        (entry.targetType?.toLowerCase().includes(loweredQuery) ?? false) ||
-        (entry.targetPublicId?.toLowerCase().includes(loweredQuery) ?? false)
-      );
-    }
-    return true;
-  });
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-  const successCount = dummyAuditEntries.filter((e) => e.outcome === "success").length;
-  const failureCount = dummyAuditEntries.filter((e) => e.outcome === "failure").length;
 
   return (
     <div className="mx-auto max-w-[1480px]">
-      {/* Page header */}
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">
-            Audit log
+            {t("chrome.title")}
           </h1>
           <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            {successCount} successes · {failureCount} failures · platform event history
+            {t("chrome.platformSubtitle")}
           </p>
         </div>
+        {/* The catalog answers "what is this event?" for a reader choosing filters, so it sits
+            beside the trail rather than behind a menu. */}
+        <Link
+          to="/admin/audit/catalog"
+          className={cn(
+            auditChipClassName,
+            "inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] transition-colors",
+          )}
+        >
+          <BookOpen size={14} aria-hidden="true" />
+          {t("chrome.catalogLink")}
+        </Link>
       </div>
 
-      {/* Filter bar */}
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        {/* Outcome chips */}
-        {(["", "success", "failure"] as const).map((o) => (
-          <Button
-            key={o === "" ? "all" : o}
-            variant="ghost"
-            size="sm"
-            pressed={outcomeFilter === o}
-            onClick={() => setOutcomeFilter(o)}
-          >
-            {o === "" ? "All outcomes" : o === "success" ? "Success" : "Failure"}
-          </Button>
-        ))}
-
-        {/* Search */}
-        <div className="relative w-full sm:ms-auto sm:max-w-xs">
-          <Search
-            size={14}
-            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-            aria-hidden="true"
+      <AuditFilterBar
+        idPrefix="admin-audit"
+        filters={search}
+        eventTypes={platformAuditEventTypes}
+        actorSearchKey="platform"
+        searchActors={searchPlatformAuditActors}
+        onChange={changeFilters}
+        onClearAll={() =>
+          changeFilters({
+            ...clearedAuditFilters,
+            companyPublicId: undefined,
+            scope: undefined,
+            traceId: undefined,
+          })
+        }
+        slottedFilterCount={
+          [search.companyPublicId, search.scope, search.traceId].filter(Boolean).length
+        }
+        companyFilter={
+          <AuditFilterCombobox
+            id="admin-audit-company"
+            label={t("chrome.filterCompany")}
+            searchPlaceholder={t("chrome.filterCompanySearch")}
+            summary={selectedCompany?.label ?? search.companyPublicId}
+            value={search.companyPublicId}
+            options={companyOptions.data ?? []}
+            state={auditFilterComboboxState(companyOptions)}
+            onSelect={(option) => changeFilters({ companyPublicId: option.value })}
+            onClear={() => changeFilters({ companyPublicId: undefined })}
           />
-          <Input
-            type="search"
-            placeholder="Search action, module, target…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="ps-8"
+        }
+        scopeFilter={
+          <AuditFilterChoice
+            id="admin-audit-scope"
+            label={t("chrome.filterScope")}
+            options={scopes.map((scope) => ({
+              value: scope,
+              label: scope === "PLATFORM" ? t("chrome.scopePlatform") : t("chrome.scopeCompany"),
+            }))}
+            value={search.scope}
+            onChange={(scope) => changeFilters({ scope })}
           />
-        </div>
-      </div>
+        }
+        clickedFilter={
+          search.traceId ? (
+            <AuditFilterTag
+              label={t("chrome.filterTrace")}
+              value={search.traceId}
+              mono
+              onClear={() => changeFilters({ traceId: undefined })}
+            />
+          ) : undefined
+        }
+      />
 
-      {/* Table card */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
-          {visible.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-center">
-              <Shield size={32} className="text-[var(--color-text-faint)]" />
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                No audit entries match
-              </p>
-              <p className="text-xs text-[var(--color-text-faint)]">Try adjusting your filters</p>
+          <div className="flex flex-wrap items-center gap-3 border-b border-[var(--color-border)] px-4 py-2">
+            <div className="flex items-center gap-1">
+              {(["timeline", "table"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={view === mode}
+                  onClick={() => changeFilters({ view: mode === "table" ? undefined : mode })}
+                  className={cn(
+                    "rounded-[var(--radius-sm)] px-2.5 py-1 text-[12px] font-medium transition-colors duration-150 ease-out",
+                    view === mode
+                      ? "bg-[var(--color-surface-2)] text-[var(--color-text)]"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+                  )}
+                >
+                  {t(mode === "table" ? "chrome.viewTable" : "chrome.viewTimeline")}
+                </button>
+              ))}
             </div>
+            {view === "timeline" ? (
+              <div
+                role="group"
+                aria-label={t("chrome.viewTimeline")}
+                className="flex items-center gap-1 border-s border-[var(--color-border)] ps-3"
+              >
+                {(["chronological", "person", "entity"] as const).map((lensOption) => (
+                  <button
+                    key={lensOption}
+                    type="button"
+                    aria-pressed={(search.lens ?? "chronological") === lensOption}
+                    onClick={() =>
+                      changeFilters({
+                        lens: lensOption === "chronological" ? undefined : lensOption,
+                      })
+                    }
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[11.5px] font-medium transition-colors duration-150 ease-out",
+                      (search.lens ?? "chronological") === lensOption
+                        ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                        : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+                    )}
+                  >
+                    {t(
+                      lensOption === "person"
+                        ? "chrome.lensPerson"
+                        : lensOption === "entity"
+                          ? "chrome.lensEntity"
+                          : "chrome.viewTimeline",
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          {query.isPending ? (
+            <EmptyState message={t("chrome.loading")} />
+          ) : query.isError ? (
+            <EmptyState
+              message={t("chrome.loadFailed")}
+              action={
+                <Button intent="utility" size="sm" onClick={() => query.refetch()}>
+                  {t("chrome.retry")}
+                </Button>
+              }
+            />
+          ) : items.length === 0 ? (
+            <EmptyState message={t("chrome.empty")} />
+          ) : view === "timeline" ? (
+            <AdminAuditTimeline
+              items={items}
+              lens={search.lens ?? "chronological"}
+              onTraceSelect={(traceId) => changeFilters({ traceId })}
+            />
           ) : (
-            <AuditTable items={visible} />
+            <AdminAuditTable
+              items={items}
+              onActorSelect={(actorPublicId) => changeFilters({ actorPublicId })}
+              onTraceSelect={(traceId) => changeFilters({ traceId })}
+            />
           )}
         </CardContent>
         <div className="flex flex-col gap-3 border-t border-[var(--color-border)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-[var(--color-text-muted)]">
-            {visible.length} of {filtered.length} entries
+            {t("chrome.eventCount", { count: items.length })}
           </span>
           <div className="flex items-center gap-1">
-            <Button
-              variant="nav"
-              size="iconXs"
-              className="btn-nav-prev"
-              disabled={currentPage <= 1}
-              onClick={() => setPage(currentPage - 1)}
-              aria-label="Previous page"
-              title="Previous page"
-            >
-              <ChevronLeft size={14} />
-            </Button>
-            <span className="select-none px-2 text-[12px] tabular-nums text-[var(--color-text-muted)]">
-              {currentPage} / {totalPages}
-            </span>
-            <Button
-              variant="nav"
-              size="iconXs"
-              className="btn-nav-next"
-              disabled={currentPage >= totalPages}
-              onClick={() => setPage(currentPage + 1)}
-              aria-label="Next page"
-              title="Next page"
-            >
-              <ChevronRight size={14} />
-            </Button>
+            {search.cursor && (
+              <Button
+                variant="nav"
+                size="iconXs"
+                className="btn-nav-prev"
+                onClick={goBackToFirstPage}
+                aria-label={t("chrome.firstPage")}
+                title={t("chrome.firstPage")}
+              >
+                <ChevronLeft size={14} />
+              </Button>
+            )}
+            {hasMore && nextCursor ? (
+              <Button
+                variant="nav"
+                size="iconXs"
+                className="btn-nav-next"
+                onClick={loadMore}
+                aria-label={t("chrome.loadMore")}
+                title={t("chrome.loadMore")}
+              >
+                <ChevronRight size={14} />
+              </Button>
+            ) : null}
           </div>
         </div>
       </Card>

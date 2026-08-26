@@ -68,6 +68,10 @@ const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "short",
 });
 
+const DELIVERY_PICKER_TEXT = {
+  description: "Select the date and time used by this delivery-history filter.",
+};
+
 const STATUS_BADGE_VARIANTS: Readonly<
   Record<DeliveryStatus, "default" | "info" | "success" | "warning" | "danger">
 > = {
@@ -852,6 +856,7 @@ export function AdminEmailDeliveriesPage() {
                 value={getDateEdgeDate(draft.createdFrom)}
                 edgeDateType={getDateEdgeType(draft.createdFrom)}
                 boundary="from"
+                text={DELIVERY_PICKER_TEXT}
                 onChange={(createdFrom) =>
                   updateDraft({ createdFrom: createdFrom ? draft.createdFrom : undefined })
                 }
@@ -863,6 +868,7 @@ export function AdminEmailDeliveriesPage() {
                 value={getDateEdgeDate(draft.createdTo)}
                 edgeDateType={getDateEdgeType(draft.createdTo)}
                 boundary="to"
+                text={DELIVERY_PICKER_TEXT}
                 onChange={(createdTo) =>
                   updateDraft({ createdTo: createdTo ? draft.createdTo : undefined })
                 }
