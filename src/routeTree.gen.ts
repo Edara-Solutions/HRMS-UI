@@ -12,11 +12,14 @@ import { Route as rootRouteImport } from "./app/routes/__root"
 import { Route as CompanyRouteRouteImport } from "./app/routes/company/route"
 import { Route as AdminRouteRouteImport } from "./app/routes/admin/route"
 import { Route as IndexRouteImport } from "./app/routes/index"
+import { Route as ResetPasswordIndexRouteImport } from "./app/routes/reset-password/index"
 import { Route as LoginIndexRouteImport } from "./app/routes/login/index"
+import { Route as ForgotPasswordIndexRouteImport } from "./app/routes/forgot-password/index"
 import { Route as ForbiddenIndexRouteImport } from "./app/routes/forbidden/index"
 import { Route as ChangePasswordIndexRouteImport } from "./app/routes/change-password/index"
 import { Route as AdminIndexRouteImport } from "./app/routes/admin/index"
 import { Route as AcceptInvitationIndexRouteImport } from "./app/routes/accept-invitation/index"
+import { Route as ForgotPasswordSentRouteImport } from "./app/routes/forgot-password/sent"
 import { Route as AdminLoginRouteImport } from "./app/routes/admin_/login"
 import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
 import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
@@ -25,6 +28,8 @@ import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/pr
 import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
 import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
+import { Route as AdminResetPasswordIndexRouteImport } from "./app/routes/admin_/reset-password/index"
+import { Route as AdminForgotPasswordIndexRouteImport } from "./app/routes/admin_/forgot-password/index"
 import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
 import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
 import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
@@ -33,6 +38,7 @@ import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dash
 import { Route as AdminConversionRequestsIndexRouteImport } from "./app/routes/admin/conversion-requests/index"
 import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
 import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
+import { Route as AdminForgotPasswordSentRouteImport } from "./app/routes/admin_/forgot-password/sent"
 import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
 import { Route as AdminEmailSendingRouteImport } from "./app/routes/admin/email/sending"
 import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
@@ -57,9 +63,19 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
+  id: "/reset-password/",
+  path: "/reset-password/",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: "/login/",
   path: "/login/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordIndexRoute = ForgotPasswordIndexRouteImport.update({
+  id: "/forgot-password/",
+  path: "/forgot-password/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForbiddenIndexRoute = ForbiddenIndexRouteImport.update({
@@ -80,6 +96,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AcceptInvitationIndexRoute = AcceptInvitationIndexRouteImport.update({
   id: "/accept-invitation/",
   path: "/accept-invitation/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordSentRoute = ForgotPasswordSentRouteImport.update({
+  id: "/forgot-password/sent",
+  path: "/forgot-password/sent",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -123,6 +144,17 @@ const CompanyAuditIndexRoute = CompanyAuditIndexRouteImport.update({
   path: "/audit/",
   getParentRoute: () => CompanyRouteRoute,
 } as any)
+const AdminResetPasswordIndexRoute = AdminResetPasswordIndexRouteImport.update({
+  id: "/admin_/reset-password/",
+  path: "/admin/reset-password/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminForgotPasswordIndexRoute =
+  AdminForgotPasswordIndexRouteImport.update({
+    id: "/admin_/forgot-password/",
+    path: "/admin/forgot-password/",
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminSubscriptionsIndexRoute = AdminSubscriptionsIndexRouteImport.update({
   id: "/subscriptions/",
   path: "/subscriptions/",
@@ -163,6 +195,11 @@ const AdminAuditIndexRoute = AdminAuditIndexRouteImport.update({
   id: "/audit/",
   path: "/audit/",
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminForgotPasswordSentRoute = AdminForgotPasswordSentRouteImport.update({
+  id: "/admin_/forgot-password/sent",
+  path: "/admin/forgot-password/sent",
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
   id: "/$publicId",
@@ -216,17 +253,21 @@ export interface FileRoutesByFullPath {
   "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
   "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/admin/login": typeof AdminLoginRoute
+  "/forgot-password/sent": typeof ForgotPasswordSentRoute
   "/accept-invitation/": typeof AcceptInvitationIndexRoute
   "/admin/": typeof AdminIndexRoute
   "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
+  "/forgot-password/": typeof ForgotPasswordIndexRoute
   "/login/": typeof LoginIndexRoute
+  "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
@@ -235,6 +276,8 @@ export interface FileRoutesByFullPath {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/admin/forgot-password/": typeof AdminForgotPasswordIndexRoute
+  "/admin/reset-password/": typeof AdminResetPasswordIndexRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
@@ -247,16 +290,20 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/company": typeof CompanyRouteRouteWithChildren
   "/admin/login": typeof AdminLoginRoute
+  "/forgot-password/sent": typeof ForgotPasswordSentRoute
   "/accept-invitation": typeof AcceptInvitationIndexRoute
   "/admin": typeof AdminIndexRoute
   "/change-password": typeof ChangePasswordIndexRoute
   "/forbidden": typeof ForbiddenIndexRoute
+  "/forgot-password": typeof ForgotPasswordIndexRoute
   "/login": typeof LoginIndexRoute
+  "/reset-password": typeof ResetPasswordIndexRoute
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit": typeof AdminAuditIndexRoute
   "/admin/companies": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests": typeof AdminConversionRequestsIndexRoute
@@ -265,6 +312,8 @@ export interface FileRoutesByTo {
   "/admin/leads": typeof AdminLeadsIndexRoute
   "/admin/plans": typeof AdminPlansIndexRoute
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
+  "/admin/forgot-password": typeof AdminForgotPasswordIndexRoute
+  "/admin/reset-password": typeof AdminResetPasswordIndexRoute
   "/company/audit": typeof CompanyAuditIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
   "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
@@ -281,17 +330,21 @@ export interface FileRoutesById {
   "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
   "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/admin_/login": typeof AdminLoginRoute
+  "/forgot-password/sent": typeof ForgotPasswordSentRoute
   "/accept-invitation/": typeof AcceptInvitationIndexRoute
   "/admin/": typeof AdminIndexRoute
   "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
+  "/forgot-password/": typeof ForgotPasswordIndexRoute
   "/login/": typeof LoginIndexRoute
+  "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
+  "/admin_/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
@@ -300,6 +353,8 @@ export interface FileRoutesById {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
+  "/admin_/forgot-password/": typeof AdminForgotPasswordIndexRoute
+  "/admin_/reset-password/": typeof AdminResetPasswordIndexRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
@@ -317,17 +372,21 @@ export interface FileRouteTypes {
     | "/admin/companies"
     | "/admin/leads"
     | "/admin/login"
+    | "/forgot-password/sent"
     | "/accept-invitation/"
     | "/admin/"
     | "/change-password/"
     | "/forbidden/"
+    | "/forgot-password/"
     | "/login/"
+    | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
+    | "/admin/forgot-password/sent"
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/conversion-requests/"
@@ -336,6 +395,8 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
+    | "/admin/forgot-password/"
+    | "/admin/reset-password/"
     | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
@@ -348,16 +409,20 @@ export interface FileRouteTypes {
     | "/"
     | "/company"
     | "/admin/login"
+    | "/forgot-password/sent"
     | "/accept-invitation"
     | "/admin"
     | "/change-password"
     | "/forbidden"
+    | "/forgot-password"
     | "/login"
+    | "/reset-password"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
+    | "/admin/forgot-password/sent"
     | "/admin/audit"
     | "/admin/companies"
     | "/admin/conversion-requests"
@@ -366,6 +431,8 @@ export interface FileRouteTypes {
     | "/admin/leads"
     | "/admin/plans"
     | "/admin/subscriptions"
+    | "/admin/forgot-password"
+    | "/admin/reset-password"
     | "/company/audit"
     | "/company/dashboard"
     | "/company/email-settings"
@@ -381,17 +448,21 @@ export interface FileRouteTypes {
     | "/admin/companies"
     | "/admin/leads"
     | "/admin_/login"
+    | "/forgot-password/sent"
     | "/accept-invitation/"
     | "/admin/"
     | "/change-password/"
     | "/forbidden/"
+    | "/forgot-password/"
     | "/login/"
+    | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
+    | "/admin_/forgot-password/sent"
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/conversion-requests/"
@@ -400,6 +471,8 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
+    | "/admin_/forgot-password/"
+    | "/admin_/reset-password/"
     | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
@@ -414,10 +487,16 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   CompanyRouteRoute: typeof CompanyRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
+  ForgotPasswordSentRoute: typeof ForgotPasswordSentRoute
   AcceptInvitationIndexRoute: typeof AcceptInvitationIndexRoute
   ChangePasswordIndexRoute: typeof ChangePasswordIndexRoute
   ForbiddenIndexRoute: typeof ForbiddenIndexRoute
+  ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  ResetPasswordIndexRoute: typeof ResetPasswordIndexRoute
+  AdminForgotPasswordSentRoute: typeof AdminForgotPasswordSentRoute
+  AdminForgotPasswordIndexRoute: typeof AdminForgotPasswordIndexRoute
+  AdminResetPasswordIndexRoute: typeof AdminResetPasswordIndexRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -443,11 +522,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/reset-password/": {
+      id: "/reset-password/"
+      path: "/reset-password"
+      fullPath: "/reset-password/"
+      preLoaderRoute: typeof ResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/login/": {
       id: "/login/"
       path: "/login"
       fullPath: "/login/"
       preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/forgot-password/": {
+      id: "/forgot-password/"
+      path: "/forgot-password"
+      fullPath: "/forgot-password/"
+      preLoaderRoute: typeof ForgotPasswordIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/forbidden/": {
@@ -476,6 +569,13 @@ declare module "@tanstack/react-router" {
       path: "/accept-invitation"
       fullPath: "/accept-invitation/"
       preLoaderRoute: typeof AcceptInvitationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/forgot-password/sent": {
+      id: "/forgot-password/sent"
+      path: "/forgot-password/sent"
+      fullPath: "/forgot-password/sent"
+      preLoaderRoute: typeof ForgotPasswordSentRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/admin_/login": {
@@ -534,6 +634,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyAuditIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
     }
+    "/admin_/reset-password/": {
+      id: "/admin_/reset-password/"
+      path: "/admin/reset-password"
+      fullPath: "/admin/reset-password/"
+      preLoaderRoute: typeof AdminResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/admin_/forgot-password/": {
+      id: "/admin_/forgot-password/"
+      path: "/admin/forgot-password"
+      fullPath: "/admin/forgot-password/"
+      preLoaderRoute: typeof AdminForgotPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/admin/subscriptions/": {
       id: "/admin/subscriptions/"
       path: "/subscriptions"
@@ -589,6 +703,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/audit/"
       preLoaderRoute: typeof AdminAuditIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    "/admin_/forgot-password/sent": {
+      id: "/admin_/forgot-password/sent"
+      path: "/admin/forgot-password/sent"
+      fullPath: "/admin/forgot-password/sent"
+      preLoaderRoute: typeof AdminForgotPasswordSentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     "/admin/leads/$publicId": {
       id: "/admin/leads/$publicId"
@@ -755,10 +876,16 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   CompanyRouteRoute: CompanyRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
+  ForgotPasswordSentRoute: ForgotPasswordSentRoute,
   AcceptInvitationIndexRoute: AcceptInvitationIndexRoute,
   ChangePasswordIndexRoute: ChangePasswordIndexRoute,
   ForbiddenIndexRoute: ForbiddenIndexRoute,
+  ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
+  ResetPasswordIndexRoute: ResetPasswordIndexRoute,
+  AdminForgotPasswordSentRoute: AdminForgotPasswordSentRoute,
+  AdminForgotPasswordIndexRoute: AdminForgotPasswordIndexRoute,
+  AdminResetPasswordIndexRoute: AdminResetPasswordIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

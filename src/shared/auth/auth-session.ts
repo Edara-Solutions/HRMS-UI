@@ -57,6 +57,25 @@ export interface AcceptInvitationInput {
   clientType: "web";
 }
 
+/**
+ * `users.email` is not unique across companies, so the company code is what narrows the address to
+ * one account — the same pair the employee already types on the sign-in form.
+ */
+export interface PasswordResetRequest {
+  companyCode: string;
+  email: string;
+}
+
+/** A Platform Admin belongs to no company, so their address alone names them. */
+export interface AdminPasswordResetRequest {
+  email: string;
+}
+
+export interface ResetPasswordInput {
+  token: string;
+  newPassword: string;
+}
+
 export interface ChangePasswordInput {
   currentPassword: string;
   newPassword: string;
