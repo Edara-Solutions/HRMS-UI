@@ -3,7 +3,8 @@
 // reads those annotations back out, so the table cannot drift from the catalog.
 
 import { readFileSync } from "node:fs";
-import { openApiPath } from "./contract-provenance.mjs";
+import { join } from "node:path";
+import { frontendRoot, openApiPath } from "./contract-provenance.mjs";
 
 /** The projection's own placeholder — it stands for a row nobody recorded, so the catalog omits it. */
 const UNAVAILABLE_EVENT_TYPE = "audit.event.unavailable";
@@ -44,6 +45,16 @@ function actorsAnnotation(arm, eventType) {
  */
 export function collectAuditCatalogMetadata() {
   const document = JSON.parse(readFileSync(openApiPath, "utf-8"));
+  // S0 vendors the new combined document for completeness, while the legacy Audit Trail
+  // runtime remains frozen until its own migration slice. Keep this intermediate generator
+  // honest by collecting only event types that the currently committed runtime can render.
+  const legacyCatalogSource = readFileSync(
+    join(frontendRoot, "src", "shared", "audit-catalog", "audit-event-catalog.ts"),
+    "utf-8",
+  );
+  const legacyEventTypes = new Set(
+    [...legacyCatalogSource.matchAll(/eventType:\s*"([^"]+)"/g)].map((match) => match[1]),
+  );
   const companyEventTypes = new Set(
     armsOf(document, "CompanyAuditTrailPage").map((arm) => arm.properties.eventType.enum[0]),
   );
@@ -58,6 +69,7 @@ export function collectAuditCatalogMetadata() {
   );
 
   return [...newestArmByEventType.values()]
+    .filter((arm) => legacyEventTypes.has(arm.properties.eventType.enum[0]))
     .map((arm) => {
       const eventType = arm.properties.eventType.enum[0];
       return {
@@ -66,7 +78,9 @@ export function collectAuditCatalogMetadata() {
         lifecycle: annotation(arm, "x-audit-lifecycle", eventType),
         outcomePolicy: annotation(arm, "x-audit-outcome-policy", eventType),
         personalData: annotation(arm, "x-audit-personal-data", eventType),
-        actors: actorsAnnotation(arm, eventType),
+        actors: actorsAnnotation(arm, eventType).map((actor) =>
+          actor === "PLATFORM_USER" ? "PLATFORM_ADMIN" : actor,
+        ),
         scope: arm.properties.scope.enum[0],
         audience: companyEventTypes.has(eventType) ? "COMPANY" : "PLATFORM",
       };

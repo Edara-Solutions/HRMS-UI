@@ -13,6 +13,7 @@ import { Route as CompanyRouteRouteImport } from "./app/routes/company/route"
 import { Route as AdminRouteRouteImport } from "./app/routes/admin/route"
 import { Route as IndexRouteImport } from "./app/routes/index"
 import { Route as ResetPasswordIndexRouteImport } from "./app/routes/reset-password/index"
+import { Route as PlansIndexRouteImport } from "./app/routes/plans/index"
 import { Route as LoginIndexRouteImport } from "./app/routes/login/index"
 import { Route as ForgotPasswordIndexRouteImport } from "./app/routes/forgot-password/index"
 import { Route as ForbiddenIndexRouteImport } from "./app/routes/forbidden/index"
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
 const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
   id: "/reset-password/",
   path: "/reset-password/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlansIndexRoute = PlansIndexRouteImport.update({
+  id: "/plans/",
+  path: "/plans/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/forgot-password/": typeof ForgotPasswordIndexRoute
   "/login/": typeof LoginIndexRoute
+  "/plans/": typeof PlansIndexRoute
   "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByTo {
   "/forbidden": typeof ForbiddenIndexRoute
   "/forgot-password": typeof ForgotPasswordIndexRoute
   "/login": typeof LoginIndexRoute
+  "/plans": typeof PlansIndexRoute
   "/reset-password": typeof ResetPasswordIndexRoute
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
@@ -337,6 +345,7 @@ export interface FileRoutesById {
   "/forbidden/": typeof ForbiddenIndexRoute
   "/forgot-password/": typeof ForgotPasswordIndexRoute
   "/login/": typeof LoginIndexRoute
+  "/plans/": typeof PlansIndexRoute
   "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
@@ -379,6 +388,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/forgot-password/"
     | "/login/"
+    | "/plans/"
     | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | "/forbidden"
     | "/forgot-password"
     | "/login"
+    | "/plans"
     | "/reset-password"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
@@ -455,6 +466,7 @@ export interface FileRouteTypes {
     | "/forbidden/"
     | "/forgot-password/"
     | "/login/"
+    | "/plans/"
     | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
@@ -493,6 +505,7 @@ export interface RootRouteChildren {
   ForbiddenIndexRoute: typeof ForbiddenIndexRoute
   ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  PlansIndexRoute: typeof PlansIndexRoute
   ResetPasswordIndexRoute: typeof ResetPasswordIndexRoute
   AdminForgotPasswordSentRoute: typeof AdminForgotPasswordSentRoute
   AdminForgotPasswordIndexRoute: typeof AdminForgotPasswordIndexRoute
@@ -527,6 +540,13 @@ declare module "@tanstack/react-router" {
       path: "/reset-password"
       fullPath: "/reset-password/"
       preLoaderRoute: typeof ResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/plans/": {
+      id: "/plans/"
+      path: "/plans"
+      fullPath: "/plans/"
+      preLoaderRoute: typeof PlansIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/login/": {
@@ -882,6 +902,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForbiddenIndexRoute: ForbiddenIndexRoute,
   ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
+  PlansIndexRoute: PlansIndexRoute,
   ResetPasswordIndexRoute: ResetPasswordIndexRoute,
   AdminForgotPasswordSentRoute: AdminForgotPasswordSentRoute,
   AdminForgotPasswordIndexRoute: AdminForgotPasswordIndexRoute,

@@ -26,6 +26,8 @@ const PASSWORD_CHANGE_EXEMPT_PATHS = new Set([
   "/admin/login",
   "/change-password",
   "/accept-invitation",
+  "/plans",
+  "/plans/",
 ]);
 
 /**

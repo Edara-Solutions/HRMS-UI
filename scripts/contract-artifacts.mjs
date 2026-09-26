@@ -56,19 +56,19 @@ export const auditCatalogArtifact = {
 /** Each generated artifact, paired with the package script that reproduces it. */
 export const derivedArtifacts = [
   {
-    generator: "openapi:types",
-    outputs: [join(frontendRoot, "src", "shared", "api", "schema.d.ts")],
+    generator: "openapi:audiences",
+    outputs: [join(contractsDir, "provenance.json")],
   },
   {
-    generator: "audit:validators",
+    generator: "contract:legacy-check",
     outputs: auditRuntimeContracts.map(({ outputPath }) => outputPath),
   },
   {
-    generator: "audit:labels",
+    generator: "contract:legacy-check",
     outputs: [auditLabelArtifacts.manifestPath, auditLabelArtifacts.enumFieldsPath],
   },
   {
-    generator: "audit:catalog",
+    generator: "contract:legacy-check",
     outputs: [auditCatalogArtifact.metadataPath],
   },
 ];
