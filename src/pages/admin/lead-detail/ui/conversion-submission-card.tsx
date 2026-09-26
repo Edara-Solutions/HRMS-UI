@@ -3,7 +3,7 @@ import { Send } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { readBackendErrorMessage } from "@/shared/api";
-import { hasPermission, useAuthStore } from "@/shared/auth";
+import { hasPermission, useCurrentSession } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { DateTimePicker } from "@/shared/ui/date-time-picker";
@@ -49,7 +49,7 @@ export function ConversionSubmissionCard({
   const plansQuery = useConversionPlans();
   const plans = plansQuery.data?.data ?? [];
   const planOptions = plans.map((plan) => ({ value: plan.publicId, label: plan.name }));
-  const user = useAuthStore((state) => state.session?.user);
+  const user = useCurrentSession("platform")?.user;
   const canRequest = hasPermission(user, "REQUEST_LEAD_CONVERSION");
   const canConvertImmediately = hasPermission(user, "AUTO_APPROVE_LEAD_CONVERSION");
   const canReview = hasPermission(user, "APPROVE_LEAD_CONVERSION_REQUEST");

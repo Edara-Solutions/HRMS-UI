@@ -1,14 +1,10 @@
-import { useAuthStore } from "@/shared/auth";
+import { useCurrentAudience, useCurrentSession } from "@/shared/auth";
 
-/** Which tier's notification mount the center talks to. Derived from the session, never from props. */
+/** The selected, validated portal owns the notification mount. */
 export type NotificationTier = "company" | "platform";
 
 export function useNotificationTier(): NotificationTier | null {
-  const isPlatformAdmin = useAuthStore((state) => state.session?.user.isPlatformAdmin);
-
-  if (isPlatformAdmin === undefined) {
-    return null;
-  }
-
-  return isPlatformAdmin ? "platform" : "company";
+  const audience = useCurrentAudience();
+  const session = useCurrentSession();
+  return session ? audience : null;
 }

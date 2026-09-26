@@ -24,7 +24,7 @@ import { ModuleShortcuts } from "./module-shortcuts";
 import { PeopleTable } from "./people-table";
 
 export function CompanyDashboardPage() {
-  const session = useCurrentSession();
+  const session = useCurrentSession("company");
   const user = session?.user;
   const [asideCollapsed, setAsideCollapsed] = useState(false);
   const locale = usePreferencesStore((state) => state.locale);

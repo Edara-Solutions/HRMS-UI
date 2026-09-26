@@ -3,8 +3,8 @@ import { cleanup, render, screen } from "@testing-library/react";
 import i18next from "i18next";
 import { I18nextProvider } from "react-i18next";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { AudienceSessionProvider, usePlatformSession as useAuthStore } from "@/shared/auth";
+import { platformSessionFixture } from "../../../test/audience-fixtures";
 import { NotificationBell } from "./notification-bell";
 
 const apiGetMock = vi.hoisted(() => vi.fn());
@@ -21,27 +21,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 
 const testI18n = i18next.createInstance();
 
-const platformAdmin: SessionUser = {
-  publicId: "admin-1",
-  employeeCode: "ADM-001",
-  firstName: "Amina",
-  lastName: "Saleh",
-  email: "amina@edara.test",
-  status: "ACTIVE",
-  companyCode: "EDARA",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: true,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: platformAdmin,
-};
+const session = platformSessionFixture();
 
 function stubCount(unreadCount: number) {
   apiGetMock.mockImplementation((path: string) => {
@@ -63,9 +43,11 @@ function renderBell() {
 
   return render(
     <I18nextProvider i18n={testI18n}>
-      <QueryClientProvider client={queryClient}>
-        <NotificationBell />
-      </QueryClientProvider>
+      <AudienceSessionProvider audience="platform">
+        <QueryClientProvider client={queryClient}>
+          <NotificationBell />
+        </QueryClientProvider>
+      </AudienceSessionProvider>
     </I18nextProvider>,
   );
 }

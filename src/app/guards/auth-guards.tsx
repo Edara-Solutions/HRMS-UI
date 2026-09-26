@@ -1,24 +1,32 @@
 import { notFound, redirect } from "@tanstack/react-router";
+import { loadCompanyIdentity, loadPlatformIdentity } from "@/shared/api";
 import {
   hasEveryPermission,
-  isAdminConsoleEnabled,
+  isPlatformPortalEnabled,
   type PermissionAction,
-  useAuthStore,
+  safeReturnDestination,
+  useCompanySession,
   useCurrentSession,
+  usePlatformSession,
 } from "@/shared/auth";
 
-export { isAdminConsoleEnabled, useCurrentSession };
+export { isPlatformPortalEnabled, useCurrentSession };
 
 /** With the flag off, operator routes 404 as if they don't exist in this build. */
-export function requireAdminConsoleEnabled() {
-  if (!isAdminConsoleEnabled()) {
+export function requirePlatformPortalEnabled() {
+  if (!isPlatformPortalEnabled()) {
     throw notFound();
   }
 }
 
+// Removed with the old route tree in the immediately following atomic namespace slice.
+export const requireAdminConsoleEnabled = requirePlatformPortalEnabled;
+
 interface AuthGuardOptions {
   requiredPermissions?: PermissionAction[];
   platformAdminOnly?: boolean;
+  allowPasswordChange?: boolean;
+  returnTo?: string;
 }
 
 const PASSWORD_CHANGE_EXEMPT_PATHS = new Set([
@@ -31,32 +39,79 @@ const PASSWORD_CHANGE_EXEMPT_PATHS = new Set([
 ]);
 
 /**
- * Root-level layer of the forced password change enforcement: redirects any
- * route — not just the authenticated portals — to /change-password while the
- * session requires it, so the gate cannot be bypassed by navigating to an
- * unguarded path (e.g. the public landing page).
+ * Enforce only a validated password gate in the requested audience.
+ * Quarantined persisted identity is revalidated by the protected route guard.
  */
 export function redirectIfMustChangePassword(pathname: string) {
-  const { session } = useAuthStore.getState();
+  if (
+    /^\/(company|platform)\/(login|accept-invitation|forgot-password|reset-password|change-password)\/?$/.test(
+      pathname,
+    )
+  )
+    return;
+  const state = pathname.startsWith("/company/")
+    ? useCompanySession.getState()
+    : pathname.startsWith("/admin/") || pathname.startsWith("/platform/")
+      ? usePlatformSession.getState()
+      : null;
 
-  if (session?.user.mustChangePassword && !PASSWORD_CHANGE_EXEMPT_PATHS.has(pathname)) {
-    throw redirect({ to: "/change-password" });
+  if (state?.status === "must_change_password" && !PASSWORD_CHANGE_EXEMPT_PATHS.has(pathname)) {
+    throw redirect({
+      to: pathname.startsWith("/company/")
+        ? "/company/change-password"
+        : "/platform/change-password",
+    });
   }
 }
 
-export function requireAuthenticated(options: AuthGuardOptions = {}) {
-  const { session, status } = useAuthStore.getState();
+export async function requireAuthenticated(options: AuthGuardOptions = {}) {
+  if (options.platformAdminOnly) {
+    const state = usePlatformSession.getState();
+    if (state.status === "hydrating" || state.status === "unavailable") {
+      try {
+        await state.revalidate(loadPlatformIdentity);
+      } catch {
+        // The audience boundary owns retry UI while the persisted slot remains quarantined.
+      }
+    }
+  } else {
+    const state = useCompanySession.getState();
+    if (state.status === "hydrating" || state.status === "unavailable") {
+      try {
+        await state.revalidate(loadCompanyIdentity);
+      } catch {
+        // The audience boundary owns retry UI while the persisted slot remains quarantined.
+      }
+    }
+  }
+  const audienceState = options.platformAdminOnly
+    ? usePlatformSession.getState()
+    : useCompanySession.getState();
+  const { session, status } = audienceState;
 
   if (!session || status === "anonymous" || status === "expired") {
-    throw redirect({ to: "/login" });
+    throw redirect({
+      to: options.platformAdminOnly ? "/platform/login" : "/company/login",
+      search: {
+        returnTo: safeReturnDestination(
+          options.platformAdminOnly ? "platform" : "company",
+          options.returnTo,
+        ),
+      },
+    });
   }
 
-  if (session.user.mustChangePassword || status === "must_change_password") {
-    throw redirect({ to: "/change-password" });
+  if (status !== "authenticated" && status !== "must_change_password") {
+    return null;
   }
 
-  if (options.platformAdminOnly && !session.user.isPlatformAdmin) {
-    throw redirect({ to: "/company/dashboard" });
+  if (
+    !options.allowPasswordChange &&
+    (session.user.mustChangePassword || status === "must_change_password")
+  ) {
+    throw redirect({
+      to: options.platformAdminOnly ? "/platform/change-password" : "/company/change-password",
+    });
   }
 
   if (

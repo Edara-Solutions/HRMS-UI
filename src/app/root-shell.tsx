@@ -4,12 +4,21 @@ import { LocaleRuntime } from "@/shared/i18n";
 
 export function RootLayout() {
   const pathname = useLocation({ select: (location) => location.pathname });
-  const isPublicPlans = pathname === "/plans" || pathname === "/plans/";
+  const audience = pathname.startsWith("/company/")
+    ? "company"
+    : pathname.startsWith("/admin/") || pathname.startsWith("/platform/")
+      ? "platform"
+      : null;
   return (
     <main className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
       <LocaleRuntime />
       <Outlet />
-      {!isPublicPlans && <ForcedPasswordChangeModal />}
+      {audience &&
+      !/^\/(company|platform)\/(login|accept-invitation|forgot-password|reset-password|change-password)\/?$/.test(
+        pathname,
+      ) ? (
+        <ForcedPasswordChangeModal audience={audience} />
+      ) : null}
     </main>
   );
 }

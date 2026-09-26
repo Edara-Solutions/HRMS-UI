@@ -1,7 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { AudienceSessionProvider, useCompanySession as useAuthStore } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import {
   recordPresentedNotifications,
@@ -19,27 +20,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   apiClient: { get: feedGetMock },
 }));
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
+const session = companySessionFixture();
 
 /** A settled row the watch predates; the newest row of each response sets the `since` cursor. */
 const historyItem = () => feedItem(1, "company.user-joined", "2026-08-25T09:00:00.000Z");
@@ -105,7 +86,11 @@ describe("useNotificationArrivals", () => {
       feedPage([feedItem(7, "company.role-assigned", "2026-08-25T08:00:00.000Z"), historyItem()]),
     );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     expect(searchParamsOf(0).has("since")).toBe(false);
@@ -119,7 +104,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "company.role-assigned", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -137,7 +126,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "platform.lead-created", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -153,7 +146,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "company.user-joined", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -173,7 +170,11 @@ describe("useNotificationArrivals", () => {
         ]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -190,7 +191,11 @@ describe("useNotificationArrivals", () => {
       .mockReturnValueOnce(feedPage([arrival]))
       .mockReturnValueOnce(feedPage([arrival]));
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -207,7 +212,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "company.role-assigned", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();
@@ -226,7 +235,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "company.role-assigned", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
 
     await focusTick();
     expect(feedGetMock).not.toHaveBeenCalled();
@@ -257,7 +270,11 @@ describe("useNotificationArrivals", () => {
         feedPage([feedItem(2, "company.role-assigned", "2026-08-25T09:30:00.000Z")]),
       );
 
-    renderHook(() => useNotificationArrivals());
+    renderHook(() => useNotificationArrivals(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <AudienceSessionProvider audience="company">{children}</AudienceSessionProvider>
+      ),
+    });
     await settlePoll();
 
     await focusTick();

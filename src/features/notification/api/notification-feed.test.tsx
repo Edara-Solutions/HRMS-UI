@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { AudienceSessionProvider, useCompanySession as useAuthStore } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
 import { useNotificationFeed } from "./notification-feed";
 
 const feedGetMock = vi.hoisted(() => vi.fn());
@@ -15,27 +15,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   apiClient: { get: feedGetMock },
 }));
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
+const session = companySessionFixture();
 
 function feedItem(id: number, createdAt: string) {
   return {
@@ -64,7 +44,9 @@ function searchParamsOf(call: number) {
 function renderFeed(open: boolean) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <AudienceSessionProvider audience="company">
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </AudienceSessionProvider>
   );
 
   return renderHook(({ isOpen }: { isOpen: boolean }) => useNotificationFeed(isOpen), {

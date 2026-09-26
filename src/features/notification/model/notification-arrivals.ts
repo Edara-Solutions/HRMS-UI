@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { useAuthStore } from "@/shared/auth";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import { NOTIFICATION_CATALOG } from "./notification-catalog";
 import type { ToastRequest } from "./toast-store";
@@ -64,11 +63,3 @@ export function planArrivalToast(arrivals: readonly NotificationFeedItem[]): Toa
 
   return { typeKey: announcement.typeKey, params: announcement.params };
 }
-
-// The ledger belongs to one identity; a shared browser would otherwise hand the next session's
-// first poll a stale "already presented" list.
-useAuthStore.subscribe((state, previous) => {
-  if (state.session?.user.publicId !== previous.session?.user.publicId) {
-    usePresentedNotifications.getState().clear();
-  }
-});

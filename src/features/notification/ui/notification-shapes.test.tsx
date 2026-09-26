@@ -4,9 +4,9 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import i18next from "i18next";
 import { I18nextProvider } from "react-i18next";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { AudienceSessionProvider, useCompanySession as useAuthStore } from "@/shared/auth";
 import { type NotificationListStyle, usePreferencesStore } from "@/shared/config";
+import { companySessionFixture } from "../../../test/audience-fixtures";
 import type { NotificationFeedItem } from "../api/notification-feed";
 import { useBulkReadCursor } from "../model/notification-read-state";
 import { NotificationBell } from "./notification-bell";
@@ -29,27 +29,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 
 const testI18n = i18next.createInstance();
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
+const session = companySessionFixture();
 
 /**
  * A fixed midday "now": the recency buckets are calendar days, so a suite that reads the real
@@ -106,9 +86,11 @@ function renderBell(listStyle: NotificationListStyle) {
 
   return render(
     <I18nextProvider i18n={testI18n}>
-      <QueryClientProvider client={queryClient}>
-        <NotificationBell />
-      </QueryClientProvider>
+      <AudienceSessionProvider audience="company">
+        <QueryClientProvider client={queryClient}>
+          <NotificationBell />
+        </QueryClientProvider>
+      </AudienceSessionProvider>
     </I18nextProvider>,
   );
 }

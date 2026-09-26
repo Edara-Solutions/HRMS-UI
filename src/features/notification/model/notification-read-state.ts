@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { useAuthStore } from "@/shared/auth";
 import type { NotificationFeedItem } from "../api/notification-feed";
 
 /**
@@ -30,14 +29,6 @@ export const useBulkReadCursor = create<BulkReadCursorState>()(
     { name: "hrms-notification-read" },
   ),
 );
-
-// The cursor belongs to one identity. A shared browser would otherwise carry it into the next
-// session and mute rows that reader has never been shown.
-useAuthStore.subscribe((state, previous) => {
-  if (state.session?.user.publicId !== previous.session?.user.publicId) {
-    useBulkReadCursor.setState({ cursorAt: null });
-  }
-});
 
 export function notificationRowState(
   item: NotificationFeedItem,

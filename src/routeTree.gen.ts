@@ -9,19 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./app/routes/__root"
+import { Route as PlatformRouteRouteImport } from "./app/routes/platform/route"
 import { Route as CompanyRouteRouteImport } from "./app/routes/company/route"
 import { Route as AdminRouteRouteImport } from "./app/routes/admin/route"
 import { Route as IndexRouteImport } from "./app/routes/index"
-import { Route as ResetPasswordIndexRouteImport } from "./app/routes/reset-password/index"
 import { Route as PlansIndexRouteImport } from "./app/routes/plans/index"
-import { Route as LoginIndexRouteImport } from "./app/routes/login/index"
-import { Route as ForgotPasswordIndexRouteImport } from "./app/routes/forgot-password/index"
 import { Route as ForbiddenIndexRouteImport } from "./app/routes/forbidden/index"
-import { Route as ChangePasswordIndexRouteImport } from "./app/routes/change-password/index"
 import { Route as AdminIndexRouteImport } from "./app/routes/admin/index"
-import { Route as AcceptInvitationIndexRouteImport } from "./app/routes/accept-invitation/index"
-import { Route as ForgotPasswordSentRouteImport } from "./app/routes/forgot-password/sent"
-import { Route as AdminLoginRouteImport } from "./app/routes/admin_/login"
+import { Route as PlatformResetPasswordRouteImport } from "./app/routes/platform_/reset-password"
+import { Route as PlatformLoginRouteImport } from "./app/routes/platform_/login"
+import { Route as PlatformForgotPasswordRouteImport } from "./app/routes/platform_/forgot-password"
+import { Route as PlatformChangePasswordRouteImport } from "./app/routes/platform_/change-password"
+import { Route as PlatformAcceptInvitationRouteImport } from "./app/routes/platform_/accept-invitation"
+import { Route as CompanyResetPasswordRouteImport } from "./app/routes/company_/reset-password"
+import { Route as CompanyLoginRouteImport } from "./app/routes/company_/login"
+import { Route as CompanyForgotPasswordRouteImport } from "./app/routes/company_/forgot-password"
+import { Route as CompanyChangePasswordRouteImport } from "./app/routes/company_/change-password"
+import { Route as CompanyAcceptInvitationRouteImport } from "./app/routes/company_/accept-invitation"
 import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
 import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
 import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
@@ -29,8 +33,6 @@ import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/pr
 import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
 import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
-import { Route as AdminResetPasswordIndexRouteImport } from "./app/routes/admin_/reset-password/index"
-import { Route as AdminForgotPasswordIndexRouteImport } from "./app/routes/admin_/forgot-password/index"
 import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
 import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
 import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
@@ -39,16 +41,26 @@ import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dash
 import { Route as AdminConversionRequestsIndexRouteImport } from "./app/routes/admin/conversion-requests/index"
 import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
 import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
-import { Route as AdminForgotPasswordSentRouteImport } from "./app/routes/admin_/forgot-password/sent"
 import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
 import { Route as AdminEmailSendingRouteImport } from "./app/routes/admin/email/sending"
 import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
 import { Route as AdminConversionRequestsPublicIdRouteImport } from "./app/routes/admin/conversion-requests/$publicId"
 import { Route as AdminAuditCatalogRouteImport } from "./app/routes/admin/audit/catalog"
 import { Route as AdminCompaniesPublicIdRouteRouteImport } from "./app/routes/admin/companies/$publicId/route"
+import { Route as PlatformAccountSessionsIndexRouteImport } from "./app/routes/platform/account/sessions/index"
+import { Route as PlatformAccountSecurityIndexRouteImport } from "./app/routes/platform/account/security/index"
+import { Route as PlatformAccountProfileIndexRouteImport } from "./app/routes/platform/account/profile/index"
+import { Route as CompanyAccountSessionsIndexRouteImport } from "./app/routes/company/account/sessions/index"
+import { Route as CompanyAccountSecurityIndexRouteImport } from "./app/routes/company/account/security/index"
+import { Route as CompanyAccountProfileIndexRouteImport } from "./app/routes/company/account/profile/index"
 import { Route as AdminCompaniesPublicIdIndexRouteImport } from "./app/routes/admin/companies/$publicId/index"
 import { Route as AdminCompaniesPublicIdEmailSettingsRouteImport } from "./app/routes/admin/companies/$publicId/email-settings"
 
+const PlatformRouteRoute = PlatformRouteRouteImport.update({
+  id: "/platform",
+  path: "/platform",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompanyRouteRoute = CompanyRouteRouteImport.update({
   id: "/company",
   path: "/company",
@@ -64,24 +76,9 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordIndexRoute = ResetPasswordIndexRouteImport.update({
-  id: "/reset-password/",
-  path: "/reset-password/",
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PlansIndexRoute = PlansIndexRouteImport.update({
   id: "/plans/",
   path: "/plans/",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: "/login/",
-  path: "/login/",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordIndexRoute = ForgotPasswordIndexRouteImport.update({
-  id: "/forgot-password/",
-  path: "/forgot-password/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForbiddenIndexRoute = ForbiddenIndexRouteImport.update({
@@ -89,29 +86,60 @@ const ForbiddenIndexRoute = ForbiddenIndexRouteImport.update({
   path: "/forbidden/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChangePasswordIndexRoute = ChangePasswordIndexRouteImport.update({
-  id: "/change-password/",
-  path: "/change-password/",
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AcceptInvitationIndexRoute = AcceptInvitationIndexRouteImport.update({
-  id: "/accept-invitation/",
-  path: "/accept-invitation/",
+const PlatformResetPasswordRoute = PlatformResetPasswordRouteImport.update({
+  id: "/platform_/reset-password",
+  path: "/platform/reset-password",
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForgotPasswordSentRoute = ForgotPasswordSentRouteImport.update({
-  id: "/forgot-password/sent",
-  path: "/forgot-password/sent",
+const PlatformLoginRoute = PlatformLoginRouteImport.update({
+  id: "/platform_/login",
+  path: "/platform/login",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: "/admin_/login",
-  path: "/admin/login",
+const PlatformForgotPasswordRoute = PlatformForgotPasswordRouteImport.update({
+  id: "/platform_/forgot-password",
+  path: "/platform/forgot-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformChangePasswordRoute = PlatformChangePasswordRouteImport.update({
+  id: "/platform_/change-password",
+  path: "/platform/change-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformAcceptInvitationRoute =
+  PlatformAcceptInvitationRouteImport.update({
+    id: "/platform_/accept-invitation",
+    path: "/platform/accept-invitation",
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CompanyResetPasswordRoute = CompanyResetPasswordRouteImport.update({
+  id: "/company_/reset-password",
+  path: "/company/reset-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyLoginRoute = CompanyLoginRouteImport.update({
+  id: "/company_/login",
+  path: "/company/login",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyForgotPasswordRoute = CompanyForgotPasswordRouteImport.update({
+  id: "/company_/forgot-password",
+  path: "/company/forgot-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyChangePasswordRoute = CompanyChangePasswordRouteImport.update({
+  id: "/company_/change-password",
+  path: "/company/change-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyAcceptInvitationRoute = CompanyAcceptInvitationRouteImport.update({
+  id: "/company_/accept-invitation",
+  path: "/company/accept-invitation",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLeadsRouteRoute = AdminLeadsRouteRouteImport.update({
@@ -150,17 +178,6 @@ const CompanyAuditIndexRoute = CompanyAuditIndexRouteImport.update({
   path: "/audit/",
   getParentRoute: () => CompanyRouteRoute,
 } as any)
-const AdminResetPasswordIndexRoute = AdminResetPasswordIndexRouteImport.update({
-  id: "/admin_/reset-password/",
-  path: "/admin/reset-password/",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminForgotPasswordIndexRoute =
-  AdminForgotPasswordIndexRouteImport.update({
-    id: "/admin_/forgot-password/",
-    path: "/admin/forgot-password/",
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const AdminSubscriptionsIndexRoute = AdminSubscriptionsIndexRouteImport.update({
   id: "/subscriptions/",
   path: "/subscriptions/",
@@ -202,11 +219,6 @@ const AdminAuditIndexRoute = AdminAuditIndexRouteImport.update({
   path: "/audit/",
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminForgotPasswordSentRoute = AdminForgotPasswordSentRouteImport.update({
-  id: "/admin_/forgot-password/sent",
-  path: "/admin/forgot-password/sent",
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
   id: "/$publicId",
   path: "/$publicId",
@@ -239,6 +251,42 @@ const AdminCompaniesPublicIdRouteRoute =
     path: "/$publicId",
     getParentRoute: () => AdminCompaniesRouteRoute,
   } as any)
+const PlatformAccountSessionsIndexRoute =
+  PlatformAccountSessionsIndexRouteImport.update({
+    id: "/account/sessions/",
+    path: "/account/sessions/",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
+const PlatformAccountSecurityIndexRoute =
+  PlatformAccountSecurityIndexRouteImport.update({
+    id: "/account/security/",
+    path: "/account/security/",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
+const PlatformAccountProfileIndexRoute =
+  PlatformAccountProfileIndexRouteImport.update({
+    id: "/account/profile/",
+    path: "/account/profile/",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
+const CompanyAccountSessionsIndexRoute =
+  CompanyAccountSessionsIndexRouteImport.update({
+    id: "/account/sessions/",
+    path: "/account/sessions/",
+    getParentRoute: () => CompanyRouteRoute,
+  } as any)
+const CompanyAccountSecurityIndexRoute =
+  CompanyAccountSecurityIndexRouteImport.update({
+    id: "/account/security/",
+    path: "/account/security/",
+    getParentRoute: () => CompanyRouteRoute,
+  } as any)
+const CompanyAccountProfileIndexRoute =
+  CompanyAccountProfileIndexRouteImport.update({
+    id: "/account/profile/",
+    path: "/account/profile/",
+    getParentRoute: () => CompanyRouteRoute,
+  } as any)
 const AdminCompaniesPublicIdIndexRoute =
   AdminCompaniesPublicIdIndexRouteImport.update({
     id: "/",
@@ -256,25 +304,28 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/admin": typeof AdminRouteRouteWithChildren
   "/company": typeof CompanyRouteRouteWithChildren
+  "/platform": typeof PlatformRouteRouteWithChildren
   "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
   "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
-  "/admin/login": typeof AdminLoginRoute
-  "/forgot-password/sent": typeof ForgotPasswordSentRoute
-  "/accept-invitation/": typeof AcceptInvitationIndexRoute
+  "/company/accept-invitation": typeof CompanyAcceptInvitationRoute
+  "/company/change-password": typeof CompanyChangePasswordRoute
+  "/company/forgot-password": typeof CompanyForgotPasswordRoute
+  "/company/login": typeof CompanyLoginRoute
+  "/company/reset-password": typeof CompanyResetPasswordRoute
+  "/platform/accept-invitation": typeof PlatformAcceptInvitationRoute
+  "/platform/change-password": typeof PlatformChangePasswordRoute
+  "/platform/forgot-password": typeof PlatformForgotPasswordRoute
+  "/platform/login": typeof PlatformLoginRoute
+  "/platform/reset-password": typeof PlatformResetPasswordRoute
   "/admin/": typeof AdminIndexRoute
-  "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
-  "/forgot-password/": typeof ForgotPasswordIndexRoute
-  "/login/": typeof LoginIndexRoute
   "/plans/": typeof PlansIndexRoute
-  "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
@@ -283,8 +334,6 @@ export interface FileRoutesByFullPath {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
-  "/admin/forgot-password/": typeof AdminForgotPasswordIndexRoute
-  "/admin/reset-password/": typeof AdminResetPasswordIndexRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
@@ -292,26 +341,35 @@ export interface FileRoutesByFullPath {
   "/company/setup/": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
+  "/company/account/profile/": typeof CompanyAccountProfileIndexRoute
+  "/company/account/security/": typeof CompanyAccountSecurityIndexRoute
+  "/company/account/sessions/": typeof CompanyAccountSessionsIndexRoute
+  "/platform/account/profile/": typeof PlatformAccountProfileIndexRoute
+  "/platform/account/security/": typeof PlatformAccountSecurityIndexRoute
+  "/platform/account/sessions/": typeof PlatformAccountSessionsIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/company": typeof CompanyRouteRouteWithChildren
-  "/admin/login": typeof AdminLoginRoute
-  "/forgot-password/sent": typeof ForgotPasswordSentRoute
-  "/accept-invitation": typeof AcceptInvitationIndexRoute
+  "/platform": typeof PlatformRouteRouteWithChildren
+  "/company/accept-invitation": typeof CompanyAcceptInvitationRoute
+  "/company/change-password": typeof CompanyChangePasswordRoute
+  "/company/forgot-password": typeof CompanyForgotPasswordRoute
+  "/company/login": typeof CompanyLoginRoute
+  "/company/reset-password": typeof CompanyResetPasswordRoute
+  "/platform/accept-invitation": typeof PlatformAcceptInvitationRoute
+  "/platform/change-password": typeof PlatformChangePasswordRoute
+  "/platform/forgot-password": typeof PlatformForgotPasswordRoute
+  "/platform/login": typeof PlatformLoginRoute
+  "/platform/reset-password": typeof PlatformResetPasswordRoute
   "/admin": typeof AdminIndexRoute
-  "/change-password": typeof ChangePasswordIndexRoute
   "/forbidden": typeof ForbiddenIndexRoute
-  "/forgot-password": typeof ForgotPasswordIndexRoute
-  "/login": typeof LoginIndexRoute
   "/plans": typeof PlansIndexRoute
-  "/reset-password": typeof ResetPasswordIndexRoute
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit": typeof AdminAuditIndexRoute
   "/admin/companies": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests": typeof AdminConversionRequestsIndexRoute
@@ -320,8 +378,6 @@ export interface FileRoutesByTo {
   "/admin/leads": typeof AdminLeadsIndexRoute
   "/admin/plans": typeof AdminPlansIndexRoute
   "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
-  "/admin/forgot-password": typeof AdminForgotPasswordIndexRoute
-  "/admin/reset-password": typeof AdminResetPasswordIndexRoute
   "/company/audit": typeof CompanyAuditIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
   "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
@@ -329,31 +385,40 @@ export interface FileRoutesByTo {
   "/company/setup": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdIndexRoute
+  "/company/account/profile": typeof CompanyAccountProfileIndexRoute
+  "/company/account/security": typeof CompanyAccountSecurityIndexRoute
+  "/company/account/sessions": typeof CompanyAccountSessionsIndexRoute
+  "/platform/account/profile": typeof PlatformAccountProfileIndexRoute
+  "/platform/account/security": typeof PlatformAccountSecurityIndexRoute
+  "/platform/account/sessions": typeof PlatformAccountSessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/admin": typeof AdminRouteRouteWithChildren
   "/company": typeof CompanyRouteRouteWithChildren
+  "/platform": typeof PlatformRouteRouteWithChildren
   "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
   "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
-  "/admin_/login": typeof AdminLoginRoute
-  "/forgot-password/sent": typeof ForgotPasswordSentRoute
-  "/accept-invitation/": typeof AcceptInvitationIndexRoute
+  "/company_/accept-invitation": typeof CompanyAcceptInvitationRoute
+  "/company_/change-password": typeof CompanyChangePasswordRoute
+  "/company_/forgot-password": typeof CompanyForgotPasswordRoute
+  "/company_/login": typeof CompanyLoginRoute
+  "/company_/reset-password": typeof CompanyResetPasswordRoute
+  "/platform_/accept-invitation": typeof PlatformAcceptInvitationRoute
+  "/platform_/change-password": typeof PlatformChangePasswordRoute
+  "/platform_/forgot-password": typeof PlatformForgotPasswordRoute
+  "/platform_/login": typeof PlatformLoginRoute
+  "/platform_/reset-password": typeof PlatformResetPasswordRoute
   "/admin/": typeof AdminIndexRoute
-  "/change-password/": typeof ChangePasswordIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
-  "/forgot-password/": typeof ForgotPasswordIndexRoute
-  "/login/": typeof LoginIndexRoute
   "/plans/": typeof PlansIndexRoute
-  "/reset-password/": typeof ResetPasswordIndexRoute
   "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
   "/admin/audit/catalog": typeof AdminAuditCatalogRoute
   "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
   "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
   "/admin/email/sending": typeof AdminEmailSendingRoute
   "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin_/forgot-password/sent": typeof AdminForgotPasswordSentRoute
   "/admin/audit/": typeof AdminAuditIndexRoute
   "/admin/companies/": typeof AdminCompaniesIndexRoute
   "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
@@ -362,8 +427,6 @@ export interface FileRoutesById {
   "/admin/leads/": typeof AdminLeadsIndexRoute
   "/admin/plans/": typeof AdminPlansIndexRoute
   "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
-  "/admin_/forgot-password/": typeof AdminForgotPasswordIndexRoute
-  "/admin_/reset-password/": typeof AdminResetPasswordIndexRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
   "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
@@ -371,6 +434,12 @@ export interface FileRoutesById {
   "/company/setup/": typeof CompanySetupIndexRoute
   "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
   "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
+  "/company/account/profile/": typeof CompanyAccountProfileIndexRoute
+  "/company/account/security/": typeof CompanyAccountSecurityIndexRoute
+  "/company/account/sessions/": typeof CompanyAccountSessionsIndexRoute
+  "/platform/account/profile/": typeof PlatformAccountProfileIndexRoute
+  "/platform/account/security/": typeof PlatformAccountSecurityIndexRoute
+  "/platform/account/sessions/": typeof PlatformAccountSessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -378,25 +447,28 @@ export interface FileRouteTypes {
     | "/"
     | "/admin"
     | "/company"
+    | "/platform"
     | "/admin/companies"
     | "/admin/leads"
-    | "/admin/login"
-    | "/forgot-password/sent"
-    | "/accept-invitation/"
+    | "/company/accept-invitation"
+    | "/company/change-password"
+    | "/company/forgot-password"
+    | "/company/login"
+    | "/company/reset-password"
+    | "/platform/accept-invitation"
+    | "/platform/change-password"
+    | "/platform/forgot-password"
+    | "/platform/login"
+    | "/platform/reset-password"
     | "/admin/"
-    | "/change-password/"
     | "/forbidden/"
-    | "/forgot-password/"
-    | "/login/"
     | "/plans/"
-    | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
-    | "/admin/forgot-password/sent"
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/conversion-requests/"
@@ -405,8 +477,6 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
-    | "/admin/forgot-password/"
-    | "/admin/reset-password/"
     | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
@@ -414,26 +484,35 @@ export interface FileRouteTypes {
     | "/company/setup/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
+    | "/company/account/profile/"
+    | "/company/account/security/"
+    | "/company/account/sessions/"
+    | "/platform/account/profile/"
+    | "/platform/account/security/"
+    | "/platform/account/sessions/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
     | "/company"
-    | "/admin/login"
-    | "/forgot-password/sent"
-    | "/accept-invitation"
+    | "/platform"
+    | "/company/accept-invitation"
+    | "/company/change-password"
+    | "/company/forgot-password"
+    | "/company/login"
+    | "/company/reset-password"
+    | "/platform/accept-invitation"
+    | "/platform/change-password"
+    | "/platform/forgot-password"
+    | "/platform/login"
+    | "/platform/reset-password"
     | "/admin"
-    | "/change-password"
     | "/forbidden"
-    | "/forgot-password"
-    | "/login"
     | "/plans"
-    | "/reset-password"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
-    | "/admin/forgot-password/sent"
     | "/admin/audit"
     | "/admin/companies"
     | "/admin/conversion-requests"
@@ -442,8 +521,6 @@ export interface FileRouteTypes {
     | "/admin/leads"
     | "/admin/plans"
     | "/admin/subscriptions"
-    | "/admin/forgot-password"
-    | "/admin/reset-password"
     | "/company/audit"
     | "/company/dashboard"
     | "/company/email-settings"
@@ -451,30 +528,39 @@ export interface FileRouteTypes {
     | "/company/setup"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId"
+    | "/company/account/profile"
+    | "/company/account/security"
+    | "/company/account/sessions"
+    | "/platform/account/profile"
+    | "/platform/account/security"
+    | "/platform/account/sessions"
   id:
     | "__root__"
     | "/"
     | "/admin"
     | "/company"
+    | "/platform"
     | "/admin/companies"
     | "/admin/leads"
-    | "/admin_/login"
-    | "/forgot-password/sent"
-    | "/accept-invitation/"
+    | "/company_/accept-invitation"
+    | "/company_/change-password"
+    | "/company_/forgot-password"
+    | "/company_/login"
+    | "/company_/reset-password"
+    | "/platform_/accept-invitation"
+    | "/platform_/change-password"
+    | "/platform_/forgot-password"
+    | "/platform_/login"
+    | "/platform_/reset-password"
     | "/admin/"
-    | "/change-password/"
     | "/forbidden/"
-    | "/forgot-password/"
-    | "/login/"
     | "/plans/"
-    | "/reset-password/"
     | "/admin/companies/$publicId"
     | "/admin/audit/catalog"
     | "/admin/conversion-requests/$publicId"
     | "/admin/email/deliveries"
     | "/admin/email/sending"
     | "/admin/leads/$publicId"
-    | "/admin_/forgot-password/sent"
     | "/admin/audit/"
     | "/admin/companies/"
     | "/admin/conversion-requests/"
@@ -483,8 +569,6 @@ export interface FileRouteTypes {
     | "/admin/leads/"
     | "/admin/plans/"
     | "/admin/subscriptions/"
-    | "/admin_/forgot-password/"
-    | "/admin_/reset-password/"
     | "/company/audit/"
     | "/company/dashboard/"
     | "/company/email-settings/"
@@ -492,28 +576,42 @@ export interface FileRouteTypes {
     | "/company/setup/"
     | "/admin/companies/$publicId/email-settings"
     | "/admin/companies/$publicId/"
+    | "/company/account/profile/"
+    | "/company/account/security/"
+    | "/company/account/sessions/"
+    | "/platform/account/profile/"
+    | "/platform/account/security/"
+    | "/platform/account/sessions/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   CompanyRouteRoute: typeof CompanyRouteRouteWithChildren
-  AdminLoginRoute: typeof AdminLoginRoute
-  ForgotPasswordSentRoute: typeof ForgotPasswordSentRoute
-  AcceptInvitationIndexRoute: typeof AcceptInvitationIndexRoute
-  ChangePasswordIndexRoute: typeof ChangePasswordIndexRoute
+  PlatformRouteRoute: typeof PlatformRouteRouteWithChildren
+  CompanyAcceptInvitationRoute: typeof CompanyAcceptInvitationRoute
+  CompanyChangePasswordRoute: typeof CompanyChangePasswordRoute
+  CompanyForgotPasswordRoute: typeof CompanyForgotPasswordRoute
+  CompanyLoginRoute: typeof CompanyLoginRoute
+  CompanyResetPasswordRoute: typeof CompanyResetPasswordRoute
+  PlatformAcceptInvitationRoute: typeof PlatformAcceptInvitationRoute
+  PlatformChangePasswordRoute: typeof PlatformChangePasswordRoute
+  PlatformForgotPasswordRoute: typeof PlatformForgotPasswordRoute
+  PlatformLoginRoute: typeof PlatformLoginRoute
+  PlatformResetPasswordRoute: typeof PlatformResetPasswordRoute
   ForbiddenIndexRoute: typeof ForbiddenIndexRoute
-  ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
-  LoginIndexRoute: typeof LoginIndexRoute
   PlansIndexRoute: typeof PlansIndexRoute
-  ResetPasswordIndexRoute: typeof ResetPasswordIndexRoute
-  AdminForgotPasswordSentRoute: typeof AdminForgotPasswordSentRoute
-  AdminForgotPasswordIndexRoute: typeof AdminForgotPasswordIndexRoute
-  AdminResetPasswordIndexRoute: typeof AdminResetPasswordIndexRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/platform": {
+      id: "/platform"
+      path: "/platform"
+      fullPath: "/platform"
+      preLoaderRoute: typeof PlatformRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/company": {
       id: "/company"
       path: "/company"
@@ -535,32 +633,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/reset-password/": {
-      id: "/reset-password/"
-      path: "/reset-password"
-      fullPath: "/reset-password/"
-      preLoaderRoute: typeof ResetPasswordIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     "/plans/": {
       id: "/plans/"
       path: "/plans"
       fullPath: "/plans/"
       preLoaderRoute: typeof PlansIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/login/": {
-      id: "/login/"
-      path: "/login"
-      fullPath: "/login/"
-      preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/forgot-password/": {
-      id: "/forgot-password/"
-      path: "/forgot-password"
-      fullPath: "/forgot-password/"
-      preLoaderRoute: typeof ForgotPasswordIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/forbidden/": {
@@ -570,13 +647,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ForbiddenIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/change-password/": {
-      id: "/change-password/"
-      path: "/change-password"
-      fullPath: "/change-password/"
-      preLoaderRoute: typeof ChangePasswordIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     "/admin/": {
       id: "/admin/"
       path: "/"
@@ -584,25 +654,74 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    "/accept-invitation/": {
-      id: "/accept-invitation/"
-      path: "/accept-invitation"
-      fullPath: "/accept-invitation/"
-      preLoaderRoute: typeof AcceptInvitationIndexRouteImport
+    "/platform_/reset-password": {
+      id: "/platform_/reset-password"
+      path: "/platform/reset-password"
+      fullPath: "/platform/reset-password"
+      preLoaderRoute: typeof PlatformResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/forgot-password/sent": {
-      id: "/forgot-password/sent"
-      path: "/forgot-password/sent"
-      fullPath: "/forgot-password/sent"
-      preLoaderRoute: typeof ForgotPasswordSentRouteImport
+    "/platform_/login": {
+      id: "/platform_/login"
+      path: "/platform/login"
+      fullPath: "/platform/login"
+      preLoaderRoute: typeof PlatformLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/admin_/login": {
-      id: "/admin_/login"
-      path: "/admin/login"
-      fullPath: "/admin/login"
-      preLoaderRoute: typeof AdminLoginRouteImport
+    "/platform_/forgot-password": {
+      id: "/platform_/forgot-password"
+      path: "/platform/forgot-password"
+      fullPath: "/platform/forgot-password"
+      preLoaderRoute: typeof PlatformForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/platform_/change-password": {
+      id: "/platform_/change-password"
+      path: "/platform/change-password"
+      fullPath: "/platform/change-password"
+      preLoaderRoute: typeof PlatformChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/platform_/accept-invitation": {
+      id: "/platform_/accept-invitation"
+      path: "/platform/accept-invitation"
+      fullPath: "/platform/accept-invitation"
+      preLoaderRoute: typeof PlatformAcceptInvitationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company_/reset-password": {
+      id: "/company_/reset-password"
+      path: "/company/reset-password"
+      fullPath: "/company/reset-password"
+      preLoaderRoute: typeof CompanyResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company_/login": {
+      id: "/company_/login"
+      path: "/company/login"
+      fullPath: "/company/login"
+      preLoaderRoute: typeof CompanyLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company_/forgot-password": {
+      id: "/company_/forgot-password"
+      path: "/company/forgot-password"
+      fullPath: "/company/forgot-password"
+      preLoaderRoute: typeof CompanyForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company_/change-password": {
+      id: "/company_/change-password"
+      path: "/company/change-password"
+      fullPath: "/company/change-password"
+      preLoaderRoute: typeof CompanyChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/company_/accept-invitation": {
+      id: "/company_/accept-invitation"
+      path: "/company/accept-invitation"
+      fullPath: "/company/accept-invitation"
+      preLoaderRoute: typeof CompanyAcceptInvitationRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/admin/leads": {
@@ -653,20 +772,6 @@ declare module "@tanstack/react-router" {
       fullPath: "/company/audit/"
       preLoaderRoute: typeof CompanyAuditIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
-    }
-    "/admin_/reset-password/": {
-      id: "/admin_/reset-password/"
-      path: "/admin/reset-password"
-      fullPath: "/admin/reset-password/"
-      preLoaderRoute: typeof AdminResetPasswordIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/admin_/forgot-password/": {
-      id: "/admin_/forgot-password/"
-      path: "/admin/forgot-password"
-      fullPath: "/admin/forgot-password/"
-      preLoaderRoute: typeof AdminForgotPasswordIndexRouteImport
-      parentRoute: typeof rootRouteImport
     }
     "/admin/subscriptions/": {
       id: "/admin/subscriptions/"
@@ -724,13 +829,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminAuditIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    "/admin_/forgot-password/sent": {
-      id: "/admin_/forgot-password/sent"
-      path: "/admin/forgot-password/sent"
-      fullPath: "/admin/forgot-password/sent"
-      preLoaderRoute: typeof AdminForgotPasswordSentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     "/admin/leads/$publicId": {
       id: "/admin/leads/$publicId"
       path: "/$publicId"
@@ -772,6 +870,48 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/companies/$publicId"
       preLoaderRoute: typeof AdminCompaniesPublicIdRouteRouteImport
       parentRoute: typeof AdminCompaniesRouteRoute
+    }
+    "/platform/account/sessions/": {
+      id: "/platform/account/sessions/"
+      path: "/account/sessions"
+      fullPath: "/platform/account/sessions/"
+      preLoaderRoute: typeof PlatformAccountSessionsIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/platform/account/security/": {
+      id: "/platform/account/security/"
+      path: "/account/security"
+      fullPath: "/platform/account/security/"
+      preLoaderRoute: typeof PlatformAccountSecurityIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/platform/account/profile/": {
+      id: "/platform/account/profile/"
+      path: "/account/profile"
+      fullPath: "/platform/account/profile/"
+      preLoaderRoute: typeof PlatformAccountProfileIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/company/account/sessions/": {
+      id: "/company/account/sessions/"
+      path: "/account/sessions"
+      fullPath: "/company/account/sessions/"
+      preLoaderRoute: typeof CompanyAccountSessionsIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
+    "/company/account/security/": {
+      id: "/company/account/security/"
+      path: "/account/security"
+      fullPath: "/company/account/security/"
+      preLoaderRoute: typeof CompanyAccountSecurityIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
+    "/company/account/profile/": {
+      id: "/company/account/profile/"
+      path: "/account/profile"
+      fullPath: "/company/account/profile/"
+      preLoaderRoute: typeof CompanyAccountProfileIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
     }
     "/admin/companies/$publicId/": {
       id: "/admin/companies/$publicId/"
@@ -877,6 +1017,9 @@ interface CompanyRouteRouteChildren {
   CompanyEmailSettingsIndexRoute: typeof CompanyEmailSettingsIndexRoute
   CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
   CompanySetupIndexRoute: typeof CompanySetupIndexRoute
+  CompanyAccountProfileIndexRoute: typeof CompanyAccountProfileIndexRoute
+  CompanyAccountSecurityIndexRoute: typeof CompanyAccountSecurityIndexRoute
+  CompanyAccountSessionsIndexRoute: typeof CompanyAccountSessionsIndexRoute
 }
 
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
@@ -885,28 +1028,48 @@ const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
   CompanyEmailSettingsIndexRoute: CompanyEmailSettingsIndexRoute,
   CompanyProfileIndexRoute: CompanyProfileIndexRoute,
   CompanySetupIndexRoute: CompanySetupIndexRoute,
+  CompanyAccountProfileIndexRoute: CompanyAccountProfileIndexRoute,
+  CompanyAccountSecurityIndexRoute: CompanyAccountSecurityIndexRoute,
+  CompanyAccountSessionsIndexRoute: CompanyAccountSessionsIndexRoute,
 }
 
 const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
   CompanyRouteRouteChildren,
 )
 
+interface PlatformRouteRouteChildren {
+  PlatformAccountProfileIndexRoute: typeof PlatformAccountProfileIndexRoute
+  PlatformAccountSecurityIndexRoute: typeof PlatformAccountSecurityIndexRoute
+  PlatformAccountSessionsIndexRoute: typeof PlatformAccountSessionsIndexRoute
+}
+
+const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
+  PlatformAccountProfileIndexRoute: PlatformAccountProfileIndexRoute,
+  PlatformAccountSecurityIndexRoute: PlatformAccountSecurityIndexRoute,
+  PlatformAccountSessionsIndexRoute: PlatformAccountSessionsIndexRoute,
+}
+
+const PlatformRouteRouteWithChildren = PlatformRouteRoute._addFileChildren(
+  PlatformRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   CompanyRouteRoute: CompanyRouteRouteWithChildren,
-  AdminLoginRoute: AdminLoginRoute,
-  ForgotPasswordSentRoute: ForgotPasswordSentRoute,
-  AcceptInvitationIndexRoute: AcceptInvitationIndexRoute,
-  ChangePasswordIndexRoute: ChangePasswordIndexRoute,
+  PlatformRouteRoute: PlatformRouteRouteWithChildren,
+  CompanyAcceptInvitationRoute: CompanyAcceptInvitationRoute,
+  CompanyChangePasswordRoute: CompanyChangePasswordRoute,
+  CompanyForgotPasswordRoute: CompanyForgotPasswordRoute,
+  CompanyLoginRoute: CompanyLoginRoute,
+  CompanyResetPasswordRoute: CompanyResetPasswordRoute,
+  PlatformAcceptInvitationRoute: PlatformAcceptInvitationRoute,
+  PlatformChangePasswordRoute: PlatformChangePasswordRoute,
+  PlatformForgotPasswordRoute: PlatformForgotPasswordRoute,
+  PlatformLoginRoute: PlatformLoginRoute,
+  PlatformResetPasswordRoute: PlatformResetPasswordRoute,
   ForbiddenIndexRoute: ForbiddenIndexRoute,
-  ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
-  LoginIndexRoute: LoginIndexRoute,
   PlansIndexRoute: PlansIndexRoute,
-  ResetPasswordIndexRoute: ResetPasswordIndexRoute,
-  AdminForgotPasswordSentRoute: AdminForgotPasswordSentRoute,
-  AdminForgotPasswordIndexRoute: AdminForgotPasswordIndexRoute,
-  AdminResetPasswordIndexRoute: AdminResetPasswordIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

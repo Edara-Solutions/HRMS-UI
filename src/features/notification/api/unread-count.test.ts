@@ -1,6 +1,17 @@
 // @vitest-environment node
 
+import ky from "ky";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+// This dormant workflow's caching tests exercise responses, not the retired production transport.
+vi.mock("@/shared/api", async (original) => {
+  const actual = await original<typeof import("@/shared/api")>();
+  return {
+    ...actual,
+    apiClient: ky.create({ prefixUrl: actual.apiBaseUrl, credentials: "omit", retry: 0 }),
+  };
+});
+
 import { fetchUnreadNotificationCount } from "./unread-count";
 
 function countResponse(body: unknown, headers: Record<string, string>) {

@@ -1,13 +1,15 @@
 // @vitest-environment node
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type AuthSession, useAuthStore } from "@/shared/auth";
+import { useCompanySession as useAuthStore, usePlatformSession } from "@/shared/auth";
+import { companySessionFixture, platformSessionFixture } from "../../test/audience-fixtures";
 import { operation, responseSchemas } from "./generated/public/get-api-v1-public-plans";
 import { executePublicRequest } from "./public-api";
 
 afterEach(() => {
   vi.unstubAllGlobals();
   useAuthStore.setState({ session: null, status: "anonymous" });
+  usePlatformSession.setState({ session: null, status: "anonymous" });
 });
 
 describe("publicApi", () => {
@@ -34,25 +36,9 @@ describe("publicApi", () => {
   });
 
   it("does not refresh, clear a session, or redirect after a 401", async () => {
-    const session: AuthSession = {
-      accessToken: "private-access-token",
-      refreshToken: "private-refresh-token",
-      sessionId: "session-1",
-      expiresIn: 900,
-      user: {
-        publicId: "user-1",
-        employeeCode: "EMP-1",
-        firstName: "A",
-        lastName: "B",
-        email: "a@example.com",
-        status: "ACTIVE",
-        companyCode: "ACME",
-        mustChangePassword: false,
-        permissions: [],
-        isOwner: false,
-        isPlatformAdmin: false,
-      },
-    };
+    const session = companySessionFixture();
+    const platform = platformSessionFixture();
+    usePlatformSession.setState({ session: platform, status: "authenticated" });
     useAuthStore.setState({ session, status: "authenticated" });
     const fetchMock = vi.fn(
       async () => new Response(JSON.stringify({ message: "unauthorized" }), { status: 401 }),
@@ -68,5 +54,6 @@ describe("publicApi", () => {
     ).rejects.toThrow();
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(useAuthStore.getState().session).toBe(session);
+    expect(usePlatformSession.getState().session).toBe(platform);
   });
 });

@@ -4,7 +4,7 @@ import {
   executePublicRequest,
   loadPublicPlansContract,
   type PublicPlansRequest,
-} from "@/shared/api";
+} from "@/shared/public-api";
 
 export interface PublicPlanSearch {
   billingInterval?: PublicPlansRequest["query"]["billingInterval"];

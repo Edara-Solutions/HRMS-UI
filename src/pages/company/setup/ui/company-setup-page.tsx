@@ -266,7 +266,7 @@ function ActivationCard({
 }
 
 export function CompanySetupPage() {
-  const session = useCurrentSession();
+  const session = useCurrentSession("company");
   const companyPublicId = session?.user.companyPublicId ?? null;
   const navigate = useNavigate();
   const profileQuery = useCompanyProfile(companyPublicId);

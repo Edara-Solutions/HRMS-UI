@@ -2,7 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useAuthStore } from "@/shared/auth";
+import { useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../../test/audience-fixtures";
 import { buildProfileUpdate } from "../model/company-profile-update";
 import { CompanyProfilePage } from "./company-profile-page";
 
@@ -77,29 +78,9 @@ function errorResponse(status: number, body: unknown) {
 }
 
 function setOwnerSession() {
-  useAuthStore.setState({
-    status: "authenticated",
-    session: {
-      accessToken: "token",
-      refreshToken: "refresh",
-      sessionId: "session-1",
-      expiresIn: 900,
-      user: {
-        publicId: "owner-1",
-        employeeCode: "OWNER-001",
-        firstName: "Nadia",
-        lastName: "Hassan",
-        email: "owner@example.com",
-        status: "ACTIVE",
-        companyCode: "NW",
-        companyPublicId: "company-1",
-        mustChangePassword: false,
-        permissions: [],
-        isOwner: true,
-        isPlatformAdmin: false,
-      },
-    },
-  });
+  useCompanySession
+    .getState()
+    .setSession(companySessionFixture({ companyPublicId: "company-1", isOwner: true }));
 }
 
 function renderPage() {
@@ -148,7 +129,7 @@ describe("CompanyProfilePage", () => {
     cleanup();
     apiGetMock.mockReset();
     apiPatchMock.mockReset();
-    useAuthStore.setState({ session: null, status: "anonymous" });
+    useCompanySession.getState().clearSession();
   });
 
   it("loads by the authenticated company context and resets to canonical save values", async () => {

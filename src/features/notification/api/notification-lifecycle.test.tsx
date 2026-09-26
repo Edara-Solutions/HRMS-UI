@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { AudienceSessionProvider, useCompanySession as useAuthStore } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
 import { notificationKeys } from "../model/notification-keys";
 import { useBulkReadCursor } from "../model/notification-read-state";
 import type { NotificationFeedItem } from "./notification-feed";
@@ -22,27 +22,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   apiClient: { post: postMock },
 }));
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
+const session = companySessionFixture();
 
 function feedItem(id: number): NotificationFeedItem {
   return {
@@ -88,7 +68,9 @@ function cachedCount(queryClient: QueryClient) {
 
 function renderLifecycle<T>(useLifecycle: () => T, queryClient: QueryClient) {
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <AudienceSessionProvider audience="company">
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </AudienceSessionProvider>
   );
 
   return renderHook(useLifecycle, { wrapper });
