@@ -11,11 +11,11 @@
 import { Route as rootRouteImport } from "./app/routes/__root"
 import { Route as PlatformRouteRouteImport } from "./app/routes/platform/route"
 import { Route as CompanyRouteRouteImport } from "./app/routes/company/route"
-import { Route as AdminRouteRouteImport } from "./app/routes/admin/route"
 import { Route as IndexRouteImport } from "./app/routes/index"
+import { Route as PlatformIndexRouteImport } from "./app/routes/platform/index"
 import { Route as PlansIndexRouteImport } from "./app/routes/plans/index"
 import { Route as ForbiddenIndexRouteImport } from "./app/routes/forbidden/index"
-import { Route as AdminIndexRouteImport } from "./app/routes/admin/index"
+import { Route as CompanyIndexRouteImport } from "./app/routes/company/index"
 import { Route as PlatformResetPasswordRouteImport } from "./app/routes/platform_/reset-password"
 import { Route as PlatformLoginRouteImport } from "./app/routes/platform_/login"
 import { Route as PlatformForgotPasswordRouteImport } from "./app/routes/platform_/forgot-password"
@@ -26,35 +26,14 @@ import { Route as CompanyLoginRouteImport } from "./app/routes/company_/login"
 import { Route as CompanyForgotPasswordRouteImport } from "./app/routes/company_/forgot-password"
 import { Route as CompanyChangePasswordRouteImport } from "./app/routes/company_/change-password"
 import { Route as CompanyAcceptInvitationRouteImport } from "./app/routes/company_/accept-invitation"
-import { Route as AdminLeadsRouteRouteImport } from "./app/routes/admin/leads/route"
-import { Route as AdminCompaniesRouteRouteImport } from "./app/routes/admin/companies/route"
-import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
-import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
-import { Route as CompanyEmailSettingsIndexRouteImport } from "./app/routes/company/email-settings/index"
+import { Route as PlatformDashboardIndexRouteImport } from "./app/routes/platform/dashboard/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
-import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
-import { Route as AdminSubscriptionsIndexRouteImport } from "./app/routes/admin/subscriptions/index"
-import { Route as AdminPlansIndexRouteImport } from "./app/routes/admin/plans/index"
-import { Route as AdminLeadsIndexRouteImport } from "./app/routes/admin/leads/index"
-import { Route as AdminEmailIndexRouteImport } from "./app/routes/admin/email/index"
-import { Route as AdminDashboardIndexRouteImport } from "./app/routes/admin/dashboard/index"
-import { Route as AdminConversionRequestsIndexRouteImport } from "./app/routes/admin/conversion-requests/index"
-import { Route as AdminCompaniesIndexRouteImport } from "./app/routes/admin/companies/index"
-import { Route as AdminAuditIndexRouteImport } from "./app/routes/admin/audit/index"
-import { Route as AdminLeadsPublicIdRouteImport } from "./app/routes/admin/leads/$publicId"
-import { Route as AdminEmailSendingRouteImport } from "./app/routes/admin/email/sending"
-import { Route as AdminEmailDeliveriesRouteImport } from "./app/routes/admin/email/deliveries"
-import { Route as AdminConversionRequestsPublicIdRouteImport } from "./app/routes/admin/conversion-requests/$publicId"
-import { Route as AdminAuditCatalogRouteImport } from "./app/routes/admin/audit/catalog"
-import { Route as AdminCompaniesPublicIdRouteRouteImport } from "./app/routes/admin/companies/$publicId/route"
-import { Route as PlatformAccountSessionsIndexRouteImport } from "./app/routes/platform/account/sessions/index"
-import { Route as PlatformAccountSecurityIndexRouteImport } from "./app/routes/platform/account/security/index"
-import { Route as PlatformAccountProfileIndexRouteImport } from "./app/routes/platform/account/profile/index"
-import { Route as CompanyAccountSessionsIndexRouteImport } from "./app/routes/company/account/sessions/index"
-import { Route as CompanyAccountSecurityIndexRouteImport } from "./app/routes/company/account/security/index"
-import { Route as CompanyAccountProfileIndexRouteImport } from "./app/routes/company/account/profile/index"
-import { Route as AdminCompaniesPublicIdIndexRouteImport } from "./app/routes/admin/companies/$publicId/index"
-import { Route as AdminCompaniesPublicIdEmailSettingsRouteImport } from "./app/routes/admin/companies/$publicId/email-settings"
+import { Route as PlatformMeSessionsIndexRouteImport } from "./app/routes/platform/me/sessions/index"
+import { Route as PlatformMeSecurityIndexRouteImport } from "./app/routes/platform/me/security/index"
+import { Route as PlatformMeProfileIndexRouteImport } from "./app/routes/platform/me/profile/index"
+import { Route as CompanyMeSessionsIndexRouteImport } from "./app/routes/company/me/sessions/index"
+import { Route as CompanyMeSecurityIndexRouteImport } from "./app/routes/company/me/security/index"
+import { Route as CompanyMeProfileIndexRouteImport } from "./app/routes/company/me/profile/index"
 
 const PlatformRouteRoute = PlatformRouteRouteImport.update({
   id: "/platform",
@@ -66,15 +45,15 @@ const CompanyRouteRoute = CompanyRouteRouteImport.update({
   path: "/company",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: "/admin",
-  path: "/admin",
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformIndexRoute = PlatformIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlatformRouteRoute,
 } as any)
 const PlansIndexRoute = PlansIndexRouteImport.update({
   id: "/plans/",
@@ -86,10 +65,10 @@ const ForbiddenIndexRoute = ForbiddenIndexRouteImport.update({
   path: "/forbidden/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
+const CompanyIndexRoute = CompanyIndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => AdminRouteRoute,
+  getParentRoute: () => CompanyRouteRoute,
 } as any)
 const PlatformResetPasswordRoute = PlatformResetPasswordRouteImport.update({
   id: "/platform_/reset-password",
@@ -142,171 +121,51 @@ const CompanyAcceptInvitationRoute = CompanyAcceptInvitationRouteImport.update({
   path: "/company/accept-invitation",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLeadsRouteRoute = AdminLeadsRouteRouteImport.update({
-  id: "/leads",
-  path: "/leads",
-  getParentRoute: () => AdminRouteRoute,
+const PlatformDashboardIndexRoute = PlatformDashboardIndexRouteImport.update({
+  id: "/dashboard/",
+  path: "/dashboard/",
+  getParentRoute: () => PlatformRouteRoute,
 } as any)
-const AdminCompaniesRouteRoute = AdminCompaniesRouteRouteImport.update({
-  id: "/companies",
-  path: "/companies",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const CompanySetupIndexRoute = CompanySetupIndexRouteImport.update({
-  id: "/setup/",
-  path: "/setup/",
-  getParentRoute: () => CompanyRouteRoute,
-} as any)
-const CompanyProfileIndexRoute = CompanyProfileIndexRouteImport.update({
-  id: "/profile/",
-  path: "/profile/",
-  getParentRoute: () => CompanyRouteRoute,
-} as any)
-const CompanyEmailSettingsIndexRoute =
-  CompanyEmailSettingsIndexRouteImport.update({
-    id: "/email-settings/",
-    path: "/email-settings/",
-    getParentRoute: () => CompanyRouteRoute,
-  } as any)
 const CompanyDashboardIndexRoute = CompanyDashboardIndexRouteImport.update({
   id: "/dashboard/",
   path: "/dashboard/",
   getParentRoute: () => CompanyRouteRoute,
 } as any)
-const CompanyAuditIndexRoute = CompanyAuditIndexRouteImport.update({
-  id: "/audit/",
-  path: "/audit/",
+const PlatformMeSessionsIndexRoute = PlatformMeSessionsIndexRouteImport.update({
+  id: "/me/sessions/",
+  path: "/me/sessions/",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
+const PlatformMeSecurityIndexRoute = PlatformMeSecurityIndexRouteImport.update({
+  id: "/me/security/",
+  path: "/me/security/",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
+const PlatformMeProfileIndexRoute = PlatformMeProfileIndexRouteImport.update({
+  id: "/me/profile/",
+  path: "/me/profile/",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
+const CompanyMeSessionsIndexRoute = CompanyMeSessionsIndexRouteImport.update({
+  id: "/me/sessions/",
+  path: "/me/sessions/",
   getParentRoute: () => CompanyRouteRoute,
 } as any)
-const AdminSubscriptionsIndexRoute = AdminSubscriptionsIndexRouteImport.update({
-  id: "/subscriptions/",
-  path: "/subscriptions/",
-  getParentRoute: () => AdminRouteRoute,
+const CompanyMeSecurityIndexRoute = CompanyMeSecurityIndexRouteImport.update({
+  id: "/me/security/",
+  path: "/me/security/",
+  getParentRoute: () => CompanyRouteRoute,
 } as any)
-const AdminPlansIndexRoute = AdminPlansIndexRouteImport.update({
-  id: "/plans/",
-  path: "/plans/",
-  getParentRoute: () => AdminRouteRoute,
+const CompanyMeProfileIndexRoute = CompanyMeProfileIndexRouteImport.update({
+  id: "/me/profile/",
+  path: "/me/profile/",
+  getParentRoute: () => CompanyRouteRoute,
 } as any)
-const AdminLeadsIndexRoute = AdminLeadsIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AdminLeadsRouteRoute,
-} as any)
-const AdminEmailIndexRoute = AdminEmailIndexRouteImport.update({
-  id: "/email/",
-  path: "/email/",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
-  id: "/dashboard/",
-  path: "/dashboard/",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminConversionRequestsIndexRoute =
-  AdminConversionRequestsIndexRouteImport.update({
-    id: "/conversion-requests/",
-    path: "/conversion-requests/",
-    getParentRoute: () => AdminRouteRoute,
-  } as any)
-const AdminCompaniesIndexRoute = AdminCompaniesIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AdminCompaniesRouteRoute,
-} as any)
-const AdminAuditIndexRoute = AdminAuditIndexRouteImport.update({
-  id: "/audit/",
-  path: "/audit/",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLeadsPublicIdRoute = AdminLeadsPublicIdRouteImport.update({
-  id: "/$publicId",
-  path: "/$publicId",
-  getParentRoute: () => AdminLeadsRouteRoute,
-} as any)
-const AdminEmailSendingRoute = AdminEmailSendingRouteImport.update({
-  id: "/email/sending",
-  path: "/email/sending",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminEmailDeliveriesRoute = AdminEmailDeliveriesRouteImport.update({
-  id: "/email/deliveries",
-  path: "/email/deliveries",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminConversionRequestsPublicIdRoute =
-  AdminConversionRequestsPublicIdRouteImport.update({
-    id: "/conversion-requests/$publicId",
-    path: "/conversion-requests/$publicId",
-    getParentRoute: () => AdminRouteRoute,
-  } as any)
-const AdminAuditCatalogRoute = AdminAuditCatalogRouteImport.update({
-  id: "/audit/catalog",
-  path: "/audit/catalog",
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminCompaniesPublicIdRouteRoute =
-  AdminCompaniesPublicIdRouteRouteImport.update({
-    id: "/$publicId",
-    path: "/$publicId",
-    getParentRoute: () => AdminCompaniesRouteRoute,
-  } as any)
-const PlatformAccountSessionsIndexRoute =
-  PlatformAccountSessionsIndexRouteImport.update({
-    id: "/account/sessions/",
-    path: "/account/sessions/",
-    getParentRoute: () => PlatformRouteRoute,
-  } as any)
-const PlatformAccountSecurityIndexRoute =
-  PlatformAccountSecurityIndexRouteImport.update({
-    id: "/account/security/",
-    path: "/account/security/",
-    getParentRoute: () => PlatformRouteRoute,
-  } as any)
-const PlatformAccountProfileIndexRoute =
-  PlatformAccountProfileIndexRouteImport.update({
-    id: "/account/profile/",
-    path: "/account/profile/",
-    getParentRoute: () => PlatformRouteRoute,
-  } as any)
-const CompanyAccountSessionsIndexRoute =
-  CompanyAccountSessionsIndexRouteImport.update({
-    id: "/account/sessions/",
-    path: "/account/sessions/",
-    getParentRoute: () => CompanyRouteRoute,
-  } as any)
-const CompanyAccountSecurityIndexRoute =
-  CompanyAccountSecurityIndexRouteImport.update({
-    id: "/account/security/",
-    path: "/account/security/",
-    getParentRoute: () => CompanyRouteRoute,
-  } as any)
-const CompanyAccountProfileIndexRoute =
-  CompanyAccountProfileIndexRouteImport.update({
-    id: "/account/profile/",
-    path: "/account/profile/",
-    getParentRoute: () => CompanyRouteRoute,
-  } as any)
-const AdminCompaniesPublicIdIndexRoute =
-  AdminCompaniesPublicIdIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => AdminCompaniesPublicIdRouteRoute,
-  } as any)
-const AdminCompaniesPublicIdEmailSettingsRoute =
-  AdminCompaniesPublicIdEmailSettingsRouteImport.update({
-    id: "/email-settings",
-    path: "/email-settings",
-    getParentRoute: () => AdminCompaniesPublicIdRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
-  "/admin": typeof AdminRouteRouteWithChildren
   "/company": typeof CompanyRouteRouteWithChildren
   "/platform": typeof PlatformRouteRouteWithChildren
-  "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
-  "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/company/accept-invitation": typeof CompanyAcceptInvitationRoute
   "/company/change-password": typeof CompanyChangePasswordRoute
   "/company/forgot-password": typeof CompanyForgotPasswordRoute
@@ -317,41 +176,21 @@ export interface FileRoutesByFullPath {
   "/platform/forgot-password": typeof PlatformForgotPasswordRoute
   "/platform/login": typeof PlatformLoginRoute
   "/platform/reset-password": typeof PlatformResetPasswordRoute
-  "/admin/": typeof AdminIndexRoute
+  "/company/": typeof CompanyIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
   "/plans/": typeof PlansIndexRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
-  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
-  "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
-  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
-  "/admin/email/sending": typeof AdminEmailSendingRoute
-  "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin/audit/": typeof AdminAuditIndexRoute
-  "/admin/companies/": typeof AdminCompaniesIndexRoute
-  "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
-  "/admin/dashboard/": typeof AdminDashboardIndexRoute
-  "/admin/email/": typeof AdminEmailIndexRoute
-  "/admin/leads/": typeof AdminLeadsIndexRoute
-  "/admin/plans/": typeof AdminPlansIndexRoute
-  "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
-  "/company/audit/": typeof CompanyAuditIndexRoute
+  "/platform/": typeof PlatformIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
-  "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
-  "/company/profile/": typeof CompanyProfileIndexRoute
-  "/company/setup/": typeof CompanySetupIndexRoute
-  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
-  "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
-  "/company/account/profile/": typeof CompanyAccountProfileIndexRoute
-  "/company/account/security/": typeof CompanyAccountSecurityIndexRoute
-  "/company/account/sessions/": typeof CompanyAccountSessionsIndexRoute
-  "/platform/account/profile/": typeof PlatformAccountProfileIndexRoute
-  "/platform/account/security/": typeof PlatformAccountSecurityIndexRoute
-  "/platform/account/sessions/": typeof PlatformAccountSessionsIndexRoute
+  "/platform/dashboard/": typeof PlatformDashboardIndexRoute
+  "/company/me/profile/": typeof CompanyMeProfileIndexRoute
+  "/company/me/security/": typeof CompanyMeSecurityIndexRoute
+  "/company/me/sessions/": typeof CompanyMeSessionsIndexRoute
+  "/platform/me/profile/": typeof PlatformMeProfileIndexRoute
+  "/platform/me/security/": typeof PlatformMeSecurityIndexRoute
+  "/platform/me/sessions/": typeof PlatformMeSessionsIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
-  "/company": typeof CompanyRouteRouteWithChildren
-  "/platform": typeof PlatformRouteRouteWithChildren
   "/company/accept-invitation": typeof CompanyAcceptInvitationRoute
   "/company/change-password": typeof CompanyChangePasswordRoute
   "/company/forgot-password": typeof CompanyForgotPasswordRoute
@@ -362,44 +201,24 @@ export interface FileRoutesByTo {
   "/platform/forgot-password": typeof PlatformForgotPasswordRoute
   "/platform/login": typeof PlatformLoginRoute
   "/platform/reset-password": typeof PlatformResetPasswordRoute
-  "/admin": typeof AdminIndexRoute
+  "/company": typeof CompanyIndexRoute
   "/forbidden": typeof ForbiddenIndexRoute
   "/plans": typeof PlansIndexRoute
-  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
-  "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
-  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
-  "/admin/email/sending": typeof AdminEmailSendingRoute
-  "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin/audit": typeof AdminAuditIndexRoute
-  "/admin/companies": typeof AdminCompaniesIndexRoute
-  "/admin/conversion-requests": typeof AdminConversionRequestsIndexRoute
-  "/admin/dashboard": typeof AdminDashboardIndexRoute
-  "/admin/email": typeof AdminEmailIndexRoute
-  "/admin/leads": typeof AdminLeadsIndexRoute
-  "/admin/plans": typeof AdminPlansIndexRoute
-  "/admin/subscriptions": typeof AdminSubscriptionsIndexRoute
-  "/company/audit": typeof CompanyAuditIndexRoute
+  "/platform": typeof PlatformIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
-  "/company/email-settings": typeof CompanyEmailSettingsIndexRoute
-  "/company/profile": typeof CompanyProfileIndexRoute
-  "/company/setup": typeof CompanySetupIndexRoute
-  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdIndexRoute
-  "/company/account/profile": typeof CompanyAccountProfileIndexRoute
-  "/company/account/security": typeof CompanyAccountSecurityIndexRoute
-  "/company/account/sessions": typeof CompanyAccountSessionsIndexRoute
-  "/platform/account/profile": typeof PlatformAccountProfileIndexRoute
-  "/platform/account/security": typeof PlatformAccountSecurityIndexRoute
-  "/platform/account/sessions": typeof PlatformAccountSessionsIndexRoute
+  "/platform/dashboard": typeof PlatformDashboardIndexRoute
+  "/company/me/profile": typeof CompanyMeProfileIndexRoute
+  "/company/me/security": typeof CompanyMeSecurityIndexRoute
+  "/company/me/sessions": typeof CompanyMeSessionsIndexRoute
+  "/platform/me/profile": typeof PlatformMeProfileIndexRoute
+  "/platform/me/security": typeof PlatformMeSecurityIndexRoute
+  "/platform/me/sessions": typeof PlatformMeSessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
-  "/admin": typeof AdminRouteRouteWithChildren
   "/company": typeof CompanyRouteRouteWithChildren
   "/platform": typeof PlatformRouteRouteWithChildren
-  "/admin/companies": typeof AdminCompaniesRouteRouteWithChildren
-  "/admin/leads": typeof AdminLeadsRouteRouteWithChildren
   "/company_/accept-invitation": typeof CompanyAcceptInvitationRoute
   "/company_/change-password": typeof CompanyChangePasswordRoute
   "/company_/forgot-password": typeof CompanyForgotPasswordRoute
@@ -410,46 +229,25 @@ export interface FileRoutesById {
   "/platform_/forgot-password": typeof PlatformForgotPasswordRoute
   "/platform_/login": typeof PlatformLoginRoute
   "/platform_/reset-password": typeof PlatformResetPasswordRoute
-  "/admin/": typeof AdminIndexRoute
+  "/company/": typeof CompanyIndexRoute
   "/forbidden/": typeof ForbiddenIndexRoute
   "/plans/": typeof PlansIndexRoute
-  "/admin/companies/$publicId": typeof AdminCompaniesPublicIdRouteRouteWithChildren
-  "/admin/audit/catalog": typeof AdminAuditCatalogRoute
-  "/admin/conversion-requests/$publicId": typeof AdminConversionRequestsPublicIdRoute
-  "/admin/email/deliveries": typeof AdminEmailDeliveriesRoute
-  "/admin/email/sending": typeof AdminEmailSendingRoute
-  "/admin/leads/$publicId": typeof AdminLeadsPublicIdRoute
-  "/admin/audit/": typeof AdminAuditIndexRoute
-  "/admin/companies/": typeof AdminCompaniesIndexRoute
-  "/admin/conversion-requests/": typeof AdminConversionRequestsIndexRoute
-  "/admin/dashboard/": typeof AdminDashboardIndexRoute
-  "/admin/email/": typeof AdminEmailIndexRoute
-  "/admin/leads/": typeof AdminLeadsIndexRoute
-  "/admin/plans/": typeof AdminPlansIndexRoute
-  "/admin/subscriptions/": typeof AdminSubscriptionsIndexRoute
-  "/company/audit/": typeof CompanyAuditIndexRoute
+  "/platform/": typeof PlatformIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
-  "/company/email-settings/": typeof CompanyEmailSettingsIndexRoute
-  "/company/profile/": typeof CompanyProfileIndexRoute
-  "/company/setup/": typeof CompanySetupIndexRoute
-  "/admin/companies/$publicId/email-settings": typeof AdminCompaniesPublicIdEmailSettingsRoute
-  "/admin/companies/$publicId/": typeof AdminCompaniesPublicIdIndexRoute
-  "/company/account/profile/": typeof CompanyAccountProfileIndexRoute
-  "/company/account/security/": typeof CompanyAccountSecurityIndexRoute
-  "/company/account/sessions/": typeof CompanyAccountSessionsIndexRoute
-  "/platform/account/profile/": typeof PlatformAccountProfileIndexRoute
-  "/platform/account/security/": typeof PlatformAccountSecurityIndexRoute
-  "/platform/account/sessions/": typeof PlatformAccountSessionsIndexRoute
+  "/platform/dashboard/": typeof PlatformDashboardIndexRoute
+  "/company/me/profile/": typeof CompanyMeProfileIndexRoute
+  "/company/me/security/": typeof CompanyMeSecurityIndexRoute
+  "/company/me/sessions/": typeof CompanyMeSessionsIndexRoute
+  "/platform/me/profile/": typeof PlatformMeProfileIndexRoute
+  "/platform/me/security/": typeof PlatformMeSecurityIndexRoute
+  "/platform/me/sessions/": typeof PlatformMeSessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | "/"
-    | "/admin"
     | "/company"
     | "/platform"
-    | "/admin/companies"
-    | "/admin/leads"
     | "/company/accept-invitation"
     | "/company/change-password"
     | "/company/forgot-password"
@@ -460,41 +258,21 @@ export interface FileRouteTypes {
     | "/platform/forgot-password"
     | "/platform/login"
     | "/platform/reset-password"
-    | "/admin/"
+    | "/company/"
     | "/forbidden/"
     | "/plans/"
-    | "/admin/companies/$publicId"
-    | "/admin/audit/catalog"
-    | "/admin/conversion-requests/$publicId"
-    | "/admin/email/deliveries"
-    | "/admin/email/sending"
-    | "/admin/leads/$publicId"
-    | "/admin/audit/"
-    | "/admin/companies/"
-    | "/admin/conversion-requests/"
-    | "/admin/dashboard/"
-    | "/admin/email/"
-    | "/admin/leads/"
-    | "/admin/plans/"
-    | "/admin/subscriptions/"
-    | "/company/audit/"
+    | "/platform/"
     | "/company/dashboard/"
-    | "/company/email-settings/"
-    | "/company/profile/"
-    | "/company/setup/"
-    | "/admin/companies/$publicId/email-settings"
-    | "/admin/companies/$publicId/"
-    | "/company/account/profile/"
-    | "/company/account/security/"
-    | "/company/account/sessions/"
-    | "/platform/account/profile/"
-    | "/platform/account/security/"
-    | "/platform/account/sessions/"
+    | "/platform/dashboard/"
+    | "/company/me/profile/"
+    | "/company/me/security/"
+    | "/company/me/sessions/"
+    | "/platform/me/profile/"
+    | "/platform/me/security/"
+    | "/platform/me/sessions/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
-    | "/company"
-    | "/platform"
     | "/company/accept-invitation"
     | "/company/change-password"
     | "/company/forgot-password"
@@ -505,43 +283,23 @@ export interface FileRouteTypes {
     | "/platform/forgot-password"
     | "/platform/login"
     | "/platform/reset-password"
-    | "/admin"
+    | "/company"
     | "/forbidden"
     | "/plans"
-    | "/admin/audit/catalog"
-    | "/admin/conversion-requests/$publicId"
-    | "/admin/email/deliveries"
-    | "/admin/email/sending"
-    | "/admin/leads/$publicId"
-    | "/admin/audit"
-    | "/admin/companies"
-    | "/admin/conversion-requests"
-    | "/admin/dashboard"
-    | "/admin/email"
-    | "/admin/leads"
-    | "/admin/plans"
-    | "/admin/subscriptions"
-    | "/company/audit"
+    | "/platform"
     | "/company/dashboard"
-    | "/company/email-settings"
-    | "/company/profile"
-    | "/company/setup"
-    | "/admin/companies/$publicId/email-settings"
-    | "/admin/companies/$publicId"
-    | "/company/account/profile"
-    | "/company/account/security"
-    | "/company/account/sessions"
-    | "/platform/account/profile"
-    | "/platform/account/security"
-    | "/platform/account/sessions"
+    | "/platform/dashboard"
+    | "/company/me/profile"
+    | "/company/me/security"
+    | "/company/me/sessions"
+    | "/platform/me/profile"
+    | "/platform/me/security"
+    | "/platform/me/sessions"
   id:
     | "__root__"
     | "/"
-    | "/admin"
     | "/company"
     | "/platform"
-    | "/admin/companies"
-    | "/admin/leads"
     | "/company_/accept-invitation"
     | "/company_/change-password"
     | "/company_/forgot-password"
@@ -552,41 +310,22 @@ export interface FileRouteTypes {
     | "/platform_/forgot-password"
     | "/platform_/login"
     | "/platform_/reset-password"
-    | "/admin/"
+    | "/company/"
     | "/forbidden/"
     | "/plans/"
-    | "/admin/companies/$publicId"
-    | "/admin/audit/catalog"
-    | "/admin/conversion-requests/$publicId"
-    | "/admin/email/deliveries"
-    | "/admin/email/sending"
-    | "/admin/leads/$publicId"
-    | "/admin/audit/"
-    | "/admin/companies/"
-    | "/admin/conversion-requests/"
-    | "/admin/dashboard/"
-    | "/admin/email/"
-    | "/admin/leads/"
-    | "/admin/plans/"
-    | "/admin/subscriptions/"
-    | "/company/audit/"
+    | "/platform/"
     | "/company/dashboard/"
-    | "/company/email-settings/"
-    | "/company/profile/"
-    | "/company/setup/"
-    | "/admin/companies/$publicId/email-settings"
-    | "/admin/companies/$publicId/"
-    | "/company/account/profile/"
-    | "/company/account/security/"
-    | "/company/account/sessions/"
-    | "/platform/account/profile/"
-    | "/platform/account/security/"
-    | "/platform/account/sessions/"
+    | "/platform/dashboard/"
+    | "/company/me/profile/"
+    | "/company/me/security/"
+    | "/company/me/sessions/"
+    | "/platform/me/profile/"
+    | "/platform/me/security/"
+    | "/platform/me/sessions/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   CompanyRouteRoute: typeof CompanyRouteRouteWithChildren
   PlatformRouteRoute: typeof PlatformRouteRouteWithChildren
   CompanyAcceptInvitationRoute: typeof CompanyAcceptInvitationRoute
@@ -619,19 +358,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/admin": {
-      id: "/admin"
-      path: "/admin"
-      fullPath: "/admin"
-      preLoaderRoute: typeof AdminRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     "/": {
       id: "/"
       path: "/"
       fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    "/platform/": {
+      id: "/platform/"
+      path: "/"
+      fullPath: "/platform/"
+      preLoaderRoute: typeof PlatformIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
     }
     "/plans/": {
       id: "/plans/"
@@ -647,12 +386,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ForbiddenIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/admin/": {
-      id: "/admin/"
+    "/company/": {
+      id: "/company/"
       path: "/"
-      fullPath: "/admin/"
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
+      fullPath: "/company/"
+      preLoaderRoute: typeof CompanyIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
     }
     "/platform_/reset-password": {
       id: "/platform_/reset-password"
@@ -724,40 +463,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyAcceptInvitationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/admin/leads": {
-      id: "/admin/leads"
-      path: "/leads"
-      fullPath: "/admin/leads"
-      preLoaderRoute: typeof AdminLeadsRouteRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/companies": {
-      id: "/admin/companies"
-      path: "/companies"
-      fullPath: "/admin/companies"
-      preLoaderRoute: typeof AdminCompaniesRouteRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/company/setup/": {
-      id: "/company/setup/"
-      path: "/setup"
-      fullPath: "/company/setup/"
-      preLoaderRoute: typeof CompanySetupIndexRouteImport
-      parentRoute: typeof CompanyRouteRoute
-    }
-    "/company/profile/": {
-      id: "/company/profile/"
-      path: "/profile"
-      fullPath: "/company/profile/"
-      preLoaderRoute: typeof CompanyProfileIndexRouteImport
-      parentRoute: typeof CompanyRouteRoute
-    }
-    "/company/email-settings/": {
-      id: "/company/email-settings/"
-      path: "/email-settings"
-      fullPath: "/company/email-settings/"
-      preLoaderRoute: typeof CompanyEmailSettingsIndexRouteImport
-      parentRoute: typeof CompanyRouteRoute
+    "/platform/dashboard/": {
+      id: "/platform/dashboard/"
+      path: "/dashboard"
+      fullPath: "/platform/dashboard/"
+      preLoaderRoute: typeof PlatformDashboardIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
     }
     "/company/dashboard/": {
       id: "/company/dashboard/"
@@ -766,271 +477,65 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyDashboardIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
     }
-    "/company/audit/": {
-      id: "/company/audit/"
-      path: "/audit"
-      fullPath: "/company/audit/"
-      preLoaderRoute: typeof CompanyAuditIndexRouteImport
-      parentRoute: typeof CompanyRouteRoute
-    }
-    "/admin/subscriptions/": {
-      id: "/admin/subscriptions/"
-      path: "/subscriptions"
-      fullPath: "/admin/subscriptions/"
-      preLoaderRoute: typeof AdminSubscriptionsIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/plans/": {
-      id: "/admin/plans/"
-      path: "/plans"
-      fullPath: "/admin/plans/"
-      preLoaderRoute: typeof AdminPlansIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/leads/": {
-      id: "/admin/leads/"
-      path: "/"
-      fullPath: "/admin/leads/"
-      preLoaderRoute: typeof AdminLeadsIndexRouteImport
-      parentRoute: typeof AdminLeadsRouteRoute
-    }
-    "/admin/email/": {
-      id: "/admin/email/"
-      path: "/email"
-      fullPath: "/admin/email/"
-      preLoaderRoute: typeof AdminEmailIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/dashboard/": {
-      id: "/admin/dashboard/"
-      path: "/dashboard"
-      fullPath: "/admin/dashboard/"
-      preLoaderRoute: typeof AdminDashboardIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/conversion-requests/": {
-      id: "/admin/conversion-requests/"
-      path: "/conversion-requests"
-      fullPath: "/admin/conversion-requests/"
-      preLoaderRoute: typeof AdminConversionRequestsIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/companies/": {
-      id: "/admin/companies/"
-      path: "/"
-      fullPath: "/admin/companies/"
-      preLoaderRoute: typeof AdminCompaniesIndexRouteImport
-      parentRoute: typeof AdminCompaniesRouteRoute
-    }
-    "/admin/audit/": {
-      id: "/admin/audit/"
-      path: "/audit"
-      fullPath: "/admin/audit/"
-      preLoaderRoute: typeof AdminAuditIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/leads/$publicId": {
-      id: "/admin/leads/$publicId"
-      path: "/$publicId"
-      fullPath: "/admin/leads/$publicId"
-      preLoaderRoute: typeof AdminLeadsPublicIdRouteImport
-      parentRoute: typeof AdminLeadsRouteRoute
-    }
-    "/admin/email/sending": {
-      id: "/admin/email/sending"
-      path: "/email/sending"
-      fullPath: "/admin/email/sending"
-      preLoaderRoute: typeof AdminEmailSendingRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/email/deliveries": {
-      id: "/admin/email/deliveries"
-      path: "/email/deliveries"
-      fullPath: "/admin/email/deliveries"
-      preLoaderRoute: typeof AdminEmailDeliveriesRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/conversion-requests/$publicId": {
-      id: "/admin/conversion-requests/$publicId"
-      path: "/conversion-requests/$publicId"
-      fullPath: "/admin/conversion-requests/$publicId"
-      preLoaderRoute: typeof AdminConversionRequestsPublicIdRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/audit/catalog": {
-      id: "/admin/audit/catalog"
-      path: "/audit/catalog"
-      fullPath: "/admin/audit/catalog"
-      preLoaderRoute: typeof AdminAuditCatalogRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    "/admin/companies/$publicId": {
-      id: "/admin/companies/$publicId"
-      path: "/$publicId"
-      fullPath: "/admin/companies/$publicId"
-      preLoaderRoute: typeof AdminCompaniesPublicIdRouteRouteImport
-      parentRoute: typeof AdminCompaniesRouteRoute
-    }
-    "/platform/account/sessions/": {
-      id: "/platform/account/sessions/"
-      path: "/account/sessions"
-      fullPath: "/platform/account/sessions/"
-      preLoaderRoute: typeof PlatformAccountSessionsIndexRouteImport
+    "/platform/me/sessions/": {
+      id: "/platform/me/sessions/"
+      path: "/me/sessions"
+      fullPath: "/platform/me/sessions/"
+      preLoaderRoute: typeof PlatformMeSessionsIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
-    "/platform/account/security/": {
-      id: "/platform/account/security/"
-      path: "/account/security"
-      fullPath: "/platform/account/security/"
-      preLoaderRoute: typeof PlatformAccountSecurityIndexRouteImport
+    "/platform/me/security/": {
+      id: "/platform/me/security/"
+      path: "/me/security"
+      fullPath: "/platform/me/security/"
+      preLoaderRoute: typeof PlatformMeSecurityIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
-    "/platform/account/profile/": {
-      id: "/platform/account/profile/"
-      path: "/account/profile"
-      fullPath: "/platform/account/profile/"
-      preLoaderRoute: typeof PlatformAccountProfileIndexRouteImport
+    "/platform/me/profile/": {
+      id: "/platform/me/profile/"
+      path: "/me/profile"
+      fullPath: "/platform/me/profile/"
+      preLoaderRoute: typeof PlatformMeProfileIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
-    "/company/account/sessions/": {
-      id: "/company/account/sessions/"
-      path: "/account/sessions"
-      fullPath: "/company/account/sessions/"
-      preLoaderRoute: typeof CompanyAccountSessionsIndexRouteImport
+    "/company/me/sessions/": {
+      id: "/company/me/sessions/"
+      path: "/me/sessions"
+      fullPath: "/company/me/sessions/"
+      preLoaderRoute: typeof CompanyMeSessionsIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
     }
-    "/company/account/security/": {
-      id: "/company/account/security/"
-      path: "/account/security"
-      fullPath: "/company/account/security/"
-      preLoaderRoute: typeof CompanyAccountSecurityIndexRouteImport
+    "/company/me/security/": {
+      id: "/company/me/security/"
+      path: "/me/security"
+      fullPath: "/company/me/security/"
+      preLoaderRoute: typeof CompanyMeSecurityIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
     }
-    "/company/account/profile/": {
-      id: "/company/account/profile/"
-      path: "/account/profile"
-      fullPath: "/company/account/profile/"
-      preLoaderRoute: typeof CompanyAccountProfileIndexRouteImport
+    "/company/me/profile/": {
+      id: "/company/me/profile/"
+      path: "/me/profile"
+      fullPath: "/company/me/profile/"
+      preLoaderRoute: typeof CompanyMeProfileIndexRouteImport
       parentRoute: typeof CompanyRouteRoute
-    }
-    "/admin/companies/$publicId/": {
-      id: "/admin/companies/$publicId/"
-      path: "/"
-      fullPath: "/admin/companies/$publicId/"
-      preLoaderRoute: typeof AdminCompaniesPublicIdIndexRouteImport
-      parentRoute: typeof AdminCompaniesPublicIdRouteRoute
-    }
-    "/admin/companies/$publicId/email-settings": {
-      id: "/admin/companies/$publicId/email-settings"
-      path: "/email-settings"
-      fullPath: "/admin/companies/$publicId/email-settings"
-      preLoaderRoute: typeof AdminCompaniesPublicIdEmailSettingsRouteImport
-      parentRoute: typeof AdminCompaniesPublicIdRouteRoute
     }
   }
 }
-
-interface AdminCompaniesPublicIdRouteRouteChildren {
-  AdminCompaniesPublicIdEmailSettingsRoute: typeof AdminCompaniesPublicIdEmailSettingsRoute
-  AdminCompaniesPublicIdIndexRoute: typeof AdminCompaniesPublicIdIndexRoute
-}
-
-const AdminCompaniesPublicIdRouteRouteChildren: AdminCompaniesPublicIdRouteRouteChildren =
-  {
-    AdminCompaniesPublicIdEmailSettingsRoute:
-      AdminCompaniesPublicIdEmailSettingsRoute,
-    AdminCompaniesPublicIdIndexRoute: AdminCompaniesPublicIdIndexRoute,
-  }
-
-const AdminCompaniesPublicIdRouteRouteWithChildren =
-  AdminCompaniesPublicIdRouteRoute._addFileChildren(
-    AdminCompaniesPublicIdRouteRouteChildren,
-  )
-
-interface AdminCompaniesRouteRouteChildren {
-  AdminCompaniesPublicIdRouteRoute: typeof AdminCompaniesPublicIdRouteRouteWithChildren
-  AdminCompaniesIndexRoute: typeof AdminCompaniesIndexRoute
-}
-
-const AdminCompaniesRouteRouteChildren: AdminCompaniesRouteRouteChildren = {
-  AdminCompaniesPublicIdRouteRoute:
-    AdminCompaniesPublicIdRouteRouteWithChildren,
-  AdminCompaniesIndexRoute: AdminCompaniesIndexRoute,
-}
-
-const AdminCompaniesRouteRouteWithChildren =
-  AdminCompaniesRouteRoute._addFileChildren(AdminCompaniesRouteRouteChildren)
-
-interface AdminLeadsRouteRouteChildren {
-  AdminLeadsPublicIdRoute: typeof AdminLeadsPublicIdRoute
-  AdminLeadsIndexRoute: typeof AdminLeadsIndexRoute
-}
-
-const AdminLeadsRouteRouteChildren: AdminLeadsRouteRouteChildren = {
-  AdminLeadsPublicIdRoute: AdminLeadsPublicIdRoute,
-  AdminLeadsIndexRoute: AdminLeadsIndexRoute,
-}
-
-const AdminLeadsRouteRouteWithChildren = AdminLeadsRouteRoute._addFileChildren(
-  AdminLeadsRouteRouteChildren,
-)
-
-interface AdminRouteRouteChildren {
-  AdminCompaniesRouteRoute: typeof AdminCompaniesRouteRouteWithChildren
-  AdminLeadsRouteRoute: typeof AdminLeadsRouteRouteWithChildren
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminAuditCatalogRoute: typeof AdminAuditCatalogRoute
-  AdminConversionRequestsPublicIdRoute: typeof AdminConversionRequestsPublicIdRoute
-  AdminEmailDeliveriesRoute: typeof AdminEmailDeliveriesRoute
-  AdminEmailSendingRoute: typeof AdminEmailSendingRoute
-  AdminAuditIndexRoute: typeof AdminAuditIndexRoute
-  AdminConversionRequestsIndexRoute: typeof AdminConversionRequestsIndexRoute
-  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
-  AdminEmailIndexRoute: typeof AdminEmailIndexRoute
-  AdminPlansIndexRoute: typeof AdminPlansIndexRoute
-  AdminSubscriptionsIndexRoute: typeof AdminSubscriptionsIndexRoute
-}
-
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminCompaniesRouteRoute: AdminCompaniesRouteRouteWithChildren,
-  AdminLeadsRouteRoute: AdminLeadsRouteRouteWithChildren,
-  AdminIndexRoute: AdminIndexRoute,
-  AdminAuditCatalogRoute: AdminAuditCatalogRoute,
-  AdminConversionRequestsPublicIdRoute: AdminConversionRequestsPublicIdRoute,
-  AdminEmailDeliveriesRoute: AdminEmailDeliveriesRoute,
-  AdminEmailSendingRoute: AdminEmailSendingRoute,
-  AdminAuditIndexRoute: AdminAuditIndexRoute,
-  AdminConversionRequestsIndexRoute: AdminConversionRequestsIndexRoute,
-  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
-  AdminEmailIndexRoute: AdminEmailIndexRoute,
-  AdminPlansIndexRoute: AdminPlansIndexRoute,
-  AdminSubscriptionsIndexRoute: AdminSubscriptionsIndexRoute,
-}
-
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
 
 interface CompanyRouteRouteChildren {
-  CompanyAuditIndexRoute: typeof CompanyAuditIndexRoute
+  CompanyIndexRoute: typeof CompanyIndexRoute
   CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
-  CompanyEmailSettingsIndexRoute: typeof CompanyEmailSettingsIndexRoute
-  CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
-  CompanySetupIndexRoute: typeof CompanySetupIndexRoute
-  CompanyAccountProfileIndexRoute: typeof CompanyAccountProfileIndexRoute
-  CompanyAccountSecurityIndexRoute: typeof CompanyAccountSecurityIndexRoute
-  CompanyAccountSessionsIndexRoute: typeof CompanyAccountSessionsIndexRoute
+  CompanyMeProfileIndexRoute: typeof CompanyMeProfileIndexRoute
+  CompanyMeSecurityIndexRoute: typeof CompanyMeSecurityIndexRoute
+  CompanyMeSessionsIndexRoute: typeof CompanyMeSessionsIndexRoute
 }
 
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
-  CompanyAuditIndexRoute: CompanyAuditIndexRoute,
+  CompanyIndexRoute: CompanyIndexRoute,
   CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
-  CompanyEmailSettingsIndexRoute: CompanyEmailSettingsIndexRoute,
-  CompanyProfileIndexRoute: CompanyProfileIndexRoute,
-  CompanySetupIndexRoute: CompanySetupIndexRoute,
-  CompanyAccountProfileIndexRoute: CompanyAccountProfileIndexRoute,
-  CompanyAccountSecurityIndexRoute: CompanyAccountSecurityIndexRoute,
-  CompanyAccountSessionsIndexRoute: CompanyAccountSessionsIndexRoute,
+  CompanyMeProfileIndexRoute: CompanyMeProfileIndexRoute,
+  CompanyMeSecurityIndexRoute: CompanyMeSecurityIndexRoute,
+  CompanyMeSessionsIndexRoute: CompanyMeSessionsIndexRoute,
 }
 
 const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
@@ -1038,15 +543,19 @@ const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
 )
 
 interface PlatformRouteRouteChildren {
-  PlatformAccountProfileIndexRoute: typeof PlatformAccountProfileIndexRoute
-  PlatformAccountSecurityIndexRoute: typeof PlatformAccountSecurityIndexRoute
-  PlatformAccountSessionsIndexRoute: typeof PlatformAccountSessionsIndexRoute
+  PlatformIndexRoute: typeof PlatformIndexRoute
+  PlatformDashboardIndexRoute: typeof PlatformDashboardIndexRoute
+  PlatformMeProfileIndexRoute: typeof PlatformMeProfileIndexRoute
+  PlatformMeSecurityIndexRoute: typeof PlatformMeSecurityIndexRoute
+  PlatformMeSessionsIndexRoute: typeof PlatformMeSessionsIndexRoute
 }
 
 const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
-  PlatformAccountProfileIndexRoute: PlatformAccountProfileIndexRoute,
-  PlatformAccountSecurityIndexRoute: PlatformAccountSecurityIndexRoute,
-  PlatformAccountSessionsIndexRoute: PlatformAccountSessionsIndexRoute,
+  PlatformIndexRoute: PlatformIndexRoute,
+  PlatformDashboardIndexRoute: PlatformDashboardIndexRoute,
+  PlatformMeProfileIndexRoute: PlatformMeProfileIndexRoute,
+  PlatformMeSecurityIndexRoute: PlatformMeSecurityIndexRoute,
+  PlatformMeSessionsIndexRoute: PlatformMeSessionsIndexRoute,
 }
 
 const PlatformRouteRouteWithChildren = PlatformRouteRoute._addFileChildren(
@@ -1055,7 +564,6 @@ const PlatformRouteRouteWithChildren = PlatformRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
   CompanyRouteRoute: CompanyRouteRouteWithChildren,
   PlatformRouteRoute: PlatformRouteRouteWithChildren,
   CompanyAcceptInvitationRoute: CompanyAcceptInvitationRoute,

@@ -1,9 +1,9 @@
-import { useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
+import { usePageDestination as useNavigate } from "@/shared/lib/page-navigation";
 import { useClippedText } from "@/shared/lib/use-clipped-text";
 import { Button } from "@/shared/ui/button";
 import { Tooltip } from "@/shared/ui/tooltip";
@@ -215,7 +215,7 @@ function MarkReadControl({ label, onMarkRead }: MarkReadControlProps) {
 }
 
 function navigateTo(navigate: ReturnType<typeof useNavigate>, route: NotificationRoute) {
-  if (route.to === "/admin/conversion-requests/$publicId") {
+  if (route.to === "/platform/conversion-requests/$publicId") {
     void navigate({ to: route.to, params: { publicId: route.publicId } });
     return;
   }

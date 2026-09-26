@@ -106,22 +106,22 @@ test("signs into both audiences independently and signs out only the selected sl
       throw new Error(`Unexpected migrated request: ${request.method()} ${path}`);
     }
   });
-  await page.goto("/company/login?returnTo=/company/account/profile%3Ftoken%3Dsecret-canary");
+  await page.goto("/company/login?returnTo=/company/me/profile%3Ftoken%3Dsecret-canary");
   await page.getByLabel(labels["journey.companyCode"], { exact: true }).fill("EDARA");
   await page.getByLabel(labels["journey.employeeCode"], { exact: true }).fill("EMP-1");
   await page.getByLabel(labels["journey.password"], { exact: true }).fill("password");
   await page.getByRole("button", { name: labels["journey.loginAction"], exact: true }).click();
-  await expect(page).toHaveURL(/\/company\/account\/profile$/);
+  await expect(page).toHaveURL(/\/company\/me\/profile$/);
   await expect(page.getByRole("heading", { name: labels["account.profileTitle"] })).toBeVisible();
-  await page.goto("/platform/login?returnTo=/platform/account/profile");
+  await page.goto("/platform/login?returnTo=/platform/me/profile");
   await page.getByLabel(labels["journey.email"], { exact: true }).fill("nadia@example.test");
   await page.getByLabel(labels["journey.password"], { exact: true }).fill("password");
   await page.getByRole("button", { name: labels["journey.loginAction"], exact: true }).click();
-  await expect(page).toHaveURL(/\/platform\/account\/profile$/);
+  await expect(page).toHaveURL(/\/platform\/me\/profile$/);
   await expect(page.getByRole("heading", { name: labels["account.profileTitle"] })).toBeVisible();
   expect(await readSlot(page, "company")).toEqual(company);
   expect(await readSlot(page, "platform")).toEqual(platform);
-  await page.goto("/company/account/security");
+  await page.goto("/company/me/security");
   await page.getByRole("button", { name: labels["account.signOutHere"], exact: true }).click();
   await expect(page).toHaveURL(/\/company\/login/);
   expect(await readSlot(page, "company")).toBeNull();
@@ -155,7 +155,7 @@ test("quarantines persisted identity offline, hides cached authority, and permit
     const path = new URL(route.request().url()).pathname;
     await route.fulfill({ json: path.endsWith("/me/profile") ? profile : company.user });
   });
-  await page.goto("/company/account/profile");
+  await page.goto("/company/me/profile");
   await expect(page.getByRole("heading", { name: labels["journey.unavailable"] })).toBeVisible();
   expect(await page.locator("body").innerText()).not.toContain(company.user.firstName);
   expect(await readSlot(page, "company")).toEqual(company);
@@ -181,9 +181,9 @@ test("forced password completion and offline cleanup do not block the other port
     if (path === "/api/v1/platform/me/profile") return route.fulfill({ json: platformProfile });
     throw new Error(`Unexpected request: ${path}`);
   });
-  await page.goto("/platform/account/profile");
+  await page.goto("/platform/me/profile");
   await expect(page.getByRole("heading", { name: labels["account.profileTitle"] })).toBeVisible();
-  await page.goto("/company/account/profile");
+  await page.goto("/company/me/profile");
   await expect(page).toHaveURL(/\/company\/change-password/);
   await expect(
     page.getByRole("heading", { name: labels["journey.changePasswordTitle"] }),
@@ -271,7 +271,7 @@ for (const audience of ["company", "platform"] as const) {
       throw new Error(`Unexpected invitation request: ${path}`);
     });
     await page.goto(
-      `/${audience}/accept-invitation?token=invitation-canary&returnTo=/${audience}/account/profile${audience === "company" ? `&companyPublicId=${company.user.companyPublicId}` : ""}`,
+      `/${audience}/accept-invitation?token=invitation-canary&returnTo=/${audience}/me/profile${audience === "company" ? `&companyPublicId=${company.user.companyPublicId}` : ""}`,
     );
     await page.getByLabel(labels["journey.newPassword"], { exact: true }).fill("New-password-1!");
     await page
@@ -280,7 +280,7 @@ for (const audience of ["company", "platform"] as const) {
     await page
       .getByRole("button", { name: labels["journey.invitationAction"], exact: true })
       .click();
-    await expect(page).toHaveURL(new RegExp(`/${audience}/account/profile$`));
+    await expect(page).toHaveURL(new RegExp(`/${audience}/me/profile$`));
     await expect(page.getByRole("heading", { name: labels["account.profileTitle"] })).toBeVisible();
     await expect.poll(() => readSlot(page, audience)).toEqual(own);
     expect(calls.slice(0, 2)).toEqual([
@@ -310,11 +310,11 @@ test("same-audience tabs converge on logout-all without clearing Platform", asyn
     }
     throw new Error(`Unexpected cross-tab request: ${path}`);
   });
-  await page.goto("/company/account/security");
+  await page.goto("/company/me/security");
   await expect(page.getByRole("heading", { name: labels["account.securityTitle"] })).toBeVisible();
   const second = await context.newPage();
   await configure(second, arabic);
-  await second.goto("/company/account/security");
+  await second.goto("/company/me/security");
   await expect(
     second.getByRole("heading", { name: labels["account.securityTitle"] }),
   ).toBeVisible();
@@ -351,7 +351,7 @@ test("quarantine retains safe email context but discards passwords before manual
     }
     throw new Error(`Unexpected email request: ${path}`);
   });
-  await page.goto("/company/account/security");
+  await page.goto("/company/me/security");
   await page.getByLabel(labels["account.newEmail"], { exact: true }).fill("new@example.test");
   await page
     .getByLabel(labels["account.currentPassword"], { exact: true })

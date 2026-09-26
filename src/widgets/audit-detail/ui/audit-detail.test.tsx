@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { AuditDetail } from "./audit-detail";
 
 const baseProps = {
-  portal: "admin" as const,
+  portal: "platform" as const,
   targets: [{ targetType: "employee", publicId: "employee-1" }],
   occurredAt: "2026-08-18T09:12:34.000Z",
   locale: "en" as const,

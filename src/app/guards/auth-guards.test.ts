@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CompanySession, PlatformSession } from "@/shared/auth";
 import { useCompanySession, usePlatformSession } from "@/shared/auth";
 import {
   isPlatformPortalEnabled,
   redirectIfMustChangePassword,
-  requireAdminConsoleEnabled,
   requireAuthenticated,
+  requirePlatformPortalEnabled,
 } from "./auth-guards";
 
 const tokens = {
@@ -49,6 +49,7 @@ afterEach(() => {
 });
 
 describe("audience route guard", () => {
+  beforeEach(() => vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "true"));
   it("requires Company authentication even when Platform is signed in", async () => {
     usePlatformSession.getState().setSession(platform);
     await expect(requireAuthenticated()).rejects.toMatchObject({
@@ -60,7 +61,7 @@ describe("audience route guard", () => {
     useCompanySession
       .getState()
       .setSession({ ...company, user: { ...company.user, isOwner: true } });
-    await expect(requireAuthenticated({ platformAdminOnly: true })).rejects.toMatchObject({
+    await expect(requireAuthenticated({ audience: "platform" })).rejects.toMatchObject({
       options: { to: "/platform/login" },
     });
   });
@@ -69,7 +70,7 @@ describe("audience route guard", () => {
     useCompanySession.getState().setSession(company);
     usePlatformSession.getState().setSession(platform);
     await expect(requireAuthenticated()).resolves.toEqual(company);
-    await expect(requireAuthenticated({ platformAdminOnly: true })).resolves.toEqual(platform);
+    await expect(requireAuthenticated({ audience: "platform" })).resolves.toEqual(platform);
   });
 
   it("does not let Company password completion block the Platform identity", async () => {
@@ -80,8 +81,8 @@ describe("audience route guard", () => {
     await expect(requireAuthenticated()).rejects.toMatchObject({
       options: { to: "/company/change-password" },
     });
-    await expect(requireAuthenticated({ platformAdminOnly: true })).resolves.toEqual(platform);
-    expect(() => redirectIfMustChangePassword("/admin/dashboard")).not.toThrow();
+    await expect(requireAuthenticated({ audience: "platform" })).resolves.toEqual(platform);
+    expect(() => redirectIfMustChangePassword("/platform/dashboard")).not.toThrow();
     expect(() => redirectIfMustChangePassword("/plans")).not.toThrow();
   });
 
@@ -97,11 +98,11 @@ describe("admin console build flag", () => {
   it("conceals absent-build routes", () => {
     vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "false");
     expect(isPlatformPortalEnabled()).toBe(false);
-    expect(() => requireAdminConsoleEnabled()).toThrow();
+    expect(() => requirePlatformPortalEnabled()).toThrow();
   });
   it("permits enabled-build routes to proceed to their audience guard", () => {
     vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "true");
     expect(isPlatformPortalEnabled()).toBe(true);
-    expect(() => requireAdminConsoleEnabled()).not.toThrow();
+    expect(() => requirePlatformPortalEnabled()).not.toThrow();
   });
 });

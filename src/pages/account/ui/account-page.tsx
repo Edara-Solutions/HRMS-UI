@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { OperationRefusal } from "@/shared/api";
 import { type AudienceName, useAudienceSession } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { loadSelfService } from "../api/self-service";
@@ -26,6 +27,8 @@ export function AccountPage({ audience, section }: AccountPageProps) {
     staleTime: Infinity,
     retry: false,
   });
+  if (service.error instanceof OperationRefusal && [401, 403, 404].includes(service.error.status))
+    throw service.error;
   if (!identity)
     return (
       <section>
@@ -50,7 +53,7 @@ export function AccountPage({ audience, section }: AccountPageProps) {
         {(["profile", "security", "sessions"] as const).map((item) => (
           <Link
             key={item}
-            to={`/${audience}/account/${item}`}
+            to={`/${audience}/me/${item}`}
             aria-current={section === item ? "page" : undefined}
             className="text-[var(--color-primary)] hover:underline"
           >
