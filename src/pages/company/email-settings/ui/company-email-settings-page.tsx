@@ -49,7 +49,7 @@ const toUpdateInput = ({ logoUrl, ...values }: FormValues): UpdateCompanyEmailSe
 });
 
 export function CompanyEmailSettingsPage() {
-  const session = useCurrentSession();
+  const session = useCurrentSession("company");
   const companyPublicId = session?.user.companyPublicId ?? null;
   const canUpdate = hasPermission(session?.user, "companies:email-settings:update");
   const settings = useCompanyEmailSettings(companyPublicId);

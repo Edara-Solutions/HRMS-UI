@@ -1,8 +1,9 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, PermissionAction, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import type { AudienceName, PermissionAction } from "@/shared/auth";
+import { AudienceSessionProvider, useCompanySession, usePlatformSession } from "@/shared/auth";
+import { companySessionFixture, platformSessionFixture } from "../../../test/audience-fixtures";
 import type { NavGroup } from "../model/nav-items";
 import { adminNavGroups, companyNavGroups } from "../model/nav-items";
 import { Sidebar } from "./sidebar";
@@ -18,77 +19,57 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-function signIn(overrides: Partial<SessionUser> & { permissions: PermissionAction[] }) {
-  useAuthStore.setState({
-    status: "authenticated",
-    session: {
-      accessToken: "access",
-      refreshToken: "refresh",
-      sessionId: "session",
-      expiresIn: 900,
-      user: {
-        publicId: "11111111-1111-4111-8111-111111111111",
-        employeeCode: "E-1",
-        firstName: "Dana",
-        lastName: "Reed",
-        email: "dana@example.com",
-        status: "ACTIVE",
-        companyCode: "NW",
-        companyPublicId: null,
-        mustChangePassword: false,
-        isOwner: false,
-        isPlatformAdmin: false,
-        ...overrides,
-      },
-    } satisfies AuthSession,
-  });
+function signIn(audience: AudienceName, permissions: PermissionAction[], isOwner = false) {
+  if (audience === "company") {
+    useCompanySession.getState().setSession(companySessionFixture({ permissions, isOwner }));
+  } else {
+    usePlatformSession.getState().setSession(platformSessionFixture({ permissions }));
+  }
 }
 
-function renderSidebar(groups: NavGroup[]) {
+function renderSidebar(groups: NavGroup[], audience: AudienceName) {
   render(
-    <Sidebar
-      groups={groups}
-      portalLabel="Edara"
-      portalSubtitle="Portal"
-      portalIcon={<span>E</span>}
-      collapsed={false}
-      onToggleCollapsed={vi.fn()}
-    />,
+    <AudienceSessionProvider audience={audience}>
+      <Sidebar
+        groups={groups}
+        portalLabel="Edara"
+        portalSubtitle="Portal"
+        portalIcon={<span>E</span>}
+        collapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />
+    </AudienceSessionProvider>,
   );
 }
 
 afterEach(() => {
   cleanup();
-  useAuthStore.setState({ session: null, status: "anonymous" });
+  useCompanySession.getState().clearSession();
+  usePlatformSession.getState().clearSession();
 });
 
 describe.each([
-  { portal: "Company", groups: companyNavGroups, label: "Audit log" },
-  { portal: "Admin", groups: adminNavGroups, label: "Audit Log" },
-])("$portal audit nav entry", ({ groups, label }) => {
+  { portal: "Company", audience: "company" as const, groups: companyNavGroups, label: "Audit log" },
+  { portal: "Admin", audience: "platform" as const, groups: adminNavGroups, label: "Audit Log" },
+])("$portal audit nav entry", ({ audience, groups, label }) => {
   it("is hidden for an identity without audit-events:read", () => {
-    signIn({ permissions: ["users:read"] });
-    renderSidebar(groups);
+    signIn(audience, ["users:read"]);
+    renderSidebar(groups, audience);
 
     expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
   });
 
   it("is shown for an identity granted audit-events:read", () => {
-    signIn({ permissions: ["audit-events:read"] });
-    renderSidebar(groups);
+    signIn(audience, ["audit-events:read"]);
+    renderSidebar(groups, audience);
 
     expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
   });
 
-  // Both portals bypass the permission list for these identities, exactly as the backend
-  // guard does, so neither may be hidden by the new nav field.
-  it.each([
-    { identity: "an owner", grants: { isOwner: true } },
-    { identity: "a platform admin", grants: { isPlatformAdmin: true } },
-  ])("is shown for $identity holding no explicit grant", ({ grants }) => {
-    signIn({ permissions: [], ...grants });
-    renderSidebar(groups);
+  it("does not turn privileged identity metadata into a permission grant", () => {
+    signIn(audience, [], true);
+    renderSidebar(groups, audience);
 
-    expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
   });
 });

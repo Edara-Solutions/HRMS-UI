@@ -2,7 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTPError } from "ky";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useAuthStore } from "@/shared/auth";
+import { usePlatformSession as useAuthStore } from "@/shared/auth";
+import { platformSessionFixture } from "../../../../test/audience-fixtures";
 import { ConversionSubmissionCard } from "./conversion-submission-card";
 
 const apiGetMock = vi.hoisted(() => vi.fn());
@@ -61,29 +62,18 @@ function errorResponse(status: number, body: unknown) {
   };
 }
 
-function setPermissions(permissions: string[], isPlatformAdmin = false) {
-  useAuthStore.setState({
-    status: "authenticated",
-    session: {
-      accessToken: "token",
-      refreshToken: "refresh",
-      sessionId: "session-1",
-      expiresIn: 900,
-      user: {
-        publicId: "admin-1",
-        employeeCode: "ADMIN-001",
-        firstName: "Nadia",
-        lastName: "Hassan",
-        email: "nadia@example.com",
-        status: "ACTIVE",
-        companyCode: "EDARA",
-        mustChangePassword: false,
-        permissions,
-        isOwner: false,
-        isPlatformAdmin,
-      },
-    },
-  });
+function setPermissions(permissions: string[], privileged = false) {
+  useAuthStore.getState().setSession(
+    platformSessionFixture({
+      permissions: privileged
+        ? [
+            "REQUEST_LEAD_CONVERSION",
+            "AUTO_APPROVE_LEAD_CONVERSION",
+            "APPROVE_LEAD_CONVERSION_REQUEST",
+          ]
+        : permissions,
+    }),
+  );
 }
 
 function renderCard(

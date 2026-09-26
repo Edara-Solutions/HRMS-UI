@@ -20,7 +20,7 @@ import { RevenueChart } from "./revenue-chart";
 import { SubscriptionDistribution } from "./subscription-distribution";
 
 export function AdminDashboardPage() {
-  const session = useCurrentSession();
+  const session = useCurrentSession("platform");
   const user = session?.user;
   const [asideCollapsed, setAsideCollapsed] = useState(false);
   const locale = usePreferencesStore((state) => state.locale);

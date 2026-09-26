@@ -130,7 +130,7 @@ async function readProfileError(error: unknown) {
 }
 
 export function CompanyProfilePage() {
-  const session = useCurrentSession();
+  const session = useCurrentSession("company");
   const companyPublicId = session?.user.companyPublicId ?? null;
   const profileQuery = useCompanyProfile(companyPublicId);
   const setupQuery = useCompanySetupChecklist(companyPublicId);

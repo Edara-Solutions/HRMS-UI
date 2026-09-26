@@ -1,4 +1,6 @@
-import type { SessionUser } from "./auth-session";
+interface PermissionUser {
+  permissions: string[];
+}
 
 const permissionActions = [
   "users:create",
@@ -28,16 +30,16 @@ const permissionActions = [
 
 export type PermissionAction = (typeof permissionActions)[number];
 
-export function hasPermission(user: SessionUser | null | undefined, action: PermissionAction) {
+export function hasPermission(user: PermissionUser | null | undefined, action: PermissionAction) {
   if (!user) {
     return false;
   }
 
-  return user.isPlatformAdmin || user.isOwner || user.permissions.includes(action);
+  return user.permissions.includes(action);
 }
 
 export function hasEveryPermission(
-  user: SessionUser | null | undefined,
+  user: PermissionUser | null | undefined,
   actions: PermissionAction[],
 ) {
   return actions.every((action) => hasPermission(user, action));

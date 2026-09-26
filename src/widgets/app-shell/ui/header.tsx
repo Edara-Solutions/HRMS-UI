@@ -1,13 +1,12 @@
 import { HelpCircle, Search } from "lucide-react";
-import { NotificationBell } from "@/features/notification";
-import { useAuthStore } from "@/shared/auth";
+import { useCurrentSession } from "@/shared/auth";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 export function Header() {
-  const user = useAuthStore((state) => state.session?.user);
+  const user = useCurrentSession()?.user;
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-bg)] px-3 sm:gap-3 sm:px-6">
@@ -33,8 +32,6 @@ export function Header() {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <NotificationBell />
-
         <Button
           intent="toggle"
           size="iconSm"

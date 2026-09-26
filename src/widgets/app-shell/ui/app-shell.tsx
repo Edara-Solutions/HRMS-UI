@@ -1,6 +1,5 @@
 import { Shield } from "lucide-react";
 import { type ReactNode, useCallback, useState, useSyncExternalStore } from "react";
-import { NotificationToaster } from "@/features/notification";
 import { adminNavGroups, companyNavGroups } from "../model/nav-items";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
@@ -73,8 +72,6 @@ export function AppShell({ portal, children }: AppShellProps) {
           <div className="p-4 sm:p-5 lg:p-7">{children}</div>
         </main>
       </div>
-
-      <NotificationToaster />
     </div>
   );
 }

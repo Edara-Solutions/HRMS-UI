@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
 import {
@@ -9,7 +10,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { hasPermission, useAuthStore } from "@/shared/auth";
+import { hasPermission, useCurrentAudience, useCurrentSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
@@ -32,7 +33,7 @@ export function Sidebar({
   collapsed,
   onToggleCollapsed,
 }: SidebarProps) {
-  const user = useAuthStore((state) => state.session?.user);
+  const user = useCurrentSession()?.user;
   const visibleGroups = groups.reduce<NavGroup[]>((result, group) => {
     const items = group.items.filter(
       (item) => !item.permission || hasPermission(user, item.permission),
@@ -289,8 +290,24 @@ function UserMenu({
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
-  const clearSession = useAuthStore((s) => s.clearSession);
+  const audience = useCurrentAudience();
   const navigate = useNavigate();
+  const logout = useMutation({
+    retry: false,
+    mutationFn: async () => {
+      if (audience === "company") return (await import("@/shared/company-auth")).signOutCompany();
+      if (audience === "platform")
+        return (await import("@/shared/platform-auth")).signOutPlatform();
+      throw new Error("Session unavailable");
+    },
+    onSuccess: (result) => {
+      onClose();
+      void navigate({
+        to: audience === "platform" ? "/platform/login" : "/company/login",
+        search: { localSignOutOnly: !result.remoteConfirmed },
+      });
+    },
+  });
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
     position: "fixed",
@@ -343,9 +360,7 @@ function UserMenu({
   }, [triggerRef]);
 
   function handleLogout() {
-    clearSession();
-    onClose();
-    navigate({ to: "/login" });
+    if (!logout.isPending) logout.mutate();
   }
 
   const itemClass =
@@ -358,11 +373,21 @@ function UserMenu({
       className="z-50 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
       role="menu"
     >
-      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
+      <Link
+        to={audience === "platform" ? "/platform/account/profile" : "/company/account/profile"}
+        className={itemClass}
+        onClick={onClose}
+        role="menuitem"
+      >
         <User size={14} className="shrink-0 opacity-70" />
         <span>Profile</span>
       </Link>
-      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
+      <Link
+        to={audience === "platform" ? "/platform/account/security" : "/company/account/security"}
+        className={itemClass}
+        onClick={onClose}
+        role="menuitem"
+      >
         <Settings size={14} className="shrink-0 opacity-70" />
         <span>Settings</span>
       </Link>
@@ -374,6 +399,7 @@ function UserMenu({
           "text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]",
         )}
         onClick={handleLogout}
+        disabled={logout.isPending}
         role="menuitem"
       >
         <LogOut size={14} className="shrink-0" />
@@ -385,7 +411,7 @@ function UserMenu({
 }
 
 function SidebarFooter({ collapsed }: { collapsed: boolean }) {
-  const user = useAuthStore((state) => state.session?.user);
+  const user = useCurrentSession()?.user;
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
