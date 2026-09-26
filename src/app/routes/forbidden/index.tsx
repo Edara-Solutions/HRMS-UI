@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ForbiddenPage } from "@/pages/forbidden";
+import { RefusalPage } from "@/pages/refusal";
 
 export const Route = createFileRoute("/forbidden/")({
-  component: ForbiddenPage,
+  component: () => <RefusalPage kind="forbidden" />,
 });

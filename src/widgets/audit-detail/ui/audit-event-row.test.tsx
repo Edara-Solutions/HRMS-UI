@@ -42,7 +42,7 @@ function renderRow(props: RenderRowProps) {
     <table>
       <tbody>
         <AuditEventRow
-          portal="admin"
+          portal="platform"
           density="comfortable"
           expanded={false}
           detailId="detail"
@@ -72,7 +72,7 @@ describe("AuditEventRow", () => {
             <AuditEventRow
               key={actor.kind}
               event={{ ...baseEvent, actor }}
-              portal="admin"
+              portal="platform"
               density="comfortable"
               expanded={false}
               detailId={`detail-${index}`}
@@ -105,7 +105,7 @@ describe("AuditEventRow", () => {
         <tbody>
           <AuditEventRow
             event={unlabelled}
-            portal="admin"
+            portal="platform"
             density="comfortable"
             expanded={false}
             detailId="detail-unlabelled"
@@ -181,7 +181,7 @@ describe("AuditEventRow", () => {
 
     expect(screen.getByRole("link", { name: "Nexus Technologies" })).toHaveAttribute(
       "href",
-      "/admin/companies/company-1",
+      "/platform/companies/company-1",
     );
   });
 

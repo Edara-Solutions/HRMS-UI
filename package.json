@@ -27,7 +27,7 @@
     "openapi:gen": "bun run openapi:vendor && bun run openapi:audiences && bun run openapi:types && bun run audit:validators && bun run audit:labels && bun run audit:catalog",
     "openapi:check": "bun run scripts/check-contract-drift.mjs",
     "doctor": "react-doctor .",
-    "contract:legacy-check": "bun scripts/check-legacy-contract-artifacts.mjs"
+    "contract:legacy-check": "bun scripts/check-legacy-contract-artifacts.mjs && bun scripts/check-platform-namespace.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

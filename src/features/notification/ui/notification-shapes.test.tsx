@@ -81,7 +81,9 @@ function stubEndpoints({ unreadCount = 0, items = [] as NotificationFeedItem[] }
 }
 
 function renderBell(listStyle: NotificationListStyle) {
-  usePreferencesStore.setState({ notificationListStyle: listStyle });
+  usePreferencesStore
+    .getState()
+    .setPresentation(`company:${session.user.publicId}`, { notificationListStyle: listStyle });
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
   return render(
@@ -129,7 +131,7 @@ afterEach(() => {
   vi.clearAllMocks();
   useBulkReadCursor.setState({ cursorAt: null });
   useAuthStore.setState({ session: null, status: "anonymous" });
-  usePreferencesStore.setState({ notificationListStyle: "panel" });
+  usePreferencesStore.setState({ scopes: {} });
   localStorage.removeItem("hrms-prefs");
 });
 
@@ -241,7 +243,10 @@ describe("notification style picker", () => {
 
     fireEvent.click(within(options).getByRole("radio", { name: /Sheet/ }));
 
-    expect(usePreferencesStore.getState().notificationListStyle).toBe("sheet");
+    expect(
+      usePreferencesStore.getState().scopes[`company:${session.user.publicId}`]
+        ?.notificationListStyle,
+    ).toBe("sheet");
     // The picker rides along into the new shape, so the next option is one click away.
     expect(await screen.findByRole("dialog", { name: "Notifications" })).toHaveAttribute(
       "aria-modal",
@@ -250,7 +255,11 @@ describe("notification style picker", () => {
     expect(screen.getByRole("radiogroup", { name: "List style" })).toBeInTheDocument();
 
     await usePreferencesStore.persist.rehydrate();
-    expect(JSON.parse(localStorage.getItem("hrms-prefs") ?? "{}").state).toMatchObject({
+    expect(
+      JSON.parse(localStorage.getItem("hrms-preferences:v2") ?? "{}").state.scopes[
+        `company:${session.user.publicId}`
+      ],
+    ).toMatchObject({
       notificationListStyle: "sheet",
     });
   });
@@ -266,11 +275,17 @@ describe("notification style picker", () => {
     const sheetOption = within(options).getByRole("radio", { name: /Sheet/ });
     expect(sheetOption).toHaveFocus();
     expect(sheetOption).toHaveAttribute("aria-checked", "false");
-    expect(usePreferencesStore.getState().notificationListStyle).toBe("panel");
+    expect(
+      usePreferencesStore.getState().scopes[`company:${session.user.publicId}`]
+        ?.notificationListStyle,
+    ).toBe("panel");
 
     fireEvent.click(sheetOption);
 
-    expect(usePreferencesStore.getState().notificationListStyle).toBe("sheet");
+    expect(
+      usePreferencesStore.getState().scopes[`company:${session.user.publicId}`]
+        ?.notificationListStyle,
+    ).toBe("sheet");
   });
 
   it("returns to the feed from the picker's back control", async () => {

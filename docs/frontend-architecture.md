@@ -7,6 +7,7 @@
 > *looks*, load the `edara-hrms-ui` skill. This doc governs **where code goes**.
 
 We use a **pragmatic, minimal [Feature-Sliced Design](https://fsd.how)**.
+During the split-tier migration, the business slice examples below describe source ownership, not mounted routes. Only public plans, audience authentication and SELF workflows are currently reachable. Explicit CompanyShell and PlatformShell compose the audience-neutral app-shell widget. Future business/notification workflows must pass their owning contract migration gates before mounting; this intermediate state is nondeployable until the parent epic's final removal/reachability check.
 The guiding rule is FSD's own: **start in `pages/`, extract downward only when
 the same code is *already* used in more than one place.** When unsure, keep it
 in the page.
@@ -40,8 +41,8 @@ src/
     routes/            # TanStack routesDirectory — thin route files only
       __root.tsx
       login/index.tsx
-      admin/
-        route.tsx      # admin portal shell (layout)
+      platform/
+        route.tsx      # platform portal shell (layout)
         companies/index.tsx        $publicId.tsx
         leads/index.tsx            $publicId.tsx
         dashboard/index.tsx  audit/  plans/  subscriptions/  login/
@@ -55,7 +56,7 @@ src/
     main.tsx
   pages/
     login/
-    admin/{companies,company-detail,leads,lead-detail,dashboard,audit,plans,subscriptions,login}/
+    platform/{companies,company-detail,leads,lead-detail,dashboard,audit,plans,subscriptions,login}/
     company/dashboard/
     accept-invitation/  change-password/  forbidden/
   widgets/
@@ -76,7 +77,7 @@ Every slice in `pages/`, `widgets/`, `features/` is a folder with these
 optional segments and **one `index.ts` public API**:
 
 ```
-pages/admin/companies/
+pages/platform/companies/
   ui/            # components: the page + its modals, forms, table rows
   api/           # React Query hooks that call the backend for THIS slice
   model/         # slice-local types, zod schemas, small state, derived logic
@@ -91,18 +92,18 @@ Use whatever segments you need; a tiny page may be just `ui/` + `index.ts`.
 ## 2. The four hard rules (Steiger enforces these)
 
 1. **Import downward only.** `app → pages → widgets → features → shared`.
-2. **No cross-slice imports.** `pages/admin/leads` must not import from
-   `pages/admin/companies`. If they must share, push the shared bit down to
+2. **No cross-slice imports.** `pages/platform/leads` must not import from
+   `pages/platform/companies`. If they must share, push the shared bit down to
    `shared/` (or, rarely, a `feature`/`widget`) — never sideways.
 3. **Enter every slice through its `index.ts`.** Import
-   `from "@/pages/admin/companies"`, never
-   `from "@/pages/admin/companies/ui/CompaniesTable"`.
+   `from "@/pages/platform/companies"`, never
+   `from "@/pages/platform/companies/ui/CompaniesTable"`.
 4. **No business logic in `shared/`.** `shared/` is infrastructure only.
    Domain rules live in the page/feature that owns them.
 
 ### Portal isolation (important)
 
-`admin/*` and `company/*` are **separate worlds** that will one day be split
+`platform/*` and `company/*` are **separate worlds** that will one day be split
 into separate apps. **They must never import from each other.** Anything
 genuinely common goes to `shared/`. Each portal has its own shell widget/route.
 
@@ -145,24 +146,24 @@ layout nesting) and renders a page from `@/pages/*`. No screen logic lives in a
 route file.
 
 ```tsx
-// src/app/routes/admin/companies/index.tsx
+// src/app/routes/platform/companies/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AdminCompaniesPage } from "@/pages/admin/companies";
+import { PlatformCompaniesPage } from "@/pages/platform/companies";
 
 const searchSchema = z.object({
   q: z.string().max(120).optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
 });
 
-export const Route = createFileRoute("/admin/companies/")({
+export const Route = createFileRoute("/platform/companies/")({
   validateSearch: searchSchema.parse,
-  component: AdminCompaniesPage,
+  component: PlatformCompaniesPage,
 });
 ```
 
 - `route.tsx` inside a folder = that folder's layout/shell (e.g.
-  `admin/route.tsx` is the admin portal shell).
+  `platform/route.tsx` is the platform portal shell).
 - `$publicId.tsx` = a dynamic segment.
 - `__root.tsx` = the app root.
 - The generated `routeTree.gen.ts` is committed output — never edit by hand.
@@ -195,10 +196,10 @@ Backend↔frontend map (all real except dashboards):
 | Backend context | Frontend slice(s)                         |
 | --------------- | ----------------------------------------- |
 | auth / rbac     | `pages/*/login`, `features/auth`, `shared/auth` |
-| companies       | `pages/admin/companies`, `company-detail` |
-| leads           | `pages/admin/leads`, `lead-detail`        |
-| plans           | `pages/admin/plans`                       |
-| audit           | `pages/admin/audit`                        |
+| companies       | `pages/platform/companies`, `company-detail` |
+| leads           | `pages/platform/leads`, `lead-detail`        |
+| plans           | `pages/platform/plans`                       |
+| audit           | `pages/platform/audit`                        |
 | *(none yet)*    | `pages/*/dashboard` → still on `fixtures.ts` (placeholder) |
 
 Per-slice **React Query hooks** (`useCompanies`, `useCreateLead`) live in that
@@ -206,20 +207,20 @@ slice's `api/` segment and consume the generated types + the shared client.
 
 ---
 
-## 6. Worked example — add an "Admin → Departments" screen
+## 6. Worked example — add an "Platform → Departments" screen
 
-1. **Slice:** create `src/pages/admin/departments/` with `ui/`, `api/`,
+1. **Slice:** create `src/pages/platform/departments/` with `ui/`, `api/`,
    `index.ts`.
 2. **Types:** if the backend exposes departments, run `bun run openapi:types`
    and use `components["schemas"]["Department"]`. Otherwise define a temporary
    `model/department.ts` and mark it placeholder.
 3. **Data:** `api/departments.ts` → `useDepartments()` React Query hook using
    `@/shared/api` client.
-4. **UI:** `ui/AdminDepartmentsPage.tsx` (plus any modal/form in the same
+4. **UI:** `ui/PlatformDepartmentsPage.tsx` (plus any modal/form in the same
    `ui/`). Build it with `edara-hrms-ui` primitives from `@/shared/ui`.
-5. **Public API:** `index.ts` → `export { AdminDepartmentsPage } from "./ui/AdminDepartmentsPage";`
-6. **Route:** `src/app/routes/admin/departments/index.tsx` — thin, renders
-   `AdminDepartmentsPage` from `@/pages/admin/departments`.
+5. **Public API:** `index.ts` → `export { PlatformDepartmentsPage } from "./ui/PlatformDepartmentsPage";`
+6. **Route:** `src/app/routes/platform/departments/index.tsx` — thin, renders
+   `PlatformDepartmentsPage` from `@/pages/platform/departments`.
 7. **Verify:** `bun run typecheck && bun run lint && bun run test`. `lint`
    includes Steiger, which will fail if you crossed a layer or skipped a
    public API.
@@ -229,7 +230,7 @@ slice's `api/` segment and consume the generated types + the shared client.
 ## 7. Checklist before you commit UI
 
 - [ ] Screen lives in `pages/<portal>/<name>/`, entered via its `index.ts`.
-- [ ] No cross-slice or upward imports; no `admin ↔ company` import.
+- [ ] No cross-slice or upward imports; no `platform ↔ company` import.
 - [ ] Single-use blocks stayed in the page (didn't pre-extract to widgets/features).
 - [ ] Domain types come from `@/shared/api/schema`, not hand-rolled.
 - [ ] Route file is thin (config + render page only).
@@ -286,7 +287,7 @@ exactly one owner, so they never double-report or conflict:
   `ui / api / model / lib`.
 - **Public API** — a slice's `index.ts`; the only import surface outsiders may
   use.
-- **Portal** — one of the two isolated worlds: **Admin** (operator CRM/SaaS
+- **Portal** — one of the two isolated worlds: **Platform** (operator CRM/SaaS
   management) and **Company** (tenant/employee app). See root `CONTEXT.md` for
   the domain language. Portals never import each other.
 - **Placeholder slice** — a screen still running on `fixtures.ts` demo data

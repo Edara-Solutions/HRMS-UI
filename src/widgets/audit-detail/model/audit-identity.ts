@@ -6,7 +6,7 @@ import {
 import type { CatalogAuditActor, CatalogAuditTarget } from "./audit-catalog";
 
 /** The trail an identity is being read in. It decides which targets have a destination. */
-export type AuditPortal = "admin" | "company";
+export type AuditPortal = "platform" | "company";
 
 /**
  * An erased `user` target arrives as this literal rather than an identifier, so the sentinel
@@ -55,7 +55,7 @@ export interface AuditActorPresentation {
 export type AuditTargetIdentity = CatalogAuditTarget & { name?: string | null };
 
 /** A destination that exists in the portal doing the reading. */
-export type AuditTargetDestination = "admin-company" | "admin-lead";
+export type AuditTargetDestination = "platform-company" | "platform-lead";
 
 export interface AuditTargetPresentation {
   typeLabel: string;
@@ -70,9 +70,9 @@ export interface AuditTargetPresentation {
 
 type TargetRoutes = Readonly<Record<string, AuditTargetDestination>>;
 
-const adminTargetRoutes: TargetRoutes = {
-  company: "admin-company",
-  lead: "admin-lead",
+const platformTargetRoutes: TargetRoutes = {
+  company: "platform-company",
+  lead: "platform-lead",
 };
 
 /**
@@ -82,7 +82,7 @@ const adminTargetRoutes: TargetRoutes = {
 const companyTargetRoutes: TargetRoutes = {};
 
 const portalTargetRoutes: Readonly<Record<AuditPortal, TargetRoutes>> = {
-  admin: adminTargetRoutes,
+  platform: platformTargetRoutes,
   company: companyTargetRoutes,
 };
 

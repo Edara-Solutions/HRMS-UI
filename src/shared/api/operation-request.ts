@@ -1,4 +1,11 @@
+import { z } from "zod";
 import type { AudienceClient } from "./audience-client";
+import {
+  generatedRefusalCodes,
+  generatedRefusalModes,
+  type RefusalCode,
+  type RefusalMode,
+} from "./generated/authorization";
 import { ContractViolation } from "./generated/runtime";
 import { type ResponseContract, readOperationResponse } from "./operation-response";
 
@@ -18,7 +25,8 @@ export class OperationRefusal extends Error {
   readonly status: number;
   readonly audience: ResponseContract["audience"];
   readonly key: string;
-  readonly code?: string;
+  readonly code?: RefusalCode;
+  readonly mode?: RefusalMode;
 
   constructor(operation: ResponseContract, status: number, validatedProblem: unknown) {
     super("The request could not be completed.");
@@ -26,13 +34,15 @@ export class OperationRefusal extends Error {
     this.status = status;
     this.audience = operation.audience;
     this.key = operation.key;
-    if (
-      typeof validatedProblem === "object" &&
-      validatedProblem !== null &&
-      "code" in validatedProblem &&
-      typeof validatedProblem.code === "string"
-    ) {
-      this.code = validatedProblem.code;
+    const metadata = z
+      .object({
+        code: z.enum(generatedRefusalCodes).optional(),
+        mode: z.enum(generatedRefusalModes).optional(),
+      })
+      .safeParse(validatedProblem);
+    if (metadata.success) {
+      this.code = metadata.data.code;
+      this.mode = metadata.data.mode;
     }
   }
 }

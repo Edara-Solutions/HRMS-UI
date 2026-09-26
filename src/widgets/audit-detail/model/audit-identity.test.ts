@@ -76,13 +76,13 @@ describe("presentAuditActor", () => {
 
 describe("auditTargetDestination", () => {
   it("routes the two admin target types that have a detail page", () => {
-    expect(auditTargetDestination("admin", "company")).toBe("admin-company");
-    expect(auditTargetDestination("admin", "lead")).toBe("admin-lead");
+    expect(auditTargetDestination("platform", "company")).toBe("platform-company");
+    expect(auditTargetDestination("platform", "lead")).toBe("platform-lead");
   });
 
   it("offers no destination for a type with no route in either portal", () => {
-    expect(auditTargetDestination("admin", "user")).toBeNull();
-    expect(auditTargetDestination("admin", "session")).toBeNull();
+    expect(auditTargetDestination("platform", "user")).toBeNull();
+    expect(auditTargetDestination("platform", "session")).toBeNull();
   });
 
   it("offers the Company portal no destination at all", () => {
@@ -92,35 +92,35 @@ describe("auditTargetDestination", () => {
   });
 
   it("is total: an unknown target type resolves to no destination without throwing", () => {
-    expect(() => auditTargetDestination("admin", "payroll_run")).not.toThrow();
-    expect(auditTargetDestination("admin", "payroll_run")).toBeNull();
+    expect(() => auditTargetDestination("platform", "payroll_run")).not.toThrow();
+    expect(auditTargetDestination("platform", "payroll_run")).toBeNull();
     // A key from Object.prototype is a lookup, not a destination.
-    expect(auditTargetDestination("admin", "constructor")).toBeNull();
+    expect(auditTargetDestination("platform", "constructor")).toBeNull();
   });
 });
 
 describe("presentAuditTarget", () => {
   it("links a named company on the admin trail", () => {
     expect(
-      presentAuditTarget({ targetType: "company", publicId: "c-1", name: "Nexus" }, "admin"),
+      presentAuditTarget({ targetType: "company", publicId: "c-1", name: "Nexus" }, "platform"),
     ).toEqual({
       typeLabel: "Company",
       name: "Nexus",
       publicId: "c-1",
       erased: false,
-      destination: "admin-company",
+      destination: "platform-company",
     });
   });
 
   it("degrades an unresolved entity to text rather than a dead link", () => {
     expect(
-      presentAuditTarget({ targetType: "company", publicId: "c-1", name: null }, "admin"),
+      presentAuditTarget({ targetType: "company", publicId: "c-1", name: null }, "platform"),
     ).toMatchObject({ name: null, destination: null });
   });
 
   it("names a user target but never links it, because no user detail route exists", () => {
     expect(
-      presentAuditTarget({ targetType: "user", publicId: "u-1", name: "Layla" }, "admin"),
+      presentAuditTarget({ targetType: "user", publicId: "u-1", name: "Layla" }, "platform"),
     ).toMatchObject({ name: "Layla", destination: null });
   });
 
@@ -131,7 +131,7 @@ describe("presentAuditTarget", () => {
   });
 
   it("reads the erased sentinel before any id formatting, so it is never truncated or linked", () => {
-    const erased = presentAuditTarget({ targetType: "user", publicId: "ERASED" }, "admin");
+    const erased = presentAuditTarget({ targetType: "user", publicId: "ERASED" }, "platform");
 
     expect(erased).toEqual({
       typeLabel: "User",
@@ -144,7 +144,7 @@ describe("presentAuditTarget", () => {
 
   it("renders an unknown target type as words with no destination", () => {
     expect(
-      presentAuditTarget({ targetType: "payroll_run", publicId: "p-1" }, "admin"),
+      presentAuditTarget({ targetType: "payroll_run", publicId: "p-1" }, "platform"),
     ).toMatchObject({
       typeLabel: "Payroll run",
       destination: null,

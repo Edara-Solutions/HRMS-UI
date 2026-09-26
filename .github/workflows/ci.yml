@@ -41,6 +41,9 @@ jobs:
       - name: Drift-guard generated OpenAPI artifacts
         run: bun run openapi:check
 
+      - name: Platform namespace and frozen legacy artifact gate
+        run: bun run contract:legacy-check
+
       - name: Typecheck
         run: bun run typecheck
 

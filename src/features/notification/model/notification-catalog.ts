@@ -24,8 +24,8 @@ export type NotificationTone = "info" | "success" | "warning";
 
 /** The verified routes a row may navigate to; one member per click-through in the catalog. */
 export type NotificationRoute =
-  | { readonly to: "/admin/leads" | "/company/dashboard" | "/company/profile" }
-  | { readonly to: "/admin/conversion-requests/$publicId"; readonly publicId: string };
+  | { readonly to: "/platform/leads" | "/company/dashboard" | "/company/profile" }
+  | { readonly to: "/platform/conversion-requests/$publicId"; readonly publicId: string };
 
 export interface NotificationSubject {
   readonly type: string;
@@ -83,14 +83,16 @@ export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = 
     importance: "high",
     tone: "info",
     icon: UserPlus,
-    route: () => ({ to: "/admin/leads" }),
+    route: () => ({ to: "/platform/leads" }),
   }),
   catalogEntry("platform.conversion-requested", {
     importance: "high",
     tone: "warning",
     icon: ArrowRightLeft,
     route: (subject) =>
-      subject ? { to: "/admin/conversion-requests/$publicId", publicId: subject.publicId } : null,
+      subject
+        ? { to: "/platform/conversion-requests/$publicId", publicId: subject.publicId }
+        : null,
   }),
   catalogEntry("platform.company-activated", {
     importance: "normal",

@@ -1,9 +1,9 @@
-﻿import { Link, useNavigate } from "@tanstack/react-router";
 import { HTTPError } from "ky";
 import { ArrowLeft, Check, Play, RefreshCw, SkipForward } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { readBackendErrorMessage } from "@/shared/api";
 import { useCurrentSession } from "@/shared/auth";
+import { PageLink as Link, usePageDestination as useNavigate } from "@/shared/lib/page-navigation";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";

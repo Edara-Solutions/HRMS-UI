@@ -19,7 +19,7 @@ export const auditRuntimeContracts = [
     envelopeName: "platformAuditTrailPageEnvelopeSchema",
     parserName: "parsePlatformAuditTrailPage",
     itemParserName: "parsePlatformAuditTrailItem",
-    outputPath: auditApiPath("admin"),
+    outputPath: auditApiPath("platform"),
   },
   {
     schemaName: "CompanyAuditTrailPage",

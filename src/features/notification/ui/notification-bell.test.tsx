@@ -189,7 +189,7 @@ describe("NotificationBell", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Notifications" }));
     fireEvent.click(await screen.findByRole("button", { name: /New lead registered/ }));
 
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/admin/leads" });
+    expect(navigateMock).toHaveBeenCalledWith({ href: "/platform/leads" });
     expect(screen.queryByRole("button", { name: /New member joined/ })).not.toBeInTheDocument();
     expect(screen.getByText("New member joined")).toBeInTheDocument();
   });
@@ -241,7 +241,7 @@ describe("NotificationBell", () => {
     await waitFor(() =>
       expect(apiPostMock).toHaveBeenCalledWith("company/notifications/read", { json: { id: 1 } }),
     );
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/admin/leads" });
+    expect(navigateMock).toHaveBeenCalledWith({ href: "/platform/leads" });
   });
 
   it("advances the bulk-read cursor from the panel header and mutes the rows", async () => {

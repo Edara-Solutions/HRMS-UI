@@ -1,11 +1,12 @@
 import { Bell } from "lucide-react";
 import { type ComponentType, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { type NotificationListStyle, usePreferencesStore } from "@/shared/config";
+import type { NotificationListStyle } from "@/shared/config";
 import { Button } from "@/shared/ui/button";
 import { useUnreadNotificationCount } from "../api/unread-count";
 import { useNotificationCenter } from "../lib/use-notification-center";
 import type { NotificationCenterView, NotificationShapeProps } from "../model/notification-shape";
+import { useNotificationPreference } from "../model/use-notification-preference";
 import { NotificationFlat } from "./notification-flat";
 import { NotificationPanel } from "./notification-panel";
 import { NotificationSheet } from "./notification-sheet";
@@ -21,7 +22,7 @@ const shapeComponent: Record<NotificationListStyle, ComponentType<NotificationSh
 export function NotificationBell() {
   const { t } = useTranslation("notification", { useSuspense: false });
   const { data } = useUnreadNotificationCount();
-  const listStyle = usePreferencesStore((preferences) => preferences.notificationListStyle);
+  const { selected: listStyle } = useNotificationPreference();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<NotificationCenterView>("feed");
   const bellRef = useRef<HTMLButtonElement>(null);

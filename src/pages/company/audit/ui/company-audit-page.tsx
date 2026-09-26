@@ -1,4 +1,3 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -7,6 +6,10 @@ import {
   auditNamespace,
   clearedAuditFilters,
 } from "@/features/audit-filters";
+import {
+  usePageNavigate as useNavigate,
+  usePageSearch as useSearch,
+} from "@/shared/lib/page-navigation";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import {
@@ -15,6 +18,7 @@ import {
   useCompanyAuditTrail,
 } from "../api/audit";
 import { searchCompanyAuditActors } from "../api/audit-actors";
+import { pageSearchSchema } from "../model/page-search";
 import { CompanyAuditTable } from "./company-audit-table";
 
 function EmptyState({ message, action }: { message: string; action?: React.ReactNode }) {
@@ -29,8 +33,8 @@ function EmptyState({ message, action }: { message: string; action?: React.React
 
 export function CompanyAuditPage() {
   const { t } = useTranslation(auditNamespace);
-  const search = useSearch({ from: "/company/audit/" });
-  const navigate = useNavigate({ from: "/company/audit/" });
+  const search = useSearch(pageSearchSchema);
+  const navigate = useNavigate(pageSearchSchema);
   const query = useCompanyAuditTrail(search);
 
   const page = query.data;

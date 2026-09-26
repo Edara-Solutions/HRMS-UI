@@ -1,20 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { adminNavGroups, companyNavGroups } from "./nav-items";
+import { buildNavGroups } from "./nav-items";
 
-describe("Admin navigation", () => {
-  it("exposes the Email Platform area", () => {
-    expect(adminNavGroups.flatMap((group) => group.items)).toEqual(
-      expect.arrayContaining([expect.objectContaining({ label: "Email", href: "/admin/email" })]),
+describe("owned workflow navigation", () => {
+  it.each([
+    "company",
+    "platform",
+  ] as const)("shows only migrated %s workflows without fixture badges", (audience) => {
+    const items = buildNavGroups({ audience, authenticated: true, permissions: [] }, "en").flatMap(
+      (group) => group.items,
     );
+    expect(items.map((item) => item.href)).toEqual([
+      `/${audience}/dashboard`,
+      `/${audience}/me/profile`,
+      `/${audience}/me/security`,
+      `/${audience}/me/sessions`,
+    ]);
+    expect(items.every((item) => !("indicator" in item))).toBe(true);
   });
-});
-
-describe("Company navigation", () => {
-  it("reaches the Company Audit Trail", () => {
-    expect(companyNavGroups.flatMap((group) => group.items)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ label: "Audit log", href: "/company/audit" }),
-      ]),
-    );
+  it("localizes the same registry without synthesizing Owner grants", () => {
+    const facts = { audience: "company", authenticated: true, owner: true } as const;
+    expect(buildNavGroups(facts, "ar")[0]?.items[1]?.label).toBe("ملفي الشخصي");
+    expect(
+      buildNavGroups(facts, "en")
+        .flatMap((group) => group.items)
+        .some((item) => item.href.includes("users")),
+    ).toBe(false);
   });
 });

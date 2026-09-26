@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { navigationSearch } from "../../../../test/navigation-fixtures";
 import type { CompanyAuditTrailItem, CompanyAuditTrailPage } from "../api/audit";
 import { CompanyAuditPage } from "./company-audit-page";
 
@@ -190,7 +191,8 @@ describe("CompanyAuditPage cursor navigation", () => {
 
 /** Applies the search updater the page passed to `navigate` to the current search state. */
 function readNavigatedSearch() {
-  const updateSearch = navigateMock.mock.calls[0]?.[0]?.search;
+  const updateSearch = (_previous: Record<string, unknown>) =>
+    navigationSearch(navigateMock.mock.calls[0]?.[0]?.href);
   return updateSearch({ ...searchState });
 }
 
@@ -228,10 +230,11 @@ describe("CompanyAuditPage filters", () => {
     );
 
     const nextSearch = readNavigatedSearch();
-    expect(nextSearch).toEqual({ limit: 50, cursor: undefined, outcome: "FAILURE" });
+    expect(nextSearch).toEqual({ limit: 50, outcome: "FAILURE" });
 
     cleanup();
     apiGetMock.mockClear();
+    delete searchState.cursor;
     Object.assign(searchState, nextSearch);
     renderPage({ items: [profileUpdatedEvent] });
     await screen.findByText("Profile details changed");
@@ -252,7 +255,7 @@ describe("CompanyAuditPage filters", () => {
 
     const nextSearch = readNavigatedSearch();
     expect(nextSearch.occurredFrom).toMatch(/Z$/);
-    expect(Number.isNaN(Date.parse(nextSearch.occurredFrom))).toBe(false);
+    expect(Number.isNaN(Date.parse(String(nextSearch.occurredFrom)))).toBe(false);
     expect(nextSearch.cursor).toBeUndefined();
   });
 

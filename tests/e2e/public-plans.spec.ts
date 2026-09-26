@@ -42,7 +42,6 @@ const forcedPasswordSession = {
         mustChangePassword: true,
         permissions: [],
         isOwner: false,
-        isPlatformAdmin: false,
       },
     },
   },

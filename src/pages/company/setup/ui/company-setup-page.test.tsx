@@ -55,7 +55,6 @@ const SESSION = {
     mustChangePassword: false,
     permissions: [],
     isOwner: true,
-    isPlatformAdmin: false,
   },
 };
 
