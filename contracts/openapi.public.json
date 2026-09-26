@@ -1,0 +1,372 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "Edara HRMS API",
+		"version": "1.0.0"
+	},
+	"components": {
+		"schemas": {
+			"HealthStatus": {
+				"type": "object",
+				"required": ["ok"],
+				"properties": {
+					"ok": {
+						"type": "boolean"
+					},
+					"timestamp": {
+						"format": "date-time",
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
+	"paths": {
+		"/health": {
+			"get": {
+				"summary": "Report whether the API and its dependencies are serving",
+				"tags": ["Health"],
+				"x-edara-audience": "PUBLIC",
+				"x-edara-authorization": "PUBLIC",
+				"responses": {
+					"200": {
+						"description": "Default Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HealthStatus"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Default Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HealthStatus"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/public/plans": {
+			"get": {
+				"summary": "List the published plan catalogue",
+				"tags": ["Public Plans"],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"minLength": 1
+						},
+						"in": "query",
+						"name": "name",
+						"required": false
+					},
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[A-Z]{2}$"
+						},
+						"in": "query",
+						"name": "countryCode",
+						"required": false
+					},
+					{
+						"schema": {
+							"type": "string",
+							"maxLength": 32
+						},
+						"in": "query",
+						"name": "regionCode",
+						"required": false
+					},
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[A-Z]{3}$"
+						},
+						"in": "query",
+						"name": "currencyCode",
+						"required": false
+					},
+					{
+						"schema": {
+							"type": "string",
+							"enum": ["monthly", "quarterly", "biannual", "annually"]
+						},
+						"in": "query",
+						"name": "billingInterval",
+						"required": false
+					},
+					{
+						"schema": {
+							"type": "integer",
+							"minimum": 1
+						},
+						"in": "query",
+						"name": "intervalCount",
+						"required": false
+					}
+				],
+				"x-edara-audience": "PUBLIC",
+				"x-edara-authorization": "PUBLIC",
+				"responses": {
+					"200": {
+						"description": "Default Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"additionalProperties": false,
+									"type": "object",
+									"required": ["data"],
+									"properties": {
+										"data": {
+											"type": "array",
+											"items": {
+												"additionalProperties": false,
+												"type": "object",
+												"required": [
+													"publicId",
+													"name",
+													"description",
+													"duration",
+													"features",
+													"effectivePrice"
+												],
+												"properties": {
+													"publicId": {
+														"format": "uuid",
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"description": {
+														"anyOf": [
+															{
+																"type": "string"
+															},
+															{
+																"type": "null"
+															}
+														]
+													},
+													"duration": {
+														"type": "integer"
+													},
+													"features": {
+														"type": "array",
+														"items": {
+															"type": "string"
+														}
+													},
+													"effectivePrice": {
+														"anyOf": [
+															{
+																"additionalProperties": false,
+																"type": "object",
+																"required": [
+																	"billingInterval",
+																	"intervalCount",
+																	"countryCode",
+																	"regionCode",
+																	"money"
+																],
+																"properties": {
+																	"billingInterval": {
+																		"anyOf": [
+																			{
+																				"type": "string",
+																				"enum": ["monthly"]
+																			},
+																			{
+																				"type": "string",
+																				"enum": [
+																					"quarterly"
+																				]
+																			},
+																			{
+																				"type": "string",
+																				"enum": ["biannual"]
+																			},
+																			{
+																				"type": "string",
+																				"enum": ["annually"]
+																			}
+																		]
+																	},
+																	"intervalCount": {
+																		"type": "integer"
+																	},
+																	"countryCode": {
+																		"anyOf": [
+																			{
+																				"type": "string"
+																			},
+																			{
+																				"type": "null"
+																			}
+																		]
+																	},
+																	"regionCode": {
+																		"anyOf": [
+																			{
+																				"type": "string"
+																			},
+																			{
+																				"type": "null"
+																			}
+																		]
+																	},
+																	"money": {
+																		"additionalProperties": false,
+																		"type": "object",
+																		"required": [
+																			"currencyCode",
+																			"currencyExponent",
+																			"amountMinor",
+																			"amountMajor",
+																			"formattedAmount"
+																		],
+																		"properties": {
+																			"currencyCode": {
+																				"type": "string"
+																			},
+																			"currencyExponent": {
+																				"type": "integer"
+																			},
+																			"amountMinor": {
+																				"type": "integer"
+																			},
+																			"amountMajor": {
+																				"type": "string"
+																			},
+																			"formattedAmount": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}
+															},
+															{
+																"type": "null"
+															}
+														]
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Default Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"required": [
+										"type",
+										"title",
+										"status",
+										"detail",
+										"instance",
+										"traceId"
+									],
+									"properties": {
+										"type": {
+											"format": "uri-reference",
+											"type": "string"
+										},
+										"title": {
+											"type": "string"
+										},
+										"status": {
+											"minimum": 400,
+											"maximum": 599,
+											"type": "integer"
+										},
+										"detail": {
+											"type": "string"
+										},
+										"instance": {
+											"format": "uri-reference",
+											"type": "string"
+										},
+										"traceId": {
+											"pattern": "^[0-9a-f]{32}$",
+											"type": "string"
+										},
+										"invalidParams": {
+											"type": "array",
+											"items": {
+												"minLength": 1,
+												"type": "string"
+											}
+										},
+										"code": {
+											"type": "string",
+											"enum": ["COMPANY_ACCESS_DENIED"]
+										},
+										"mode": {
+											"anyOf": [
+												{
+													"type": "string",
+													"enum": ["NORMAL"]
+												},
+												{
+													"type": "string",
+													"enum": ["READ_ONLY"]
+												},
+												{
+													"type": "string",
+													"enum": ["FROZEN"]
+												},
+												{
+													"type": "string",
+													"enum": ["BLOCKED"]
+												},
+												{
+													"type": "string",
+													"enum": ["MAINTENANCE"]
+												}
+											]
+										},
+										"reason": {
+											"anyOf": [
+												{
+													"maxLength": 255,
+													"type": "string"
+												},
+												{
+													"type": "null"
+												}
+											]
+										},
+										"effectiveUntil": {
+											"anyOf": [
+												{
+													"format": "date-time",
+													"type": "string"
+												},
+												{
+													"type": "null"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

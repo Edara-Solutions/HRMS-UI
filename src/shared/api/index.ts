@@ -8,6 +8,8 @@ export {
   mapLoginError,
   readBackendErrorMessage,
 } from "./error-mapper";
+export type { Request as PublicPlansRequest } from "./generated/public/get-api-v1-public-plans";
+export { ContractViolation } from "./generated/runtime";
 export type {
   components as leadComponents,
   paths as leadPaths,
@@ -19,7 +21,6 @@ export {
   parseLeadDetails,
   parseLeadListResponse,
 } from "./lead-runtime-contract";
-
 export {
   ALL_KNOWN_PLAN_FEATURES,
   ALL_KNOWN_PLAN_LIMITS,
@@ -59,6 +60,10 @@ export {
   useUpdatePlan,
   useUpdatePlanPrice,
 } from "./plans";
-
+export { executePublicRequest } from "./public-api";
 export { queryClient } from "./query-client";
 export type { components, paths } from "./schema";
+
+export async function loadPublicPlansContract() {
+  return import("./generated/public/get-api-v1-public-plans");
+}

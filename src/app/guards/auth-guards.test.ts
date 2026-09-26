@@ -3,6 +3,7 @@ import type { AuthSession, SessionUser } from "@/shared/auth";
 import { useAuthStore } from "@/shared/auth";
 import {
   isAdminConsoleEnabled,
+  redirectIfMustChangePassword,
   requireAdminConsoleEnabled,
   requireAuthenticated,
 } from "./auth-guards";
@@ -98,6 +99,26 @@ describe("requireAuthenticated", () => {
     useAuthStore.setState({ session, status: "authenticated" });
 
     expect(requireAuthenticated({ platformAdminOnly: true })).toEqual(session);
+  });
+});
+
+describe("public plans password-change projection", () => {
+  afterEach(() => {
+    useAuthStore.setState({ session: null, status: "anonymous" });
+  });
+
+  it("leaves /plans public for normal and forced-password sessions", () => {
+    useAuthStore.setState({
+      session: buildSession({ mustChangePassword: true }),
+      status: "must_change_password",
+    });
+    expect(() => redirectIfMustChangePassword("/plans")).not.toThrow();
+
+    useAuthStore.setState({
+      session: buildSession({ mustChangePassword: false }),
+      status: "authenticated",
+    });
+    expect(() => redirectIfMustChangePassword("/plans")).not.toThrow();
   });
 });
 

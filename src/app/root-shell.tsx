@@ -1,13 +1,15 @@
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useLocation } from "@tanstack/react-router";
 import { ForcedPasswordChangeModal } from "@/features/auth";
 import { LocaleRuntime } from "@/shared/i18n";
 
 export function RootLayout() {
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const isPublicPlans = pathname === "/plans" || pathname === "/plans/";
   return (
     <main className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
       <LocaleRuntime />
       <Outlet />
-      <ForcedPasswordChangeModal />
+      {!isPublicPlans && <ForcedPasswordChangeModal />}
     </main>
   );
 }
