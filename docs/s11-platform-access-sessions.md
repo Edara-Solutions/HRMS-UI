@@ -40,4 +40,4 @@ All paths have the `/api/v1/platform` prefix. Direct operations use the Platform
 
 ## Local release gate
 
-Typecheck, Biome and Steiger pass. The full Vitest suite passes. OpenAPI drift, legacy contract artifacts and the production build pass. `tests/e2e/platform-access-sessions.spec.ts` passes in both Chromium projects alongside the existing Company workspace spec. React Doctor reports no finding in this slice's files.
+Typecheck, Biome and Steiger pass. The full Vitest suite passes. OpenAPI drift, legacy contract artifacts and the production build pass. `tests/e2e/platform-access-sessions.spec.ts` passes in both Chromium projects alongside the existing Company workspace spec. React Doctor (changed scope against the base) scores 92/100 with zero errors and one advisory: the session-open mutation has no cache invalidation, which is intentional because success navigates to a session that has no cached data yet. Employee status, setup step type and sending-domain status/health are typed as free strings by the delegated contract, so their label allowlists fall back to a neutral "unknown" label rather than being derived from a schema enum.
