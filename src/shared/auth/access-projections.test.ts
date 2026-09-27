@@ -196,4 +196,18 @@ describe("shared access projections", () => {
       projectRouteAccess("/platform/setup", { audience: "platform", authenticated: true }),
     ).toBe("not-found");
   });
+  it("matches people and role detail routes only for well-formed public IDs", () => {
+    const reader = { ...company, permissions: ["users:read", "roles:read"] };
+    const id = "7b1d2c3e-4f5a-4b6c-8d7e-9f0a1b2c3d4e";
+    expect(projectRouteAccess(`/company/people/${id}`, reader)).toBe("allow");
+    expect(projectRouteAccess(`/company/roles/${id}`, reader)).toBe("allow");
+    expect(projectRouteAccess("/company/people/internal-secret", reader)).toBe("not-found");
+    expect(projectRouteAccess(`/company/people/${id}/extra`, reader)).toBe("not-found");
+    expect(
+      projectRouteAccess(`/company/people/${id}`, { ...company, permissions: ["roles:read"] }),
+    ).toBe("forbidden");
+    expect(projectRouteAccess("/company/roles", { ...company, permissions: ["users:read"] })).toBe(
+      "forbidden",
+    );
+  });
 });

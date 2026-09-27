@@ -1,5 +1,9 @@
 export { apiClient } from "./client";
-export { isCompanyBlocked, useCompanyAccess } from "./company-access";
+export {
+  isCompanyBlocked,
+  useCompanyAccess,
+  useCompanyMutationRecovery,
+} from "./company-access";
 export { companyApi, loadCompanyIdentity, loginCompany } from "./company-api";
 export { companyApiClient } from "./company-client";
 export {
@@ -9,8 +13,10 @@ export {
   companyQueryKey,
   companyReadQuery,
   requestCompanyOperation,
+  sendCompanyCommand,
 } from "./company-operation";
 export { companyOrganizationOperations } from "./company-operations";
+export { companyPeopleOperations } from "./company-people-operations";
 export { companyQueryClient } from "./company-query-client";
 export { apiBaseUrl } from "./config";
 export {
