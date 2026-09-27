@@ -41,6 +41,7 @@ describe("shared access projections", () => {
     [{ protectedRoot: true }, "protected-root"],
     [{ finalRoot: true }, "final-root"],
     [{ systemRole: true }, "system-role"],
+    [{ selfHeldRole: true }, "self-held-role"],
     [{ preservesOwner: false }, "owner-continuity"],
     [{ lifecycleAllowed: false }, "lifecycle"],
   ] as const)("projects validated target restrictions independently of permission", (target, reason) => {
@@ -230,5 +231,28 @@ describe("shared access projections", () => {
     const worker = { ...company, permissions: ["users:read"] };
     for (const path of ["/company/email", "/company/notifications", "/company/audit"])
       expect(projectRouteAccess(path, worker)).toBe("forbidden");
+  });
+  it("routes Platform people and roles by their read permissions and public IDs", () => {
+    const platform = { audience: "platform", authenticated: true } as const;
+    const reader = {
+      ...platform,
+      permissions: ["platform-users:read", "platform-roles:read"],
+    };
+    const id = "7b1d2c3e-4f5a-4b6c-8d7e-9f0a1b2c3d4e";
+    for (const path of [
+      "/platform/people",
+      `/platform/people/${id}`,
+      "/platform/roles",
+      `/platform/roles/${id}`,
+    ])
+      expect(projectRouteAccess(path, reader)).toBe("allow");
+    expect(projectRouteAccess("/platform/people/not-an-id", reader)).toBe("not-found");
+    expect(
+      projectRouteAccess("/platform/roles", { ...platform, permissions: ["leads:read"] }),
+    ).toBe("forbidden");
+    expect(projectRouteAccess("/company/people", reader)).toBe("not-found");
+    expect(projectNavigation(reader).map((route) => route.path)).toEqual(
+      expect.arrayContaining(["/platform/people", "/platform/roles"]),
+    );
   });
 });

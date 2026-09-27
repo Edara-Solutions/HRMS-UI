@@ -32,7 +32,12 @@ export {
   mapLoginError,
   readBackendErrorMessage,
 } from "./error-mapper";
-export type { OperationKey, RefusalMode } from "./generated/authorization";
+export type {
+  OperationKey,
+  OperationPermission,
+  RefusalMode,
+} from "./generated/authorization";
+export { operationAuthorization } from "./generated/authorization";
 export { ContractViolation } from "./generated/runtime";
 export type {
   components as leadComponents,
@@ -91,8 +96,21 @@ export {
   useUpdatePlan,
   useUpdatePlanPrice,
 } from "./plans";
+export {
+  platformRootRoleName,
+  rootReservedPermissions,
+  usePlatformAccess,
+  usePlatformMutationRecovery,
+} from "./platform-access";
 export { loadPlatformIdentity, loginPlatform, platformApi } from "./platform-api";
 export { platformApiClient } from "./platform-client";
+export {
+  platformQueryKey,
+  platformReadQuery,
+  requestPlatformOperation,
+  sendPlatformCommand,
+} from "./platform-operation";
+export { platformPeopleOperations } from "./platform-people-operations";
 export { platformQueryClient } from "./platform-query-client";
 export { queryClient } from "./query-client";
 export type { components, paths } from "./schema";
