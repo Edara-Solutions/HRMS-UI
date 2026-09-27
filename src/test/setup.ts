@@ -36,3 +36,9 @@ i18next.addResourceBundle("en", "communications", enCommunications);
 i18next.addResourceBundle("ar", "communications", arCommunications);
 i18next.addResourceBundle("en", "platform-people", enPlatformPeople);
 i18next.addResourceBundle("ar", "platform-people", arPlatformPeople);
+
+import arPlatformCompanies from "../../public/locales/ar/platform-companies.json";
+import enPlatformCompanies from "../../public/locales/en/platform-companies.json";
+
+i18next.addResourceBundle("en", "platform-companies", enPlatformCompanies);
+i18next.addResourceBundle("ar", "platform-companies", arPlatformCompanies);

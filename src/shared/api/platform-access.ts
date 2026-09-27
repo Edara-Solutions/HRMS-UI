@@ -24,6 +24,10 @@ function isRootReserved(operation: OperationKey) {
   return rootReservedPermissions.some((reserved) => reserved === permission);
 }
 
+function isOperationKey(key: string): key is OperationKey {
+  return Object.hasOwn(operationAuthorization, key);
+}
+
 /**
  * The live Platform identity and its access facts. A reserved operation needs both its permission
  * and current root standing; the root role name alone never synthesizes a permission (M06).
@@ -42,12 +46,14 @@ export function usePlatformAccess() {
     user,
     facts,
     /** Projects an action; target predicates (self, protected root, ...) come from the caller. */
-    availability: (operation: OperationKey, target: Partial<AccessFacts> = {}) =>
-      projectActionAvailability(operation, {
-        ...facts,
-        requiresRoot: isRootReserved(operation),
-        ...target,
-      }),
+    availability: (operation: string, target: Partial<AccessFacts> = {}) =>
+      isOperationKey(operation)
+        ? projectActionAvailability(operation, {
+            ...facts,
+            requiresRoot: isRootReserved(operation),
+            ...target,
+          })
+        : { state: "hidden" as const },
   };
 }
 

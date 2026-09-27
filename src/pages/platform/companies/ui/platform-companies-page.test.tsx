@@ -1,133 +1,92 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { navigationSearch } from "../../../../test/navigation-fixtures";
-import type { Company, CompanyListResponse } from "../api/companies";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { usePlatformSession } from "@/shared/auth";
+import { platformSessionFixture } from "../../../../test/audience-fixtures";
+import { operationNetwork } from "../../../../test/operation-request-mock";
+import {
+  companyBody,
+  companyListBody,
+  companyPermissions,
+} from "../../../../test/platform-company-fixtures";
+import { navigations } from "../../../../test/router-mock";
 import { PlatformCompaniesPage } from "./platform-companies-page";
 
-const navigateMock = vi.hoisted(() => vi.fn());
-const apiGetMock = vi.hoisted(() => vi.fn());
-const searchState = vi.hoisted(
-  () => ({ page: 1, pageSize: 10, q: undefined }) as Record<string, unknown>,
-);
-
-vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
-  return {
-    ...actual,
-    useNavigate: () => navigateMock,
-    useSearch: () => searchState,
-  };
-});
-
-// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm - stub the client boundary instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: {
-    get: apiGetMock,
-  },
-}));
-
-function jsonResponse<T>(value: T) {
-  return { json: () => Promise.resolve(value) };
-}
-
-function makeCompany(overrides: Partial<Company> = {}): Company {
-  return {
-    publicId: "company-1",
-    logo: null,
-    name: "Nexus Technologies",
-    website: "https://nexustech.sa",
-    phoneNumber: "+966112345678",
-    country: "Saudi Arabia",
-    companyCode: "NEXUS",
-    isActive: true,
-    lifecycleStatus: "ONBOARDING",
-    addressLine: null,
-    createdAt: "2026-05-20T10:00:00.000Z",
-    updatedAt: "2026-05-20T10:00:00.000Z",
-    deletedAt: null,
-    ...overrides,
-  };
-}
-
-function makeCompaniesResponse(overrides: Partial<CompanyListResponse> = {}): CompanyListResponse {
-  return {
-    data: [makeCompany()],
-    meta: { page: 1, limit: 10, total: 1, totalPages: 1 },
-    ...overrides,
-  };
-}
-
-function mockApi() {
-  apiGetMock.mockImplementation((path: string) => {
-    if (path === "companies") return jsonResponse(makeCompaniesResponse());
-    throw new Error(`Unexpected path: ${path}`);
-  });
-}
-
-function renderPage() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <PlatformCompaniesPage />
+function open(permissions = companyPermissions, q?: string) {
+  const net = operationNetwork.install();
+  usePlatformSession.getState().setSession(platformSessionFixture({ permissions }));
+  net.on("GET /api/v1/platform/companies", () => ({ status: 200, body: companyListBody() }));
+  render(
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
+      <PlatformCompaniesPage search={{ page: 1, q }} />
     </QueryClientProvider>,
   );
+  return net;
 }
-
-describe("PlatformCompaniesPage", () => {
-  afterEach(() => {
-    cleanup();
-    navigateMock.mockReset();
-    apiGetMock.mockReset();
-    Object.assign(searchState, { page: 1, pageSize: 10, q: undefined });
-  });
-
-  it("renders companies with lifecycle and active status from the real hook", async () => {
-    mockApi();
-    renderPage();
-
-    expect(await screen.findByRole("heading", { name: "Nexus Technologies" })).toBeInTheDocument();
-    expect(screen.getAllByText("NEXUS").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Onboarding").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Enabled").length).toBeGreaterThan(0);
-  });
-
-  it("reflects backend totals via useCompanies, not client-side slicing", async () => {
-    apiGetMock.mockImplementation((path: string) => {
-      if (path === "companies") {
-        return jsonResponse(
-          makeCompaniesResponse({ meta: { page: 2, limit: 10, total: 42, totalPages: 5 } }),
-        );
-      }
-      throw new Error(`Unexpected path: ${path}`);
-    });
-    renderPage();
-
-    expect(await screen.findByText("2 / 5")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: /next page/i }));
-
-    await waitFor(() => expect(navigateMock).toHaveBeenCalled());
-    const search = (_previous: Record<string, unknown>) =>
-      navigationSearch(navigateMock.mock.calls.at(-1)?.[0].href);
-    expect(search({ page: 2, pageSize: 10 })).toEqual(expect.objectContaining({ page: 3 }));
-  });
-
-  it("navigates to the company detail view when View is clicked", async () => {
-    mockApi();
-    renderPage();
-    await screen.findByRole("heading", { name: "Nexus Technologies" });
-
-    fireEvent.click(screen.getAllByRole("button", { name: /^view$/i })[0]);
-
-    expect(navigateMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        href: "/platform/companies/company-1",
-      }),
+afterEach(() => {
+  cleanup();
+  usePlatformSession.getState().clearSession();
+  navigations.length = 0;
+});
+describe("Platform Company registry", () => {
+  it("uses the exact Platform page contract and separates metadata from lifecycle", async () => {
+    const net = open();
+    expect(await screen.findByRole("link", { name: "Acme Company" })).toHaveAttribute(
+      "href",
+      expect.stringContaining("/platform/companies/"),
     );
+    expect(net.calls[0]).toMatchObject({
+      audience: "platform",
+      key: "GET /api/v1/platform/companies",
+      input: { query: { page: 1, limit: 20 } },
+    });
+    expect(screen.getByText("Registry isActive (read-only)")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Activate" })).toBeNull();
+  });
+  it("creates only safe registry fields and navigates to its public ID", async () => {
+    const net = open();
+    net.on("POST /api/v1/platform/companies", () => ({ status: 201, body: companyBody() }));
+    await screen.findByText("Acme Company");
+    fireEvent.click(screen.getByRole("button", { name: "Create Company" }));
+    const dialog = await screen.findByRole("dialog");
+    for (const [label, value] of [
+      ["Company name", "New Company"],
+      ["Phone number", "01012345678"],
+      ["Country", "Egypt"],
+    ])
+      fireEvent.change(within(dialog).getByLabelText(label), { target: { value } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create Company" }));
+    await waitFor(() => expect(net.count("POST /api/v1/platform/companies")).toBe(1));
+    expect(net.calls.find((call) => call.key.startsWith("POST"))?.input).toEqual({
+      body: {
+        name: "New Company",
+        logo: null,
+        website: null,
+        phoneNumber: "01012345678",
+        country: "Egypt",
+        addressLine: null,
+      },
+    });
+    await waitFor(() => expect(navigations.length).toBe(1));
+  });
+  it("shows page-filter empty state without pretending the entire registry is empty", async () => {
+    open(companyPermissions, "absent");
+    expect(await screen.findByText("No matches on this page.")).toBeInTheDocument();
+  });
+  it("hides create without its exact permission", async () => {
+    open(["companies:read"]);
+    await screen.findByText("Acme Company");
+    expect(screen.queryByRole("button", { name: "Create Company" })).toBeNull();
+  });
+  it("renders no request with only a Company identity", () => {
+    const net = operationNetwork.install();
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <PlatformCompaniesPage search={{ page: 1 }} />
+      </QueryClientProvider>,
+    );
+    expect(net.calls).toHaveLength(0);
   });
 });

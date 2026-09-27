@@ -26,9 +26,11 @@ import { Route as CompanyLoginRouteImport } from "./app/routes/company_/login"
 import { Route as CompanyForgotPasswordRouteImport } from "./app/routes/company_/forgot-password"
 import { Route as CompanyChangePasswordRouteImport } from "./app/routes/company_/change-password"
 import { Route as CompanyAcceptInvitationRouteImport } from "./app/routes/company_/accept-invitation"
+import { Route as PlatformSubscriptionsIndexRouteImport } from "./app/routes/platform/subscriptions/index"
 import { Route as PlatformRolesIndexRouteImport } from "./app/routes/platform/roles/index"
 import { Route as PlatformPeopleIndexRouteImport } from "./app/routes/platform/people/index"
 import { Route as PlatformDashboardIndexRouteImport } from "./app/routes/platform/dashboard/index"
+import { Route as PlatformCompaniesIndexRouteImport } from "./app/routes/platform/companies/index"
 import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
 import { Route as CompanyRolesIndexRouteImport } from "./app/routes/company/roles/index"
 import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
@@ -39,6 +41,7 @@ import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/
 import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
 import { Route as PlatformRolesPublicIdRouteImport } from "./app/routes/platform/roles/$publicId"
 import { Route as PlatformPeoplePublicIdRouteImport } from "./app/routes/platform/people/$publicId"
+import { Route as PlatformCompaniesPublicIdRouteImport } from "./app/routes/platform/companies/$publicId"
 import { Route as CompanyRolesPublicIdRouteImport } from "./app/routes/company/roles/$publicId"
 import { Route as CompanyPeoplePublicIdRouteImport } from "./app/routes/company/people/$publicId"
 import { Route as PlatformMeSessionsIndexRouteImport } from "./app/routes/platform/me/sessions/index"
@@ -135,6 +138,12 @@ const CompanyAcceptInvitationRoute = CompanyAcceptInvitationRouteImport.update({
   path: "/company/accept-invitation",
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlatformSubscriptionsIndexRoute =
+  PlatformSubscriptionsIndexRouteImport.update({
+    id: "/subscriptions/",
+    path: "/subscriptions/",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
 const PlatformRolesIndexRoute = PlatformRolesIndexRouteImport.update({
   id: "/roles/",
   path: "/roles/",
@@ -148,6 +157,11 @@ const PlatformPeopleIndexRoute = PlatformPeopleIndexRouteImport.update({
 const PlatformDashboardIndexRoute = PlatformDashboardIndexRouteImport.update({
   id: "/dashboard/",
   path: "/dashboard/",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
+const PlatformCompaniesIndexRoute = PlatformCompaniesIndexRouteImport.update({
+  id: "/companies/",
+  path: "/companies/",
   getParentRoute: () => PlatformRouteRoute,
 } as any)
 const CompanySetupIndexRoute = CompanySetupIndexRouteImport.update({
@@ -201,6 +215,12 @@ const PlatformPeoplePublicIdRoute = PlatformPeoplePublicIdRouteImport.update({
   path: "/people/$publicId",
   getParentRoute: () => PlatformRouteRoute,
 } as any)
+const PlatformCompaniesPublicIdRoute =
+  PlatformCompaniesPublicIdRouteImport.update({
+    id: "/companies/$publicId",
+    path: "/companies/$publicId",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
 const CompanyRolesPublicIdRoute = CompanyRolesPublicIdRouteImport.update({
   id: "/roles/$publicId",
   path: "/roles/$publicId",
@@ -268,6 +288,7 @@ export interface FileRoutesByFullPath {
   "/platform/": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
@@ -278,9 +299,11 @@ export interface FileRoutesByFullPath {
   "/company/profile/": typeof CompanyProfileIndexRoute
   "/company/roles/": typeof CompanyRolesIndexRoute
   "/company/setup/": typeof CompanySetupIndexRoute
+  "/platform/companies/": typeof PlatformCompaniesIndexRoute
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/platform/people/": typeof PlatformPeopleIndexRoute
   "/platform/roles/": typeof PlatformRolesIndexRoute
+  "/platform/subscriptions/": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates/": typeof CompanyEmailTemplatesIndexRoute
   "/company/me/profile/": typeof CompanyMeProfileIndexRoute
   "/company/me/security/": typeof CompanyMeSecurityIndexRoute
@@ -307,6 +330,7 @@ export interface FileRoutesByTo {
   "/platform": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit": typeof CompanyAuditIndexRoute
@@ -317,9 +341,11 @@ export interface FileRoutesByTo {
   "/company/profile": typeof CompanyProfileIndexRoute
   "/company/roles": typeof CompanyRolesIndexRoute
   "/company/setup": typeof CompanySetupIndexRoute
+  "/platform/companies": typeof PlatformCompaniesIndexRoute
   "/platform/dashboard": typeof PlatformDashboardIndexRoute
   "/platform/people": typeof PlatformPeopleIndexRoute
   "/platform/roles": typeof PlatformRolesIndexRoute
+  "/platform/subscriptions": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates": typeof CompanyEmailTemplatesIndexRoute
   "/company/me/profile": typeof CompanyMeProfileIndexRoute
   "/company/me/security": typeof CompanyMeSecurityIndexRoute
@@ -349,6 +375,7 @@ export interface FileRoutesById {
   "/platform/": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
@@ -359,9 +386,11 @@ export interface FileRoutesById {
   "/company/profile/": typeof CompanyProfileIndexRoute
   "/company/roles/": typeof CompanyRolesIndexRoute
   "/company/setup/": typeof CompanySetupIndexRoute
+  "/platform/companies/": typeof PlatformCompaniesIndexRoute
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/platform/people/": typeof PlatformPeopleIndexRoute
   "/platform/roles/": typeof PlatformRolesIndexRoute
+  "/platform/subscriptions/": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates/": typeof CompanyEmailTemplatesIndexRoute
   "/company/me/profile/": typeof CompanyMeProfileIndexRoute
   "/company/me/security/": typeof CompanyMeSecurityIndexRoute
@@ -392,6 +421,7 @@ export interface FileRouteTypes {
     | "/platform/"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/companies/$publicId"
     | "/platform/people/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit/"
@@ -402,9 +432,11 @@ export interface FileRouteTypes {
     | "/company/profile/"
     | "/company/roles/"
     | "/company/setup/"
+    | "/platform/companies/"
     | "/platform/dashboard/"
     | "/platform/people/"
     | "/platform/roles/"
+    | "/platform/subscriptions/"
     | "/company/email/templates/"
     | "/company/me/profile/"
     | "/company/me/security/"
@@ -431,6 +463,7 @@ export interface FileRouteTypes {
     | "/platform"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/companies/$publicId"
     | "/platform/people/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit"
@@ -441,9 +474,11 @@ export interface FileRouteTypes {
     | "/company/profile"
     | "/company/roles"
     | "/company/setup"
+    | "/platform/companies"
     | "/platform/dashboard"
     | "/platform/people"
     | "/platform/roles"
+    | "/platform/subscriptions"
     | "/company/email/templates"
     | "/company/me/profile"
     | "/company/me/security"
@@ -472,6 +507,7 @@ export interface FileRouteTypes {
     | "/platform/"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/companies/$publicId"
     | "/platform/people/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit/"
@@ -482,9 +518,11 @@ export interface FileRouteTypes {
     | "/company/profile/"
     | "/company/roles/"
     | "/company/setup/"
+    | "/platform/companies/"
     | "/platform/dashboard/"
     | "/platform/people/"
     | "/platform/roles/"
+    | "/platform/subscriptions/"
     | "/company/email/templates/"
     | "/company/me/profile/"
     | "/company/me/security/"
@@ -633,6 +671,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CompanyAcceptInvitationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/platform/subscriptions/": {
+      id: "/platform/subscriptions/"
+      path: "/subscriptions"
+      fullPath: "/platform/subscriptions/"
+      preLoaderRoute: typeof PlatformSubscriptionsIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
     "/platform/roles/": {
       id: "/platform/roles/"
       path: "/roles"
@@ -652,6 +697,13 @@ declare module "@tanstack/react-router" {
       path: "/dashboard"
       fullPath: "/platform/dashboard/"
       preLoaderRoute: typeof PlatformDashboardIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/platform/companies/": {
+      id: "/platform/companies/"
+      path: "/companies"
+      fullPath: "/platform/companies/"
+      preLoaderRoute: typeof PlatformCompaniesIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
     "/company/setup/": {
@@ -722,6 +774,13 @@ declare module "@tanstack/react-router" {
       path: "/people/$publicId"
       fullPath: "/platform/people/$publicId"
       preLoaderRoute: typeof PlatformPeoplePublicIdRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/platform/companies/$publicId": {
+      id: "/platform/companies/$publicId"
+      path: "/companies/$publicId"
+      fullPath: "/platform/companies/$publicId"
+      preLoaderRoute: typeof PlatformCompaniesPublicIdRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
     "/company/roles/$publicId": {
@@ -832,11 +891,14 @@ const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
 
 interface PlatformRouteRouteChildren {
   PlatformIndexRoute: typeof PlatformIndexRoute
+  PlatformCompaniesPublicIdRoute: typeof PlatformCompaniesPublicIdRoute
   PlatformPeoplePublicIdRoute: typeof PlatformPeoplePublicIdRoute
   PlatformRolesPublicIdRoute: typeof PlatformRolesPublicIdRoute
+  PlatformCompaniesIndexRoute: typeof PlatformCompaniesIndexRoute
   PlatformDashboardIndexRoute: typeof PlatformDashboardIndexRoute
   PlatformPeopleIndexRoute: typeof PlatformPeopleIndexRoute
   PlatformRolesIndexRoute: typeof PlatformRolesIndexRoute
+  PlatformSubscriptionsIndexRoute: typeof PlatformSubscriptionsIndexRoute
   PlatformMeProfileIndexRoute: typeof PlatformMeProfileIndexRoute
   PlatformMeSecurityIndexRoute: typeof PlatformMeSecurityIndexRoute
   PlatformMeSessionsIndexRoute: typeof PlatformMeSessionsIndexRoute
@@ -844,11 +906,14 @@ interface PlatformRouteRouteChildren {
 
 const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
   PlatformIndexRoute: PlatformIndexRoute,
+  PlatformCompaniesPublicIdRoute: PlatformCompaniesPublicIdRoute,
   PlatformPeoplePublicIdRoute: PlatformPeoplePublicIdRoute,
   PlatformRolesPublicIdRoute: PlatformRolesPublicIdRoute,
+  PlatformCompaniesIndexRoute: PlatformCompaniesIndexRoute,
   PlatformDashboardIndexRoute: PlatformDashboardIndexRoute,
   PlatformPeopleIndexRoute: PlatformPeopleIndexRoute,
   PlatformRolesIndexRoute: PlatformRolesIndexRoute,
+  PlatformSubscriptionsIndexRoute: PlatformSubscriptionsIndexRoute,
   PlatformMeProfileIndexRoute: PlatformMeProfileIndexRoute,
   PlatformMeSecurityIndexRoute: PlatformMeSecurityIndexRoute,
   PlatformMeSessionsIndexRoute: PlatformMeSessionsIndexRoute,

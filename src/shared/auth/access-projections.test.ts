@@ -255,4 +255,28 @@ describe("shared access projections", () => {
       expect.arrayContaining(["/platform/people", "/platform/roles"]),
     );
   });
+  it("keeps Company registry and subscription route grants independent", () => {
+    const facts = {
+      audience: "platform",
+      authenticated: true,
+      permissions: ["company-subscriptions:read"],
+    } as const;
+    expect(projectRouteAccess("/platform/subscriptions", facts)).toBe("allow");
+    expect(projectRouteAccess("/platform/companies", facts)).toBe("forbidden");
+    expect(
+      projectRouteAccess("/platform/subscriptions", {
+        ...facts,
+        permissions: ["company-subscriptions:expire-trials"],
+      }),
+    ).toBe("allow");
+    expect(
+      projectRouteAccess("/platform/subscriptions", {
+        ...facts,
+        permissions: ["company-subscriptions:extend-trial"],
+      }),
+    ).toBe("forbidden");
+    expect(projectNavigation(facts).map((route) => route.path)).toContain(
+      "/platform/subscriptions",
+    );
+  });
 });

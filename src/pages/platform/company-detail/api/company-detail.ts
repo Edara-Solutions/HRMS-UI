@@ -1,148 +1,107 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
-import { apiClient } from "@/shared/api";
+import { queryOptions } from "@tanstack/react-query";
+import {
+  ContractViolation,
+  platformCompanyOperations as operations,
+  platformQueryKey,
+  requestPlatformOperation,
+  sendPlatformCommand,
+} from "@/shared/api";
+import {
+  type Command,
+  projectActivation,
+  projectCommercial,
+  projectPolicy,
+  projectSubscription,
+} from "../model/company";
 
-const timestampSchema = z.string().datetime({ offset: true });
-
-export const setupStepTypeValues = [
-  "SET_COMPANY_PROFILE",
-  "SET_ROLES",
-  "SET_JOBS",
-  "SET_BRANCHES",
-  "SET_SHIFTS",
-  "SET_DEPARTMENTS",
-] as const;
-
-export const setupStepStatusValues = ["PENDING", "IN_PROGRESS", "COMPLETED", "SKIPPED"] as const;
-
-export const companyProfileSchema = z.object({
-  publicId: z.string(),
-  companyPublicId: z.string(),
-  name: z.string(),
-  logoUrl: z.string().nullable(),
-  email: z.string().email().nullable(),
-  phone: z.string().nullable(),
-  country: z.string().nullable(),
-  city: z.string().nullable(),
-  addressLine: z.string().nullable(),
-  taxNumber: z.string().nullable(),
-  commercialNumber: z.string().nullable(),
-  status: z.enum(["INCOMPLETE", "COMPLETE"]),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-});
-
-export const companySetupStepSchema = z.object({
-  publicId: z.string(),
-  stepType: z.enum(setupStepTypeValues),
-  status: z.enum(setupStepStatusValues),
-  isRequired: z.boolean(),
-  sequence: z.number().int().positive(),
-  templateVersion: z.number().int().positive(),
-  dependencies: z.array(z.enum(setupStepTypeValues)),
-  startedAt: timestampSchema.nullable(),
-  completedAt: timestampSchema.nullable(),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-});
-
-export const companySetupChecklistSchema = z.object({
-  companyPublicId: z.string(),
-  templateVersion: z.number().int().positive(),
-  steps: z.array(companySetupStepSchema),
-});
-
-export type CompanyProfile = z.infer<typeof companyProfileSchema>;
-export type CompanySetupChecklist = z.infer<typeof companySetupChecklistSchema>;
-export type CompanySetupStep = z.infer<typeof companySetupStepSchema>;
-export type SetupStepStatus = (typeof setupStepStatusValues)[number];
-export type SetupStepType = (typeof setupStepTypeValues)[number];
-
-export interface Company {
-  publicId: string;
-  logo: string | null;
-  name: string;
-  website: string | null;
-  phoneNumber: string;
-  country: string;
-  companyCode: string;
-  isActive: boolean;
-  addressLine: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+function scoped<T>(value: T, actual: string, expected: string, key: string): T {
+  if (actual !== expected)
+    throw new ContractViolation({ audience: "platform", key, status: 200, phase: "response" });
+  return value;
 }
-
-export interface CreateCompanyInput {
-  name: string;
-  phoneNumber: string;
-  country: string;
-  website?: string | null;
-  logo?: string | null;
-  isActive?: boolean;
-  addressLine?: string | null;
-  companyCode?: string;
+export function companyQueries(userPublicId: string, publicId: string) {
+  const params = { publicId };
+  return {
+    company: queryOptions({
+      queryKey: platformQueryKey(userPublicId, operations.company, publicId),
+      queryFn: async ({ signal }) => {
+        const value = await requestPlatformOperation(operations.company, { params }, signal);
+        return scoped(value, value.publicId, publicId, operations.company.key);
+      },
+    }),
+    policy: queryOptions({
+      queryKey: platformQueryKey(userPublicId, operations.policy, publicId),
+      queryFn: async ({ signal }) => {
+        const value = await requestPlatformOperation(operations.policy, { params }, signal);
+        return scoped(value, value.policy.companyPublicId, publicId, operations.policy.key);
+      },
+      select: projectPolicy,
+    }),
+    activation: queryOptions({
+      queryKey: platformQueryKey(userPublicId, operations.activation, publicId),
+      queryFn: async ({ signal }) => {
+        const value = await requestPlatformOperation(operations.activation, { params }, signal);
+        return scoped(value, value.companyPublicId, publicId, operations.activation.key);
+      },
+      select: projectActivation,
+    }),
+    subscription: queryOptions({
+      queryKey: platformQueryKey(userPublicId, operations.subscription, publicId),
+      queryFn: async ({ signal }) => {
+        const value = await requestPlatformOperation(operations.subscription, { params }, signal);
+        return scoped(
+          value,
+          value.subscription.companyPublicId,
+          publicId,
+          operations.subscription.key,
+        );
+      },
+      select: projectSubscription,
+    }),
+    commercial: queryOptions({
+      queryKey: platformQueryKey(userPublicId, operations.commercial, publicId),
+      queryFn: async ({ signal }) => {
+        const value = await requestPlatformOperation(operations.commercial, { params }, signal);
+        return scoped(value, value.companyPublicId, publicId, operations.commercial.key);
+      },
+      select: projectCommercial,
+    }),
+  };
 }
-
-export interface UpdateCompanyInput extends Partial<Omit<CreateCompanyInput, "companyCode">> {}
-
-const companyDetailKeys = {
-  all: ["companies"] as const,
-  detail: (id: string) => ["companies", id] as const,
-  profile: (id: string) => ["platform-company-profile", id] as const,
-  setup: (id: string) => ["platform-company-setup", id] as const,
-};
-
-async function fetchCompany(publicId: string): Promise<Company> {
-  return apiClient.get(`companies/${publicId}`).json();
+export function companyRoots(userPublicId: string) {
+  return [
+    operations.company,
+    operations.companies,
+    operations.cursor,
+    operations.policy,
+    operations.activation,
+    operations.subscription,
+    operations.commercial,
+  ].map((operation) => platformQueryKey(userPublicId, operation));
 }
-
-async function fetchCompanyProfile(publicId: string): Promise<CompanyProfile> {
-  const response: unknown = await apiClient.get(`companies/${publicId}/profile`).json();
-  return companyProfileSchema.parse(response);
-}
-
-async function fetchCompanySetup(publicId: string): Promise<CompanySetupChecklist> {
-  const response: unknown = await apiClient.get(`companies/${publicId}/setup`).json();
-  return companySetupChecklistSchema.parse(response);
-}
-
-async function updateCompany(
-  publicId: string,
-  input: UpdateCompanyInput,
-): Promise<{ message: string }> {
-  return apiClient.patch(`companies/${publicId}`, { json: input }).json();
-}
-
-export function useCompany(publicId: string) {
-  return useQuery({
-    queryKey: companyDetailKeys.detail(publicId),
-    queryFn: () => fetchCompany(publicId),
-    enabled: Boolean(publicId),
-  });
-}
-
-export function useCompanyProfile(publicId: string) {
-  return useQuery({
-    queryKey: companyDetailKeys.profile(publicId),
-    queryFn: () => fetchCompanyProfile(publicId),
-    enabled: Boolean(publicId),
-  });
-}
-
-export function useCompanySetup(publicId: string) {
-  return useQuery({
-    queryKey: companyDetailKeys.setup(publicId),
-    queryFn: () => fetchCompanySetup(publicId),
-    enabled: Boolean(publicId),
-  });
-}
-
-export function useUpdateCompany() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ publicId, input }: { publicId: string; input: UpdateCompanyInput }) =>
-      updateCompany(publicId, input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: companyDetailKeys.all }),
-  });
+export async function runCompanyCommand(command: Command, publicId: string, body?: unknown) {
+  const params = { publicId };
+  switch (command) {
+    case "remove":
+      return sendPlatformCommand(operations.remove, { params });
+    case "evaluate": {
+      const value = await requestPlatformOperation(operations.evaluate, { params });
+      return scoped(value, value.companyPublicId, publicId, operations.evaluate.key);
+    }
+    case "updatePolicy": {
+      const value = await requestPlatformOperation(operations.updatePolicy, { params, body });
+      return scoped(value, value.companyPublicId, publicId, operations.updatePolicy.key);
+    }
+    case "extendTrial": {
+      const value = await requestPlatformOperation(operations.extendTrial, { params, body });
+      return scoped(
+        value,
+        value.subscription.companyPublicId,
+        publicId,
+        operations.extendTrial.key,
+      );
+    }
+    default:
+      return sendPlatformCommand(operations[command], { params, body: {} });
+  }
 }

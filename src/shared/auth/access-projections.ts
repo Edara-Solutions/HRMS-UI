@@ -71,6 +71,7 @@ export interface RouteDeclaration {
   audience: AudienceName;
   category: "public" | "credential" | "self" | "work";
   operation?: OperationKey;
+  alternativeOperations?: readonly OperationKey[];
   label?: { en: string; ar: string };
 }
 
@@ -186,6 +187,27 @@ const companyWorkRoutes: RouteDeclaration[] = [
 ];
 
 const platformWorkRoutes: RouteDeclaration[] = [
+  {
+    path: "/platform/companies",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/companies",
+    label: { en: "Companies", ar: "الشركات" },
+  },
+  {
+    path: "/platform/companies/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/companies/{publicId}",
+  },
+  {
+    path: "/platform/subscriptions",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/companies/{publicId}/subscription",
+    alternativeOperations: ["POST /api/v1/platform/company-subscriptions/expire-trials"],
+    label: { en: "Subscriptions", ar: "الاشتراكات" },
+  },
   {
     path: "/platform/people",
     audience: "platform",
@@ -311,7 +333,13 @@ export function projectRouteAccess(pathname: string, facts: AccessFacts): Access
   if (route.audience === "company" && facts.companyMode === "BLOCKED") return "company-blocked";
   if (route.operation) {
     const available = projectActionAvailability(route.operation, facts);
-    if (available.state === "hidden") return "forbidden";
+    if (
+      available.state === "hidden" &&
+      !route.alternativeOperations?.some(
+        (operation) => projectActionAvailability(operation, facts).state !== "hidden",
+      )
+    )
+      return "forbidden";
     if (available.state === "disabled" && available.reason === "access-session-inactive")
       return "access-session-inactive";
   }

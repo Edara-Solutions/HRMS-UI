@@ -24,6 +24,7 @@ void i18next
       "people",
       "communications",
       "platform-people",
+      "platform-companies",
     ],
     // Every namespace here keys resources flat. Audit labels are keyed by the event type
     // itself, whose dots would otherwise read as a nested lookup — so a missing label
