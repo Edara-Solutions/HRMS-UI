@@ -44,4 +44,15 @@ describe("owned workflow navigation", () => {
       ["/company/me/sessions", "My sessions"],
     ]);
   });
+  it("lists People and Roles, never their detail routes", () => {
+    const hrefs = buildNavGroups(
+      { audience: "company", authenticated: true, permissions: ["users:read", "roles:read"] },
+      "ar",
+    )
+      .flatMap((group) => group.items)
+      .map((item) => [item.href, item.label]);
+    expect(hrefs).toContainEqual(["/company/people", "الأفراد"]);
+    expect(hrefs).toContainEqual(["/company/roles", "الأدوار"]);
+    expect(hrefs.some(([href]) => href?.includes("$"))).toBe(false);
+  });
 });

@@ -128,7 +128,49 @@ const companyWorkRoutes: RouteDeclaration[] = [
     operation: "GET /api/v1/company/setup",
     label: { en: "Company setup", ar: "إعداد الشركة" },
   },
+  {
+    path: "/company/people",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/users",
+    label: { en: "People", ar: "الأفراد" },
+  },
+  {
+    path: "/company/people/$publicId",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/users/{publicId}",
+  },
+  {
+    path: "/company/roles",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/roles",
+    label: { en: "Roles", ar: "الأدوار" },
+  },
+  {
+    path: "/company/roles/$publicId",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/roles/{publicId}",
+  },
 ];
+
+const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A `$publicId` segment matches only a well-formed public ID; anything else stays unknown. */
+function matchesDeclaredPath(declared: string, path: string) {
+  const expected = declared.split("/");
+  const actual = path.split("/");
+  return (
+    expected.length === actual.length &&
+    expected.every((segment, index) =>
+      segment === "$publicId"
+        ? publicIdPattern.test(actual[index] ?? "")
+        : segment === actual[index],
+    )
+  );
+}
 
 function withWorkRoutes(routes: RouteDeclaration[], work: RouteDeclaration[]) {
   const dashboard = routes.findIndex((route) => route.path.endsWith("/dashboard"));
@@ -199,7 +241,7 @@ export function projectActionAvailability(
 
 export function projectRouteAccess(pathname: string, facts: AccessFacts): AccessDecision {
   const path = pathname.replace(/\/$/, "");
-  const route = routeDeclarations.find((candidate) => candidate.path === path);
+  const route = routeDeclarations.find((candidate) => matchesDeclaredPath(candidate.path, path));
   if (!route || (route.audience === "platform" && facts.platformEnabled === false))
     return "not-found";
   if (facts.audience && route.audience !== facts.audience) return "not-found";

@@ -1,8 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type AccessFacts, projectActionAvailability } from "../auth/access-projections";
 import { useCompanySession } from "../auth/company-session";
+import { loadCompanyIdentity } from "./company-api";
 import { companyAccessPolicyQuery } from "./company-operation";
 import type { OperationKey, RefusalMode } from "./generated/authorization";
+import { classifyMutationFailure, type MutationOutcome } from "./mutation-outcome";
 import { OperationRefusal } from "./operation-request";
 
 /**
@@ -35,7 +37,9 @@ export function useCompanyAccess() {
     user,
     policy: policy.data,
     facts,
-    availability: (operation: OperationKey) => projectActionAvailability(operation, facts),
+    /** Projects an action; target predicates (self, Owner continuity, ...) come from the caller. */
+    availability: (operation: OperationKey, target: Partial<AccessFacts> = {}) =>
+      projectActionAvailability(operation, { ...facts, ...target }),
     /** Records a validated refusal mode, then re-reads the policy when this identity may. */
     recordRefusedMode: async (mode: RefusalMode) => {
       queryClient.setQueryData(policyQuery.queryKey, {
@@ -55,4 +59,23 @@ export function isCompanyBlocked(error: unknown): error is OperationRefusal {
     error.code === "COMPANY_ACCESS_DENIED" &&
     error.mode === "BLOCKED"
   );
+}
+
+/**
+ * Classifies a failed Company mutation and reconciles authority (M06/M09). A validated access denial
+ * is recorded against the policy; any other refusal re-reads the actor's current authority. Callers
+ * re-read the affected data in the mutation's own settle step and decide the copy, never a retry.
+ */
+export function useCompanyMutationRecovery() {
+  const access = useCompanyAccess();
+  return async (error: unknown): Promise<MutationOutcome> => {
+    const outcome = classifyMutationFailure(error);
+    if (outcome.kind === "access-restricted") await access.recordRefusedMode(outcome.mode);
+    if (outcome.kind === "refused")
+      await useCompanySession
+        .getState()
+        .revalidate(loadCompanyIdentity)
+        .catch(() => {});
+    return outcome;
+  };
 }

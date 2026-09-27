@@ -1,4 +1,13 @@
-import { Building2, Home, ListChecks, LockKeyhole, Monitor, UserRound } from "lucide-react";
+import {
+  Building2,
+  Home,
+  KeyRound,
+  ListChecks,
+  LockKeyhole,
+  Monitor,
+  UserRound,
+  Users,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { type AccessFacts, projectNavigation } from "@/shared/auth";
 import type { SupportedLocale } from "@/shared/i18n";
@@ -26,6 +35,8 @@ const icons: Record<string, ReactNode> = {
   "me/sessions": <Monitor size={17} />,
   profile: <Building2 size={17} />,
   setup: <ListChecks size={17} />,
+  people: <Users size={17} />,
+  roles: <KeyRound size={17} />,
 };
 export function buildNavGroups(facts: AccessFacts, locale: SupportedLocale): NavGroup[] {
   const items = projectNavigation(facts).map((route) => ({
