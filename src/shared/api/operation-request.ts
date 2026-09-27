@@ -27,6 +27,8 @@ export class OperationRefusal extends Error {
   readonly key: string;
   readonly code?: RefusalCode;
   readonly mode?: RefusalMode;
+  /** Field names the validated problem declared invalid; never the backend's message text. */
+  readonly invalidParams: readonly string[];
 
   constructor(operation: ResponseContract, status: number, validatedProblem: unknown) {
     super("The request could not be completed.");
@@ -38,8 +40,10 @@ export class OperationRefusal extends Error {
       .object({
         code: z.enum(generatedRefusalCodes).optional(),
         mode: z.enum(generatedRefusalModes).optional(),
+        invalidParams: z.array(z.string()).optional(),
       })
       .safeParse(validatedProblem);
+    this.invalidParams = metadata.success ? (metadata.data.invalidParams ?? []) : [];
     if (metadata.success) {
       this.code = metadata.data.code;
       this.mode = metadata.data.mode;

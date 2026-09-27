@@ -6,6 +6,7 @@ interface ConfirmDialogProps {
   title: string;
   description: string;
   confirmLabel: string;
+  cancelLabel?: string;
   isLoading?: boolean;
   onConfirm: () => void;
   onClose: () => void;
@@ -17,6 +18,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel,
+  cancelLabel = "Cancel",
   isLoading = false,
   onConfirm,
   onClose,
@@ -37,7 +39,7 @@ export function ConfirmDialog({
 
       <div className="mt-6 flex items-center justify-end gap-2">
         <Button intent="dismissive" onClick={onClose}>
-          Cancel
+          {cancelLabel}
         </Button>
         <Button intent="destructive" onClick={onConfirm} disabled={isLoading} isLoading={isLoading}>
           {confirmLabel}

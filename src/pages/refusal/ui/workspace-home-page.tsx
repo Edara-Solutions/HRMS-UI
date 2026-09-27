@@ -1,8 +1,14 @@
+import type { ReactNode } from "react";
 import { projectRouteAccess, useCurrentAudience, useCurrentSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { RefusalPage } from "./refusal-page";
 
-export function WorkspaceHomePage() {
+interface WorkspaceHomePageProps {
+  /** The audience's operational home, rendered once the session has work access. */
+  children?: ReactNode;
+}
+
+export function WorkspaceHomePage({ children }: WorkspaceHomePageProps) {
   const audience = useCurrentAudience();
   const session = useCurrentSession();
   const locale = usePreferencesStore((state) => state.locale);
@@ -12,6 +18,7 @@ export function WorkspaceHomePage() {
     permissions: session?.user.permissions,
   });
   if (decision === "no-work-access") return <RefusalPage kind="no-work-access" />;
+  if (children) return children;
   return (
     <section className="mx-auto max-w-3xl py-10">
       <h1 className="text-2xl font-semibold">

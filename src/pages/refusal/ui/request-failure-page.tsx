@@ -1,6 +1,6 @@
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { OperationRefusal } from "@/shared/api";
-import { projectDenialResponse } from "@/shared/auth";
+import { projectDenialResponse, RouteAccessRefusal } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { Button } from "@/shared/ui/button";
 import { RefusalPage } from "./refusal-page";
@@ -8,6 +8,8 @@ import { RefusalPage } from "./refusal-page";
 /** A bounded application error boundary: no stack, raw problem, route or target identifier. */
 export function RequestFailurePage({ error, reset }: ErrorComponentProps) {
   const locale = usePreferencesStore((state) => state.locale);
+  if (error instanceof RouteAccessRefusal)
+    return <RefusalPage kind={error.decision} audience={error.audience} />;
   if (error instanceof OperationRefusal && [401, 403, 404].includes(error.status)) {
     const decision = projectDenialResponse(error.status, error.code, error.mode);
     if (

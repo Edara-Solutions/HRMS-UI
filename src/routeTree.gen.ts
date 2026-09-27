@@ -27,6 +27,8 @@ import { Route as CompanyForgotPasswordRouteImport } from "./app/routes/company_
 import { Route as CompanyChangePasswordRouteImport } from "./app/routes/company_/change-password"
 import { Route as CompanyAcceptInvitationRouteImport } from "./app/routes/company_/accept-invitation"
 import { Route as PlatformDashboardIndexRouteImport } from "./app/routes/platform/dashboard/index"
+import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
+import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
 import { Route as PlatformMeSessionsIndexRouteImport } from "./app/routes/platform/me/sessions/index"
 import { Route as PlatformMeSecurityIndexRouteImport } from "./app/routes/platform/me/security/index"
@@ -126,6 +128,16 @@ const PlatformDashboardIndexRoute = PlatformDashboardIndexRouteImport.update({
   path: "/dashboard/",
   getParentRoute: () => PlatformRouteRoute,
 } as any)
+const CompanySetupIndexRoute = CompanySetupIndexRouteImport.update({
+  id: "/setup/",
+  path: "/setup/",
+  getParentRoute: () => CompanyRouteRoute,
+} as any)
+const CompanyProfileIndexRoute = CompanyProfileIndexRouteImport.update({
+  id: "/profile/",
+  path: "/profile/",
+  getParentRoute: () => CompanyRouteRoute,
+} as any)
 const CompanyDashboardIndexRoute = CompanyDashboardIndexRouteImport.update({
   id: "/dashboard/",
   path: "/dashboard/",
@@ -181,6 +193,8 @@ export interface FileRoutesByFullPath {
   "/plans/": typeof PlansIndexRoute
   "/platform/": typeof PlatformIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
+  "/company/profile/": typeof CompanyProfileIndexRoute
+  "/company/setup/": typeof CompanySetupIndexRoute
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/company/me/profile/": typeof CompanyMeProfileIndexRoute
   "/company/me/security/": typeof CompanyMeSecurityIndexRoute
@@ -206,6 +220,8 @@ export interface FileRoutesByTo {
   "/plans": typeof PlansIndexRoute
   "/platform": typeof PlatformIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
+  "/company/profile": typeof CompanyProfileIndexRoute
+  "/company/setup": typeof CompanySetupIndexRoute
   "/platform/dashboard": typeof PlatformDashboardIndexRoute
   "/company/me/profile": typeof CompanyMeProfileIndexRoute
   "/company/me/security": typeof CompanyMeSecurityIndexRoute
@@ -234,6 +250,8 @@ export interface FileRoutesById {
   "/plans/": typeof PlansIndexRoute
   "/platform/": typeof PlatformIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
+  "/company/profile/": typeof CompanyProfileIndexRoute
+  "/company/setup/": typeof CompanySetupIndexRoute
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/company/me/profile/": typeof CompanyMeProfileIndexRoute
   "/company/me/security/": typeof CompanyMeSecurityIndexRoute
@@ -263,6 +281,8 @@ export interface FileRouteTypes {
     | "/plans/"
     | "/platform/"
     | "/company/dashboard/"
+    | "/company/profile/"
+    | "/company/setup/"
     | "/platform/dashboard/"
     | "/company/me/profile/"
     | "/company/me/security/"
@@ -288,6 +308,8 @@ export interface FileRouteTypes {
     | "/plans"
     | "/platform"
     | "/company/dashboard"
+    | "/company/profile"
+    | "/company/setup"
     | "/platform/dashboard"
     | "/company/me/profile"
     | "/company/me/security"
@@ -315,6 +337,8 @@ export interface FileRouteTypes {
     | "/plans/"
     | "/platform/"
     | "/company/dashboard/"
+    | "/company/profile/"
+    | "/company/setup/"
     | "/platform/dashboard/"
     | "/company/me/profile/"
     | "/company/me/security/"
@@ -470,6 +494,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlatformDashboardIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
+    "/company/setup/": {
+      id: "/company/setup/"
+      path: "/setup"
+      fullPath: "/company/setup/"
+      preLoaderRoute: typeof CompanySetupIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
+    "/company/profile/": {
+      id: "/company/profile/"
+      path: "/profile"
+      fullPath: "/company/profile/"
+      preLoaderRoute: typeof CompanyProfileIndexRouteImport
+      parentRoute: typeof CompanyRouteRoute
+    }
     "/company/dashboard/": {
       id: "/company/dashboard/"
       path: "/dashboard"
@@ -525,6 +563,8 @@ declare module "@tanstack/react-router" {
 interface CompanyRouteRouteChildren {
   CompanyIndexRoute: typeof CompanyIndexRoute
   CompanyDashboardIndexRoute: typeof CompanyDashboardIndexRoute
+  CompanyProfileIndexRoute: typeof CompanyProfileIndexRoute
+  CompanySetupIndexRoute: typeof CompanySetupIndexRoute
   CompanyMeProfileIndexRoute: typeof CompanyMeProfileIndexRoute
   CompanyMeSecurityIndexRoute: typeof CompanyMeSecurityIndexRoute
   CompanyMeSessionsIndexRoute: typeof CompanyMeSessionsIndexRoute
@@ -533,6 +573,8 @@ interface CompanyRouteRouteChildren {
 const CompanyRouteRouteChildren: CompanyRouteRouteChildren = {
   CompanyIndexRoute: CompanyIndexRoute,
   CompanyDashboardIndexRoute: CompanyDashboardIndexRoute,
+  CompanyProfileIndexRoute: CompanyProfileIndexRoute,
+  CompanySetupIndexRoute: CompanySetupIndexRoute,
   CompanyMeProfileIndexRoute: CompanyMeProfileIndexRoute,
   CompanyMeSecurityIndexRoute: CompanyMeSecurityIndexRoute,
   CompanyMeSessionsIndexRoute: CompanyMeSessionsIndexRoute,

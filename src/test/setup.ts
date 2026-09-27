@@ -4,10 +4,12 @@ import arAudit from "../../public/locales/ar/audit.json";
 import arAuth from "../../public/locales/ar/auth.json";
 import arCommon from "../../public/locales/ar/common.json";
 import arNotification from "../../public/locales/ar/notification.json";
+import arOrganization from "../../public/locales/ar/organization.json";
 import enAudit from "../../public/locales/en/audit.json";
 import enAuth from "../../public/locales/en/auth.json";
 import enCommon from "../../public/locales/en/common.json";
 import enNotification from "../../public/locales/en/notification.json";
+import enOrganization from "../../public/locales/en/organization.json";
 
 // The app fetches locale resources over HTTP, which jsdom has no server for. Registering
 // the shipped files keeps every asserted label the one a user reads, and keeps `t`
@@ -20,3 +22,5 @@ i18next.addResourceBundle("en", "common", enCommon);
 i18next.addResourceBundle("ar", "common", arCommon);
 i18next.addResourceBundle("en", "notification", enNotification);
 i18next.addResourceBundle("ar", "notification", arNotification);
+i18next.addResourceBundle("en", "organization", enOrganization);
+i18next.addResourceBundle("ar", "organization", arOrganization);

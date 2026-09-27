@@ -26,7 +26,7 @@ describe("shared access projections", () => {
         companyMode: undefined,
         permissions: ["users:delete"],
       }),
-    ).toEqual({ state: "disabled", reason: "restricted-mode" });
+    ).toEqual({ state: "disabled", reason: "access-unverified" });
     expect(
       projectActionAvailability("GET /api/v1/platform/access-sessions/{sessionPublicId}/users", {
         audience: "platform",
@@ -171,5 +171,29 @@ describe("shared access projections", () => {
     expect(projectDenialResponse(403, undefined, undefined, true)).toBe("access-session-inactive");
     expect(projectDenialResponse(401)).toBe("authenticate");
     expect(projectRouteAccess("/company/dashboard", company)).toBe("no-work-access");
+  });
+  it("routes the Company organization workflows by their generated read permission", () => {
+    const worker = { ...company, permissions: ["users:read"] };
+    expect(projectRouteAccess("/company/profile", worker)).toBe("forbidden");
+    expect(projectRouteAccess("/company/setup", worker)).toBe("forbidden");
+    expect(
+      projectRouteAccess("/company/profile", {
+        ...company,
+        permissions: ["company-profiles:read"],
+      }),
+    ).toBe("allow");
+    expect(
+      projectRouteAccess("/company/setup", { ...company, permissions: ["company-setup:read"] }),
+    ).toBe("allow");
+    expect(
+      projectRouteAccess("/company/setup", {
+        ...company,
+        companyMode: "BLOCKED",
+        permissions: ["company-setup:read"],
+      }),
+    ).toBe("company-blocked");
+    expect(
+      projectRouteAccess("/platform/setup", { audience: "platform", authenticated: true }),
+    ).toBe("not-found");
   });
 });

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { OperationRefusal } from "@/shared/api";
+import { RouteAccessRefusal } from "@/shared/auth";
 import { RequestFailurePage } from "./request-failure-page";
 
 vi.mock("@tanstack/react-router", () => ({ useLocation: () => "/company/me/profile" }));
@@ -38,5 +39,13 @@ describe("safe request failure boundary", () => {
     );
     expect(screen.getByRole("heading")).toHaveTextContent("Your company workspace is unavailable");
     expect(document.body.textContent).not.toMatch(/secret-id|private-trace/);
+  });
+  it("renders a guarded route refusal as the audience forbidden surface", () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RequestFailurePage error={new RouteAccessRefusal("company")} reset={vi.fn()} />
+      </QueryClientProvider>,
+    );
+    expect(screen.getByRole("heading")).toHaveTextContent("This area is not available to you");
   });
 });

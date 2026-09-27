@@ -7,7 +7,7 @@
 > *looks*, load the `edara-hrms-ui` skill. This doc governs **where code goes**.
 
 We use a **pragmatic, minimal [Feature-Sliced Design](https://fsd.how)**.
-During the split-tier migration, the business slice examples below describe source ownership, not mounted routes. Only public plans, audience authentication and SELF workflows are currently reachable. Explicit CompanyShell and PlatformShell compose the audience-neutral app-shell widget. Future business/notification workflows must pass their owning contract migration gates before mounting; this intermediate state is nondeployable until the parent epic's final removal/reachability check.
+During the split-tier migration, the business slice examples below describe source ownership, not mounted routes. Only public plans, audience authentication, SELF and the Company organization workflows (operational dashboard, organization profile, setup) are currently reachable. Company pages read through `requestCompanyOperation`/`companyReadQuery` in `shared/api`: generated operations, a session-derived Company scope and `company + Company User` cache roots. Explicit CompanyShell and PlatformShell compose the audience-neutral app-shell widget. Future business/notification workflows must pass their owning contract migration gates before mounting; this intermediate state is nondeployable until the parent epic's final removal/reachability check.
 The guiding rule is FSD's own: **start in `pages/`, extract downward only when
 the same code is *already* used in more than one place.** When unsure, keep it
 in the page.
@@ -200,7 +200,7 @@ Backend↔frontend map (all real except dashboards):
 | leads           | `pages/platform/leads`, `lead-detail`        |
 | plans           | `pages/platform/plans`                       |
 | audit           | `pages/platform/audit`                        |
-| *(none yet)*    | `pages/*/dashboard` → still on `fixtures.ts` (placeholder) |
+| company registry / activation / subscription / setup | `pages/company/dashboard`, `profile`, `setup` |
 
 Per-slice **React Query hooks** (`useCompanies`, `useCreateLead`) live in that
 slice's `api/` segment and consume the generated types + the shared client.
@@ -291,4 +291,4 @@ exactly one owner, so they never double-report or conflict:
   management) and **Company** (tenant/employee app). See root `CONTEXT.md` for
   the domain language. Portals never import each other.
 - **Placeholder slice** — a screen still running on `fixtures.ts` demo data
-  because its backend endpoints aren't wired yet (currently: the dashboards).
+  because its backend endpoints aren't wired yet (currently: the Platform dashboard).
