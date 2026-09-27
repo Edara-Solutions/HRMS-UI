@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
 import { i18next } from "@/shared/i18n";
 import arAudit from "../../public/locales/ar/audit.json";
 import arAuth from "../../public/locales/ar/auth.json";
@@ -16,6 +17,24 @@ import enNotification from "../../public/locales/en/notification.json";
 import enOrganization from "../../public/locales/en/organization.json";
 import enPeople from "../../public/locales/en/people.json";
 import enPlatformPeople from "../../public/locales/en/platform-people.json";
+
+// Locale loading must not race transport tests that replace global fetch. The real
+// shipped resources below remain authoritative; browser tests exercise the HTTP backend.
+vi.mock("i18next-http-backend", () => ({
+  default: class FixtureLocaleBackend {
+    static type = "backend";
+    type = "backend";
+    read(
+      ...request: [
+        language: string,
+        namespace: string,
+        complete: (error: Error | null, data: Record<string, unknown>) => void,
+      ]
+    ) {
+      request[2](null, {});
+    }
+  },
+}));
 
 // The app fetches locale resources over HTTP, which jsdom has no server for. Registering
 // the shipped files keeps every asserted label the one a user reads, and keeps `t`
@@ -42,3 +61,9 @@ import enPlatformCompanies from "../../public/locales/en/platform-companies.json
 
 i18next.addResourceBundle("en", "platform-companies", enPlatformCompanies);
 i18next.addResourceBundle("ar", "platform-companies", arPlatformCompanies);
+
+import arPlatformLeads from "../../public/locales/ar/platform-leads.json";
+import enPlatformLeads from "../../public/locales/en/platform-leads.json";
+
+i18next.addResourceBundle("en", "platform-leads", enPlatformLeads);
+i18next.addResourceBundle("ar", "platform-leads", arPlatformLeads);

@@ -1,6 +1,10 @@
 import { z } from "zod";
+import type { platformLeadOperations } from "@/shared/api";
 import { parseDateEdgeSearchValue } from "@/shared/lib/date-edge";
-import type { ConversionRequestStatus } from "../api/conversion-requests";
+
+type ConversionRequestStatus = z.output<
+  typeof platformLeadOperations.requests.requestSchema
+>["query"]["status"];
 
 const requestStatuses = [
   "PENDING",
@@ -25,3 +29,4 @@ export const pageSearchSchema = z.object({
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(1).max(100).catch(10),
 });
+export type RequestSearch = z.output<typeof pageSearchSchema>;

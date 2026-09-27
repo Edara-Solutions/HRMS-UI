@@ -1,6 +1,13 @@
 import { z } from "zod";
+import type { platformLeadOperations } from "@/shared/api";
 import { parseDateEdgeSearchValue } from "@/shared/lib/date-edge";
-import type { LeadSort, LeadSource, LeadStatus } from "../api/leads";
+
+type Lead = z.output<(typeof platformLeadOperations.lead.responses)[200]>["lead"];
+type LeadStatus = Lead["status"];
+type LeadSource = Lead["source"];
+type LeadSort = NonNullable<
+  z.output<typeof platformLeadOperations.leads.requestSchema>["query"]["sort"]
+>;
 
 const leadStatuses = [
   "NEW",
@@ -76,3 +83,4 @@ export const pageSearchSchema = z.object({
   page: z.coerce.number().int().min(1).catch(1),
   pageSize: z.coerce.number().int().min(1).max(100).catch(10),
 });
+export type LeadsSearch = z.output<typeof pageSearchSchema>;

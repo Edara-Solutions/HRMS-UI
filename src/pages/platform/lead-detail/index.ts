@@ -1,1 +1,1 @@
-export { PlatformLeadDetailPage } from "./ui/platform-lead-detail-page";
+export { PlatformLeadDetailPage } from "./ui/crm-lead-detail-page";

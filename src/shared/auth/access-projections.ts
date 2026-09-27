@@ -188,6 +188,32 @@ const companyWorkRoutes: RouteDeclaration[] = [
 
 const platformWorkRoutes: RouteDeclaration[] = [
   {
+    path: "/platform/leads",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/leads",
+    label: { en: "Leads", ar: "العملاء المحتملون" },
+  },
+  {
+    path: "/platform/leads/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/leads/{publicId}",
+  },
+  {
+    path: "/platform/conversion-requests",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/lead-conversion-requests",
+    label: { en: "Conversion requests", ar: "طلبات التحويل" },
+  },
+  {
+    path: "/platform/conversion-requests/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/lead-conversion-requests/{publicId}",
+  },
+  {
     path: "/platform/companies",
     audience: "platform",
     category: "work",

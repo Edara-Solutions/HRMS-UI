@@ -1,3 +1,9 @@
 {
-  "appName": "HRMS"
+  "appName": "HRMS",
+  "loading": "Loading",
+  "retry": "Retry read",
+  "query.contract": "The response could not be verified. This section is unavailable.",
+  "query.refused": "This section is unavailable with your current access.",
+  "query.failed": "This section could not be loaded. You can retry the read.",
+  "date.includeBoundary": "Include this date"
 }
