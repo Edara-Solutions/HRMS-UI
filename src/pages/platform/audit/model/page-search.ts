@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { auditPageSize } from "@/features/audit-filters";
+import type { PlatformAuditEventType } from "../api/audit";
 import { platformAuditEventTypes } from "../api/audit";
 
-const platformEventTypes = new Set(platformAuditEventTypes);
+const platformEventTypes = new Set<string>(platformAuditEventTypes);
 
 // A filtered trail has to be shareable and back-button-safe, so every filter is search state.
 // The event types are narrowed to the ones this contract admits: a link carrying anything
@@ -17,13 +18,15 @@ export const pageSearchSchema = z.object({
   actorPublicId: z.string().uuid().optional().catch(undefined),
   traceId: z.string().min(1).max(64).optional().catch(undefined),
   outcome: z.enum(["SUCCESS", "FAILURE"]).optional().catch(undefined),
-  targetType: z.string().min(1).max(64).optional().catch(undefined),
-  targetPublicId: z.string().min(1).max(64).optional().catch(undefined),
   view: z.enum(["table", "timeline"]).optional().catch(undefined),
   lens: z.enum(["chronological", "person", "entity"]).optional().catch(undefined),
   eventType: z
     .array(z.string())
-    .transform((eventTypes) => eventTypes.filter((eventType) => platformEventTypes.has(eventType)))
+    .transform((eventTypes: string[]): PlatformAuditEventType[] =>
+      eventTypes.filter((eventType): eventType is PlatformAuditEventType =>
+        platformEventTypes.has(eventType),
+      ),
+    )
     .optional()
     .catch(undefined),
 });

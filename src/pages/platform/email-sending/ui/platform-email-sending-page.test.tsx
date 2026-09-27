@@ -1,139 +1,88 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import type { SendingContextStatus, SendingStatusResponse } from "../api/email-sending";
+import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { expect, it, vi } from "vitest";
+import { platformCommunicationsOperations as operations } from "@/shared/api";
+import { sendingBody } from "../../../../test/platform-communications-fixtures";
+import { communicationsRender } from "../../../../test/platform-communications-render";
 import { PlatformEmailSendingPage } from "./platform-email-sending-page";
 
-const API_GET_MOCK = vi.hoisted(() => vi.fn());
-const API_POST_MOCK = vi.hoisted(() => vi.fn());
-
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: API_GET_MOCK, post: API_POST_MOCK },
-}));
-
-function status(overrides: Partial<SendingContextStatus> = {}): SendingContextStatus {
-  return {
-    context: "EDARA",
-    paused: false,
-    reason: null,
-    updatedBy: null,
-    updatedAt: null,
-    ...overrides,
-  };
-}
-
-const BOTH_ACTIVE: SendingStatusResponse = {
-  items: [status({ context: "EDARA" }), status({ context: "COMPANY" })],
-};
-
-function jsonResponse<T>(value: T) {
-  return { json: () => Promise.resolve(value) };
-}
-
-function renderPage() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <PlatformEmailSendingPage />
-    </QueryClientProvider>,
-  );
-}
-
-describe("PlatformEmailSendingPage", () => {
-  afterEach(() => {
-    cleanup();
-    API_GET_MOCK.mockReset();
-    API_POST_MOCK.mockReset();
-  });
-
-  it("shows both contexts as active when nothing is paused", async () => {
-    API_GET_MOCK.mockReturnValue(jsonResponse(BOTH_ACTIVE));
-    renderPage();
-
-    expect(await screen.findByText("Edara sending")).toBeInTheDocument();
-    expect(screen.getByText("Company sending")).toBeInTheDocument();
-    expect(screen.getAllByText("Active")).toHaveLength(2);
-    // Both contexts offer a pause action; neither offers resume.
-    expect(screen.getAllByRole("button", { name: "Pause sending" })).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: "Resume sending" })).not.toBeInTheDocument();
-  });
-
-  it("surfaces the pause reason and a resume action for a paused context", async () => {
-    API_GET_MOCK.mockReturnValue(
-      jsonResponse({
+for (const paused of [false, true])
+  it(`confirms and changes only the ${paused ? "paused" : "running"} context`, async () => {
+    const { network, show } = communicationsRender(<PlatformEmailSendingPage />, [
+      "emails:sending:read",
+      "emails:sending:pause",
+      "emails:sending:resume",
+    ]);
+    let changed = false;
+    network.on(operations.sendingStatus.key, () => ({
+      status: 200,
+      body: sendingBody({
         items: [
-          status({
+          {
             context: "EDARA",
-            paused: true,
-            reason: "SMTP provider outage",
-            updatedBy: 7,
-            updatedAt: "2026-07-17T10:00:00.000Z",
-          }),
-          status({ context: "COMPANY" }),
+            paused: changed ? !paused : paused,
+            reason: null,
+            updatedAt: null,
+            updatedBy: 12345,
+          },
         ],
-      } satisfies SendingStatusResponse),
-    );
-    renderPage();
-
-    expect(await screen.findByText("SMTP provider outage")).toBeInTheDocument();
-    expect(screen.getByText("Paused")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Resume sending" })).toBeInTheDocument();
-  });
-
-  it("requires a reason before it will pause a context", async () => {
-    API_GET_MOCK.mockReturnValue(jsonResponse(BOTH_ACTIVE));
-    renderPage();
-
-    const pauseButtons = await screen.findAllByRole("button", { name: "Pause sending" });
-    fireEvent.click(pauseButtons[0] as HTMLElement);
-
-    // Confirm without typing a reason: the dialog validates and never calls the API.
-    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
-    await screen.findByText("A reason is required.");
-    expect(API_POST_MOCK).not.toHaveBeenCalled();
-  });
-
-  it("pauses a context with the entered reason through the API", async () => {
-    API_GET_MOCK.mockReturnValue(jsonResponse(BOTH_ACTIVE));
-    API_POST_MOCK.mockReturnValue(
-      jsonResponse(status({ context: "EDARA", paused: true, reason: "provider outage" })),
-    );
-    renderPage();
-
-    const pauseButtons = await screen.findAllByRole("button", { name: "Pause sending" });
-    fireEvent.click(pauseButtons[0] as HTMLElement);
-    fireEvent.change(screen.getByLabelText("Reason"), {
-      target: { value: "provider outage" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
-
-    await waitFor(() =>
-      expect(API_POST_MOCK).toHaveBeenCalledWith("emails/sending/EDARA/pause", {
-        json: { reason: "provider outage" },
       }),
+    }));
+    const operation = paused ? operations.resumeSending : operations.pauseSending;
+    network.on(operation.key, () => {
+      changed = true;
+      return {
+        status: 200,
+        body: {
+          context: "EDARA",
+          paused: !paused,
+          reason: null,
+          updatedAt: null,
+          updatedBy: 12345,
+        },
+      };
+    });
+    show();
+    await userEvent.click(
+      await screen.findByRole("button", { name: paused ? "Resume sending" : "Pause sending" }),
     );
+    const dialog = screen.getByRole("dialog");
+    if (!paused) {
+      expect(within(dialog).getByRole("button", { name: "Confirm" })).toBeDisabled();
+      await userEvent.type(
+        within(dialog).getByLabelText("Operator reason"),
+        "Investigating incident",
+      );
+    }
+    await userEvent.click(within(dialog).getByRole("button", { name: "Confirm" }));
+    await screen.findByText("Action completed.");
+    expect(network.calls.find((call) => call.key === operation.key)?.input).toEqual(
+      paused
+        ? { params: { context: "EDARA" } }
+        : { params: { context: "EDARA" }, body: { reason: "Investigating incident" } },
+    );
+    expect(document.body).not.toHaveTextContent("12345");
   });
+it("does not invent absent sending contexts", async () => {
+  const { network, show } = communicationsRender(<PlatformEmailSendingPage />, [
+    "emails:sending:read",
+  ]);
+  network.on(operations.sendingStatus.key, () => ({ status: 200, body: { items: [] } }));
+  show();
+  await screen.findByText("Sending is not configured.");
+  expect(screen.queryByRole("button", { name: "Pause sending" })).not.toBeInTheDocument();
+});
 
-  it("resumes a paused context through the API", async () => {
-    API_GET_MOCK.mockReturnValue(
-      jsonResponse({
-        items: [
-          status({ context: "EDARA", paused: true, reason: "outage" }),
-          status({ context: "COMPANY" }),
-        ],
-      } satisfies SendingStatusResponse),
-    );
-    API_POST_MOCK.mockReturnValue(jsonResponse(status({ context: "EDARA", paused: false })));
-    renderPage();
+import { operationNetwork } from "../../../../test/operation-request-mock";
 
-    fireEvent.click(await screen.findByRole("button", { name: "Resume sending" }));
-    fireEvent.click(screen.getByRole("button", { name: "Resume" }));
-
-    await waitFor(() =>
-      expect(API_POST_MOCK).toHaveBeenCalledWith("emails/sending/EDARA/resume", { json: {} }),
-    );
-  });
+vi.mock("@/shared/api/operation-request", async (original) => {
+  const actual =
+    await original<
+      Pick<typeof import("@/shared/api"), "executeOperationRequest" | "OperationRefusal">
+    >();
+  return {
+    ...actual,
+    executeOperationRequest: (client: never, operation: never, input: unknown) =>
+      operationNetwork.current.execute(client, operation, input, actual.OperationRefusal),
+  };
 });

@@ -5,26 +5,8 @@
 import { join } from "node:path";
 import { contractsDir, frontendRoot } from "./contract-provenance.mjs";
 
-function auditApiPath(portal) {
-  return join(frontendRoot, "src", "pages", portal, "audit", "api", "audit-runtime-contract.ts");
-}
-
-/**
- * The Audit Trail runtime contracts scripts/generate-audit-validators.mjs renders. The Company
- * trail reads the generated Company audience operation instead.
- */
-export const auditRuntimeContracts = [
-  {
-    schemaName: "PlatformAuditTrailPage",
-    eventName: "PlatformAuditTrailEvent",
-    itemName: "PlatformAuditTrailItem",
-    unrecognizedName: "UnrecognizedPlatformAuditTrailEvent",
-    envelopeName: "platformAuditTrailPageEnvelopeSchema",
-    parserName: "parsePlatformAuditTrailPage",
-    itemParserName: "parsePlatformAuditTrailItem",
-    outputPath: auditApiPath("platform"),
-  },
-];
+/** Both audit portals now read generated audience operations; no parallel runtime schemas remain. */
+export const auditRuntimeContracts = [];
 
 /** The two artifacts derived from the Audit Trail label key set. */
 export const auditLabelArtifacts = {

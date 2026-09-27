@@ -170,7 +170,7 @@ function presentIdentifiedActor(
     return {
       state: "named",
       primary: actor.name,
-      secondary: humanizeAuditKey(actor.kind),
+      secondary: t(`chrome.actorKind.${actor.kind}`),
       filterablePublicId: actor.publicId,
     };
   }
@@ -178,7 +178,7 @@ function presentIdentifiedActor(
   return {
     state: "unresolved",
     primary: shortAuditIdentifier(actor.publicId),
-    secondary: humanizeAuditKey(actor.kind),
+    secondary: t(`chrome.actorKind.${actor.kind}`),
     filterablePublicId: actor.publicId,
   };
 }

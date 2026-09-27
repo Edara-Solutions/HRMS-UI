@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
@@ -22,6 +22,8 @@ interface ConfirmDialogProps {
   /** Reserved for irreversible or high-blast-radius commands (M10). */
   typedConfirmation?: TypedConfirmation;
   isLoading?: boolean;
+  confirmDisabled?: boolean;
+  children?: ReactNode;
   onConfirm: () => void;
   onClose: () => void;
 }
@@ -36,6 +38,8 @@ export function ConfirmDialog({
   tone = "destructive",
   typedConfirmation,
   isLoading = false,
+  confirmDisabled = false,
+  children,
   onConfirm,
   onClose,
 }: ConfirmDialogProps) {
@@ -60,6 +64,7 @@ export function ConfirmDialog({
     >
       <DialogTitle id={titleId}>{title}</DialogTitle>
       <DialogDescription id={descriptionId}>{description}</DialogDescription>
+      {children}
 
       {typedConfirmation && (
         <div className="mt-4 space-y-1.5">
@@ -84,7 +89,7 @@ export function ConfirmDialog({
             setTyped("");
             onConfirm();
           }}
-          disabled={isLoading || !confirmed}
+          disabled={isLoading || confirmDisabled || !confirmed}
           isLoading={isLoading}
         >
           {confirmLabel}

@@ -273,6 +273,54 @@ const platformWorkRoutes: RouteDeclaration[] = [
     category: "work",
     operation: "GET /api/v1/platform/roles",
   },
+  {
+    path: "/platform/announcements",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/announcements",
+    label: { en: "Announcements", ar: "الإعلانات" },
+  },
+  {
+    path: "/platform/notifications",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/notification-settings",
+    label: { en: "Notifications", ar: "الإشعارات" },
+  },
+  {
+    path: "/platform/audit",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/audit-trail",
+    label: { en: "Audit trail", ar: "سجل التدقيق" },
+  },
+  {
+    path: "/platform/audit/catalog",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/audit-trail",
+  },
+  {
+    path: "/platform/emails",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/email-types",
+    label: { en: "Email templates", ar: "قوالب البريد" },
+  },
+  {
+    path: "/platform/email-deliveries",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/emails/deliveries",
+    label: { en: "Email deliveries", ar: "تسليمات البريد" },
+  },
+  {
+    path: "/platform/email-sending",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/emails/sending",
+    label: { en: "Email sending", ar: "إرسال البريد" },
+  },
 ];
 
 const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

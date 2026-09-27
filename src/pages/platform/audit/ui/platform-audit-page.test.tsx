@@ -2,12 +2,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { platformCommunicationsOperations as operations } from "@/shared/api";
+import { RouteAccessRefusal, usePlatformSession } from "@/shared/auth";
+import { platformSessionFixture } from "../../../../test/audience-fixtures";
 import { navigationSearch } from "../../../../test/navigation-fixtures";
+import { operationNetwork } from "../../../../test/operation-request-mock";
 import type { PlatformAuditTrailItem, PlatformAuditTrailPage } from "../api/audit";
 import { PlatformAuditPage } from "./platform-audit-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
-const apiGetMock = vi.hoisted(() => vi.fn());
 const searchState = vi.hoisted(() => ({ limit: 50 }) as Record<string, unknown>);
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
@@ -24,12 +27,17 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch rejects as
-// cross-realm — stub the client boundary instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: apiGetMock },
-}));
+vi.mock("@/shared/api/operation-request", async (original) => {
+  const actual =
+    await original<
+      Pick<typeof import("@/shared/api"), "executeOperationRequest" | "OperationRefusal">
+    >();
+  return {
+    ...actual,
+    executeOperationRequest: (client: never, operation: never, input: unknown) =>
+      operationNetwork.current.execute(client, operation, input, actual.OperationRefusal),
+  };
+});
 
 const platformReadEvent: PlatformAuditTrailItem = {
   eventType: "audit.trail.platform_read",
@@ -39,13 +47,13 @@ const platformReadEvent: PlatformAuditTrailItem = {
   companyPublicId: null,
   outcome: "SUCCESS",
   actor: {
-    kind: "PLATFORM_ADMIN",
+    kind: "PLATFORM_USER",
     publicId: "550e8400-e29b-41d4-a716-446655440000",
     name: "Nadia Fahmy",
   },
   traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
-  origin: { ip: "203.0.113.10", userAgent: null },
-  targets: [{ targetType: "audit-trail", publicId: "platform" }],
+  origin: { ip: "203.0.113.10", userAgent: null, country: null, city: null },
+  targets: [{ targetType: "audit-trail", publicId: "platform", name: null }],
   details: { companyPublicId: null, scope: null },
   recordingBinding: "STANDALONE",
   recordedAt: "2026-08-13T10:00:04.000Z",
@@ -53,27 +61,58 @@ const platformReadEvent: PlatformAuditTrailItem = {
 
 const companyOptionsPage = {
   data: [
-    { publicId: "11111111-1111-4111-8111-111111111111", companyCode: "NW", name: "Northwind" },
+    {
+      publicId: "11111111-1111-4111-8111-111111111111",
+      companyCode: "NW",
+      name: "Northwind",
+      logo: null,
+      website: null,
+      phoneNumber: "+20 100 000 0000",
+      country: "EG",
+      addressLine: null,
+      isActive: true,
+      lifecycleStatus: "ACTIVE",
+      activatedAt: "2026-08-01T00:00:00.000Z",
+      createdAt: "2026-08-01T00:00:00.000Z",
+      updatedAt: "2026-08-01T00:00:00.000Z",
+    },
   ],
+  meta: { page: 1, limit: 100, total: 1, totalPages: 1 },
 };
 
 function renderPage(
   page: Partial<Omit<PlatformAuditTrailPage, "items">> & { items?: unknown[] } = {},
+  permissions: string[] = ["audit-events:read", "companies:read"],
 ) {
-  apiGetMock.mockImplementation((path: string) => ({
-    json: () =>
-      Promise.resolve(
-        path === "companies"
-          ? companyOptionsPage
-          : { items: [], nextCursor: null, hasMore: false, ...page },
-      ),
+  const net = operationNetwork.install();
+  usePlatformSession.getState().setSession(platformSessionFixture({ permissions }));
+  net.on("GET /api/v1/platform/me", () => ({
+    status: 200,
+    body: platformSessionFixture({ permissions }).user,
   }));
+  net.on(operations.auditTrail.key, () => ({
+    status: 200,
+    body: {
+      items: page.items ?? [],
+      nextCursor: page.nextCursor ?? null,
+      hasMore: page.hasMore ?? false,
+    },
+  }));
+  net.on("GET /api/v1/platform/companies", () => ({ status: 200, body: companyOptionsPage }));
+  net.on(operations.auditActors.key, () => ({
+    status: 200,
+    body: [
+      { publicId: "22222222-2222-4222-8222-222222222222", name: "Layla Hassan", kind: "USER" },
+    ],
+  }));
+
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={queryClient}>
       <PlatformAuditPage />
     </QueryClientProvider>,
   );
+  return net;
 }
 
 /** Applies the search updater the page passed to `navigate` to the current search state. */
@@ -83,14 +122,10 @@ function readNavigatedSearch() {
   return updateSearch({ ...searchState });
 }
 
-function trailRequests() {
-  return apiGetMock.mock.calls.filter(([path]) => path === "platform/audit-trail");
-}
-
 afterEach(() => {
   cleanup();
-  apiGetMock.mockReset();
   navigateMock.mockReset();
+  usePlatformSession.getState().clearSession();
   for (const key of Object.keys(searchState)) {
     if (key !== "limit") delete searchState[key];
   }
@@ -124,22 +159,7 @@ describe("PlatformAuditPage filters", () => {
   });
 
   it("resolves an actor name to the identifier the trail filters by", async () => {
-    apiGetMock.mockImplementation((path: string) => ({
-      json: () =>
-        Promise.resolve(
-          path === "platform/audit-trail/actors"
-            ? [{ publicId: "22222222-2222-4222-8222-222222222222", name: "Layla Hassan" }]
-            : path === "companies"
-              ? companyOptionsPage
-              : { items: [platformReadEvent], nextCursor: null, hasMore: false },
-        ),
-    }));
-    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    render(
-      <QueryClientProvider client={queryClient}>
-        <PlatformAuditPage />
-      </QueryClientProvider>,
-    );
+    renderPage({ items: [platformReadEvent] });
 
     fireEvent.click(await screen.findByRole("button", { name: /Actor/ }));
     const panel = screen.getByRole("group", { name: "Actor" });
@@ -153,8 +173,6 @@ describe("PlatformAuditPage filters", () => {
     });
   });
 
-  // "Everything else that happened in this request" is the move an investigator makes from a
-  // row, so the trace has to become a filter rather than a string to copy out by hand.
   it("turns the trace on an expanded row into the filter that gathers its request", async () => {
     renderPage({ items: [platformReadEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Audit trail viewed/ }));
@@ -183,13 +201,18 @@ describe("PlatformAuditPage filters", () => {
     searchState.cursor = "opaque-current";
     searchState.scope = "PLATFORM";
     searchState.eventType = ["audit.trail.platform_read"];
-    renderPage({ items: [platformReadEvent] });
+    const net = renderPage({ items: [platformReadEvent] });
     await screen.findByText("Audit trail viewed");
 
-    // The mocked client is untyped by construction; the fetcher always passes this shape.
-    const first = trailRequests()[0]?.[1] as { searchParams: URLSearchParams };
-    expect(first.searchParams.get("cursor")).toBe("opaque-current");
-    expect(first.searchParams.getAll("eventType")).toEqual(["audit.trail.platform_read"]);
+    const calls = net.calls.filter((call) => call.key === operations.auditTrail.key);
+    expect(calls[0]?.input).toEqual({
+      query: {
+        cursor: "opaque-current",
+        limit: 50,
+        scope: "PLATFORM",
+        eventType: ["audit.trail.platform_read"],
+      },
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /Outcome/ }));
     fireEvent.click(
@@ -201,14 +224,54 @@ describe("PlatformAuditPage filters", () => {
     expect(nextSearch.cursor).toBeUndefined();
 
     cleanup();
-    apiGetMock.mockClear();
     delete searchState.cursor;
     Object.assign(searchState, nextSearch);
     renderPage({ items: [platformReadEvent] });
-    await waitFor(() => expect(trailRequests().length).toBeGreaterThan(0));
+    await waitFor(() =>
+      expect(
+        operationNetwork.current.calls.filter((call) => call.key === operations.auditTrail.key)
+          .length,
+      ).toBeGreaterThan(0),
+    );
 
-    for (const [, options] of trailRequests()) {
-      expect((options as { searchParams: URLSearchParams }).searchParams.has("cursor")).toBe(false);
+    const newCalls = operationNetwork.current.calls.filter(
+      (call) => call.key === operations.auditTrail.key,
+    );
+    for (const call of newCalls) {
+      expect(call.input).not.toMatchObject({ query: { cursor: expect.any(String) } });
     }
+  });
+
+  it("refuses access when audit-events:read is missing", () => {
+    expect(() => renderPage({ items: [platformReadEvent] }, [])).toThrow(RouteAccessRefusal);
+    cleanup();
+  });
+
+  it("shows contract unavailable state on ContractViolation", async () => {
+    const net = operationNetwork.install();
+    usePlatformSession
+      .getState()
+      .setSession(platformSessionFixture({ permissions: ["audit-events:read"] }));
+    net.on("GET /api/v1/platform/me", () => ({
+      status: 200,
+      body: platformSessionFixture().user,
+    }));
+    net.on(operations.auditTrail.key, () => ({
+      status: 200,
+      body: { secret: "response-canary" },
+    }));
+    net.on("GET /api/v1/platform/companies", () => ({ status: 200, body: companyOptionsPage }));
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PlatformAuditPage />
+      </QueryClientProvider>,
+    );
+
+    expect(
+      await screen.findByText("This history is temporarily unavailable. Try again later."),
+    ).toBeInTheDocument();
+    expect(document.body.textContent).not.toContain("response-canary");
   });
 });

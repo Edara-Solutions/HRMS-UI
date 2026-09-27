@@ -7,7 +7,10 @@ import {
   ListChecks,
   LockKeyhole,
   Mail,
+  MailCheck,
+  Megaphone,
   Monitor,
+  Send,
   UserRound,
   Users,
 } from "lucide-react";
@@ -43,6 +46,10 @@ const icons: Record<string, ReactNode> = {
   notifications: <BellRing size={17} />,
   audit: <History size={17} />,
   email: <Mail size={17} />,
+  emails: <Mail size={17} />,
+  "email-deliveries": <Send size={17} />,
+  "email-sending": <MailCheck size={17} />,
+  announcements: <Megaphone size={17} />,
 };
 export function buildNavGroups(facts: AccessFacts, locale: SupportedLocale): NavGroup[] {
   const items = projectNavigation(facts).map((route) => ({

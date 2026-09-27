@@ -1,84 +1,56 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
-import { apiClient } from "@/shared/api";
-
-export type EmailContext = "EDARA" | "COMPANY";
-
-const EMAIL_CONTEXTS = ["EDARA", "COMPANY"] as const satisfies readonly EmailContext[];
-
-/** The emergency-pause state of one communication context (backend PRD story 110). */
-const SENDING_CONTEXT_STATUS_SCHEMA = z.object({
-  context: z.enum(EMAIL_CONTEXTS),
-  paused: z.boolean(),
-  reason: z.string().nullable(),
-  updatedBy: z.number().int().nullable(),
-  updatedAt: z.string().datetime().nullable(),
-});
-
-const SENDING_STATUS_SCHEMA = z.object({
-  items: z.array(SENDING_CONTEXT_STATUS_SCHEMA),
-});
-
-// The runtime schema is the single source of truth; the static types are derived from it so the two
-// can never drift (FRONTEND.md — the boundary is Zod).
-export type SendingContextStatus = z.infer<typeof SENDING_CONTEXT_STATUS_SCHEMA>;
-export type SendingStatusResponse = z.infer<typeof SENDING_STATUS_SCHEMA>;
-
-export interface PauseSendingInput {
-  context: EmailContext;
-  reason: string;
-}
-
-const SENDING_STATUS_QUERY_KEY = ["email-sending", "status"] as const;
-
-async function fetchSendingStatus(): Promise<SendingStatusResponse> {
-  const response = await apiClient.get("emails/sending").json<unknown>();
-  return SENDING_STATUS_SCHEMA.parse(response);
-}
-
-async function pauseSending({ context, reason }: PauseSendingInput): Promise<SendingContextStatus> {
-  const response = await apiClient
-    .post(`emails/sending/${context}/pause`, { json: { reason } })
-    .json<unknown>();
-  return SENDING_CONTEXT_STATUS_SCHEMA.parse(response);
-}
-
-async function resumeSending(context: EmailContext): Promise<SendingContextStatus> {
-  // Resume takes no payload, but the shared client always sends `Content-Type: application/json`, and
-  // Fastify rejects that with an empty body. An empty JSON object satisfies both sides.
-  const response = await apiClient
-    .post(`emails/sending/${context}/resume`, { json: {} })
-    .json<unknown>();
-  return SENDING_CONTEXT_STATUS_SCHEMA.parse(response);
-}
-
-/** Loads the current emergency-pause status of both communication contexts. */
-export function useSendingStatus() {
-  return useQuery({
-    queryKey: SENDING_STATUS_QUERY_KEY,
-    queryFn: fetchSendingStatus,
-    // An incident-response screen: an operator recovers from a failed request explicitly rather than
-    // watching silent retries obscure the switch they are trying to read.
-    retry: false,
-    retryOnMount: false,
-    refetchOnReconnect: false,
+import { queryOptions } from "@tanstack/react-query";
+import type { z } from "zod";
+import {
+  ContractViolation,
+  platformCommunicationsOperations as operations,
+  platformReadQuery,
+  requestPlatformOperation,
+} from "@/shared/api";
+export type SendingContextStatus = z.output<(typeof operations.pauseSending.responses)["200"]>;
+export type EmailContext = SendingContextStatus["context"];
+export function sendingQuery(identity: string) {
+  return queryOptions({
+    ...platformReadQuery(identity, operations.sendingStatus),
+    queryFn: async ({ signal }) => {
+      const result = await requestPlatformOperation(operations.sendingStatus, {}, signal);
+      const contexts = new Set(result.items.map((item) => item.context));
+      if (contexts.size !== result.items.length)
+        throw new ContractViolation({
+          audience: "platform",
+          key: operations.sendingStatus.key,
+          status: 200,
+          phase: "response",
+        });
+      return result;
+    },
   });
 }
-
-function useSendingMutation<TInput>(mutationFn: (input: TInput) => Promise<SendingContextStatus>) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: SENDING_STATUS_QUERY_KEY }),
-  });
-}
-
-/** Emergency-pauses one context with a required, audited reason. */
-export function usePauseSending() {
-  return useSendingMutation(pauseSending);
-}
-
-/** Resumes one paused context after an incident is contained. */
-export function useResumeSending() {
-  return useSendingMutation(resumeSending);
+export async function changeSending(
+  target: SendingContextStatus,
+  reason: string,
+  check: () => void,
+) {
+  const current = await requestPlatformOperation(operations.sendingStatus, {});
+  const matches = current.items.filter((item) => item.context === target.context);
+  const fresh = matches.length === 1 ? matches[0] : undefined;
+  if (!fresh || fresh.paused !== target.paused || fresh.updatedAt !== target.updatedAt)
+    throw new Error("stale");
+  check();
+  const operation = target.paused ? operations.resumeSending : operations.pauseSending;
+  const result = target.paused
+    ? await requestPlatformOperation(operations.resumeSending, {
+        params: { context: target.context },
+      })
+    : await requestPlatformOperation(operations.pauseSending, {
+        params: { context: target.context },
+        body: { reason },
+      });
+  if (result.context !== target.context || result.paused === target.paused)
+    throw new ContractViolation({
+      audience: "platform",
+      key: operation.key,
+      status: 200,
+      phase: "response",
+    });
+  return result;
 }
