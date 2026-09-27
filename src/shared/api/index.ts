@@ -65,6 +65,7 @@ export {
 } from "./platform-access";
 export { loadPlatformIdentity, loginPlatform, platformApi } from "./platform-api";
 export { platformApiClient } from "./platform-client";
+export { platformCommunicationsOperations } from "./platform-communications-operations";
 export { platformCompanyOperations } from "./platform-company-operations";
 export { platformLeadOperations } from "./platform-lead-operations";
 export {

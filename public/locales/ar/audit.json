@@ -281,5 +281,11 @@
   "chrome.viewTimeline": "خط زمني",
   "chrome.lensPerson": "حسب الشخص",
   "chrome.lensEntity": "حسب الكيان",
-  "chrome.lensNoTarget": "بدون هدف محدد"
+  "chrome.lensNoTarget": "بدون هدف محدد",
+  "chrome.actorKind.USER": "مستخدم الشركة",
+  "chrome.actorKind.PLATFORM_USER": "مستخدم المنصة",
+  "chrome.actorKind.SYSTEM": "النظام",
+  "chrome.actorKind.ANONYMOUS": "مجهول",
+  "chrome.actorKind.ERASED": "هوية محذوفة",
+  "chrome.actorKind.ATTRIBUTION_FAILED": "تعذر تحديد الفاعل"
 }

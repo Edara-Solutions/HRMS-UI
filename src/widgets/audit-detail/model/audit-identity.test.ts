@@ -26,7 +26,7 @@ describe("presentAuditActor", () => {
     expect(actor).toMatchObject({
       state: "named",
       primary: "Layla Mansour",
-      secondary: "User",
+      secondary: "chrome.actorKind.USER",
       filterablePublicId: "u-1",
     });
   });
@@ -66,13 +66,17 @@ describe("presentAuditActor", () => {
   });
 
   it("treats an identifierless platform admin as an attribution defect, not a withheld identity", () => {
-    expect(presentAuditActor({ kind: "PLATFORM_ADMIN" }, t).state).toBe("attribution-failed");
+    expect(presentAuditActor({ kind: "PLATFORM_USER" }, t).state).toBe("attribution-failed");
   });
 
   it("names a platform admin the Platform trail does identify", () => {
     expect(
-      presentAuditActor({ kind: "PLATFORM_ADMIN", publicId: "a-1", name: "Omar" }, t),
-    ).toMatchObject({ state: "named", primary: "Omar", secondary: "Platform admin" });
+      presentAuditActor({ kind: "PLATFORM_USER", publicId: "a-1", name: "Omar" }, t),
+    ).toMatchObject({
+      state: "named",
+      primary: "Omar",
+      secondary: "chrome.actorKind.PLATFORM_USER",
+    });
   });
 });
 

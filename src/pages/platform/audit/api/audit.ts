@@ -1,71 +1,86 @@
 import { useQuery } from "@tanstack/react-query";
+import type { z } from "zod";
+import type { AuditTrailFilters } from "@/features/audit-filters";
 import {
-  type AuditTrailFilters,
-  appendAuditFilterParams,
-  filterableAuditEventTypes,
-} from "@/features/audit-filters";
-import { apiClient } from "@/shared/api";
-import {
-  PlatformAuditTrailEvent,
-  type PlatformAuditTrailItem,
-  parsePlatformAuditTrailPage,
-  type PlatformAuditTrailPage as RuntimePlatformAuditTrailPage,
-} from "./audit-runtime-contract";
+  platformCommunicationsOperations as operations,
+  platformQueryKey,
+  requestPlatformOperation,
+  usePlatformAccess,
+} from "@/shared/api";
 
-export type { PlatformAuditTrailItem };
+type AuditTrailQuery = z.input<(typeof operations.auditTrail)["requestSchema"]>["query"];
+export type PlatformAuditTrailPage = z.output<(typeof operations.auditTrail)["responses"]["200"]>;
+export type PlatformAuditTrailItem = PlatformAuditTrailPage["items"][number];
 
-/**
- * How the audit row was written, read off the generated contract so the two cannot drift.
- * Every available Platform arm carries it, so the first one names the union for all of them.
- */
+/** Recording binding as declared by the generated contract (TRANSACTIONAL | STANDALONE). */
 export type AuditRecordingBinding = Extract<
   PlatformAuditTrailItem,
-  { recordingBinding: string }
+  { eventType: "audit.trail.platform_read" }
 >["recordingBinding"];
-export type PlatformAuditTrailPage = RuntimePlatformAuditTrailPage;
 
+/** Every event type the Platform trail admits, straight from its generated request contract. */
+export type PlatformAuditEventType = NonNullable<AuditTrailQuery["eventType"]>[number];
+
+const eventTypeSchema =
+  operations.auditTrail.requestSchema.shape.query.shape.eventType.unwrap().element;
+
+export const platformAuditEventTypes: readonly PlatformAuditEventType[] = [
+  ...new Set(eventTypeSchema.options.map((option) => option.value)),
+];
+
+/** Whether a URL value names an event type the Platform operation declares. */
+export function isPlatformEventType(value: string): value is PlatformAuditEventType {
+  return platformAuditEventTypes.some((eventType) => eventType === value);
+}
+
+/** Scope filter for the Platform audit trail. */
 export type PlatformAuditTrailScope = "PLATFORM" | "COMPANY";
 
-export interface PlatformAuditTrailParams extends AuditTrailFilters {
+/**
+ * Filter and paging inputs for the Platform Audit Trail.
+ * Extends the shared filter set with Platform-specific filters: companyPublicId, scope, traceId.
+ */
+export interface PlatformAuditTrailParams extends Omit<AuditTrailFilters, "eventType"> {
   cursor?: string;
   limit?: number;
   companyPublicId?: string;
   scope?: PlatformAuditTrailScope;
-  /** Platform-only: everything else the system recorded under one request. */
   traceId?: string;
-  targetType?: string;
-  targetPublicId?: string;
   view?: "table" | "timeline";
   lens?: "chronological" | "person" | "entity";
+  eventType?: string[];
 }
 
-/** Every event type the Platform trail admits, read off the generated contract. */
-export const platformAuditEventTypes = filterableAuditEventTypes(PlatformAuditTrailEvent.options);
-
-export const auditTrailKeys = {
-  all: ["audit-trail"] as const,
-  platform: (params: PlatformAuditTrailParams) => ["audit-trail", "platform", params] as const,
-};
-
-export async function fetchPlatformAuditTrail(
-  params: PlatformAuditTrailParams,
-): Promise<PlatformAuditTrailPage> {
-  const searchParams = new URLSearchParams();
-  if (params.cursor) searchParams.set("cursor", params.cursor);
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.companyPublicId) searchParams.set("companyPublicId", params.companyPublicId);
-  if (params.scope) searchParams.set("scope", params.scope);
-  if (params.traceId) searchParams.set("traceId", params.traceId);
-  appendAuditFilterParams(searchParams, params);
-
-  const response: unknown = await apiClient.get("platform/audit-trail", { searchParams }).json();
-
-  return parsePlatformAuditTrailPage(response);
+/** Only declared event types reach the request; anything else would be a request violation. */
+export function toQuery(params: PlatformAuditTrailParams): AuditTrailQuery {
+  const eventType = params.eventType?.filter(isPlatformEventType);
+  return {
+    cursor: params.cursor,
+    limit: params.limit,
+    occurredFrom: params.occurredFrom,
+    occurredTo: params.occurredTo,
+    actorPublicId: params.actorPublicId,
+    outcome: params.outcome,
+    eventType: eventType && eventType.length > 0 ? eventType : undefined,
+    companyPublicId: params.companyPublicId,
+    traceId: params.traceId,
+    scope: params.scope,
+  };
 }
 
 export function usePlatformAuditTrail(params: PlatformAuditTrailParams = {}) {
+  const access = usePlatformAccess();
+  const query = toQuery(params);
   return useQuery({
-    queryKey: auditTrailKeys.platform(params),
-    queryFn: () => fetchPlatformAuditTrail(params),
+    queryKey: platformQueryKey(
+      access.user?.publicId ?? "",
+      operations.auditTrail,
+      JSON.stringify(query),
+    ),
+    queryFn: ({ signal }) => requestPlatformOperation(operations.auditTrail, { query }, signal),
+    enabled: access.availability(operations.auditTrail.key).state === "enabled",
+    retry: false,
   });
 }
+
+export type { AuditTrailFilters };

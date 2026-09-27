@@ -12,6 +12,13 @@ import {
   auditNamespace,
   clearedAuditFilters,
 } from "@/features/audit-filters";
+import {
+  ContractViolation,
+  OperationRefusal,
+  platformCommunicationsOperations as operations,
+  usePlatformAccess,
+} from "@/shared/api";
+import { RouteAccessRefusal } from "@/shared/auth";
 import { cn } from "@/shared/lib/cn";
 import {
   PageLink as Link,
@@ -21,6 +28,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import {
+  isPlatformEventType,
   type PlatformAuditTrailParams,
   type PlatformAuditTrailScope,
   platformAuditEventTypes,
@@ -55,6 +63,12 @@ export function PlatformAuditPage() {
   const navigate = useNavigate(pageSearchSchema);
   const query = usePlatformAuditTrail(search);
   const companyOptions = useAuditCompanyOptions();
+  const access = usePlatformAccess();
+
+  if (access.availability(operations.auditTrail.key).state === "hidden")
+    throw new RouteAccessRefusal("platform");
+  if (query.error instanceof OperationRefusal && [403, 404].includes(query.error.status))
+    throw query.error;
 
   const page = query.data;
   const items = page?.items ?? [];
@@ -67,7 +81,15 @@ export function PlatformAuditPage() {
 
   /** Every filter change goes through here, which is what guarantees the cursor is dropped. */
   function changeFilters(change: Partial<PlatformAuditTrailParams>) {
-    void navigate({ search: (previous) => applyAuditFilterChange(previous, change) });
+    void navigate({
+      search: (previous) =>
+        pageSearchSchema.parse(
+          applyAuditFilterChange(previous, {
+            ...change,
+            eventType: change.eventType?.filter(isPlatformEventType),
+          }),
+        ),
+    });
   }
 
   function loadMore() {
@@ -217,6 +239,8 @@ export function PlatformAuditPage() {
           </div>
           {query.isPending ? (
             <EmptyState message={t("chrome.loading")} />
+          ) : query.error instanceof ContractViolation ? (
+            <EmptyState message={t("chrome.contractUnavailable")} />
           ) : query.isError ? (
             <EmptyState
               message={t("chrome.loadFailed")}

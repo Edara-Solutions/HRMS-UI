@@ -68,8 +68,37 @@ import enPlatformLeads from "../../public/locales/en/platform-leads.json";
 i18next.addResourceBundle("en", "platform-leads", enPlatformLeads);
 i18next.addResourceBundle("ar", "platform-leads", arPlatformLeads);
 
+import arPlatformNotifications from "../../public/locales/ar/platform-notifications.json";
 import arPlatformPlans from "../../public/locales/ar/platform-plans.json";
+import enPlatformNotifications from "../../public/locales/en/platform-notifications.json";
 import enPlatformPlans from "../../public/locales/en/platform-plans.json";
 
 i18next.addResourceBundle("en", "platform-plans", enPlatformPlans);
 i18next.addResourceBundle("ar", "platform-plans", arPlatformPlans);
+
+i18next.addResourceBundle("en", "platform-notifications", enPlatformNotifications);
+i18next.addResourceBundle("ar", "platform-notifications", arPlatformNotifications);
+
+import arPlatformEmails from "../../public/locales/ar/platform-emails.json";
+import enPlatformEmails from "../../public/locales/en/platform-emails.json";
+
+i18next.addResourceBundle("en", "platform-emails", enPlatformEmails);
+i18next.addResourceBundle("ar", "platform-emails", arPlatformEmails);
+
+import arplatformannouncements from "../../public/locales/ar/platform-announcements.json";
+import enplatformannouncements from "../../public/locales/en/platform-announcements.json";
+
+i18next.addResourceBundle("en", "platform-announcements", enplatformannouncements);
+i18next.addResourceBundle("ar", "platform-announcements", arplatformannouncements);
+
+import arplatformemailsending from "../../public/locales/ar/platform-email-sending.json";
+import enplatformemailsending from "../../public/locales/en/platform-email-sending.json";
+
+i18next.addResourceBundle("en", "platform-email-sending", enplatformemailsending);
+i18next.addResourceBundle("ar", "platform-email-sending", arplatformemailsending);
+
+import arplatformemaildeliveries from "../../public/locales/ar/platform-email-deliveries.json";
+import enplatformemaildeliveries from "../../public/locales/en/platform-email-deliveries.json";
+
+i18next.addResourceBundle("en", "platform-email-deliveries", enplatformemaildeliveries);
+i18next.addResourceBundle("ar", "platform-email-deliveries", arplatformemaildeliveries);

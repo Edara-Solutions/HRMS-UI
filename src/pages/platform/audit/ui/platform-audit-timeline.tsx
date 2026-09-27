@@ -33,9 +33,7 @@ function initialsOf(name: string): string {
 
 /** One event may name several targets; the first is the one the trail row is about. */
 function entityOf(event: AvailableTrailEvent): { key: string; label: string } {
-  const target = (
-    event.targets as { targetType: string; publicId: string; name?: string | null }[]
-  ).at(0);
+  const target = event.targets.at(0);
   if (!target) return { key: "::none", label: "" };
   return {
     key: `${target.targetType}:${target.publicId}`,
@@ -87,7 +85,7 @@ function ChainRow({ record, locale, expanded, onToggle, onTraceSelect }: ChainRo
         </span>
         {failed ? (
           <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-danger)]">
-            FAILURE
+            {t("chrome.failure")}
           </span>
         ) : null}
         <ChevronDown
@@ -105,7 +103,7 @@ function ChainRow({ record, locale, expanded, onToggle, onTraceSelect }: ChainRo
           className="mb-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
         >
           <AuditDetail
-            details={event.details as Record<string, unknown>}
+            details={event.details}
             targets={event.targets}
             portal="platform"
             occurredAt={event.occurredAt}
@@ -189,6 +187,7 @@ export function PlatformAuditTimeline({
   const expansion = useAuditRowExpansion();
   const { t } = useTranslation(auditNamespace);
 
+  const unavailable = items.filter((item) => !("recordedAt" in item));
   const records: ChainRecord[] = [];
   for (const record of keyAuditRecords(items)) {
     if (!("recordedAt" in record.event)) continue;
@@ -219,7 +218,7 @@ export function PlatformAuditTimeline({
     for (const record of dayRecords) {
       const key =
         lens === "person"
-          ? actorOf(record.event)
+          ? `${record.event.actor.kind}:${"publicId" in record.event.actor ? record.event.actor.publicId : actorOf(record.event)}`
           : (() => {
               const entity = entityOf(record.event);
               return entity.label === "" ? `::none` : entity.key;
@@ -232,13 +231,19 @@ export function PlatformAuditTimeline({
   }
 
   function groupHeading(key: string, group: ChainRecord[]): string {
-    if (lens === "person") return key;
+    if (lens === "person")
+      return `${actorOf(group[0].event)} · ${t(`chrome.actorKind.${group[0].event.actor.kind}`)}`;
     if (key === "::none") return t("chrome.lensNoTarget");
     return entityOf(group[0].event).label || key;
   }
 
   return (
     <div className="scrollbar-calm px-4 py-5">
+      {unavailable.map((item, index) => (
+        <p key={`${item.occurredAt}:${index}`} className="py-2">
+          {t("audit.event.unavailable")} · {formatInstant(item.occurredAt, locale)}
+        </p>
+      ))}
       {[...days.entries()].map(([key, dayRecords]) => (
         <section key={key} className="mb-8 last:mb-0">
           <h2 className="mb-4 border-b border-[var(--color-border)] pb-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">

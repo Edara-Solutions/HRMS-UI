@@ -8,25 +8,12 @@ import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
-  DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
   useAuditRowExpansion,
 } from "@/widgets/audit-detail";
 import type { PlatformAuditTrailItem } from "../api/audit";
 import { PlatformAuditEventInsight } from "./platform-audit-event-insight";
-
-function isUnrecognized(
-  event: PlatformAuditTrailItem,
-): event is Extract<PlatformAuditTrailItem, { eventType: "__unrecognized__" }> {
-  return event.eventType === "__unrecognized__";
-}
-
-function isUnavailable(
-  event: PlatformAuditTrailItem,
-): event is Extract<PlatformAuditTrailItem, { eventType: "audit.event.unavailable" }> {
-  return event.eventType === "audit.event.unavailable";
-}
 
 function companyCell(value: string | null, platformLabel: string) {
   return (
@@ -88,22 +75,7 @@ export function PlatformAuditTable({
               const expanded = expansion.isExpanded(rowKey);
               const detailId = `platform-audit-detail-${rowKey.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
               const toggle = () => expansion.toggle(rowKey);
-
-              if (isUnrecognized(event)) {
-                return (
-                  <DegradedAuditEventRow
-                    key={rowKey}
-                    raw={event.raw}
-                    expanded={expanded}
-                    detailId={detailId}
-                    columnCount={5}
-                    locale={locale}
-                    companyCell={emptyCompanyCell}
-                    onToggle={toggle}
-                  />
-                );
-              }
-              if (isUnavailable(event)) {
+              if (!("recordedAt" in event))
                 return (
                   <UnavailableAuditEventRow
                     key={rowKey}
@@ -112,11 +84,12 @@ export function PlatformAuditTable({
                     companyCell={emptyCompanyCell}
                   />
                 );
-              }
+              const e = event;
+
               return (
                 <AuditEventRow
                   key={rowKey}
-                  event={event}
+                  event={e}
                   portal="platform"
                   density={density}
                   expanded={expanded}
@@ -127,15 +100,15 @@ export function PlatformAuditTable({
                   onTraceSelect={onTraceSelect}
                   insight={
                     <PlatformAuditEventInsight
-                      eventType={event.eventType}
-                      occurredAt={event.occurredAt}
-                      recordingBinding={event.recordingBinding}
-                      recordedAt={event.recordedAt}
+                      eventType={e.eventType}
+                      occurredAt={e.occurredAt}
+                      recordingBinding={e.recordingBinding}
+                      recordedAt={e.recordedAt}
                       locale={locale}
                     />
                   }
-                  subjectFallback={event.companyPublicId ?? t("chrome.platform")}
-                  companyCell={companyCell(event.companyPublicId, t("chrome.platform"))}
+                  subjectFallback={e.companyPublicId ?? t("chrome.platform")}
+                  companyCell={companyCell(e.companyPublicId, t("chrome.platform"))}
                   onToggle={toggle}
                 />
               );

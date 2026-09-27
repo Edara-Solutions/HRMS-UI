@@ -269,5 +269,11 @@
   "chrome.viewTimeline": "Timeline",
   "chrome.lensPerson": "By person",
   "chrome.lensEntity": "By entity",
-  "chrome.lensNoTarget": "No specific target"
+  "chrome.lensNoTarget": "No specific target",
+  "chrome.actorKind.USER": "Company user",
+  "chrome.actorKind.PLATFORM_USER": "Platform user",
+  "chrome.actorKind.SYSTEM": "System",
+  "chrome.actorKind.ANONYMOUS": "Anonymous",
+  "chrome.actorKind.ERASED": "Erased identity",
+  "chrome.actorKind.ATTRIBUTION_FAILED": "Attribution failed"
 }

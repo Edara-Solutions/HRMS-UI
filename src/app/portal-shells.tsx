@@ -5,8 +5,9 @@ import { useCompanySession, usePlatformSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { AppShell, buildNavGroups, Header, SessionFooter } from "@/widgets/app-shell";
 
-/** The Company header carries no per-render input, so it is built once. */
+/** Each audience header carries its own bell; a header has no per-render input, so both are built once. */
 const companyHeader = <Header notifications={<NotificationBell />} />;
+const platformHeader = <Header notifications={<NotificationBell />} />;
 
 export function CompanyShell({ children }: { children: ReactNode }) {
   const session = useCompanySession((state) => state.session);
@@ -48,10 +49,11 @@ export function PlatformShell({ children }: { children: ReactNode }) {
         locale,
       )}
       preferenceScope={`platform:${session.user.publicId}`}
-      header={<Header />}
+      header={platformHeader}
       identity={(collapsed) => <SessionFooter collapsed={collapsed} />}
     >
       {children}
+      <NotificationToaster />
     </AppShell>
   );
 }
