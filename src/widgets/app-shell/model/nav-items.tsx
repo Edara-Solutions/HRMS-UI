@@ -1,9 +1,12 @@
 import {
+  BellRing,
   Building2,
+  History,
   Home,
   KeyRound,
   ListChecks,
   LockKeyhole,
+  Mail,
   Monitor,
   UserRound,
   Users,
@@ -37,6 +40,9 @@ const icons: Record<string, ReactNode> = {
   setup: <ListChecks size={17} />,
   people: <Users size={17} />,
   roles: <KeyRound size={17} />,
+  notifications: <BellRing size={17} />,
+  audit: <History size={17} />,
+  email: <Mail size={17} />,
 };
 export function buildNavGroups(facts: AccessFacts, locale: SupportedLocale): NavGroup[] {
   const items = projectNavigation(facts).map((route) => ({

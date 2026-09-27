@@ -57,14 +57,16 @@ describe("presentAuditActor", () => {
     expect(failed.filterablePublicId).toBeUndefined();
   });
 
-  it("withholds the Company trail's platform admin, which carries no identity fields", () => {
-    const admin = presentAuditActor({ kind: "PLATFORM_ADMIN" }, t);
-
-    expect(admin).toEqual({
+  it("shows an actor the Company projection omitted as withheld, never as a guessed tier", () => {
+    expect(presentAuditActor(undefined, t)).toEqual({
       state: "withheld",
-      primary: "chrome.platformAdmin",
-      secondary: "chrome.identityWithheld",
+      primary: "chrome.identityWithheld",
+      secondary: "chrome.identityWithheldHint",
     });
+  });
+
+  it("treats an identifierless platform admin as an attribution defect, not a withheld identity", () => {
+    expect(presentAuditActor({ kind: "PLATFORM_ADMIN" }, t).state).toBe("attribution-failed");
   });
 
   it("names a platform admin the Platform trail does identify", () => {

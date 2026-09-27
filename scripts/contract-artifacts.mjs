@@ -9,7 +9,10 @@ function auditApiPath(portal) {
   return join(frontendRoot, "src", "pages", portal, "audit", "api", "audit-runtime-contract.ts");
 }
 
-/** The two Audit Trail runtime contracts scripts/generate-audit-validators.mjs renders. */
+/**
+ * The Audit Trail runtime contracts scripts/generate-audit-validators.mjs renders. The Company
+ * trail reads the generated Company audience operation instead.
+ */
 export const auditRuntimeContracts = [
   {
     schemaName: "PlatformAuditTrailPage",
@@ -20,18 +23,6 @@ export const auditRuntimeContracts = [
     parserName: "parsePlatformAuditTrailPage",
     itemParserName: "parsePlatformAuditTrailItem",
     outputPath: auditApiPath("platform"),
-  },
-  {
-    schemaName: "CompanyAuditTrailPage",
-    eventName: "CompanyAuditTrailEvent",
-    itemName: "CompanyAuditTrailItem",
-    unrecognizedName: "UnrecognizedCompanyAuditTrailEvent",
-    envelopeName: "companyAuditTrailPageEnvelopeSchema",
-    parserName: "parseCompanyAuditTrailPage",
-    itemParserName: "parseCompanyAuditTrailItem",
-    rationale:
-      "Company projections intentionally omit Platform Admin identifiers so company readers only learn that Edara acted.",
-    outputPath: auditApiPath("company"),
   },
 ];
 

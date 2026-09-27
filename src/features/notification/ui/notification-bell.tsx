@@ -30,7 +30,7 @@ export function NotificationBell() {
   const overlayId = useId();
 
   const center = useNotificationCenter(open);
-  const unreadCount = data?.unreadCount ?? 0;
+  const unreadCount = data ?? 0;
   const label = t("panel.title");
   const Shape = shapeComponent[listStyle];
 

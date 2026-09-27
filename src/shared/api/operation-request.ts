@@ -74,8 +74,11 @@ export async function executeOperationRequest(
   if ("query" in parsed && typeof parsed.query === "object" && parsed.query !== null) {
     for (const [key, value] of Object.entries(parsed.query)) {
       if (value === undefined || value === null) continue;
-      if (!["string", "number", "boolean"].includes(typeof value)) throw invalidRequest();
-      searchParams.set(key, String(value));
+      // A declared array parameter repeats its key once per value, in order.
+      for (const item of Array.isArray(value) ? value : [value]) {
+        if (!["string", "number", "boolean"].includes(typeof item)) throw invalidRequest();
+        searchParams.append(key, String(item));
+      }
     }
   }
   const response = await client(path.replace(/^\//, ""), {

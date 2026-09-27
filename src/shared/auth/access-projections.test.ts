@@ -210,4 +210,25 @@ describe("shared access projections", () => {
       "forbidden",
     );
   });
+  it("routes Company communications and audit by their own read permissions", () => {
+    const reader = {
+      ...company,
+      permissions: [
+        "companies:email-settings:read",
+        "email-types:read",
+        "notification-settings",
+        "audit-events:read",
+      ],
+    };
+    for (const path of [
+      "/company/email",
+      "/company/email/templates",
+      "/company/notifications",
+      "/company/audit",
+    ])
+      expect(projectRouteAccess(path, reader)).toBe("allow");
+    const worker = { ...company, permissions: ["users:read"] };
+    for (const path of ["/company/email", "/company/notifications", "/company/audit"])
+      expect(projectRouteAccess(path, worker)).toBe("forbidden");
+  });
 });

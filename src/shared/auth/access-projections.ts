@@ -154,6 +154,33 @@ const companyWorkRoutes: RouteDeclaration[] = [
     category: "work",
     operation: "GET /api/v1/company/roles/{publicId}",
   },
+  {
+    path: "/company/email",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/email-settings",
+    label: { en: "Email", ar: "البريد الإلكتروني" },
+  },
+  {
+    path: "/company/email/templates",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/email-types",
+  },
+  {
+    path: "/company/notifications",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/notification-settings",
+    label: { en: "Notification routing", ar: "توجيه الإشعارات" },
+  },
+  {
+    path: "/company/audit",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/audit-trail",
+    label: { en: "Audit trail", ar: "سجل التدقيق" },
+  },
 ];
 
 const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

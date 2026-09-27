@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { auditPageSize } from "@/features/audit-filters";
-import { companyAuditEventTypes } from "../api/audit";
-
-const companyEventTypes = new Set(companyAuditEventTypes);
+import { isCompanyEventType } from "../api/audit";
 
 // The Company route scopes itself to the authenticated identity, so it carries the shared
 // filter set without a Company or scope filter — every row it can see is COMPANY-scope.
@@ -15,7 +13,7 @@ export const pageSearchSchema = z.object({
   outcome: z.enum(["SUCCESS", "FAILURE"]).optional().catch(undefined),
   eventType: z
     .array(z.string())
-    .transform((eventTypes) => eventTypes.filter((eventType) => companyEventTypes.has(eventType)))
+    .transform((eventTypes): string[] => eventTypes.filter(isCompanyEventType))
     .optional()
     .catch(undefined),
 });

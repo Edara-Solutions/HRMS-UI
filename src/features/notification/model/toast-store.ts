@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { NOTIFICATION_CATALOG, type NotificationTone } from "./notification-catalog";
+import { knownNotificationEntry, type NotificationTone } from "./notification-catalog";
+import type { NotificationTier } from "./notification-tier";
 
 /**
  * Toast tones extend the catalog's set with `danger`, the one tone that never auto-dismisses.
@@ -19,7 +20,9 @@ export const TOAST_DURATION_MS: Record<ToastTone, number | null> = {
 const MAX_VISIBLE_TOASTS = 3;
 
 export interface ToastRequest {
+  readonly tier: NotificationTier;
   readonly typeKey: string;
+  readonly typeVersion?: number;
   readonly params?: Record<string, unknown>;
   /** Overrides the tone the catalog gives the type. */
   readonly tone?: ToastTone;
@@ -27,7 +30,9 @@ export interface ToastRequest {
 
 export interface NotificationToast {
   readonly id: number;
+  readonly tier: NotificationTier;
   readonly typeKey: string;
+  readonly typeVersion?: number;
   readonly params: Record<string, unknown>;
   readonly tone: ToastTone;
 }
@@ -52,9 +57,9 @@ export const useToastStore = create<ToastState>()((set) => ({
 
   showToast: (request) =>
     set((state) => {
-      const entry = NOTIFICATION_CATALOG.get(request.typeKey);
+      const entry = knownNotificationEntry(request.tier, request);
 
-      // A type the mirror does not know has no copy, tone or icon to render.
+      // Only a type the audience's mirror knows may interrupt; neutral rows wait in the bell.
       if (!entry) {
         return state;
       }
@@ -65,7 +70,9 @@ export const useToastStore = create<ToastState>()((set) => ({
         ...state.toasts,
         {
           id: lastToastId,
+          tier: request.tier,
           typeKey: request.typeKey,
+          typeVersion: request.typeVersion,
           params: request.params ?? {},
           tone: request.tone ?? entry.tone,
         },

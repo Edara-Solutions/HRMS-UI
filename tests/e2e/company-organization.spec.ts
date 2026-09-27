@@ -90,6 +90,10 @@ async function open(
     switch (key) {
       case "GET /api/v1/company/me":
         return route.fulfill({ json: session.user });
+      case "GET /api/v1/company/notifications/unread-count":
+        return route.fulfill({ json: { unreadCount: 0 } });
+      case "GET /api/v1/company/notifications":
+        return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
       case "GET /api/v1/company/registry":
         return route.fulfill({ json: registryBody() });
       case "GET /api/v1/company/activation":

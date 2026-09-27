@@ -5,18 +5,12 @@ import { I18nextProvider } from "react-i18next";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { AudienceSessionProvider, usePlatformSession as useAuthStore } from "@/shared/auth";
 import { platformSessionFixture } from "../../../test/audience-fixtures";
+import { operationNetwork } from "../../../test/operation-request-mock";
 import { NotificationBell } from "./notification-bell";
-
-const apiGetMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-router")>()),
   useNavigate: () => vi.fn(),
-}));
-
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: apiGetMock, post: vi.fn() },
 }));
 
 const testI18n = i18next.createInstance();
@@ -24,18 +18,12 @@ const testI18n = i18next.createInstance();
 const session = platformSessionFixture();
 
 function stubCount(unreadCount: number) {
-  apiGetMock.mockImplementation((path: string) => {
-    if (path.endsWith("unread-count")) {
-      return Promise.resolve(
-        new Response(JSON.stringify({ unreadCount }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
-    }
-
-    return { json: async () => ({ items: [], nextCursor: null, hasMore: false }) };
-  });
+  const net = operationNetwork.install();
+  net.on("GET /api/v1/platform/notifications/unread-count", () => ({
+    status: 200,
+    body: { unreadCount },
+  }));
+  return net;
 }
 
 function renderBell() {
@@ -66,19 +54,18 @@ beforeAll(async () => {
 
 afterEach(() => {
   cleanup();
-  vi.clearAllMocks();
-  useAuthStore.setState({ session: null, status: "anonymous" });
+  useAuthStore.getState().clearSession();
 });
 
 describe("the badge a Platform Admin sees", () => {
   it("counts the platform mount, not the company one", async () => {
-    useAuthStore.setState({ session, status: "authenticated" });
-    stubCount(1);
+    useAuthStore.getState().setSession(session);
+    const net = stubCount(1);
     renderBell();
 
     expect(await screen.findByText("1")).toBeInTheDocument();
-    expect(apiGetMock).toHaveBeenCalledWith("platform/notifications/unread-count", {
-      headers: undefined,
-    });
+    expect(net.calls.map((call) => [call.audience, call.key])).toEqual([
+      ["platform", "GET /api/v1/platform/notifications/unread-count"],
+    ]);
   });
 });

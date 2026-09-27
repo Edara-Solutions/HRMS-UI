@@ -148,21 +148,18 @@ describe("AuditEventRow", () => {
     expect(screen.getByText("System")).toBeInTheDocument();
   });
 
-  it("renders the Company trail's platform admin as a constant carrying no name or id", () => {
-    const { container } = renderRow({
-      portal: "company",
-      event: { ...baseEvent, actor: { kind: "PLATFORM_ADMIN" } },
-    });
+  it("renders an actor the Company projection withheld without naming any tier or identity", () => {
+    const { actor: _actor, ...withheld } = baseEvent;
+    const { container } = renderRow({ portal: "company", event: withheld });
 
-    expect(screen.getByText("Platform admin")).toBeInTheDocument();
     expect(screen.getByText("Identity withheld")).toBeInTheDocument();
+    expect(screen.queryByText("Platform admin")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Filter by this actor/ })).not.toBeInTheDocument();
-    // The Company arm has no identity fields, so nothing that could name the admin is on screen.
     expect(container.textContent).not.toMatch(/[0-9a-f]{8}/i);
   });
 
   it("does not label an identifierless user as the withheld platform admin", () => {
-    // Only PLATFORM_ADMIN legitimately arrives without an id; any other kind is a defect.
+    // A kind arriving without an id is a recording defect, never a withheld identity.
     renderRow({
       event: { ...baseEvent, actor: { kind: "USER" } },
     });

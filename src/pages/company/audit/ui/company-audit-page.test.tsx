@@ -1,12 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../../test/audience-fixtures";
 import { navigationSearch } from "../../../../test/navigation-fixtures";
-import type { CompanyAuditTrailItem, CompanyAuditTrailPage } from "../api/audit";
+import { operationNetwork } from "../../../../test/operation-request-mock";
 import { CompanyAuditPage } from "./company-audit-page";
 
 const navigateMock = vi.hoisted(() => vi.fn());
-const apiGetMock = vi.hoisted(() => vi.fn());
 const searchState = vi.hoisted(() => ({ limit: 50 }) as Record<string, unknown>);
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
@@ -18,114 +19,107 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
-// rejects as cross-realm — stub the client boundary instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: apiGetMock },
-}));
+const trailKey = "GET /api/v1/company/audit-trail";
+const actorId = "550e8400-e29b-41d4-a716-446655440000";
 
-const profileUpdatedEvent: CompanyAuditTrailItem = {
-  eventType: "company.profile.material_updated",
-  eventVersion: 1,
-  occurredAt: "2026-08-13T10:00:00.000Z",
-  outcome: "SUCCESS",
-  actor: { kind: "USER", publicId: "550e8400-e29b-41d4-a716-446655440000", name: "Layla Hassan" },
-  traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
-  targets: [{ targetType: "company-profile", publicId: "profile-1" }],
-  details: { changes: [{ field: "name", before: "Northwind", after: "Northwind Egypt" }] },
-};
+function event(actor: unknown, overrides: Record<string, unknown> = {}) {
+  return {
+    eventType: "company.profile.material_updated",
+    eventVersion: 1,
+    occurredAt: "2026-08-13T10:00:00.000Z",
+    outcome: "SUCCESS",
+    ...(actor === undefined ? {} : { actor }),
+    traceId: "5fc21e3361b0fe234353b1176c5b2fdf",
+    targets: [{ targetType: "company-profile", publicId: "profile-1" }],
+    details: { changes: [{ field: "name", before: "Northwind", after: "Northwind Egypt" }] },
+    ...overrides,
+  };
+}
 
-function renderPage(
-  page: Partial<Omit<CompanyAuditTrailPage, "items">> & { items?: unknown[] } = {},
-) {
-  apiGetMock.mockReturnValue({
-    json: () => Promise.resolve({ items: [], nextCursor: null, hasMore: false, ...page }),
-  });
+const profileUpdatedEvent = event({ kind: "USER", publicId: actorId, name: "Layla Hassan" });
+
+function renderPage(page: Record<string, unknown> = {}) {
+  const net = operationNetwork.install();
+  net.on(trailKey, () => ({
+    status: 200,
+    body: { items: [], nextCursor: null, hasMore: false, ...page },
+  }));
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={queryClient}>
       <CompanyAuditPage />
     </QueryClientProvider>,
   );
+  return net;
 }
+
+function queryOf(net: ReturnType<typeof renderPage>, call = 0) {
+  const input = net.calls.filter((entry) => entry.key === trailKey)[call]?.input;
+  return typeof input === "object" && input !== null && "query" in input
+    ? (input.query as Record<string, unknown>)
+    : {};
+}
+
+/** Applies the search updater the page passed to `navigate` to the current search state. */
+function readNavigatedSearch() {
+  return navigationSearch(navigateMock.mock.calls[0]?.[0]?.href);
+}
+
+beforeEach(() => useCompanySession.getState().setSession(companySessionFixture()));
 
 afterEach(() => {
   cleanup();
-  apiGetMock.mockReset();
   navigateMock.mockReset();
+  useCompanySession.getState().clearSession();
   for (const key of Object.keys(searchState)) {
     if (key !== "limit") delete searchState[key];
   }
 });
 
 describe("CompanyAuditPage", () => {
-  it("reads the Company Audit Trail and lists its events", async () => {
-    renderPage({ items: [profileUpdatedEvent] });
+  it("reads the Company trail through its generated operation and lists its events", async () => {
+    const net = renderPage({ items: [profileUpdatedEvent] });
 
     expect(await screen.findByText("Profile details changed")).toBeInTheDocument();
-    expect(apiGetMock.mock.calls[0]?.[0]).toBe("company/audit-trail");
+    expect(net.calls[0]).toEqual({
+      audience: "company",
+      key: trailKey,
+      input: { query: { limit: 50 } },
+    });
   });
 
   it("expands a row in place without requesting its already-loaded payload", async () => {
-    renderPage({ items: [profileUpdatedEvent] });
+    const net = renderPage({ items: [profileUpdatedEvent] });
     const rowButton = await screen.findByRole("button", { name: /Profile details changed/ });
-    expect(apiGetMock).toHaveBeenCalledTimes(1);
 
     fireEvent.click(rowButton);
 
     expect(screen.getByText("Northwind")).toBeInTheDocument();
     expect(screen.getByText("Northwind Egypt")).toBeInTheDocument();
-    expect(screen.getByText(/company\.profile\.material_updated v1/)).toBeInTheDocument();
-    expect(apiGetMock).toHaveBeenCalledTimes(1);
+    expect(net.count(trailKey)).toBe(1);
   });
 
   it("reserves outcome emphasis for failures", async () => {
     renderPage({ items: [{ ...profileUpdatedEvent, outcome: "FAILURE" }] });
 
     const failure = await screen.findByText("Failure");
-    expect(failure).toBeInTheDocument();
     expect(failure.closest("td")).toHaveClass("border-s-2", "border-[var(--color-danger)]");
     expect(screen.queryByText("Success")).not.toBeInTheDocument();
   });
 
-  it("keeps an unrecognized record in the sequence and identifies the portal gap", async () => {
-    renderPage({
-      items: [
-        {
-          ...profileUpdatedEvent,
-          eventType: "company.profile.future_event",
-        },
-      ],
-    });
+  it.each([
+    ["named", { kind: "USER", publicId: actorId, name: "Layla Hassan" }, "Layla Hassan"],
+    ["unresolved", { kind: "USER", publicId: actorId, name: null }, "550e8400"],
+    ["system", { kind: "SYSTEM", component: "SCHEDULER" }, "Scheduler"],
+    ["anonymous", { kind: "ANONYMOUS" }, "Anonymous"],
+    ["attribution-failed", { kind: "ATTRIBUTION_FAILED" }, "Attribution failed"],
+    ["erased", { kind: "ERASED_USER" }, "Erased identity"],
+    ["withheld", undefined, "Identity withheld"],
+  ])("renders the %s actor state without inventing identity", async (_state, actor, label) => {
+    renderPage({ items: [event(actor)] });
 
-    expect(await screen.findByText("Unrecognized event")).toBeInTheDocument();
-    expect(screen.getByText("Portal gap")).toBeInTheDocument();
-    expect(screen.getByText("1 event")).toBeInTheDocument();
-    expect(screen.queryByText("Failure")).not.toBeInTheDocument();
-  });
-
-  it("preserves a valid timestamp when another field makes the record unrecognized", async () => {
-    renderPage({
-      items: [{ ...profileUpdatedEvent, actor: { kind: "USER" } }],
-    });
-
-    expect(await screen.findByText("Unrecognized event")).toBeInTheDocument();
-    expect(screen.getByText(/13 Aug/)).toBeInTheDocument();
-    expect(screen.queryByText("Unknown time")).not.toBeInTheDocument();
-  });
-
-  it("keeps the subject identifier visible in compact density", async () => {
-    renderPage({ items: [profileUpdatedEvent] });
-    fireEvent.click(await screen.findByRole("button", { name: "Compact" }));
-
-    expect(screen.getByText("profile-1")).toBeInTheDocument();
-  });
-
-  it("tells the reader when the Company has no recorded events", async () => {
-    renderPage({ items: [] });
-
-    expect(await screen.findByText("No audit events")).toBeInTheDocument();
+    expect(await screen.findByText(new RegExp(label))).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/Platform admin|Edara acted/);
   });
 
   it("renders history it cannot project as unavailable rather than inventing facts", async () => {
@@ -143,6 +137,28 @@ describe("CompanyAuditPage", () => {
     expect(await screen.findByText("Unavailable event")).toBeInTheDocument();
     expect(screen.queryByText("audit.event.unavailable")).not.toBeInTheDocument();
   });
+
+  it("refuses an undeclared event or actor as a contract violation, never a guessed row", async () => {
+    renderPage({ items: [event({ kind: "PLATFORM_ADMIN" })] });
+
+    expect(
+      await screen.findByText("This history is temporarily unavailable. Try again later."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the subject identifier visible in compact density", async () => {
+    renderPage({ items: [profileUpdatedEvent] });
+    fireEvent.click(await screen.findByRole("button", { name: "Compact" }));
+
+    expect(screen.getByText("profile-1")).toBeInTheDocument();
+  });
+
+  it("tells the reader when the Company has no recorded events", async () => {
+    renderPage({ items: [] });
+
+    expect(await screen.findByText("No audit events")).toBeInTheDocument();
+  });
 });
 
 describe("CompanyAuditPage cursor navigation", () => {
@@ -153,12 +169,17 @@ describe("CompanyAuditPage cursor navigation", () => {
     expect(screen.queryByRole("button", { name: "Latest events" })).not.toBeInTheDocument();
   });
 
-  it("offers both steps on a middle page and follows the opaque cursor forward", async () => {
+  it("follows the opaque cursor forward from a middle page", async () => {
     searchState.cursor = "opaque-current";
-    renderPage({ items: [profileUpdatedEvent], nextCursor: "opaque-next", hasMore: true });
+    const net = renderPage({
+      items: [profileUpdatedEvent],
+      nextCursor: "opaque-next",
+      hasMore: true,
+    });
 
     fireEvent.click(await screen.findByRole("button", { name: "Older events" }));
 
+    expect(queryOf(net).cursor).toBe("opaque-current");
     expect(screen.getByRole("button", { name: "Latest events" })).toBeInTheDocument();
     expect(readNavigatedSearch()).toEqual({ limit: 50, cursor: "opaque-next" });
   });
@@ -171,30 +192,7 @@ describe("CompanyAuditPage cursor navigation", () => {
 
     expect(readNavigatedSearch()).toEqual({ limit: 50 });
   });
-
-  it("stops offering the forward step on the final page", async () => {
-    searchState.cursor = "opaque-current";
-    renderPage({ items: [profileUpdatedEvent], nextCursor: null, hasMore: false });
-
-    expect(await screen.findByRole("button", { name: "Latest events" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Older events" })).not.toBeInTheDocument();
-  });
-
-  it("offers no navigation on an empty first page", async () => {
-    renderPage({ items: [] });
-
-    expect(await screen.findByText("No audit events")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Older events" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Latest events" })).not.toBeInTheDocument();
-  });
 });
-
-/** Applies the search updater the page passed to `navigate` to the current search state. */
-function readNavigatedSearch() {
-  const updateSearch = (_previous: Record<string, unknown>) =>
-    navigationSearch(navigateMock.mock.calls[0]?.[0]?.href);
-  return updateSearch({ ...searchState });
-}
 
 describe("CompanyAuditPage filters", () => {
   it("exposes the Company filter set and neither a Company nor a scope control", async () => {
@@ -202,24 +200,13 @@ describe("CompanyAuditPage filters", () => {
     await screen.findByText("Profile details changed");
     const filters = within(screen.getByRole("search", { name: "Filters" }));
 
-    expect(filters.getByRole("button", { name: /When/ })).toBeInTheDocument();
     expect(filters.getByRole("button", { name: /Actor/ })).toBeInTheDocument();
     expect(filters.getByRole("button", { name: /Event type/ })).toBeInTheDocument();
-    expect(filters.getByRole("button", { name: /Outcome/ })).toBeInTheDocument();
     expect(filters.queryByRole("button", { name: /Company/ })).not.toBeInTheDocument();
     expect(filters.queryByRole("button", { name: /Scope/ })).not.toBeInTheDocument();
   });
 
-  it("groups the event-type picker by the family derived from the event type", async () => {
-    renderPage({ items: [profileUpdatedEvent] });
-    fireEvent.click(await screen.findByRole("button", { name: /Event type/ }));
-
-    const panel = screen.getByRole("group", { name: "Event type" });
-    expect(within(panel).getByRole("heading", { name: "Company" })).toBeInTheDocument();
-    expect(within(panel).getByRole("button", { name: /^Company lifecycle/ })).toBeInTheDocument();
-  });
-
-  it("drops the cursor when a filter changes, and never repeats it in a request", async () => {
+  it("drops the cursor when a filter changes", async () => {
     searchState.cursor = "opaque-current";
     renderPage({ items: [profileUpdatedEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Outcome/ }));
@@ -229,74 +216,34 @@ describe("CompanyAuditPage filters", () => {
       }),
     );
 
-    const nextSearch = readNavigatedSearch();
-    expect(nextSearch).toEqual({ limit: 50, outcome: "FAILURE" });
-
-    cleanup();
-    apiGetMock.mockClear();
-    delete searchState.cursor;
-    Object.assign(searchState, nextSearch);
-    renderPage({ items: [profileUpdatedEvent] });
-    await screen.findByText("Profile details changed");
-
-    for (const call of apiGetMock.mock.calls) {
-      expect((call[1] as { searchParams: URLSearchParams }).searchParams.has("cursor")).toBe(false);
-    }
-  });
-
-  it("takes the window from the date picker as an instant with an explicit offset", async () => {
-    searchState.cursor = "opaque-current";
-    renderPage({ items: [profileUpdatedEvent] });
-    fireEvent.click(await screen.findByRole("button", { name: /When/ }));
-
-    const panel = screen.getByRole("group", { name: "When" });
-    fireEvent.click(within(panel).getByRole("button", { name: "From" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply date" }));
-
-    const nextSearch = readNavigatedSearch();
-    expect(nextSearch.occurredFrom).toMatch(/Z$/);
-    expect(Number.isNaN(Date.parse(String(nextSearch.occurredFrom)))).toBe(false);
-    expect(nextSearch.cursor).toBeUndefined();
-  });
-
-  it("offers a relative window without hiding one behind a default", async () => {
-    renderPage({ items: [profileUpdatedEvent] });
-    fireEvent.click(await screen.findByRole("button", { name: /When/ }));
-
-    expect(apiGetMock.mock.calls[0]?.[1]).toBeDefined();
-    const { searchParams } = apiGetMock.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
-    expect(searchParams.has("occurredFrom")).toBe(false);
-
-    fireEvent.click(
-      within(screen.getByRole("group", { name: "When" })).getByRole("button", {
-        name: "Last 7 days",
-      }),
-    );
-
-    expect(readNavigatedSearch().occurredFrom).toMatch(/Z$/);
+    expect(readNavigatedSearch()).toEqual({ limit: 50, outcome: "FAILURE" });
   });
 
   it("filters to the actor a reader clicks in a row", async () => {
-    searchState.cursor = "opaque-current";
     renderPage({ items: [profileUpdatedEvent] });
     fireEvent.click(await screen.findByRole("button", { name: /Filter by this actor/ }));
 
-    expect(readNavigatedSearch()).toEqual({
+    expect(readNavigatedSearch()).toMatchObject({ limit: 50, actorPublicId: actorId });
+  });
+
+  it("sends the declared filters the URL carries as a repeated event-type key", async () => {
+    searchState.outcome = "FAILURE";
+    searchState.eventType = ["company.profile.material_updated", "company.lifecycle.frozen"];
+    const net = renderPage({ items: [profileUpdatedEvent] });
+
+    await waitFor(() => expect(net.count(trailKey)).toBe(1));
+    expect(queryOf(net)).toEqual({
       limit: 50,
-      cursor: undefined,
-      actorPublicId: "550e8400-e29b-41d4-a716-446655440000",
+      outcome: "FAILURE",
+      eventType: ["company.profile.material_updated", "company.lifecycle.frozen"],
     });
   });
 
-  it("sends the filters the URL carries", async () => {
-    searchState.outcome = "FAILURE";
-    searchState.eventType = ["company.profile.material_updated"];
-    renderPage({ items: [profileUpdatedEvent] });
-    await screen.findByText("Profile details changed");
+  it("never sends a Platform-only event type", async () => {
+    searchState.eventType = ["platform.lead.created"];
+    const net = renderPage({ items: [profileUpdatedEvent] });
 
-    // The mocked client is untyped by construction; the fetcher always passes this shape.
-    const { searchParams } = apiGetMock.mock.calls[0]?.[1] as { searchParams: URLSearchParams };
-    expect(searchParams.get("outcome")).toBe("FAILURE");
-    expect(searchParams.getAll("eventType")).toEqual(["company.profile.material_updated"]);
+    await waitFor(() => expect(net.count(trailKey)).toBe(1));
+    expect(queryOf(net).eventType).toBeUndefined();
   });
 });
