@@ -61,11 +61,14 @@ export function useCatalogueCommand() {
         setBlocked(true);
       }
     } finally {
-      if (current()) {
-        await client.invalidateQueries({ queryKey: ["platform", identity] });
+      try {
+        if (current()) await client.invalidateQueries({ queryKey: ["platform", identity] });
+      } finally {
+        // The portal boundary remounts on generation changes; never retain a busy
+        // flag or submission lock if reconciliation itself cannot finish.
         setPending(false);
+        lock.current = false;
       }
-      lock.current = false;
     }
   }
   async function reconcile() {
@@ -83,7 +86,7 @@ export function useCatalogueCommand() {
     } catch {
       /* Failed reads retain the command lock and their bounded panel state. */
     } finally {
-      if (current()) setPending(false);
+      setPending(false);
     }
   }
   return { run, reconcile, pending, outcome, blocked };

@@ -3,6 +3,7 @@ import { platformPlanOperations as operations } from "@/shared/api";
 import type { Plan } from "../api/catalogue";
 
 export const planFeatures = ["ATTENDANCE", "ANALYTICS", "OVERVIEW", "TEAM_MANAGEMENT"];
+export const supportedPlanFeatures = new Set(planFeatures);
 export const planLimits = ["MAX_USERS", "MAX_DEPARTMENTS", "MAX_POSITIONS"] as const;
 
 /** Convert editor controls, then let the generated body schema validate the wire input. */

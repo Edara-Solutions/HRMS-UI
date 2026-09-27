@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { platformPlanOperations as operations } from "@/shared/api";
 import { type SchemaField, SchemaForm } from "@/shared/ui/schema-form";
 import type { Plan, Price } from "../api/catalogue";
-import { planFeatures, planFormSchema, planLimits } from "../model/catalogue-form";
+import { planFormSchema, planLimits, supportedPlanFeatures } from "../model/catalogue-form";
 
 interface PlanProps {
   plan?: Plan;
@@ -33,7 +33,8 @@ export function PlanForm({ plan, disabled, invalidFields, onSubmit }: PlanProps)
       label: t("features"),
       type: "textarea",
       required: true,
-      value: plan?.features.filter((feature) => planFeatures.includes(feature)).join(", ") ?? "",
+      value:
+        plan?.features.filter((feature) => supportedPlanFeatures.has(feature)).join(", ") ?? "",
     },
     ...planLimits.map((name) => ({
       name: `limits.${name}`,

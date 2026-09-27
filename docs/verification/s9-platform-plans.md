@@ -95,6 +95,13 @@ Final local gates: typecheck and Biome/Steiger lint passed; all **714 unit tests
 production build passed; React Doctor verbose diff against the origin base returned
 **100/100 with no findings**, including staged new files; **34 Chromium checks**
 passed across catalogue, public pricing and Platform refusals. The real public bundle
-gate found seven reachable chunks totaling **622850 bytes**, with no protected
+gate found seven reachable chunks totaling **622797 bytes**, with no protected
 operation leakage. Presentation checks also inspect the main scroll container,
 not only document width. CI outcomes are recorded on the pull request and issue.
+
+The GitHub advisory action uses React Doctor 0.9.14 rather than the local pinned
+0.5.8 scan. Its cleanup and repeated-lookup findings were addressed. Conditional
+rendering complexity in the editor and detail component is reviewed as a maintenance
+advisory: the branches are page-local permission/form states, with mutation behavior
+covered by the scoped command model and fixtures. No diagnostic is suppressed.
+The final GitHub score and check conclusions are recorded on the PR.
