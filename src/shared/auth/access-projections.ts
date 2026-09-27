@@ -29,6 +29,7 @@ export type ActionRestriction =
   | "protected-root"
   | "final-root"
   | "system-role"
+  | "self-held-role"
   | "owner-continuity"
   | "lifecycle"
   | "prerequisite"
@@ -58,6 +59,7 @@ export interface AccessFacts {
     protectedRoot?: boolean;
     finalRoot?: boolean;
     systemRole?: boolean;
+    selfHeldRole?: boolean;
     preservesOwner?: boolean;
     lifecycleAllowed?: boolean;
   };
@@ -183,6 +185,35 @@ const companyWorkRoutes: RouteDeclaration[] = [
   },
 ];
 
+const platformWorkRoutes: RouteDeclaration[] = [
+  {
+    path: "/platform/people",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/users",
+    label: { en: "Platform people", ar: "فريق المنصة" },
+  },
+  {
+    path: "/platform/people/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/users/{publicId}",
+  },
+  {
+    path: "/platform/roles",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/roles",
+    label: { en: "Platform roles", ar: "أدوار المنصة" },
+  },
+  {
+    path: "/platform/roles/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/roles",
+  },
+];
+
 const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** A `$publicId` segment matches only a well-formed public ID; anything else stays unknown. */
@@ -207,7 +238,7 @@ function withWorkRoutes(routes: RouteDeclaration[], work: RouteDeclaration[]) {
 /** Only already-owned workflows are reachable. Future slices extend this registry when migrated. */
 export const routeDeclarations = [
   ...withWorkRoutes(audienceRoutes("company"), companyWorkRoutes),
-  ...audienceRoutes("platform"),
+  ...withWorkRoutes(audienceRoutes("platform"), platformWorkRoutes),
 ];
 
 /** A known route the current identity may not open; the route error boundary renders it. */
@@ -259,6 +290,7 @@ export function projectActionAvailability(
   if (facts.target?.protectedRoot) return { state: "disabled", reason: "protected-root" };
   if (facts.target?.finalRoot) return { state: "disabled", reason: "final-root" };
   if (facts.target?.systemRole) return { state: "disabled", reason: "system-role" };
+  if (facts.target?.selfHeldRole) return { state: "disabled", reason: "self-held-role" };
   if (facts.target?.preservesOwner === false)
     return { state: "disabled", reason: "owner-continuity" };
   if (facts.target?.lifecycleAllowed === false) return { state: "disabled", reason: "lifecycle" };
