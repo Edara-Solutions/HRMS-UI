@@ -26,4 +26,22 @@ describe("owned workflow navigation", () => {
         .some((item) => item.href.includes("users")),
     ).toBe(false);
   });
+  it("adds the organization workflows only when their reads are granted", () => {
+    const items = buildNavGroups(
+      {
+        audience: "company",
+        authenticated: true,
+        permissions: ["company-profiles:read", "company-setup:read"],
+      },
+      "en",
+    ).flatMap((group) => group.items);
+    expect(items.map((item) => [item.href, item.label])).toEqual([
+      ["/company/dashboard", "Home"],
+      ["/company/profile", "Organization profile"],
+      ["/company/setup", "Company setup"],
+      ["/company/me/profile", "My profile"],
+      ["/company/me/security", "Security"],
+      ["/company/me/sessions", "My sessions"],
+    ]);
+  });
 });

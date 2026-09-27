@@ -50,6 +50,20 @@ afterEach(() => {
 
 describe("audience route guard", () => {
   beforeEach(() => vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "true"));
+  it("refuses a known Company route the identity may not open, inside its audience", async () => {
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, permissions: ["users:read"] } });
+    await expect(requireAuthenticated({ returnTo: "/company/setup" })).rejects.toMatchObject({
+      name: "RouteAccessRefusal",
+      audience: "company",
+      decision: "forbidden",
+    });
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, permissions: ["company-setup:read"] } });
+    await expect(requireAuthenticated({ returnTo: "/company/setup" })).resolves.toBeTruthy();
+  });
   it("requires Company authentication even when Platform is signed in", async () => {
     usePlatformSession.getState().setSession(platform);
     await expect(requireAuthenticated()).rejects.toMatchObject({

@@ -1,12 +1,14 @@
 export {
   type AccessDecision,
   type AccessFacts,
+  type ActionAvailability,
   confirmationMatches,
   projectActionAvailability,
   projectConfirmation,
   projectDenialResponse,
   projectNavigation,
   projectRouteAccess,
+  RouteAccessRefusal,
   routeDeclarations,
 } from "./access-projections";
 export { AudienceSessionProvider, useCurrentAudience } from "./audience-context";

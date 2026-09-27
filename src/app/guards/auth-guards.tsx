@@ -6,6 +6,7 @@ import {
   isPlatformPortalEnabled,
   type PermissionAction,
   projectRouteAccess,
+  RouteAccessRefusal,
   safeReturnDestination,
   useCompanySession,
   useCurrentSession,
@@ -84,6 +85,7 @@ export async function requireAuthenticated(options: AuthGuardOptions = {}) {
       search: { returnTo: safeReturnDestination(audience, options.returnTo) },
     });
   if (status !== "authenticated" && status !== "must_change_password") return null;
+  if (decision === "forbidden") throw new RouteAccessRefusal(audience);
   if (
     !options.allowPasswordChange &&
     (session.user.mustChangePassword || status === "must_change_password")

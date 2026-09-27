@@ -105,7 +105,7 @@ test("conceals old, unknown and unsupported routes with a bilingual safe recover
     "/admin/dashboard",
     "/platform/companies/internal-secret",
     "/company/account/profile",
-    "/company/setup",
+    "/company/billing",
     "/unknown-secret",
   ]) {
     await page.goto(pathname);

@@ -1,6 +1,16 @@
 export { apiClient } from "./client";
+export { isCompanyBlocked, useCompanyAccess } from "./company-access";
 export { companyApi, loadCompanyIdentity, loginCompany } from "./company-api";
 export { companyApiClient } from "./company-client";
+export {
+  CompanySessionChanged,
+  companyAccessPolicyQuery,
+  companyEmailReadinessQuery,
+  companyQueryKey,
+  companyReadQuery,
+  requestCompanyOperation,
+} from "./company-operation";
+export { companyOrganizationOperations } from "./company-operations";
 export { companyQueryClient } from "./company-query-client";
 export { apiBaseUrl } from "./config";
 export {
@@ -11,6 +21,7 @@ export {
   mapLoginError,
   readBackendErrorMessage,
 } from "./error-mapper";
+export type { OperationKey, RefusalMode } from "./generated/authorization";
 export { ContractViolation } from "./generated/runtime";
 export type {
   components as leadComponents,
@@ -23,6 +34,7 @@ export {
   parseLeadDetails,
   parseLeadListResponse,
 } from "./lead-runtime-contract";
+export { classifyMutationFailure, type MutationOutcome } from "./mutation-outcome";
 export { executeOperationRequest, OperationRefusal } from "./operation-request";
 export { readOperationResponse } from "./operation-response";
 export {

@@ -33,6 +33,7 @@ export type ActionRestriction =
   | "lifecycle"
   | "prerequisite"
   | "restricted-mode"
+  | "access-unverified"
   | "access-session-inactive"
   | "company-blocked";
 export type ActionAvailability =
@@ -112,8 +113,46 @@ function audienceRoutes(audience: AudienceName): RouteDeclaration[] {
   ];
 }
 
+const companyWorkRoutes: RouteDeclaration[] = [
+  {
+    path: "/company/profile",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/profile",
+    label: { en: "Organization profile", ar: "ملف المؤسسة" },
+  },
+  {
+    path: "/company/setup",
+    audience: "company",
+    category: "work",
+    operation: "GET /api/v1/company/setup",
+    label: { en: "Company setup", ar: "إعداد الشركة" },
+  },
+];
+
+function withWorkRoutes(routes: RouteDeclaration[], work: RouteDeclaration[]) {
+  const dashboard = routes.findIndex((route) => route.path.endsWith("/dashboard"));
+  return [...routes.slice(0, dashboard + 1), ...work, ...routes.slice(dashboard + 1)];
+}
+
 /** Only already-owned workflows are reachable. Future slices extend this registry when migrated. */
-export const routeDeclarations = [...audienceRoutes("company"), ...audienceRoutes("platform")];
+export const routeDeclarations = [
+  ...withWorkRoutes(audienceRoutes("company"), companyWorkRoutes),
+  ...audienceRoutes("platform"),
+];
+
+/** A known route the current identity may not open; the route error boundary renders it. */
+export class RouteAccessRefusal extends Error {
+  readonly audience: AudienceName;
+  readonly decision: "forbidden";
+
+  constructor(audience: AudienceName) {
+    super("The route is not available to the current identity.");
+    this.name = "RouteAccessRefusal";
+    this.audience = audience;
+    this.decision = "forbidden";
+  }
+}
 
 export function projectActionAvailability(
   operation: OperationKey,
@@ -136,11 +175,11 @@ export function projectActionAvailability(
   }
   if (policy.authorization !== "SELF" && facts.audience === "company") {
     if (facts.companyMode === "BLOCKED") return { state: "disabled", reason: "company-blocked" };
-    if (
-      facts.companyMode !== "NORMAL" &&
-      !operation.startsWith("GET ") &&
-      !operation.startsWith("HEAD ")
-    )
+    const write = !operation.startsWith("GET ") && !operation.startsWith("HEAD ");
+    // An unknown mode fails closed, but says so instead of claiming the workspace is restricted.
+    if (write && facts.companyMode === undefined)
+      return { state: "disabled", reason: "access-unverified" };
+    if (write && facts.companyMode !== "NORMAL")
       return { state: "disabled", reason: "restricted-mode" };
   }
   if (facts.mustChangePassword && policy.authorization !== "SELF")
