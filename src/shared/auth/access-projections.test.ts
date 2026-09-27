@@ -279,4 +279,26 @@ describe("shared access projections", () => {
       "/platform/subscriptions",
     );
   });
+  it("grants CRM inspection by read permission without approval or Company scope", () => {
+    const reader = {
+      audience: "platform",
+      authenticated: true,
+      permissions: ["lead-conversion-requests:read"],
+    } as const;
+    expect(projectRouteAccess("/platform/conversion-requests", reader)).toBe("allow");
+    expect(
+      projectRouteAccess(
+        "/platform/conversion-requests/66666666-6666-4666-8666-666666666666",
+        reader,
+      ),
+    ).toBe("allow");
+    expect(projectRouteAccess("/platform/leads", reader)).toBe("forbidden");
+    expect(
+      projectRouteAccess("/platform/conversion-requests", {
+        ...reader,
+        permissions: ["APPROVE_LEAD_CONVERSION_REQUEST"],
+      }),
+    ).toBe("forbidden");
+    expect(projectRouteAccess("/platform/leads", company)).toBe("not-found");
+  });
 });

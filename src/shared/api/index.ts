@@ -105,6 +105,7 @@ export {
 export { loadPlatformIdentity, loginPlatform, platformApi } from "./platform-api";
 export { platformApiClient } from "./platform-client";
 export { platformCompanyOperations } from "./platform-company-operations";
+export { platformLeadOperations } from "./platform-lead-operations";
 export {
   platformQueryKey,
   platformReadQuery,

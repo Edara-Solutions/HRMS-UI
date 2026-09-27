@@ -1,2 +1,2 @@
-export type { LeadSort, LeadSource, LeadStatus } from "./api/leads";
-export { PlatformLeadsPage } from "./ui/platform-leads-page";
+export { pageSearchSchema } from "./model/page-search";
+export { PlatformLeadsPage } from "./ui/crm-leads-page";
