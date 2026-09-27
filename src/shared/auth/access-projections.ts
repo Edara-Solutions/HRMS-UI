@@ -188,6 +188,19 @@ const companyWorkRoutes: RouteDeclaration[] = [
 
 const platformWorkRoutes: RouteDeclaration[] = [
   {
+    path: "/platform/plans",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/plans",
+    label: { en: "Plans", ar: "الخطط" },
+  },
+  {
+    path: "/platform/plans/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/plans/{publicId}",
+  },
+  {
     path: "/platform/leads",
     audience: "platform",
     category: "work",

@@ -58,45 +58,6 @@ export {
 export { executeOperationRequest, OperationRefusal } from "./operation-request";
 export { readOperationResponse } from "./operation-response";
 export {
-  ALL_KNOWN_PLAN_FEATURES,
-  ALL_KNOWN_PLAN_LIMITS,
-  BILLING_INTERVAL_VALUES,
-  type BillingInterval,
-  type CreatePlanInput,
-  type CreatePlanPriceInput,
-  type EffectivePrice,
-  type EffectivePriceParams,
-  isBillingInterval,
-  type KnownPlanFeature,
-  type Money,
-  type Plan,
-  type PlanDetailParams,
-  type PlanFeature,
-  type PlanLimits,
-  type PlanListParams,
-  type PlanListResponse,
-  type PlanPrice,
-  type PlanPriceListParams,
-  type PublicPlanListParams,
-  parsePlanListResponse,
-  plansKeys,
-  type ResolvedEffectivePrice,
-  type UpdatePlanInput,
-  type UpdatePlanPriceInput,
-  useCreatePlan,
-  useCreatePlanPrice,
-  useDeletePlan,
-  useDeletePlanPrice,
-  useEffectivePlanPrice,
-  usePlan,
-  usePlanPrice,
-  usePlanPrices,
-  usePlans,
-  usePublicPlans,
-  useUpdatePlan,
-  useUpdatePlanPrice,
-} from "./plans";
-export {
   platformRootRoleName,
   rootReservedPermissions,
   usePlatformAccess,
@@ -113,6 +74,7 @@ export {
   sendPlatformCommand,
 } from "./platform-operation";
 export { platformPeopleOperations } from "./platform-people-operations";
+export { platformPlanOperations } from "./platform-plan-operations";
 export { platformQueryClient } from "./platform-query-client";
 export { queryClient } from "./query-client";
 export type { components, paths } from "./schema";
