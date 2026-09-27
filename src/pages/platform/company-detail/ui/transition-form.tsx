@@ -45,7 +45,7 @@ export function TransitionForm({ kind, disabled, request, minimumDate }: Props) 
         const parsed = operations[kind].requestSchema.shape.body.safeParse(body);
         const ordered = policy
           ? !until || toInstant(until) > toInstant(from)
-          : !minimumDate || toInstant(from) > minimumDate;
+          : !minimumDate || Date.parse(toInstant(from)) > Date.parse(minimumDate);
         setInvalid(!parsed.success || !ordered);
         if (parsed.success && ordered) request({ command: kind, body: parsed.data });
       }}
