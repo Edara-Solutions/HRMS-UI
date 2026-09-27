@@ -14,7 +14,7 @@ import {
   companyPolicyBody,
   companySubscriptionBody,
 } from "../../../../test/platform-company-fixtures";
-import "../../../../test/router-mock";
+import { navigations } from "../../../../test/router-mock";
 import { PlatformCompanyDetailPage } from "./platform-company-detail-page";
 
 function open(
@@ -227,5 +227,55 @@ describe("Platform Company workspace", () => {
     expect(net.calls.map((call) => call.key)).toEqual([
       "GET /api/v1/platform/companies/{publicId}",
     ]);
+  });
+  it("opens a support session only with a closed reason and navigates to its workspace", async () => {
+    const { net } = open({ permissions: [...companyPermissions, "delegation:open"] });
+    const key = "POST /api/v1/platform/access-sessions";
+    const sessionPublicId = "3f0f7a52-5d5b-4b8e-9d7e-7c3e8b1f2a10";
+    net.on(key, () => ({
+      status: 201,
+      body: {
+        publicId: sessionPublicId,
+        companyPublicId: companyIds.company,
+        reason: "INCIDENT_RESPONSE",
+        status: "OPEN",
+        openedAt: "2026-09-27T09:00:00.000Z",
+        expiresAt: "2026-09-27T10:00:00.000Z",
+        closedAt: null,
+      },
+    }));
+    navigations.length = 0;
+    await click("Open support session");
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("button", { name: "Open session" })).toBeDisabled();
+    fireEvent.click(within(dialog).getByRole("combobox", { name: "Reason" }));
+    fireEvent.click(await screen.findByRole("option", { name: "Incident response" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Open session" }));
+    await waitFor(() => expect(navigations).toHaveLength(1));
+    expect(net.calls.find((call) => call.key === key)?.input).toEqual({
+      body: { companyPublicId: companyIds.company, reason: "INCIDENT_RESPONSE" },
+    });
+    expect(navigations[0]).toEqual({
+      to: "/platform/access-sessions/$sessionPublicId",
+      params: { sessionPublicId },
+    });
+  });
+  it("reports an unconfirmed support session without retrying", async () => {
+    const { net } = open({ permissions: [...companyPermissions, "delegation:open"] });
+    const key = "POST /api/v1/platform/access-sessions";
+    net.on(key, () => ({ status: 500, body: problemBody(500) }));
+    await click("Open support session");
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("combobox", { name: "Reason" }));
+    fireEvent.click(await screen.findByRole("option", { name: "Support request" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Open session" }));
+    expect(await screen.findByText(/The outcome could not be confirmed/)).toBeInTheDocument();
+    expect(net.count(key)).toBe(1);
+    expect(screen.queryByText(/canary/)).toBeNull();
+  });
+  it("hides the support session entry without delegation:open", async () => {
+    open();
+    await screen.findByText("Registry isActive (read-only)");
+    expect(screen.queryByRole("button", { name: "Open support session" })).toBeNull();
   });
 });

@@ -1,4 +1,8 @@
 export {
+  accessSessionOperations,
+  delegatedCompanyOperations,
+} from "./access-session-operations";
+export {
   AudienceSessionChanged,
   requestAudienceOperation,
   sendAudienceCommand,
@@ -24,6 +28,11 @@ export { companyOrganizationOperations } from "./company-operations";
 export { companyPeopleOperations } from "./company-people-operations";
 export { companyQueryClient } from "./company-query-client";
 export { apiBaseUrl } from "./config";
+export {
+  delegatedQueryKey,
+  requestDelegatedOperation,
+  sendDelegatedCommand,
+} from "./delegated-operation";
 export {
   type AppError,
   type LoginError,
@@ -58,13 +67,14 @@ export {
 export { executeOperationRequest, OperationRefusal } from "./operation-request";
 export { readOperationResponse } from "./operation-response";
 export {
+  delegationOpenPermission,
   platformRootRoleName,
   rootReservedPermissions,
   usePlatformAccess,
   usePlatformMutationRecovery,
 } from "./platform-access";
 export { loadPlatformIdentity, loginPlatform, platformApi } from "./platform-api";
-export { platformApiClient } from "./platform-client";
+export { delegatedApiClient, platformApiClient } from "./platform-client";
 export { platformCommunicationsOperations } from "./platform-communications-operations";
 export { platformCompanyOperations } from "./platform-company-operations";
 export { platformLeadOperations } from "./platform-lead-operations";

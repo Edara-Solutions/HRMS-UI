@@ -11,6 +11,8 @@ import { loadPlatformIdentity } from "./platform-api";
 /** The protected root role. Its name is a prerequisite fact from `/me`, never a permission by itself. */
 export const platformRootRoleName = "SUPER_ADMIN";
 
+export const delegationOpenPermission = "delegation:open";
+
 /** Authority administration actions that only the current root holder may use, and no custom role may hold. */
 export const rootReservedPermissions: readonly OperationPermission[] = [
   "platform-roles:create",
@@ -52,6 +54,15 @@ export function usePlatformAccess() {
             ...facts,
             requiresRoot: isRootReserved(operation),
             ...target,
+          })
+        : { state: "hidden" as const },
+    delegatedAvailability: (operation: string, accessSession: "live" | "inactive") =>
+      isOperationKey(operation)
+        ? projectActionAvailability(operation, {
+            ...facts,
+            accessSession,
+            delegatedScopeMatches: true,
+            delegatedGrant: facts.permissions?.includes(delegationOpenPermission) ?? false,
           })
         : { state: "hidden" as const },
   };

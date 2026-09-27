@@ -19,7 +19,7 @@ export interface AudienceClientOptions {
 }
 
 export interface AudienceClient extends KyInstance {
-  readonly audience: AudienceClientOptions["audience"];
+  readonly audience: AudienceClientOptions["audience"] | "delegated";
 }
 
 const apiOrigin = apiBaseUrl.replace(/\/api\/v1\/?$/, "");
@@ -197,7 +197,7 @@ function responseContract(candidate: unknown): ResponseContract | undefined {
   if (
     typeof key !== "string" ||
     typeof parseResponse !== "function" ||
-    (audience !== "company" && audience !== "platform")
+    (audience !== "company" && audience !== "platform" && audience !== "delegated")
   )
     return;
   return {

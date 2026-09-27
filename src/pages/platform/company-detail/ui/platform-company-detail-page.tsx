@@ -23,6 +23,7 @@ import { LifecycleCard } from "./lifecycle-card";
 import { PolicyPanel } from "./policy-panel";
 import { ReadPanel } from "./read-panel";
 import { SubscriptionPanel } from "./subscription-panel";
+import { SupportSessionCard } from "./support-session-card";
 
 interface Props {
   publicId: string;
@@ -143,6 +144,13 @@ export function PlatformCompanyDetailPage({ publicId }: Props) {
               commercial={!commercialError ? commercial : undefined}
               blocked={blocked}
               commands={commands}
+            />
+          )}
+          {record && !companyError && (
+            <SupportSessionCard
+              companyPublicId={record.publicId}
+              companyName={record.name}
+              blocked={blocked}
             />
           )}
           <PolicyPanel queries={queries} blocked={blocked} commands={commands} />

@@ -1,6 +1,6 @@
 import { usePlatformSession } from "../auth/platform-session";
 import { refreshPlatformTokens } from "../auth/platform-session-api";
-import { createAudienceClient } from "./audience-client";
+import { type AudienceClient, createAudienceClient } from "./audience-client";
 
 function currentSession() {
   const state = usePlatformSession.getState();
@@ -24,4 +24,8 @@ export const platformApiClient = createAudienceClient({
       .getState()
       .revalidate(() => loadPlatformIdentity(true), { joinExisting: false });
   },
+});
+
+export const delegatedApiClient: AudienceClient = Object.assign(platformApiClient.extend({}), {
+  audience: "delegated" as const,
 });

@@ -240,6 +240,12 @@ const platformWorkRoutes: RouteDeclaration[] = [
     operation: "GET /api/v1/platform/companies/{publicId}",
   },
   {
+    path: "/platform/access-sessions/$publicId",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/access-sessions/{sessionPublicId}",
+  },
+  {
     path: "/platform/subscriptions",
     audience: "platform",
     category: "work",
