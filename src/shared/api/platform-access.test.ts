@@ -36,4 +36,7 @@ describe("Platform access", () => {
       ),
     ).toEqual({ state: "enabled" });
   });
+  it("hides an unknown generated key instead of projecting unverified authority", () => {
+    expect(accessFor(["SUPER_ADMIN"], []).availability("toString")).toEqual({ state: "hidden" });
+  });
 });
