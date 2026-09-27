@@ -39,4 +39,23 @@ describe("Platform access", () => {
   it("hides an unknown generated key instead of projecting unverified authority", () => {
     expect(accessFor(["SUPER_ADMIN"], []).availability("toString")).toEqual({ state: "hidden" });
   });
+
+  it("grants a delegated operation only with delegation:open, its own action and a live session", () => {
+    const update = "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}";
+    expect(accessFor([], ["delegation:open"]).delegatedAvailability(update, "live")).toEqual({
+      state: "hidden",
+    });
+    expect(
+      accessFor([], ["delegation:users:update"]).delegatedAvailability(update, "live"),
+    ).toEqual({ state: "hidden" });
+    const granted = accessFor([], ["delegation:open", "delegation:users:update"]);
+    expect(granted.delegatedAvailability(update, "live")).toEqual({ state: "enabled" });
+    expect(granted.delegatedAvailability(update, "inactive")).toEqual({
+      state: "disabled",
+      reason: "access-session-inactive",
+    });
+    expect(
+      accessFor(["SUPER_ADMIN"], ["delegation:open"]).delegatedAvailability(update, "live"),
+    ).toEqual({ state: "hidden" });
+  });
 });

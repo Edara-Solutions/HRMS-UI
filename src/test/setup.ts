@@ -102,3 +102,9 @@ import enplatformemaildeliveries from "../../public/locales/en/platform-email-de
 
 i18next.addResourceBundle("en", "platform-email-deliveries", enplatformemaildeliveries);
 i18next.addResourceBundle("ar", "platform-email-deliveries", arplatformemaildeliveries);
+
+import arPlatformAccessSession from "../../public/locales/ar/platform-access-session.json";
+import enPlatformAccessSession from "../../public/locales/en/platform-access-session.json";
+
+i18next.addResourceBundle("en", "platform-access-session", enPlatformAccessSession);
+i18next.addResourceBundle("ar", "platform-access-session", arPlatformAccessSession);

@@ -1,5 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
+import type { z } from "zod";
 import {
+  accessSessionOperations,
   ContractViolation,
   platformCompanyOperations as operations,
   platformQueryKey,
@@ -13,6 +15,14 @@ import {
   projectPolicy,
   projectSubscription,
 } from "../model/company";
+
+export type AccessSessionReason = z.input<
+  (typeof accessSessionOperations)["open"]["requestSchema"]
+>["body"]["reason"];
+export const accessSessionReasons: readonly AccessSessionReason[] =
+  accessSessionOperations.open.requestSchema.shape.body.shape.reason.options.map(
+    (option) => option.value,
+  );
 
 function scoped<T>(value: T, actual: string, expected: string, key: string): T {
   if (actual !== expected)
@@ -104,4 +114,10 @@ export async function runCompanyCommand(command: Command, publicId: string, body
     default:
       return sendPlatformCommand(operations[command], { params, body: {} });
   }
+}
+
+export function openAccessSession(companyPublicId: string, reason: AccessSessionReason) {
+  return requestPlatformOperation(accessSessionOperations.open, {
+    body: { companyPublicId, reason },
+  });
 }

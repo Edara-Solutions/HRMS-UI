@@ -54,6 +54,7 @@ import { Route as PlatformPeoplePublicIdRouteImport } from "./app/routes/platfor
 import { Route as PlatformLeadsPublicIdRouteImport } from "./app/routes/platform/leads/$publicId"
 import { Route as PlatformConversionRequestsPublicIdRouteImport } from "./app/routes/platform/conversion-requests/$publicId"
 import { Route as PlatformCompaniesPublicIdRouteImport } from "./app/routes/platform/companies/$publicId"
+import { Route as PlatformAccessSessionsSessionPublicIdRouteImport } from "./app/routes/platform/access-sessions/$sessionPublicId"
 import { Route as CompanyRolesPublicIdRouteImport } from "./app/routes/company/roles/$publicId"
 import { Route as CompanyPeoplePublicIdRouteImport } from "./app/routes/company/people/$publicId"
 import { Route as PlatformMeSessionsIndexRouteImport } from "./app/routes/platform/me/sessions/index"
@@ -300,6 +301,12 @@ const PlatformCompaniesPublicIdRoute =
     path: "/companies/$publicId",
     getParentRoute: () => PlatformRouteRoute,
   } as any)
+const PlatformAccessSessionsSessionPublicIdRoute =
+  PlatformAccessSessionsSessionPublicIdRouteImport.update({
+    id: "/access-sessions/$sessionPublicId",
+    path: "/access-sessions/$sessionPublicId",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
 const CompanyRolesPublicIdRoute = CompanyRolesPublicIdRouteImport.update({
   id: "/roles/$publicId",
   path: "/roles/$publicId",
@@ -373,6 +380,7 @@ export interface FileRoutesByFullPath {
   "/platform/": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/access-sessions/$sessionPublicId": typeof PlatformAccessSessionsSessionPublicIdRoute
   "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
@@ -428,6 +436,7 @@ export interface FileRoutesByTo {
   "/platform": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/access-sessions/$sessionPublicId": typeof PlatformAccessSessionsSessionPublicIdRoute
   "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
@@ -486,6 +495,7 @@ export interface FileRoutesById {
   "/platform/": typeof PlatformIndexRoute
   "/company/people/$publicId": typeof CompanyPeoplePublicIdRoute
   "/company/roles/$publicId": typeof CompanyRolesPublicIdRoute
+  "/platform/access-sessions/$sessionPublicId": typeof PlatformAccessSessionsSessionPublicIdRoute
   "/platform/companies/$publicId": typeof PlatformCompaniesPublicIdRoute
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
@@ -545,6 +555,7 @@ export interface FileRouteTypes {
     | "/platform/"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/access-sessions/$sessionPublicId"
     | "/platform/companies/$publicId"
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
@@ -600,6 +611,7 @@ export interface FileRouteTypes {
     | "/platform"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/access-sessions/$sessionPublicId"
     | "/platform/companies/$publicId"
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
@@ -657,6 +669,7 @@ export interface FileRouteTypes {
     | "/platform/"
     | "/company/people/$publicId"
     | "/company/roles/$publicId"
+    | "/platform/access-sessions/$sessionPublicId"
     | "/platform/companies/$publicId"
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
@@ -1030,6 +1043,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlatformCompaniesPublicIdRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
+    "/platform/access-sessions/$sessionPublicId": {
+      id: "/platform/access-sessions/$sessionPublicId"
+      path: "/access-sessions/$sessionPublicId"
+      fullPath: "/platform/access-sessions/$sessionPublicId"
+      preLoaderRoute: typeof PlatformAccessSessionsSessionPublicIdRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
     "/company/roles/$publicId": {
       id: "/company/roles/$publicId"
       path: "/roles/$publicId"
@@ -1145,6 +1165,7 @@ const CompanyRouteRouteWithChildren = CompanyRouteRoute._addFileChildren(
 
 interface PlatformRouteRouteChildren {
   PlatformIndexRoute: typeof PlatformIndexRoute
+  PlatformAccessSessionsSessionPublicIdRoute: typeof PlatformAccessSessionsSessionPublicIdRoute
   PlatformCompaniesPublicIdRoute: typeof PlatformCompaniesPublicIdRoute
   PlatformConversionRequestsPublicIdRoute: typeof PlatformConversionRequestsPublicIdRoute
   PlatformLeadsPublicIdRoute: typeof PlatformLeadsPublicIdRoute
@@ -1173,6 +1194,8 @@ interface PlatformRouteRouteChildren {
 
 const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
   PlatformIndexRoute: PlatformIndexRoute,
+  PlatformAccessSessionsSessionPublicIdRoute:
+    PlatformAccessSessionsSessionPublicIdRoute,
   PlatformCompaniesPublicIdRoute: PlatformCompaniesPublicIdRoute,
   PlatformConversionRequestsPublicIdRoute:
     PlatformConversionRequestsPublicIdRoute,
