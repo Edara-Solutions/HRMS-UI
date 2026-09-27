@@ -122,14 +122,14 @@ export function NotificationFlat({
             <ul>
               {rows.map((row) => (
                 <NotificationRow
-                  key={row.item.id}
+                  key={row.item.publicId}
                   item={row.item}
                   state={row.state}
                   onActivate={() => {
                     center.activate(row);
                     onClose();
                   }}
-                  onMarkRead={() => center.markRead(row.item.id)}
+                  onMarkRead={() => center.markRead(row.item.publicId)}
                 />
               ))}
             </ul>

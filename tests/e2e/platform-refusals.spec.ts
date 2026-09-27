@@ -35,6 +35,10 @@ test("keeps no-work SELF recovery, explicit branding and scoped collapse usable"
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/v1/company/me") return route.fulfill({ json: company.user });
+    if (path === "/api/v1/company/notifications/unread-count")
+      return route.fulfill({ json: { unreadCount: 0 } });
+    if (path === "/api/v1/company/notifications")
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
     if (path === "/api/v1/platform/me") return route.fulfill({ json: platform.user });
     throw new Error(`Unexpected S2 operation ${path}`);
   });

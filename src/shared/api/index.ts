@@ -1,3 +1,8 @@
+export {
+  AudienceSessionChanged,
+  requestAudienceOperation,
+  sendAudienceCommand,
+} from "./audience-operation";
 export { apiClient } from "./client";
 export {
   isCompanyBlocked,
@@ -6,8 +11,8 @@ export {
 } from "./company-access";
 export { companyApi, loadCompanyIdentity, loginCompany } from "./company-api";
 export { companyApiClient } from "./company-client";
+export { companyCommunicationsOperations } from "./company-communications-operations";
 export {
-  CompanySessionChanged,
   companyAccessPolicyQuery,
   companyEmailReadinessQuery,
   companyQueryKey,
@@ -41,6 +46,10 @@ export {
   parseLeadListResponse,
 } from "./lead-runtime-contract";
 export { classifyMutationFailure, type MutationOutcome } from "./mutation-outcome";
+export {
+  companyNotificationOperations,
+  platformNotificationOperations,
+} from "./notification-operations";
 export { executeOperationRequest, OperationRefusal } from "./operation-request";
 export { readOperationResponse } from "./operation-response";
 export {

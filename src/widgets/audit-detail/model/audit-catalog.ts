@@ -1,4 +1,5 @@
-import type { components } from "@/shared/api";
+import type { z } from "zod";
+import type { companyCommunicationsOperations, components } from "@/shared/api";
 
 /**
  * One trail item as the catalog defines it, minus the sentinel a projection emits for a row it
@@ -12,8 +13,11 @@ export type PlatformAuditEvent = Exclude<
   { eventType: "audit.event.unavailable" }
 >;
 
+/** The Company trail reads its generated audience operation; its actor may be withheld (absent). */
 export type CompanyAuditEvent = Exclude<
-  components["schemas"]["CompanyAuditTrailPage"]["items"][number],
+  z.output<
+    (typeof companyCommunicationsOperations)["auditTrail"]["responses"]["200"]
+  >["items"][number],
   { eventType: "audit.event.unavailable" }
 >;
 

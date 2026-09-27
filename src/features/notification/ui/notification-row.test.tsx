@@ -3,8 +3,10 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import i18next from "i18next";
 import { act } from "react";
 import { I18nextProvider } from "react-i18next";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { NotificationFeedItem } from "../api/notification-feed";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { AudienceSessionProvider, useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
+import { notificationRow } from "../../../test/notification-fixtures";
 import { NotificationRow } from "./notification-row";
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
@@ -14,24 +16,15 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 
 const testI18n = i18next.createInstance();
 
-const LEAD_TITLE = "New lead registered";
-const LEAD_BODY = "A new lead joined the pipeline and is ready for review.";
+const LEAD_TITLE = "Subscription updated";
+const LEAD_BODY = "Your plan is now Growth (active).";
 
 /** Where the row's text block sits in the window, so "above" and "below" are tellable apart. */
 const TEXT_BLOCK = { top: 300, bottom: 340, left: 40, right: 340, width: 300, height: 40 };
 
-const leadRow: NotificationFeedItem = {
-  id: 1,
-  scope: "platform",
-  typeKey: "platform.lead-created",
-  typeVersion: 1,
-  importance: "normal",
-  params: {},
-  actor: { kind: "system" },
-  subject: { type: "lead", publicId: "lead-1" },
-  createdAt: new Date().toISOString(),
-  seenAt: null,
-  readAt: null,
+const leadRow = {
+  ...notificationRow(1, "company.subscription-changed", new Date().toISOString()),
+  params: { planName: "Growth", status: "active" },
 };
 
 /**
@@ -60,9 +53,11 @@ function withMeasurements(scrollWidth: number, clientWidth: number) {
 function renderRow() {
   return render(
     <I18nextProvider i18n={testI18n}>
-      <ul>
-        <NotificationRow item={leadRow} state="settled" onActivate={vi.fn()} />
-      </ul>
+      <AudienceSessionProvider audience="company">
+        <ul>
+          <NotificationRow item={leadRow} state="settled" onActivate={vi.fn()} />
+        </ul>
+      </AudienceSessionProvider>
     </I18nextProvider>,
   );
 }
@@ -92,7 +87,10 @@ describe("NotificationRow", () => {
     });
   });
 
+  beforeEach(() => useCompanySession.getState().setSession(companySessionFixture()));
+
   afterEach(() => {
+    useCompanySession.getState().clearSession();
     cleanup();
     vi.useRealTimers();
     for (const property of ["scrollWidth", "clientWidth"]) {

@@ -28,8 +28,9 @@ interface AuditEvent {
   occurredAt: string;
   outcome: "SUCCESS" | "FAILURE";
   // Identity is read through the widened shapes rather than the generated arms: every arm is
-  // assignable to them, and the resolved names land here without the row changing again.
-  actor: AuditActorIdentity;
+  // assignable to them, and the resolved names land here without the row changing again. An
+  // absent actor is one the projection withheld.
+  actor?: AuditActorIdentity;
   traceId: string | null;
   targets: AuditTargetIdentity[];
   details: CatalogAuditEvent["details"];

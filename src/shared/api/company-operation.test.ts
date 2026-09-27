@@ -13,12 +13,8 @@ vi.hoisted(() => {
 import { useCompanySession } from "@/shared/auth";
 import { companySessionFixture } from "../../test/audience-fixtures";
 import { json, stubNetwork } from "../../test/network-fixtures";
-import {
-  CompanySessionChanged,
-  companyQueryKey,
-  companyReadQuery,
-  requestCompanyOperation,
-} from "./company-operation";
+import { AudienceSessionChanged } from "./audience-operation";
+import { companyQueryKey, companyReadQuery, requestCompanyOperation } from "./company-operation";
 import { companyOrganizationOperations as operations } from "./company-operations";
 import { ContractViolation } from "./generated/runtime";
 
@@ -70,7 +66,7 @@ describe("session-scoped Company operations", () => {
       },
     });
     await expect(requestCompanyOperation(operations.registry, {})).rejects.toBeInstanceOf(
-      CompanySessionChanged,
+      AudienceSessionChanged,
     );
   });
 
@@ -78,7 +74,7 @@ describe("session-scoped Company operations", () => {
     useCompanySession.getState().clearSession();
     const requests = stubNetwork({});
     await expect(requestCompanyOperation(operations.registry, {})).rejects.toBeInstanceOf(
-      CompanySessionChanged,
+      AudienceSessionChanged,
     );
     expect(requests).toEqual([]);
   });

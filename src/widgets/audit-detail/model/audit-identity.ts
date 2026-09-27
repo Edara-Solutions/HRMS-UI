@@ -14,16 +14,17 @@ export type AuditPortal = "platform" | "company";
  */
 export const erasedTargetPublicId = "ERASED";
 
+type RecordedAuditActor = NonNullable<CatalogAuditActor>;
+
 /**
- * The actor as the wire may carry it. Each catalog arm is narrower than this — the Company
- * trail's Platform Admin has neither `publicId` nor `name` — so the fields the arms disagree
- * about are optional here and the renderer is total over the widest shape. `kind` and
- * `component` stay derived, so an arm the catalog adds is a type error rather than a default.
+ * The actor as the wire may carry it. Each catalog arm is narrower than this, so the fields the
+ * arms disagree about are optional here and the renderer is total over the widest shape. `kind`
+ * and `component` stay derived, so an arm the catalog adds is a type error rather than a default.
  */
 export interface AuditActorIdentity {
-  kind: CatalogAuditActor["kind"];
+  kind: RecordedAuditActor["kind"];
   publicId?: string;
-  component?: Extract<CatalogAuditActor, { kind: "SYSTEM" }>["component"];
+  component?: Extract<RecordedAuditActor, { kind: "SYSTEM" }>["component"];
   name?: string | null;
 }
 
@@ -109,9 +110,19 @@ export function auditTargetDestination(
  * always writes `ANONYMOUS` explicitly, so nothing legitimate reaches the trail unattributed.
  */
 export function presentAuditActor(
-  actor: AuditActorIdentity,
+  actor: AuditActorIdentity | undefined,
   t: AuditTranslate,
 ): AuditActorPresentation {
+  // The Company projection omits an actor it may not disclose. Omission is shown as withheld and
+  // never reconstructed into who acted, so no tier, name or identifier is inferred from it.
+  if (actor === undefined) {
+    return {
+      state: "withheld",
+      primary: t("chrome.identityWithheld"),
+      secondary: t("chrome.identityWithheldHint"),
+    };
+  }
+
   switch (actor.kind) {
     case "ANONYMOUS":
       return {
@@ -147,21 +158,12 @@ function presentIdentifiedActor(
   t: AuditTranslate,
 ): AuditActorPresentation {
   if (!actor.publicId) {
-    // The Company trail's Platform Admin arm has no identity fields at all, so the actor is a
-    // fixed client-side constant: there is no server value it could leak through. Any other
-    // kind arriving without an identifier is the same recording defect as an unset actor —
-    // it must not borrow the Platform Admin's label.
-    return actor.kind === "PLATFORM_ADMIN"
-      ? {
-          state: "withheld",
-          primary: t("chrome.platformAdmin"),
-          secondary: t("chrome.identityWithheld"),
-        }
-      : {
-          state: "attribution-failed",
-          primary: t("chrome.attributionFailed"),
-          secondary: t("chrome.attributionFailedHint"),
-        };
+    // Any kind arriving without an identifier is a recording defect, never a withheld identity.
+    return {
+      state: "attribution-failed",
+      primary: t("chrome.attributionFailed"),
+      secondary: t("chrome.attributionFailedHint"),
+    };
   }
 
   if (actor.name) {

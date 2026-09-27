@@ -1,8 +1,12 @@
 import { Shield } from "lucide-react";
 import type { ReactNode } from "react";
+import { NotificationBell, NotificationToaster } from "@/features/notification";
 import { useCompanySession, usePlatformSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { AppShell, buildNavGroups, Header, SessionFooter } from "@/widgets/app-shell";
+
+/** The Company header carries no per-render input, so it is built once. */
+const companyHeader = <Header notifications={<NotificationBell />} />;
 
 export function CompanyShell({ children }: { children: ReactNode }) {
   const session = useCompanySession((state) => state.session);
@@ -20,10 +24,11 @@ export function CompanyShell({ children }: { children: ReactNode }) {
         locale,
       )}
       preferenceScope={`company:${session.user.publicId}`}
-      header={<Header />}
+      header={companyHeader}
       identity={(collapsed) => <SessionFooter collapsed={collapsed} />}
     >
       {children}
+      <NotificationToaster />
     </AppShell>
   );
 }

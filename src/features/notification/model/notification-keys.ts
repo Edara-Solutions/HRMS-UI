@@ -1,5 +1,9 @@
-/** Query keys locked by the polling contract (HRMS_Back_End#198 §5). */
+import type { NotificationScope } from "./notification-tier";
+
+/** Query roots carry the audience and identity, so one identity never reads another's rows. */
 export const notificationKeys = {
-  count: () => ["notifications", "count"] as const,
-  list: (cursor: string | null) => ["notifications", "list", cursor] as const,
+  count: (scope: NotificationScope) =>
+    [scope.tier, scope.userPublicId, "notifications", "count"] as const,
+  list: (scope: NotificationScope) =>
+    [scope.tier, scope.userPublicId, "notifications", "list"] as const,
 };
