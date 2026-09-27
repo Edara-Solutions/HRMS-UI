@@ -67,3 +67,9 @@ import enPlatformLeads from "../../public/locales/en/platform-leads.json";
 
 i18next.addResourceBundle("en", "platform-leads", enPlatformLeads);
 i18next.addResourceBundle("ar", "platform-leads", arPlatformLeads);
+
+import arPlatformPlans from "../../public/locales/ar/platform-plans.json";
+import enPlatformPlans from "../../public/locales/en/platform-plans.json";
+
+i18next.addResourceBundle("en", "platform-plans", enPlatformPlans);
+i18next.addResourceBundle("ar", "platform-plans", arPlatformPlans);

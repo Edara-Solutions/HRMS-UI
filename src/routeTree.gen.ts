@@ -28,6 +28,7 @@ import { Route as CompanyChangePasswordRouteImport } from "./app/routes/company_
 import { Route as CompanyAcceptInvitationRouteImport } from "./app/routes/company_/accept-invitation"
 import { Route as PlatformSubscriptionsIndexRouteImport } from "./app/routes/platform/subscriptions/index"
 import { Route as PlatformRolesIndexRouteImport } from "./app/routes/platform/roles/index"
+import { Route as PlatformPlansIndexRouteImport } from "./app/routes/platform/plans/index"
 import { Route as PlatformPeopleIndexRouteImport } from "./app/routes/platform/people/index"
 import { Route as PlatformLeadsIndexRouteImport } from "./app/routes/platform/leads/index"
 import { Route as PlatformDashboardIndexRouteImport } from "./app/routes/platform/dashboard/index"
@@ -42,6 +43,7 @@ import { Route as CompanyEmailIndexRouteImport } from "./app/routes/company/emai
 import { Route as CompanyDashboardIndexRouteImport } from "./app/routes/company/dashboard/index"
 import { Route as CompanyAuditIndexRouteImport } from "./app/routes/company/audit/index"
 import { Route as PlatformRolesPublicIdRouteImport } from "./app/routes/platform/roles/$publicId"
+import { Route as PlatformPlansPublicIdRouteImport } from "./app/routes/platform/plans/$publicId"
 import { Route as PlatformPeoplePublicIdRouteImport } from "./app/routes/platform/people/$publicId"
 import { Route as PlatformLeadsPublicIdRouteImport } from "./app/routes/platform/leads/$publicId"
 import { Route as PlatformConversionRequestsPublicIdRouteImport } from "./app/routes/platform/conversion-requests/$publicId"
@@ -153,6 +155,11 @@ const PlatformRolesIndexRoute = PlatformRolesIndexRouteImport.update({
   path: "/roles/",
   getParentRoute: () => PlatformRouteRoute,
 } as any)
+const PlatformPlansIndexRoute = PlatformPlansIndexRouteImport.update({
+  id: "/plans/",
+  path: "/plans/",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
 const PlatformPeopleIndexRoute = PlatformPeopleIndexRouteImport.update({
   id: "/people/",
   path: "/people/",
@@ -223,6 +230,11 @@ const CompanyAuditIndexRoute = CompanyAuditIndexRouteImport.update({
 const PlatformRolesPublicIdRoute = PlatformRolesPublicIdRouteImport.update({
   id: "/roles/$publicId",
   path: "/roles/$publicId",
+  getParentRoute: () => PlatformRouteRoute,
+} as any)
+const PlatformPlansPublicIdRoute = PlatformPlansPublicIdRouteImport.update({
+  id: "/plans/$publicId",
+  path: "/plans/$publicId",
   getParentRoute: () => PlatformRouteRoute,
 } as any)
 const PlatformPeoplePublicIdRoute = PlatformPeoplePublicIdRouteImport.update({
@@ -318,6 +330,7 @@ export interface FileRoutesByFullPath {
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
+  "/platform/plans/$publicId": typeof PlatformPlansPublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
@@ -332,6 +345,7 @@ export interface FileRoutesByFullPath {
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/platform/leads/": typeof PlatformLeadsIndexRoute
   "/platform/people/": typeof PlatformPeopleIndexRoute
+  "/platform/plans/": typeof PlatformPlansIndexRoute
   "/platform/roles/": typeof PlatformRolesIndexRoute
   "/platform/subscriptions/": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates/": typeof CompanyEmailTemplatesIndexRoute
@@ -364,6 +378,7 @@ export interface FileRoutesByTo {
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
+  "/platform/plans/$publicId": typeof PlatformPlansPublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit": typeof CompanyAuditIndexRoute
   "/company/dashboard": typeof CompanyDashboardIndexRoute
@@ -378,6 +393,7 @@ export interface FileRoutesByTo {
   "/platform/dashboard": typeof PlatformDashboardIndexRoute
   "/platform/leads": typeof PlatformLeadsIndexRoute
   "/platform/people": typeof PlatformPeopleIndexRoute
+  "/platform/plans": typeof PlatformPlansIndexRoute
   "/platform/roles": typeof PlatformRolesIndexRoute
   "/platform/subscriptions": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates": typeof CompanyEmailTemplatesIndexRoute
@@ -413,6 +429,7 @@ export interface FileRoutesById {
   "/platform/conversion-requests/$publicId": typeof PlatformConversionRequestsPublicIdRoute
   "/platform/leads/$publicId": typeof PlatformLeadsPublicIdRoute
   "/platform/people/$publicId": typeof PlatformPeoplePublicIdRoute
+  "/platform/plans/$publicId": typeof PlatformPlansPublicIdRoute
   "/platform/roles/$publicId": typeof PlatformRolesPublicIdRoute
   "/company/audit/": typeof CompanyAuditIndexRoute
   "/company/dashboard/": typeof CompanyDashboardIndexRoute
@@ -427,6 +444,7 @@ export interface FileRoutesById {
   "/platform/dashboard/": typeof PlatformDashboardIndexRoute
   "/platform/leads/": typeof PlatformLeadsIndexRoute
   "/platform/people/": typeof PlatformPeopleIndexRoute
+  "/platform/plans/": typeof PlatformPlansIndexRoute
   "/platform/roles/": typeof PlatformRolesIndexRoute
   "/platform/subscriptions/": typeof PlatformSubscriptionsIndexRoute
   "/company/email/templates/": typeof CompanyEmailTemplatesIndexRoute
@@ -463,6 +481,7 @@ export interface FileRouteTypes {
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
     | "/platform/people/$publicId"
+    | "/platform/plans/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit/"
     | "/company/dashboard/"
@@ -477,6 +496,7 @@ export interface FileRouteTypes {
     | "/platform/dashboard/"
     | "/platform/leads/"
     | "/platform/people/"
+    | "/platform/plans/"
     | "/platform/roles/"
     | "/platform/subscriptions/"
     | "/company/email/templates/"
@@ -509,6 +529,7 @@ export interface FileRouteTypes {
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
     | "/platform/people/$publicId"
+    | "/platform/plans/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit"
     | "/company/dashboard"
@@ -523,6 +544,7 @@ export interface FileRouteTypes {
     | "/platform/dashboard"
     | "/platform/leads"
     | "/platform/people"
+    | "/platform/plans"
     | "/platform/roles"
     | "/platform/subscriptions"
     | "/company/email/templates"
@@ -557,6 +579,7 @@ export interface FileRouteTypes {
     | "/platform/conversion-requests/$publicId"
     | "/platform/leads/$publicId"
     | "/platform/people/$publicId"
+    | "/platform/plans/$publicId"
     | "/platform/roles/$publicId"
     | "/company/audit/"
     | "/company/dashboard/"
@@ -571,6 +594,7 @@ export interface FileRouteTypes {
     | "/platform/dashboard/"
     | "/platform/leads/"
     | "/platform/people/"
+    | "/platform/plans/"
     | "/platform/roles/"
     | "/platform/subscriptions/"
     | "/company/email/templates/"
@@ -735,6 +759,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlatformRolesIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
+    "/platform/plans/": {
+      id: "/platform/plans/"
+      path: "/plans"
+      fullPath: "/platform/plans/"
+      preLoaderRoute: typeof PlatformPlansIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
     "/platform/people/": {
       id: "/platform/people/"
       path: "/people"
@@ -831,6 +862,13 @@ declare module "@tanstack/react-router" {
       path: "/roles/$publicId"
       fullPath: "/platform/roles/$publicId"
       preLoaderRoute: typeof PlatformRolesPublicIdRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
+    "/platform/plans/$publicId": {
+      id: "/platform/plans/$publicId"
+      path: "/plans/$publicId"
+      fullPath: "/platform/plans/$publicId"
+      preLoaderRoute: typeof PlatformPlansPublicIdRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
     "/platform/people/$publicId": {
@@ -973,12 +1011,14 @@ interface PlatformRouteRouteChildren {
   PlatformConversionRequestsPublicIdRoute: typeof PlatformConversionRequestsPublicIdRoute
   PlatformLeadsPublicIdRoute: typeof PlatformLeadsPublicIdRoute
   PlatformPeoplePublicIdRoute: typeof PlatformPeoplePublicIdRoute
+  PlatformPlansPublicIdRoute: typeof PlatformPlansPublicIdRoute
   PlatformRolesPublicIdRoute: typeof PlatformRolesPublicIdRoute
   PlatformCompaniesIndexRoute: typeof PlatformCompaniesIndexRoute
   PlatformConversionRequestsIndexRoute: typeof PlatformConversionRequestsIndexRoute
   PlatformDashboardIndexRoute: typeof PlatformDashboardIndexRoute
   PlatformLeadsIndexRoute: typeof PlatformLeadsIndexRoute
   PlatformPeopleIndexRoute: typeof PlatformPeopleIndexRoute
+  PlatformPlansIndexRoute: typeof PlatformPlansIndexRoute
   PlatformRolesIndexRoute: typeof PlatformRolesIndexRoute
   PlatformSubscriptionsIndexRoute: typeof PlatformSubscriptionsIndexRoute
   PlatformMeProfileIndexRoute: typeof PlatformMeProfileIndexRoute
@@ -993,12 +1033,14 @@ const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
     PlatformConversionRequestsPublicIdRoute,
   PlatformLeadsPublicIdRoute: PlatformLeadsPublicIdRoute,
   PlatformPeoplePublicIdRoute: PlatformPeoplePublicIdRoute,
+  PlatformPlansPublicIdRoute: PlatformPlansPublicIdRoute,
   PlatformRolesPublicIdRoute: PlatformRolesPublicIdRoute,
   PlatformCompaniesIndexRoute: PlatformCompaniesIndexRoute,
   PlatformConversionRequestsIndexRoute: PlatformConversionRequestsIndexRoute,
   PlatformDashboardIndexRoute: PlatformDashboardIndexRoute,
   PlatformLeadsIndexRoute: PlatformLeadsIndexRoute,
   PlatformPeopleIndexRoute: PlatformPeopleIndexRoute,
+  PlatformPlansIndexRoute: PlatformPlansIndexRoute,
   PlatformRolesIndexRoute: PlatformRolesIndexRoute,
   PlatformSubscriptionsIndexRoute: PlatformSubscriptionsIndexRoute,
   PlatformMeProfileIndexRoute: PlatformMeProfileIndexRoute,

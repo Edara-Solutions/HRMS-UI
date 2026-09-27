@@ -20,6 +20,7 @@ interface Props {
   invalidLabel: string;
   disabled?: boolean;
   changedOnly?: boolean;
+  serverInvalidFields?: readonly string[];
   onSubmit: (body: unknown) => void;
 }
 /** A schema-validated form with an explicit field whitelist; transport stays with its owner. */
@@ -30,11 +31,13 @@ export function SchemaForm({
   invalidLabel,
   disabled,
   changedOnly,
+  serverInvalidFields,
   onSubmit,
 }: Props) {
   const id = useId();
   const [invalid, setInvalid] = useState(false);
   const [rejected, setRejected] = useState<ReadonlySet<string>>(new Set());
+  const serverRejected = new Set(serverInvalidFields);
   return (
     <form
       className="grid gap-3 sm:grid-cols-2"
@@ -84,7 +87,7 @@ export function SchemaForm({
               required={field.required}
               defaultValue={String(field.value ?? "")}
               disabled={disabled}
-              aria-invalid={rejected.has(field.name)}
+              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
               className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
             >
               {!field.required && <option value="">—</option>}
@@ -102,7 +105,7 @@ export function SchemaForm({
               required={field.required}
               defaultValue={String(field.value ?? "")}
               disabled={disabled}
-              aria-invalid={rejected.has(field.name)}
+              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
               className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
             />
           ) : field.type === "checkbox" ? (
@@ -124,7 +127,7 @@ export function SchemaForm({
               type={field.type ?? "text"}
               defaultValue={String(field.value ?? "")}
               disabled={disabled}
-              aria-invalid={rejected.has(field.name)}
+              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
             />
           )}
         </div>

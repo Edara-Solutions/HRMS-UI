@@ -1,219 +1,89 @@
-import { PackageSearch, Plus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import type { BillingInterval, Plan } from "@/shared/api";
-import { useDeletePlan, usePlans } from "@/shared/api";
-import {
-  usePageNavigate as useNavigate,
-  usePageSearch as useSearch,
-} from "@/shared/lib/page-navigation";
+import { useTranslation } from "react-i18next";
+import { platformPlanOperations as operations, usePlatformAccess } from "@/shared/api";
+import { RouteAccessRefusal } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
-import { Card } from "@/shared/ui/card";
-import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { EmptyState } from "@/shared/ui/empty-state";
-import { pageSearchSchema } from "../model/page-search";
-import { PlanFormDialog } from "./plan-form-dialog";
-import { PlanPricesDialog } from "./plan-prices-dialog";
-import { PlanSection } from "./plan-section";
-import {
-  type PlanStatusFilter,
-  PlansFilterPanel,
-  type PlanVisibilityFilter,
-} from "./plans-filter-panel";
-import { PlansSummary } from "./plans-summary";
+import { PageHeader } from "@/shared/ui/page-header";
+import { QueryPanel } from "@/shared/ui/query-panel";
+import { type CatalogueFilters, plansQuery } from "../api/catalogue";
+import { CatalogueEditor } from "./catalogue-editor";
+import { CatalogueFilterForm } from "./catalogue-filters";
 
-export function PlatformPlansPage() {
-  const {
-    active,
-    billingInterval,
-    countryCode,
-    currencyCode,
-    intervalCount,
-    q,
-    regionCode,
-    visibility,
-  } = useSearch(pageSearchSchema);
-  const navigate = useNavigate(pageSearchSchema);
-  const deletePlan = useDeletePlan();
-
-  const [planFormTarget, setPlanFormTarget] = useState<Plan | null>(null);
-  const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false);
-  const [pricePlanTarget, setPricePlanTarget] = useState<Plan | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Plan | null>(null);
-
-  const query = q ?? "";
-  const previewEnabled = Boolean(currencyCode && billingInterval);
-  const intervalCountValue = intervalCount ?? 1;
-
-  const plansQuery = usePlans({
-    name: query || undefined,
-    isActive: active === "all" ? undefined : active === "active",
-    isPublic: visibility === "all" ? undefined : visibility === "public",
-    countryCode: countryCode || undefined,
-    regionCode: regionCode || undefined,
-    currencyCode: currencyCode || undefined,
-    billingInterval: billingInterval || undefined,
-    intervalCount: previewEnabled ? intervalCountValue : undefined,
+interface Props {
+  search: CatalogueFilters;
+}
+export function PlatformPlansPage({ search }: Props) {
+  const { t } = useTranslation("platform-plans");
+  const access = usePlatformAccess();
+  const [creating, setCreating] = useState(false);
+  const { data, error, isPending, refetch } = useQuery({
+    ...plansQuery(access.user?.publicId ?? "", search),
+    enabled: access.availability(operations.plans.key).state === "enabled",
+    retry: false,
   });
-
-  const plans = plansQuery.data?.data ?? [];
-  const activePlans = plans.filter((plan) => plan.isActive);
-  const inactivePlans = plans.filter((plan) => !plan.isActive);
-
-  function setSearchValue<K extends string>(key: K, value: string | number | undefined) {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        [key]: value === "" || value === undefined ? undefined : value,
-      }),
-    });
-  }
-
-  function clearPricePreview() {
-    void navigate({
-      search: (previous) => ({
-        ...previous,
-        countryCode: undefined,
-        regionCode: undefined,
-        currencyCode: undefined,
-        billingInterval: undefined,
-        intervalCount: undefined,
-      }),
-    });
-  }
-
-  async function confirmDeletePlan() {
-    if (!deleteTarget) return;
-    await deletePlan.mutateAsync(deleteTarget.publicId);
-    setDeleteTarget(null);
-  }
-
+  if (!access.user) return null;
+  if (access.availability(operations.plans.key).state === "hidden")
+    throw new RouteAccessRefusal("platform");
   return (
-    <div className="mx-auto max-w-[1480px]">
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">Plans</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            Manage plan definitions, market prices, and optional effective-price preview in one
-            workflow.
-          </p>
-        </div>
-        <Button
-          intent="cta"
-          leadingIcon={<Plus size={15} />}
-          className="w-full sm:w-auto"
-          onClick={() => setIsCreatePlanOpen(true)}
-        >
-          Create plan
-        </Button>
-      </div>
-
-      <PlansSummary
-        plans={plans}
-        activePlansCount={activePlans.length}
-        inactivePlansCount={inactivePlans.length}
-      />
-
-      <PlansFilterPanel
-        query={query}
-        active={active}
-        visibility={visibility}
-        currencyCode={currencyCode}
-        billingInterval={billingInterval}
-        countryCode={countryCode}
-        regionCode={regionCode}
-        intervalCountValue={intervalCountValue}
-        previewEnabled={previewEnabled}
-        onQueryChange={(nextQuery) => setSearchValue("q", nextQuery || undefined)}
-        onActiveChange={(nextActive: PlanStatusFilter) => setSearchValue("active", nextActive)}
-        onVisibilityChange={(nextVisibility: PlanVisibilityFilter) =>
-          setSearchValue("visibility", nextVisibility)
+    <div className="mx-auto min-w-0 max-w-6xl space-y-6 [overflow-wrap:anywhere]">
+      <PageHeader
+        title={t("title")}
+        description={t("intro")}
+        action={
+          access.availability(operations.create.key).state !== "hidden" && (
+            <Button
+              intent="cta"
+              disabled={
+                isPending ||
+                !!error ||
+                access.availability(operations.create.key).state !== "enabled"
+              }
+              onClick={() => setCreating(true)}
+            >
+              {t("createPlan")}
+            </Button>
+          )
         }
-        onCurrencyCodeChange={(nextCurrencyCode) =>
-          setSearchValue("currencyCode", nextCurrencyCode)
-        }
-        onBillingIntervalChange={(nextBillingInterval: BillingInterval) =>
-          setSearchValue("billingInterval", nextBillingInterval)
-        }
-        onCountryCodeChange={(nextCountryCode) => setSearchValue("countryCode", nextCountryCode)}
-        onRegionCodeChange={(nextRegionCode) => setSearchValue("regionCode", nextRegionCode)}
-        onIntervalCountChange={(nextIntervalCount) =>
-          setSearchValue("intervalCount", nextIntervalCount)
-        }
-        onClearPricePreview={clearPricePreview}
       />
-
-      {plansQuery.isPending ? (
-        <Card>
-          <EmptyState
-            icon={PackageSearch}
-            title="Loading plans"
-            description="Fetching the plan catalogue and active prices."
-          />
-        </Card>
-      ) : plansQuery.isError ? (
-        <Card>
-          <EmptyState
-            icon={PackageSearch}
-            title="Couldn't load plans"
-            description="Please retry in a moment. If the problem persists, check your access or the backend service."
-          />
-        </Card>
-      ) : plans.length === 0 ? (
-        <Card>
-          <EmptyState
-            icon={PackageSearch}
-            title="No plans found"
-            description="Try clearing the filters, or create a new plan to start the catalogue."
-            action={
-              <Button intent="cta" onClick={() => setIsCreatePlanOpen(true)}>
-                Create plan
-              </Button>
-            }
-          />
-        </Card>
-      ) : (
-        <div className="space-y-8">
-          <PlanSection
-            title="Active plans"
-            description="Plans that can still be assigned or priced."
-            plans={activePlans}
-            onEdit={setPlanFormTarget}
-            onManagePrices={setPricePlanTarget}
-            onDelete={setDeleteTarget}
-          />
-          {inactivePlans.length > 0 && (
-            <PlanSection
-              title="Inactive plans"
-              description="Kept for management and history, but not available for active selection."
-              plans={inactivePlans}
-              onEdit={setPlanFormTarget}
-              onManagePrices={setPricePlanTarget}
-              onDelete={setDeleteTarget}
-            />
-          )}
-        </div>
-      )}
-
-      <PlanFormDialog
-        plan={null}
-        open={isCreatePlanOpen}
-        onClose={() => setIsCreatePlanOpen(false)}
-      />
-      <PlanFormDialog
-        plan={planFormTarget}
-        open={planFormTarget !== null}
-        onClose={() => setPlanFormTarget(null)}
-      />
-      <PlanPricesDialog plan={pricePlanTarget} onClose={() => setPricePlanTarget(null)} />
-      <ConfirmDialog
-        open={deleteTarget !== null}
-        title={deleteTarget ? `Delete ${deleteTarget.name}?` : "Delete plan"}
-        description="This soft-deletes the plan and removes it from normal plan reads."
-        confirmLabel="Delete plan"
-        isLoading={deletePlan.isPending}
-        onConfirm={() => void confirmDeletePlan()}
-        onClose={() => setDeleteTarget(null)}
-      />
+      <QueryPanel title={t("filters")}>
+        <CatalogueFilterForm search={search} />
+      </QueryPanel>
+      <QueryPanel
+        title={t("catalogue")}
+        pending={isPending}
+        error={error}
+        retry={() => void refetch()}
+      >
+        {data?.data.length === 0 && <p>{t(Object.keys(search).length ? "noMatches" : "empty")}</p>}
+        <ul className="divide-y divide-[var(--color-border)]">
+          {data?.data.map((plan) => (
+            <li key={plan.publicId} className="space-y-2 py-4">
+              {access.availability(operations.plan.key).state === "enabled" ? (
+                <Link
+                  className="font-semibold underline"
+                  to="/platform/plans/$publicId"
+                  params={{ publicId: plan.publicId }}
+                  search={{}}
+                >
+                  <bdi>{plan.name}</bdi>
+                </Link>
+              ) : (
+                <h2>
+                  <bdi>{plan.name}</bdi>
+                </h2>
+              )}
+              <p dir="auto">{plan.description}</p>
+              <p>
+                {t(plan.isActive ? "active" : "inactive")} ·{" "}
+                {t(plan.isPublic ? "public" : "private")}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </QueryPanel>
+      {creating && <CatalogueEditor target={{ kind: "plan" }} close={() => setCreating(false)} />}
     </div>
   );
 }
