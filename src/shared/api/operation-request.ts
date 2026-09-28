@@ -27,6 +27,8 @@ export class OperationRefusal extends Error {
   readonly key: string;
   readonly code?: RefusalCode;
   readonly mode?: RefusalMode;
+  /** Bounded timing from a validated diagnostic rate-limit envelope. */
+  readonly retryAfterSeconds?: number;
   /** Field names the validated problem declared invalid; never the backend's message text. */
   readonly invalidParams: readonly string[];
 
@@ -41,12 +43,14 @@ export class OperationRefusal extends Error {
         code: z.enum(generatedRefusalCodes).optional(),
         mode: z.enum(generatedRefusalModes).optional(),
         invalidParams: z.array(z.string()).optional(),
+        retryAfterSeconds: z.number().int().min(1).max(600).optional(),
       })
       .safeParse(validatedProblem);
     this.invalidParams = metadata.success ? (metadata.data.invalidParams ?? []) : [];
     if (metadata.success) {
       this.code = metadata.data.code;
       this.mode = metadata.data.mode;
+      this.retryAfterSeconds = metadata.data.retryAfterSeconds;
     }
   }
 }

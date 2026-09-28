@@ -10,6 +10,7 @@ export const auditEnumFields: readonly string[] = [
   "afterStatus",
   "beforeStatus",
   "effectiveMode",
+  "locale",
   "mode",
   "operation",
   "previousMode",

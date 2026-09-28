@@ -1,6 +1,6 @@
 # S11: Platform Access Sessions and delegated support workspace
 
-Implements [issue 93](https://github.com/Edara-Solutions/HRMS-UI/issues/93) on `refactor/split-tier-users`. This remains an internal migration stage; deployment waits for S12's removal and reachability gate. The Company diagnostic sub-journey stays absent: backend issue 290 has not published a dedicated contract, so there is no preview/test-send control, placeholder or fallback request ([issue 95](https://github.com/Edara-Solutions/HRMS-UI/issues/95)).
+Implements [Platform Access Sessions and delegated support workspace](https://github.com/Edara-Solutions/HRMS-UI/issues/93) on `refactor/split-tier-users`. Its original 19 delegated operations are now extended by [bounded Company email diagnostics](company-email-diagnostics.md), using four dedicated operations from the accepted, published backend runtime. S12 records the existing-contract removal gate; the diagnostic extension records its own contract, reachability and acceptance evidence.
 
 ## Operation ownership
 

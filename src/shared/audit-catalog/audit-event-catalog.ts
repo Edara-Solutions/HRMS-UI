@@ -658,6 +658,17 @@ export const auditEventCatalog: readonly AuditEventMetadata[] = [
     audience: "PLATFORM",
   },
   {
+    eventType: "platform.company_email_diagnostic.accepted",
+    description:
+      "A Platform operator accepted a synthetic Company email diagnostic to their registered mailbox.",
+    lifecycle: "ACTIVE",
+    outcomePolicy: "SUCCESS_ONLY",
+    personalData: "none",
+    actors: ["PLATFORM_USER"],
+    scope: "COMPANY",
+    audience: "PLATFORM",
+  },
+  {
     eventType: "platform.role.assigned",
     description: "A Platform role was assigned to another operator.",
     lifecycle: "ACTIVE",

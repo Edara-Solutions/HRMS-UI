@@ -249,14 +249,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     ]),
   );
   if (
-    operations.length !== 209 ||
+    operations.length !== 213 ||
     counts.company !== 72 ||
     counts.platform !== 116 ||
-    counts.delegated !== 19 ||
+    counts.delegated !== 23 ||
     counts.public !== 2
   )
     throw new Error(`Unexpected audience inventory: ${JSON.stringify(counts)}`);
   console.log(
-    "Exact operation ledger passed: 72 Company, 116 Platform, 19 delegated, 1 public UI, 1 headless health.",
+    "Exact operation ledger passed: 72 Company, 116 Platform, 23 delegated, 1 public UI, 1 headless health.",
   );
 }

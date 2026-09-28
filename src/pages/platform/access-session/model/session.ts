@@ -27,7 +27,13 @@ export const areaReadOperation: Record<WorkspaceArea, keyof Delegated> = {
 
 export const areaAlternativeReads: Partial<Record<WorkspaceArea, readonly (keyof Delegated)[]>> = {
   profile: ["setup"],
-  email: ["emailReadiness", "templateAssignments", "sendingDomain"],
+  email: [
+    "emailReadiness",
+    "templateAssignments",
+    "sendingDomain",
+    "diagnosticTypes",
+    "diagnosticResult",
+  ],
 };
 
 export const workspaceSearchSchema = z.object({

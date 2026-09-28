@@ -96,6 +96,7 @@ export const requestSchema = z
               z.literal("platform.user.deleted"),
               z.literal("platform.user.password-reset-forced"),
               z.literal("platform.user.sessions-revoked"),
+              z.literal("platform.company_email_diagnostic.accepted"),
               z.literal("platform.access_session.opened"),
               z.literal("platform.access_session.closed"),
             ]),
@@ -5129,6 +5130,80 @@ export const responseSchemas = {
                 .object({
                   sessionPublicId: z.union([z.string(), z.null()]),
                   revoked: z.number().int(),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.company_email_diagnostic.accepted"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("COMPANY"),
+              companyPublicId: z.string().uuid(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessSessionPublicId: z.string().uuid(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                  emailTypeKey: z.string().min(1).max(120),
+                  locale: z.union([z.literal("en"), z.literal("ar")]),
+                  requestId: z.string().uuid(),
+                  deliveryPublicId: z.string().uuid(),
                 })
                 .strict(),
               recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),

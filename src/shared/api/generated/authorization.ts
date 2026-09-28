@@ -456,6 +456,27 @@ export const operationAuthorization = {
     authorization: "D",
     permission: "delegation:sending-domains:read",
   },
+  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types": {
+    audience: "delegated",
+    authorization: "D",
+    permission: "delegation:email-diagnostics:preview",
+  },
+  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview": {
+    audience: "delegated",
+    authorization: "D",
+    permission: "delegation:email-diagnostics:preview",
+  },
+  "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends": {
+    audience: "delegated",
+    authorization: "D",
+    permission: "delegation:email-diagnostics:test-send",
+  },
+  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends/{requestId}":
+    {
+      audience: "delegated",
+      authorization: "D",
+      permission: "delegation:email-diagnostics:test-send",
+    },
   "POST /api/v1/platform/auth/login": {
     audience: "platform",
     authorization: "PUBLIC",
@@ -1052,7 +1073,14 @@ export type OperationPermission = Exclude<
   (typeof operationAuthorization)[OperationKey]["permission"],
   null
 >;
-export const generatedRefusalCodes = ["COMPANY_ACCESS_DENIED"] as const;
+export const generatedRefusalCodes = [
+  "ACCESS_SESSION_INACTIVE",
+  "COMPANY_ACCESS_DENIED",
+  "DIAGNOSTIC_RATE_LIMITED",
+  "DIAGNOSTIC_REQUEST_CONFLICT",
+  "EMAIL_DIAGNOSTIC_NOT_READY",
+  "PERMISSION_DENIED",
+] as const;
 export type RefusalCode = (typeof generatedRefusalCodes)[number];
 export const generatedRefusalModes = [
   "BLOCKED",

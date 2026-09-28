@@ -287,6 +287,21 @@
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
   },
   {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends/{requestId}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
     "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness",
     "audience": "delegated",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
@@ -827,6 +842,11 @@
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close",
     "audience": "platform",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
   },
   {
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",

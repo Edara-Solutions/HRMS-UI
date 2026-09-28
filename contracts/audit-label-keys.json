@@ -53,6 +53,7 @@
     "lead.lifecycle.updated",
     "platform.access_session.closed",
     "platform.access_session.opened",
+    "platform.company_email_diagnostic.accepted",
     "platform.role.assigned",
     "platform.role.created",
     "platform.role.deleted",
@@ -99,6 +100,7 @@
     "field.companySizeRange",
     "field.context",
     "field.country",
+    "field.deliveryPublicId",
     "field.effectiveFrom",
     "field.effectiveMode",
     "field.effectiveUntil",
@@ -117,6 +119,7 @@
     "field.isPrimary",
     "field.isRequired",
     "field.lifecycleStatus",
+    "field.locale",
     "field.mode",
     "field.name",
     "field.note",
@@ -133,6 +136,7 @@
     "field.rejoined",
     "field.removedActions",
     "field.replacementContactPublicId",
+    "field.requestId",
     "field.revoked",
     "field.roleName",
     "field.rolePublicIds",
@@ -167,6 +171,10 @@
       "MAINTENANCE",
       "NORMAL",
       "READ_ONLY"
+    ],
+    "locale": [
+      "ar",
+      "en"
     ],
     "mode": [
       "BLOCKED",

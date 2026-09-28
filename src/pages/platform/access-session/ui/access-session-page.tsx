@@ -7,6 +7,7 @@ import {
   OperationRefusal,
   platformCompanyOperations,
 } from "@/shared/api";
+import { usePlatformSession } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -37,6 +38,26 @@ interface AccessSessionPageProps {
 }
 
 export function AccessSessionPage({ sessionPublicId, search }: AccessSessionPageProps) {
+  const generation = usePlatformSession((state) => state.generation);
+  const authority = usePlatformSession((state) =>
+    [
+      "delegation:open",
+      "delegation:email-diagnostics:preview",
+      "delegation:email-diagnostics:test-send",
+    ]
+      .map((permission) => (state.session?.user.permissions.includes(permission) ? "1" : "0"))
+      .join(""),
+  );
+  return (
+    <ScopedAccessSessionPage
+      key={`${generation}:${sessionPublicId}:${authority}`}
+      sessionPublicId={sessionPublicId}
+      search={search}
+    />
+  );
+}
+
+function ScopedAccessSessionPage({ sessionPublicId, search }: AccessSessionPageProps) {
   const { t } = useTranslation("platform-access-session");
   const workspace = useAccessSessionWorkspace(sessionPublicId);
   const { session, sessionError: error } = workspace;
@@ -80,7 +101,10 @@ export function AccessSessionPage({ sessionPublicId, search }: AccessSessionPage
       </div>
     );
 
-  const companyName = company?.name ?? profile?.name ?? t("companyFallback");
+  const companyName =
+    workspace.state === "open"
+      ? (company?.name ?? profile?.name ?? t("companyFallback"))
+      : t("companyFallback");
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">

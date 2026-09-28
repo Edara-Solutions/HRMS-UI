@@ -4,6 +4,12 @@ import arCompanies from "../../public/locales/ar/platform-companies.json" with {
 import en from "../../public/locales/en/platform-access-session.json" with { type: "json" };
 import enCompanies from "../../public/locales/en/platform-companies.json" with { type: "json" };
 import { companySessionFixture, platformSessionFixture } from "../../src/test/audience-fixtures";
+import {
+  diagnosticCatalogueBody,
+  diagnosticPreviewBody,
+  diagnosticReceiptBody,
+  diagnosticsPermissions,
+} from "../../src/test/email-diagnostics-fixtures";
 import { problemBody } from "../../src/test/operation-fakes";
 import {
   accessSessionBody,
@@ -36,9 +42,23 @@ async function open(
   page: Page,
   arabic: boolean,
   overrides: Record<string, (route: Route) => Promise<void>> = {},
+  diagnosticMode?:
+    | "normal"
+    | "unknown"
+    | "limited"
+    | "inactive"
+    | "permission"
+    | "notReady"
+    | "conflict"
+    | "unprocessable"
+    | "contract",
 ) {
   const session = platformSessionFixture({
-    permissions: [...companyPermissions, ...everyDelegatedPermission],
+    permissions: [
+      ...companyPermissions,
+      ...everyDelegatedPermission,
+      ...(diagnosticMode ? diagnosticsPermissions : []),
+    ],
   });
   const company = companySessionFixture();
   await page.setViewportSize(arabic ? { width: 390, height: 844 } : { width: 1280, height: 900 });
@@ -73,6 +93,7 @@ async function open(
     { session, company, arabic },
   );
   let closed = false;
+  let diagnosticAttempts = 0;
   const requests: Request[] = [];
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
@@ -104,6 +125,65 @@ async function open(
     if (key === "POST /api/v1/platform/access-sessions")
       return route.fulfill({ status: 201, json: accessSessionBody() });
     const root = `/api/v1/platform/access-sessions/${ids.session}`;
+    const diagnosticRoot = `${root}/email-diagnostics`;
+    if (path === `${diagnosticRoot}/types`)
+      return route.fulfill({ json: diagnosticCatalogueBody() });
+    if (path.endsWith("/preview") && path.startsWith(diagnosticRoot))
+      return route.fulfill({
+        json: diagnosticPreviewBody(new URL(request.url()).searchParams.get("locale") ?? "en"),
+      });
+    if (path === `${diagnosticRoot}/test-sends`) {
+      diagnosticAttempts += 1;
+      const body = JSON.parse(request.postData() ?? "{}");
+      if (diagnosticMode === "unknown" && diagnosticAttempts === 1)
+        return route.fulfill({ status: 500, json: problemBody(500) });
+      if (diagnosticMode === "limited")
+        return route.fulfill({
+          status: 429,
+          json: problemBody(429, { code: "DIAGNOSTIC_RATE_LIMITED", retryAfterSeconds: 2 }),
+        });
+      if (diagnosticMode === "inactive" || diagnosticMode === "permission")
+        return route.fulfill({
+          status: 403,
+          json: problemBody(403, {
+            code: diagnosticMode === "inactive" ? "ACCESS_SESSION_INACTIVE" : "PERMISSION_DENIED",
+          }),
+        });
+      if (diagnosticMode === "notReady" || diagnosticMode === "conflict")
+        return route.fulfill({
+          status: 409,
+          json: problemBody(409, {
+            code:
+              diagnosticMode === "notReady"
+                ? "EMAIL_DIAGNOSTIC_NOT_READY"
+                : "DIAGNOSTIC_REQUEST_CONFLICT",
+          }),
+        });
+      if (diagnosticMode === "unprocessable")
+        return route.fulfill({ status: 422, json: problemBody(422) });
+      return route.fulfill({
+        status: 202,
+        json: diagnosticReceiptBody(body.requestId, {
+          emailTypeKey: body.emailTypeKey,
+          locale: body.locale,
+          ...(diagnosticMode === "contract" ? { recipient: "recipient-canary" } : {}),
+        }),
+      });
+    }
+    if (path.startsWith(`${diagnosticRoot}/test-sends/`)) {
+      if (diagnosticMode === "unknown" && diagnosticAttempts === 1)
+        return route.fulfill({ status: 404, json: problemBody(404) });
+      const command = requests.findLast(
+        (item) => item.key === `POST ${diagnosticRoot}/test-sends`,
+      )?.body;
+      const locale =
+        typeof command === "object" && command !== null && "locale" in command
+          ? command.locale
+          : "en";
+      return route.fulfill({
+        json: diagnosticReceiptBody(path.split("/").at(-1) ?? "", { locale, status: "SENT" }),
+      });
+    }
     if (path === root) return route.fulfill({ json: closed ? closedBody() : accessSessionBody() });
     if (path === `${root}/close`) {
       closed = true;
@@ -219,3 +299,194 @@ test("conceals a foreign session and rejects a malformed identifier", async ({ p
   expect(requests.some((request) => request.key.includes("/users"))).toBe(false);
   await expect(page.locator("body")).not.toContainText("canary");
 });
+
+for (const theme of ["light", "dark"] as const) {
+  test(`Company diagnostic journey is isolated and accessible in ${theme}`, async ({
+    page,
+  }, info) => {
+    const arabic = info.project.name === "chromium-rtl";
+    const copy = arabic ? ar : en;
+    const { requests } = await open(page, arabic, {}, "normal");
+    await page.addInitScript((theme) => {
+      const stored = JSON.parse(localStorage.getItem("hrms-preferences:v2") ?? "{}");
+      stored.state.theme = theme;
+      localStorage.setItem("hrms-preferences:v2", JSON.stringify(stored));
+    }, theme);
+    const escapes: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("diagnostic-canary.invalid")) escapes.push(request.url());
+    });
+    await page.goto(`/platform/access-sessions/${ids.session}?area=email`);
+    await expect(page.locator("html")).toHaveAttribute("dir", arabic ? "rtl" : "ltr");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    const frame = page.frameLocator(`iframe[title="${copy["diagnostics.frame"]}"]`);
+    await expect(frame.getByRole("heading", { name: "Company sample" })).toBeVisible();
+    await frame.getByText("Inert invitation link").click();
+    expect(await page.evaluate(() => "__diagnosticEscape" in window)).toBe(false);
+    expect(escapes).toEqual([]);
+    await expect(page).toHaveURL(
+      new RegExp(`/platform/access-sessions/${ids.session}\\?area=email$`),
+    );
+    await expect(frame.locator("script, iframe, form, a[href], img[src^='https:']")).toHaveCount(0);
+    await expect(page.locator(`iframe[title="${copy["diagnostics.frame"]}"]`)).toHaveAttribute(
+      "sandbox",
+      "",
+    );
+    const trigger = page.getByRole("button", { name: copy["diagnostics.send"], exact: true });
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeFocused();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(
+      dialog.getByRole("button", { name: copy["diagnostics.confirm"], exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    expect(
+      requests.filter(
+        (item) => item.key.includes("POST") && item.key.includes("email-diagnostics"),
+      ),
+    ).toHaveLength(0);
+    await trigger.click();
+    await dialog.getByRole("button", { name: copy["diagnostics.confirm"], exact: true }).click();
+    await expect(page.getByText(copy["diagnostics.status.QUEUED"], { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: copy["diagnostics.check"], exact: true }).click();
+    await expect(page.getByText(copy["diagnostics.status.SENT"], { exact: true })).toBeVisible();
+    const sends = requests.filter(
+      (item) => item.key.startsWith("POST") && item.key.includes("email-diagnostics"),
+    );
+    expect(sends).toHaveLength(1);
+    expect(sends[0].body).toEqual({
+      requestId: expect.stringMatching(/^[0-9a-f-]{36}$/),
+      emailTypeKey: "employee-invitation",
+      locale: arabic ? "ar" : "en",
+    });
+    expect(
+      requests
+        .filter((item) => item.key.includes("email-diagnostics"))
+        .every((item) => item.authorization === "Bearer access-canary"),
+    ).toBe(true);
+    expect(requests.some((item) => item.key.includes("/company/"))).toBe(false);
+    await noOverflow(page);
+    await page.evaluate(() => {
+      for (const element of document.querySelectorAll("*")) element.scrollTop = 0;
+    });
+    await expect(
+      page.getByRole("heading", { name: copy["diagnostics.title"], exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `test-results/diagnostics-${arabic ? "ar" : "en"}-${theme}.png`,
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: arabic ? 1280 : 390, height: 900 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await noOverflow(page);
+    await page.evaluate(() => {
+      for (const element of document.querySelectorAll("*")) element.scrollTop = 0;
+    });
+    await page.screenshot({
+      path: `test-results/diagnostics-zoom-${arabic ? "ar" : "en"}-${theme}.png`,
+      fullPage: true,
+    });
+    await expect(page.locator("body")).not.toContainText("canary");
+  });
+}
+
+test("Company diagnostic unknown acceptance retains the command across support tabs and confirmed replay", async ({
+  page,
+}, info) => {
+  const arabic = info.project.name === "chromium-rtl";
+  const copy = arabic ? ar : en;
+  const { requests } = await open(page, arabic, {}, "unknown");
+  await page.goto(`/platform/access-sessions/${ids.session}?area=email`);
+  await page.getByRole("button", { name: copy["diagnostics.send"], exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: copy["diagnostics.confirm"], exact: true })
+    .click();
+  await expect(page.getByText(copy["diagnostics.outcome.unknown"], { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: copy["diagnostics.send"], exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: copy["diagnostics.replay"], exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("tab", { name: copy["area.roles"], exact: true }).click();
+  await page.getByRole("tab", { name: copy["area.email"], exact: true }).click();
+  await expect(page.getByText(copy["diagnostics.outcome.unknown"], { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: copy["diagnostics.check"], exact: true }).click();
+  await expect(page.getByText(copy["diagnostics.outcome.notFound"], { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: copy["diagnostics.replay"], exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: copy["diagnostics.confirm"], exact: true })
+    .click();
+  await expect(page.getByText(copy["diagnostics.status.QUEUED"], { exact: true })).toBeVisible();
+  const sends = requests.filter(
+    (item) => item.key.startsWith("POST") && item.key.includes("email-diagnostics"),
+  );
+  expect(sends).toHaveLength(2);
+  expect(sends[0].body).toEqual(sends[1].body);
+});
+
+for (const fault of [
+  "inactive",
+  "permission",
+  "notReady",
+  "conflict",
+  "unprocessable",
+  "contract",
+  "limited",
+] as const) {
+  test(`Company diagnostic ${fault} is safe and never auto-retries`, async ({ page }, info) => {
+    const arabic = info.project.name === "chromium-rtl";
+    const copy = arabic ? ar : en;
+    const { requests } = await open(page, arabic, {}, fault);
+    await page.goto(`/platform/access-sessions/${ids.session}?area=email`);
+    await page.getByRole("button", { name: copy["diagnostics.send"], exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: copy["diagnostics.confirm"], exact: true })
+      .click();
+    if (fault === "inactive" || fault === "permission") {
+      await expect(
+        page.getByText(
+          copy[fault === "inactive" ? "ended.inactive.title" : "ended.ineligible.title"],
+          { exact: true },
+        ),
+      ).toBeVisible();
+      await expect(page.locator("iframe")).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: copy["diagnostics.send"], exact: true }),
+      ).toHaveCount(0);
+    } else if (fault === "limited") {
+      await expect(
+        page.getByText(copy["diagnostics.outcome.limited"].replace("{{seconds}}", "2"), {
+          exact: true,
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: copy["diagnostics.replay"], exact: true }),
+      ).toBeVisible({ timeout: 6000 });
+    } else {
+      await expect(
+        page.getByText(copy[`diagnostics.outcome.${fault}`], { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: copy["diagnostics.send"], exact: true }),
+      ).toHaveCount(0);
+    }
+    expect(
+      requests.filter(
+        (item) => item.key.startsWith("POST") && item.key.includes("email-diagnostics"),
+      ),
+    ).toHaveLength(1);
+    await expect(page.locator("body")).not.toContainText("canary");
+    await noOverflow(page);
+  });
+}

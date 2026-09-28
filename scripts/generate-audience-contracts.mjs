@@ -69,8 +69,8 @@ for (const [audience, documentPath] of Object.entries(documents)) {
       for (const [status, response] of Object.entries(operation.responses ?? {})) {
         if (!/^[45]\d\d$/.test(status)) continue;
         const problem = resolveSchema(response.content?.["application/json"]?.schema, document);
-        for (const code of enumValues(problem.properties?.code, document)) refusalCodes.add(code);
-        for (const mode of enumValues(problem.properties?.mode, document)) refusalModes.add(mode);
+        for (const code of problemEnumValues(problem, "code", document)) refusalCodes.add(code);
+        for (const mode of problemEnumValues(problem, "mode", document)) refusalModes.add(mode);
       }
     }
   }
@@ -88,6 +88,16 @@ function enumValues(schema, document) {
   return [
     ...(resolved.enum ?? []).filter((value) => typeof value === "string"),
     ...(resolved.anyOf ?? resolved.oneOf ?? []).flatMap((variant) => enumValues(variant, document)),
+  ];
+}
+
+function problemEnumValues(schema, field, document) {
+  const problem = resolveSchema(schema, document);
+  return [
+    ...enumValues(problem.properties?.[field], document),
+    ...[...(problem.anyOf ?? []), ...(problem.oneOf ?? []), ...(problem.allOf ?? [])].flatMap(
+      (variant) => problemEnumValues(variant, field, document),
+    ),
   ];
 }
 
