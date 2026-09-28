@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ContractViolation,
   OperationRefusal,
@@ -25,35 +25,32 @@ export function useEmailDiagnostics(
   const generation = usePlatformSession((state) => state.generation);
   const sendAllowed =
     open && access.delegatedAvailability(operations.diagnosticSend.key, "live").state === "enabled";
-  const authorityVersion = useRef(0);
   const [state, setState] = useState<DiagnosticState>({ phase: "idle" });
   const [checking, setChecking] = useState(false);
   const lock = useRef(false);
   const mounted = useRef(true);
   const readController = useRef<AbortController | undefined>(undefined);
   const live = useRef(open);
-  live.current = open;
+  useLayoutEffect(() => {
+    live.current = open;
+  }, [open]);
   useEffect(() => {
     if (!sendAllowed) {
-      authorityVersion.current += 1;
       readController.current?.abort();
-      setState({ phase: "idle" });
-      setChecking(false);
     }
   }, [sendAllowed]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
       readController.current?.abort();
     };
   }, []);
-  const current = (version: number) => {
+  const current = () => {
     const identity = usePlatformSession.getState();
     return (
       mounted.current &&
       live.current &&
-      authorityVersion.current === version &&
       session !== undefined &&
       sessionLiveness(session, Date.now()) === "live" &&
       identity.generation === generation &&
@@ -93,7 +90,6 @@ export function useEmailDiagnostics(
     )
       return;
     lock.current = true;
-    const version = authorityVersion.current;
     const command = state.command;
     setState({ phase: "pending", command });
     try {
@@ -105,9 +101,9 @@ export function useEmailDiagnostics(
           phase: "response",
           status: 202,
         });
-      if (current(version)) setState({ phase: "accepted", command, receipt });
+      if (current()) setState({ phase: "accepted", command, receipt });
     } catch (error) {
-      if (current(version)) {
+      if (current()) {
         const failure = diagnosticFailure(error, command, Date.now());
         setState({ ...failure, sendUnavailable: failure.phase === "contract" ? true : undefined });
         await reconcile(error);
@@ -128,7 +124,6 @@ export function useEmailDiagnostics(
     )
       return;
     lock.current = true;
-    const version = authorityVersion.current;
     setChecking(true);
     const command = state.command;
     const controller = new AbortController();
@@ -142,7 +137,7 @@ export function useEmailDiagnostics(
           phase: "response",
           status: 200,
         });
-      if (current(version))
+      if (current())
         setState({
           phase: "accepted",
           command,
@@ -151,7 +146,7 @@ export function useEmailDiagnostics(
           message: state.sendUnavailable ? "contract" : undefined,
         });
     } catch (error) {
-      if (current(version)) {
+      if (current()) {
         if (error instanceof OperationRefusal && error.status === 404)
           setState({
             phase: "unknown",
@@ -182,13 +177,14 @@ export function useEmailDiagnostics(
       }
     } finally {
       lock.current = false;
-      if (current(version)) setChecking(false);
+      if (current()) setChecking(false);
     }
   }
 
+  const visibleState: DiagnosticState = sendAllowed ? state : { phase: "idle" };
   return {
-    state,
-    checking,
+    state: visibleState,
+    checking: sendAllowed && checking,
     prepare,
     confirm,
     check,

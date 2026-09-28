@@ -12,6 +12,8 @@ import { Label } from "@/shared/ui/label";
 import { QueryPanel } from "@/shared/ui/query-panel";
 import { diagnosticQueries } from "../api/email-diagnostics";
 import {
+  type DiagnosticReceipt,
+  type DiagnosticState,
   type DiagnosticType,
   diagnosticTypes,
   isDiagnosticType,
@@ -216,6 +218,18 @@ interface DeliveryProps extends PreviewProps {
   supported: boolean;
 }
 
+function deliveryProjection(state: DiagnosticState, now: number) {
+  return {
+    remaining: Math.max(0, Math.ceil(((state.retryAt ?? 0) - now) / 1000)),
+    newAllowed:
+      !state.sendUnavailable && ["idle", "accepted", "confirming", "pending"].includes(state.phase),
+    checkAllowed:
+      !state.resultUnavailable &&
+      ["unknown", "accepted", "conflict", "contract"].includes(state.phase),
+    replayAllowed: replayAllowed(state, now),
+  };
+}
+
 function DiagnosticDelivery({ workspace, type, locale, supported }: DeliveryProps) {
   const { t } = useTranslation("platform-access-session");
   const command = workspace.diagnostics;
@@ -227,11 +241,9 @@ function DiagnosticDelivery({ workspace, type, locale, supported }: DeliveryProp
     [state.message, state.phase, checking],
   );
   const now = useRetryClock(state.retryAt);
-  const remaining = Math.max(0, Math.ceil(((state.retryAt ?? 0) - now) / 1000));
+  const view = deliveryProjection(state, now);
+  const { remaining } = view;
   const mailbox = workspace.access.user?.email ?? "";
-  const newAllowed =
-    !state.sendUnavailable && ["idle", "accepted", "confirming", "pending"].includes(state.phase);
-  const frozenType = state.command?.emailTypeKey;
   return (
     <div className="space-y-3">
       <p className="break-words text-sm">
@@ -248,16 +260,9 @@ function DiagnosticDelivery({ workspace, type, locale, supported }: DeliveryProp
           {t(`diagnostics.outcome.${state.message}`, { seconds: remaining })}
         </p>
       )}
-      {state.receipt && (
-        <output className="block space-y-2 text-sm">
-          <Badge variant={state.receipt.status === "SENT" ? "success" : "default"}>
-            {t(`diagnostics.status.${state.receipt.status}`)}
-          </Badge>
-          <p>{t("diagnostics.evidence")}</p>
-        </output>
-      )}
+      {state.receipt && <DiagnosticResult receipt={state.receipt} />}
       <div className="flex flex-wrap gap-2">
-        {newAllowed && (
+        {view.newAllowed && (
           <Button
             intent="action"
             disabled={!supported || checking || remaining > 0 || state.phase === "pending"}
@@ -266,42 +271,63 @@ function DiagnosticDelivery({ workspace, type, locale, supported }: DeliveryProp
             {t("diagnostics.send")}
           </Button>
         )}
-        {!state.resultUnavailable &&
-          ["unknown", "accepted", "conflict", "contract"].includes(state.phase) && (
-            <Button
-              intent="action"
-              disabled={checking || remaining > 0}
-              isLoading={checking}
-              onClick={() => void command.check()}
-            >
-              {t("diagnostics.check")}
-            </Button>
-          )}
-        {replayAllowed(state, now) && (
+        {view.checkAllowed && (
+          <Button
+            intent="action"
+            disabled={checking || remaining > 0}
+            isLoading={checking}
+            onClick={() => void command.check()}
+          >
+            {t("diagnostics.check")}
+          </Button>
+        )}
+        {view.replayAllowed && (
           <Button intent="action" disabled={checking} onClick={command.replay}>
             {t("diagnostics.replay")}
           </Button>
         )}
         {state.phase === "pending" && <p role="status">{t("diagnostics.pending")}</p>}
       </div>
-      <ConfirmDialog
-        open={state.phase === "confirming" || state.phase === "pending"}
-        isLoading={state.phase === "pending"}
-        tone="consequential"
-        title={t("diagnostics.confirmTitle")}
-        description={t("diagnostics.confirmDescription", {
-          type: isDiagnosticType(frozenType ?? "")
-            ? t(`diagnostics.types.${frozenType}`)
-            : t("diagnostics.unavailable"),
-          locale: t(`email.locale.${state.command?.locale ?? locale}`),
-          mailbox,
-        })}
-        confirmLabel={t("diagnostics.confirm")}
-        cancelLabel={t("cancel")}
-        confirmDisabled={!mailbox}
-        onConfirm={() => void command.confirm()}
-        onClose={command.cancel}
-      />
+      <DiagnosticConfirmation workspace={workspace} locale={locale} />
     </div>
+  );
+}
+
+function DiagnosticResult({ receipt }: { receipt: DiagnosticReceipt }) {
+  const { t } = useTranslation("platform-access-session");
+  return (
+    <output className="block space-y-2 text-sm">
+      <Badge variant={receipt.status === "SENT" ? "success" : "default"}>
+        {t(`diagnostics.status.${receipt.status}`)}
+      </Badge>
+      <p>{t("diagnostics.evidence")}</p>
+    </output>
+  );
+}
+
+function DiagnosticConfirmation({ workspace, locale }: Props & { locale: "en" | "ar" }) {
+  const { t } = useTranslation("platform-access-session");
+  const command = workspace.diagnostics;
+  const { state } = command;
+  const key = state.command?.emailTypeKey;
+  const type = key && isDiagnosticType(key) ? key : undefined;
+  const mailbox = workspace.access.user?.email ?? "";
+  return (
+    <ConfirmDialog
+      open={state.phase === "confirming" || state.phase === "pending"}
+      isLoading={state.phase === "pending"}
+      tone="consequential"
+      title={t("diagnostics.confirmTitle")}
+      description={t("diagnostics.confirmDescription", {
+        type: type ? t(`diagnostics.types.${type}`) : t("diagnostics.unavailable"),
+        locale: t(`email.locale.${state.command?.locale ?? locale}`),
+        mailbox,
+      })}
+      confirmLabel={t("diagnostics.confirm")}
+      cancelLabel={t("cancel")}
+      confirmDisabled={!mailbox}
+      onConfirm={() => void command.confirm()}
+      onClose={command.cancel}
+    />
   );
 }
