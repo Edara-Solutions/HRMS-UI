@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { auditNamespace } from "@/features/audit-filters";
 import { cn } from "@/shared/lib/cn";
+import { PageLink as Link } from "@/shared/lib/page-navigation";
 import { TruncatedText } from "@/shared/ui/truncated-text";
 import type { AuditTargetDestination, AuditTargetPresentation } from "../model/audit-identity";
 
@@ -28,20 +28,20 @@ function TargetLink({
   children: ReactNode;
 }) {
   switch (target.destination) {
-    case "admin-company":
+    case "platform-company":
       return (
         <Link
-          to="/admin/companies/$publicId"
+          to="/platform/companies/$publicId"
           params={{ publicId: target.publicId }}
           className={linkClassName}
         >
           {children}
         </Link>
       );
-    case "admin-lead":
+    case "platform-lead":
       return (
         <Link
-          to="/admin/leads/$publicId"
+          to="/platform/leads/$publicId"
           params={{ publicId: target.publicId }}
           className={linkClassName}
         >

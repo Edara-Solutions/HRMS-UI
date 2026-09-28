@@ -17,6 +17,7 @@ concurrency:
 
 env:
   BUN_VERSION: 1.3.14
+  VITE_ENABLE_PLATFORM_PORTAL: "true"
 
 jobs:
   quality:
@@ -41,6 +42,9 @@ jobs:
       - name: Drift-guard generated OpenAPI artifacts
         run: bun run openapi:check
 
+      - name: Retired surface and exact operation ownership gate
+        run: bun run contract:check
+
       - name: Typecheck
         run: bun run typecheck
 
@@ -53,6 +57,9 @@ jobs:
       - name: Production build
         run: bun run build
 
+      - name: Verify production audience boundaries
+        run: bun scripts/check-audience-boundaries.mjs
+
       - name: Upload production artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
@@ -63,7 +70,6 @@ jobs:
           retention-days: 14
 
   e2e:
-    if: ${{ false }} # Temporarily disabled: covered by the local release gate.
     name: Playwright E2E
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -88,6 +94,11 @@ jobs:
 
       - name: Run E2E tests
         run: bun run test:e2e
+
+      - name: Verify disabled Platform concealment
+        run: bun run test:e2e platform-disabled.spec.ts
+        env:
+          VITE_ENABLE_PLATFORM_PORTAL: "false"
 
       - name: Upload Playwright report
         if: failure()

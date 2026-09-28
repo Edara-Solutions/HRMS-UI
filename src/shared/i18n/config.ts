@@ -15,7 +15,25 @@ void i18next
     fallbackLng: defaultLocale,
     supportedLngs: supportedLocales,
     defaultNS: "common",
-    ns: ["common", "auth", "audit", "notification"],
+    ns: [
+      "common",
+      "auth",
+      "audit",
+      "notification",
+      "organization",
+      "people",
+      "communications",
+      "platform-people",
+      "platform-companies",
+      "platform-leads",
+      "platform-plans",
+      "platform-announcements",
+      "platform-emails",
+      "platform-email-deliveries",
+      "platform-email-sending",
+      "platform-notifications",
+      "platform-access-session",
+    ],
     // Every namespace here keys resources flat. Audit labels are keyed by the event type
     // itself, whose dots would otherwise read as a nested lookup — so a missing label
     // renders as `auth.session.started` rather than resolving to nothing.

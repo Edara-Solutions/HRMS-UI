@@ -1,0 +1,889 @@
+{
+  "commit": "d96d4916aec1cc04f1a7215db50e1772432aef2d",
+  "ref": "refactor/split-tier-users",
+  "generatorVersion": 1,
+  "contracts": {
+    "internal": {
+      "file": "contracts/openapi.json",
+      "sha256": "a96127d4add2ba8662d3babad368ff40a5638474ac2ef21c8df3ad80bafdc909"
+    },
+    "company": {
+      "file": "contracts/openapi.company.json",
+      "sha256": "fe9f5f192ce9feb04065933eccdfa75eba199f51699af01ce27bcc80c738f563"
+    },
+    "delegated": {
+      "file": "contracts/openapi.delegated.json",
+      "sha256": "00e46d0e2f96ebf1f37bfc3886e8b6916915e37b2f7eb8c479184e6950f16311"
+    },
+    "platform": {
+      "file": "contracts/openapi.platform.json",
+      "sha256": "cc4759bcf9069c80d9eed4c8749c112db67503c3a1569b0cae7beba8fde5e3be"
+    },
+    "public": {
+      "file": "contracts/openapi.public.json",
+      "sha256": "d2832a1c7a26cd8e53d920b6813b4d8575bc751b29b0e5b559677ff8eaa90062"
+    }
+  },
+  "operations": {
+    "company": [
+      {
+        "file": "delete-api-v1-company-email-template-assignments-emailtypekey.ts",
+        "key": "DELETE /api/v1/company/email-template-assignments/{emailTypeKey}"
+      },
+      {
+        "file": "delete-api-v1-company-me-sessions-sessionid.ts",
+        "key": "DELETE /api/v1/company/me/sessions/{sessionId}"
+      },
+      {
+        "file": "delete-api-v1-company-roles-publicid.ts",
+        "key": "DELETE /api/v1/company/roles/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-company-users-publicid.ts",
+        "key": "DELETE /api/v1/company/users/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-company-users-publicid-role.ts",
+        "key": "DELETE /api/v1/company/users/{publicId}/role"
+      },
+      {
+        "file": "delete-api-v1-company-users-publicid-sessions-sessionpublicid.ts",
+        "key": "DELETE /api/v1/company/users/{publicId}/sessions/{sessionPublicId}"
+      },
+      {
+        "file": "delete-api-v1-company-users-bulk.ts",
+        "key": "DELETE /api/v1/company/users/bulk"
+      },
+      {
+        "file": "get-api-v1-company-access-policy.ts",
+        "key": "GET /api/v1/company/access-policy"
+      },
+      {
+        "file": "get-api-v1-company-activation.ts",
+        "key": "GET /api/v1/company/activation"
+      },
+      {
+        "file": "get-api-v1-company-audit-trail.ts",
+        "key": "GET /api/v1/company/audit-trail"
+      },
+      {
+        "file": "get-api-v1-company-audit-trail-actors.ts",
+        "key": "GET /api/v1/company/audit-trail/actors"
+      },
+      {
+        "file": "get-api-v1-company-email-readiness.ts",
+        "key": "GET /api/v1/company/email-readiness"
+      },
+      {
+        "file": "get-api-v1-company-email-settings.ts",
+        "key": "GET /api/v1/company/email-settings"
+      },
+      {
+        "file": "get-api-v1-company-email-template-assignments.ts",
+        "key": "GET /api/v1/company/email-template-assignments"
+      },
+      {
+        "file": "get-api-v1-company-email-template-assignments-emailtypekey-effective.ts",
+        "key": "GET /api/v1/company/email-template-assignments/{emailTypeKey}/effective"
+      },
+      {
+        "file": "get-api-v1-company-email-types.ts",
+        "key": "GET /api/v1/company/email-types"
+      },
+      {
+        "file": "get-api-v1-company-email-types-key.ts",
+        "key": "GET /api/v1/company/email-types/{key}"
+      },
+      {
+        "file": "get-api-v1-company-email-types-key-preview.ts",
+        "key": "GET /api/v1/company/email-types/{key}/preview"
+      },
+      {
+        "file": "get-api-v1-company-email-types-key-variants.ts",
+        "key": "GET /api/v1/company/email-types/{key}/variants"
+      },
+      {
+        "file": "get-api-v1-company-me.ts",
+        "key": "GET /api/v1/company/me"
+      },
+      {
+        "file": "get-api-v1-company-me-profile.ts",
+        "key": "GET /api/v1/company/me/profile"
+      },
+      {
+        "file": "get-api-v1-company-me-sessions.ts",
+        "key": "GET /api/v1/company/me/sessions"
+      },
+      {
+        "file": "get-api-v1-company-notification-settings.ts",
+        "key": "GET /api/v1/company/notification-settings"
+      },
+      {
+        "file": "get-api-v1-company-notifications.ts",
+        "key": "GET /api/v1/company/notifications"
+      },
+      {
+        "file": "get-api-v1-company-notifications-unread-count.ts",
+        "key": "GET /api/v1/company/notifications/unread-count"
+      },
+      {
+        "file": "get-api-v1-company-permissions.ts",
+        "key": "GET /api/v1/company/permissions"
+      },
+      {
+        "file": "get-api-v1-company-profile.ts",
+        "key": "GET /api/v1/company/profile"
+      },
+      {
+        "file": "get-api-v1-company-registry.ts",
+        "key": "GET /api/v1/company/registry"
+      },
+      {
+        "file": "get-api-v1-company-roles.ts",
+        "key": "GET /api/v1/company/roles"
+      },
+      {
+        "file": "get-api-v1-company-roles-publicid.ts",
+        "key": "GET /api/v1/company/roles/{publicId}"
+      },
+      {
+        "file": "get-api-v1-company-sending-domain.ts",
+        "key": "GET /api/v1/company/sending-domain"
+      },
+      {
+        "file": "get-api-v1-company-sending-domain-readiness.ts",
+        "key": "GET /api/v1/company/sending-domain/readiness"
+      },
+      {
+        "file": "get-api-v1-company-setup.ts",
+        "key": "GET /api/v1/company/setup"
+      },
+      {
+        "file": "get-api-v1-company-subscription.ts",
+        "key": "GET /api/v1/company/subscription"
+      },
+      {
+        "file": "get-api-v1-company-users.ts",
+        "key": "GET /api/v1/company/users"
+      },
+      {
+        "file": "get-api-v1-company-users-publicid.ts",
+        "key": "GET /api/v1/company/users/{publicId}"
+      },
+      {
+        "file": "get-api-v1-company-users-publicid-role.ts",
+        "key": "GET /api/v1/company/users/{publicId}/role"
+      },
+      {
+        "file": "get-api-v1-company-users-publicid-sessions.ts",
+        "key": "GET /api/v1/company/users/{publicId}/sessions"
+      },
+      {
+        "file": "get-api-v1-company-users-generate-code.ts",
+        "key": "GET /api/v1/company/users/generate-code"
+      },
+      {
+        "file": "patch-api-v1-company-me-profile.ts",
+        "key": "PATCH /api/v1/company/me/profile"
+      },
+      {
+        "file": "patch-api-v1-company-profile.ts",
+        "key": "PATCH /api/v1/company/profile"
+      },
+      {
+        "file": "patch-api-v1-company-roles-publicid.ts",
+        "key": "PATCH /api/v1/company/roles/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-company-users-publicid.ts",
+        "key": "PATCH /api/v1/company/users/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-company-users-bulk.ts",
+        "key": "PATCH /api/v1/company/users/bulk"
+      },
+      {
+        "file": "post-api-v1-company-auth-accept-invitation.ts",
+        "key": "POST /api/v1/company/auth/accept-invitation"
+      },
+      {
+        "file": "post-api-v1-company-auth-login.ts",
+        "key": "POST /api/v1/company/auth/login"
+      },
+      {
+        "file": "post-api-v1-company-auth-logout.ts",
+        "key": "POST /api/v1/company/auth/logout"
+      },
+      {
+        "file": "post-api-v1-company-auth-logout-all.ts",
+        "key": "POST /api/v1/company/auth/logout-all"
+      },
+      {
+        "file": "post-api-v1-company-auth-password-reset-confirm.ts",
+        "key": "POST /api/v1/company/auth/password-reset/confirm"
+      },
+      {
+        "file": "post-api-v1-company-auth-password-reset-request.ts",
+        "key": "POST /api/v1/company/auth/password-reset/request"
+      },
+      {
+        "file": "post-api-v1-company-auth-refresh.ts",
+        "key": "POST /api/v1/company/auth/refresh"
+      },
+      {
+        "file": "post-api-v1-company-email-template-assignments.ts",
+        "key": "POST /api/v1/company/email-template-assignments"
+      },
+      {
+        "file": "post-api-v1-company-emails-test-send.ts",
+        "key": "POST /api/v1/company/emails/test-send"
+      },
+      {
+        "file": "post-api-v1-company-me-email.ts",
+        "key": "POST /api/v1/company/me/email"
+      },
+      {
+        "file": "post-api-v1-company-me-password.ts",
+        "key": "POST /api/v1/company/me/password"
+      },
+      {
+        "file": "post-api-v1-company-notifications-read.ts",
+        "key": "POST /api/v1/company/notifications/read"
+      },
+      {
+        "file": "post-api-v1-company-notifications-seen.ts",
+        "key": "POST /api/v1/company/notifications/seen"
+      },
+      {
+        "file": "post-api-v1-company-roles.ts",
+        "key": "POST /api/v1/company/roles"
+      },
+      {
+        "file": "post-api-v1-company-roles-transfer-ownership.ts",
+        "key": "POST /api/v1/company/roles/transfer-ownership"
+      },
+      {
+        "file": "post-api-v1-company-sending-domain.ts",
+        "key": "POST /api/v1/company/sending-domain"
+      },
+      {
+        "file": "post-api-v1-company-sending-domain-verify.ts",
+        "key": "POST /api/v1/company/sending-domain/verify"
+      },
+      {
+        "file": "post-api-v1-company-setup-steppublicid-complete.ts",
+        "key": "POST /api/v1/company/setup/{stepPublicId}/complete"
+      },
+      {
+        "file": "post-api-v1-company-setup-steppublicid-skip.ts",
+        "key": "POST /api/v1/company/setup/{stepPublicId}/skip"
+      },
+      {
+        "file": "post-api-v1-company-setup-steppublicid-start.ts",
+        "key": "POST /api/v1/company/setup/{stepPublicId}/start"
+      },
+      {
+        "file": "post-api-v1-company-users.ts",
+        "key": "POST /api/v1/company/users"
+      },
+      {
+        "file": "post-api-v1-company-users-publicid-invitation.ts",
+        "key": "POST /api/v1/company/users/{publicId}/invitation"
+      },
+      {
+        "file": "post-api-v1-company-users-publicid-password-reset.ts",
+        "key": "POST /api/v1/company/users/{publicId}/password-reset"
+      },
+      {
+        "file": "post-api-v1-company-users-publicid-role.ts",
+        "key": "POST /api/v1/company/users/{publicId}/role"
+      },
+      {
+        "file": "post-api-v1-company-users-bulk.ts",
+        "key": "POST /api/v1/company/users/bulk"
+      },
+      {
+        "file": "put-api-v1-company-email-settings.ts",
+        "key": "PUT /api/v1/company/email-settings"
+      },
+      {
+        "file": "put-api-v1-company-notification-settings-typekey.ts",
+        "key": "PUT /api/v1/company/notification-settings/{typeKey}"
+      },
+      {
+        "file": "put-api-v1-company-roles-publicid-permissions.ts",
+        "key": "PUT /api/v1/company/roles/{publicId}/permissions"
+      }
+    ],
+    "delegated": [
+      {
+        "file": "delete-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments-emailtypekey.ts",
+        "key": "DELETE /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments/{emailTypeKey}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-audit-trail.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/audit-trail"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-test-sends-requestid.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends/{requestId}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-types.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-types-key-preview.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-readiness.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-settings.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-settings"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-profile.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/profile"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-roles.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-roles-rolepublicid.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles/{rolePublicId}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-sending-domain.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/sending-domain"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-setup.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/setup"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-users.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-access-sessions-sessionpublicid-profile.ts",
+        "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/profile"
+      },
+      {
+        "file": "patch-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid.ts",
+        "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-test-sends.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-complete.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-skip.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/skip"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-start.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/start"
+      },
+      {
+        "file": "put-api-v1-platform-access-sessions-sessionpublicid-email-settings.ts",
+        "key": "PUT /api/v1/platform/access-sessions/{sessionPublicId}/email-settings"
+      }
+    ],
+    "platform": [
+      {
+        "file": "delete-api-v1-platform-companies-publicid.ts",
+        "key": "DELETE /api/v1/platform/companies/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-leads-publicid.ts",
+        "key": "DELETE /api/v1/platform/leads/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-leads-publicid-activities-activitypublicid.ts",
+        "key": "DELETE /api/v1/platform/leads/{publicId}/activities/{activityPublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-leads-publicid-contacts-contactpublicid.ts",
+        "key": "DELETE /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-plan-prices-publicid.ts",
+        "key": "DELETE /api/v1/platform/plan-prices/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-plans-publicid.ts",
+        "key": "DELETE /api/v1/platform/plans/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-role-assignments-assignmentpublicid.ts",
+        "key": "DELETE /api/v1/platform/role-assignments/{assignmentPublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-roles-rolepublicid.ts",
+        "key": "DELETE /api/v1/platform/roles/{rolePublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-users-publicid.ts",
+        "key": "DELETE /api/v1/platform/users/{publicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-users-publicid-sessions.ts",
+        "key": "DELETE /api/v1/platform/users/{publicId}/sessions"
+      },
+      {
+        "file": "delete-api-v1-platform-users-publicid-sessions-sessionpublicid.ts",
+        "key": "DELETE /api/v1/platform/users/{publicId}/sessions/{sessionPublicId}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-sessionpublicid.ts",
+        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}"
+      },
+      {
+        "file": "get-api-v1-platform-announcements.ts",
+        "key": "GET /api/v1/platform/announcements"
+      },
+      {
+        "file": "get-api-v1-platform-audit-trail.ts",
+        "key": "GET /api/v1/platform/audit-trail"
+      },
+      {
+        "file": "get-api-v1-platform-audit-trail-actors.ts",
+        "key": "GET /api/v1/platform/audit-trail/actors"
+      },
+      {
+        "file": "get-api-v1-platform-companies.ts",
+        "key": "GET /api/v1/platform/companies"
+      },
+      {
+        "file": "get-api-v1-platform-companies-publicid.ts",
+        "key": "GET /api/v1/platform/companies/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-companies-publicid-access-policy.ts",
+        "key": "GET /api/v1/platform/companies/{publicId}/access-policy"
+      },
+      {
+        "file": "get-api-v1-platform-companies-publicid-activation.ts",
+        "key": "GET /api/v1/platform/companies/{publicId}/activation"
+      },
+      {
+        "file": "get-api-v1-platform-companies-publicid-commercial-config.ts",
+        "key": "GET /api/v1/platform/companies/{publicId}/commercial-config"
+      },
+      {
+        "file": "get-api-v1-platform-companies-publicid-subscription.ts",
+        "key": "GET /api/v1/platform/companies/{publicId}/subscription"
+      },
+      {
+        "file": "get-api-v1-platform-companies-cursor.ts",
+        "key": "GET /api/v1/platform/companies/cursor"
+      },
+      {
+        "file": "get-api-v1-platform-email-template-variants-key-removal-readiness.ts",
+        "key": "GET /api/v1/platform/email-template-variants/{key}/removal-readiness"
+      },
+      {
+        "file": "get-api-v1-platform-email-types.ts",
+        "key": "GET /api/v1/platform/email-types"
+      },
+      {
+        "file": "get-api-v1-platform-email-types-key.ts",
+        "key": "GET /api/v1/platform/email-types/{key}"
+      },
+      {
+        "file": "get-api-v1-platform-email-types-key-preview.ts",
+        "key": "GET /api/v1/platform/email-types/{key}/preview"
+      },
+      {
+        "file": "get-api-v1-platform-email-types-key-variants.ts",
+        "key": "GET /api/v1/platform/email-types/{key}/variants"
+      },
+      {
+        "file": "get-api-v1-platform-emails-deliveries.ts",
+        "key": "GET /api/v1/platform/emails/deliveries"
+      },
+      {
+        "file": "get-api-v1-platform-emails-deliveries-context-publicid.ts",
+        "key": "GET /api/v1/platform/emails/deliveries/{context}/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-emails-sending.ts",
+        "key": "GET /api/v1/platform/emails/sending"
+      },
+      {
+        "file": "get-api-v1-platform-lead-conversion-requests.ts",
+        "key": "GET /api/v1/platform/lead-conversion-requests"
+      },
+      {
+        "file": "get-api-v1-platform-lead-conversion-requests-publicid.ts",
+        "key": "GET /api/v1/platform/lead-conversion-requests/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-lead-conversion-requests-publicid-onboarding-delivery.ts",
+        "key": "GET /api/v1/platform/lead-conversion-requests/{publicId}/onboarding-delivery"
+      },
+      {
+        "file": "get-api-v1-platform-leads.ts",
+        "key": "GET /api/v1/platform/leads"
+      },
+      {
+        "file": "get-api-v1-platform-leads-leadpublicid-sending-domain.ts",
+        "key": "GET /api/v1/platform/leads/{leadPublicId}/sending-domain"
+      },
+      {
+        "file": "get-api-v1-platform-leads-leadpublicid-sending-domain-readiness.ts",
+        "key": "GET /api/v1/platform/leads/{leadPublicId}/sending-domain/readiness"
+      },
+      {
+        "file": "get-api-v1-platform-leads-publicid.ts",
+        "key": "GET /api/v1/platform/leads/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-leads-publicid-activities.ts",
+        "key": "GET /api/v1/platform/leads/{publicId}/activities"
+      },
+      {
+        "file": "get-api-v1-platform-leads-publicid-conversion-eligibility.ts",
+        "key": "GET /api/v1/platform/leads/{publicId}/conversion-eligibility"
+      },
+      {
+        "file": "get-api-v1-platform-me.ts",
+        "key": "GET /api/v1/platform/me"
+      },
+      {
+        "file": "get-api-v1-platform-me-profile.ts",
+        "key": "GET /api/v1/platform/me/profile"
+      },
+      {
+        "file": "get-api-v1-platform-me-sessions.ts",
+        "key": "GET /api/v1/platform/me/sessions"
+      },
+      {
+        "file": "get-api-v1-platform-notification-settings.ts",
+        "key": "GET /api/v1/platform/notification-settings"
+      },
+      {
+        "file": "get-api-v1-platform-notifications.ts",
+        "key": "GET /api/v1/platform/notifications"
+      },
+      {
+        "file": "get-api-v1-platform-notifications-unread-count.ts",
+        "key": "GET /api/v1/platform/notifications/unread-count"
+      },
+      {
+        "file": "get-api-v1-platform-plan-prices-publicid.ts",
+        "key": "GET /api/v1/platform/plan-prices/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-plans.ts",
+        "key": "GET /api/v1/platform/plans"
+      },
+      {
+        "file": "get-api-v1-platform-plans-publicid.ts",
+        "key": "GET /api/v1/platform/plans/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-plans-publicid-effective-price.ts",
+        "key": "GET /api/v1/platform/plans/{publicId}/effective-price"
+      },
+      {
+        "file": "get-api-v1-platform-plans-publicid-prices.ts",
+        "key": "GET /api/v1/platform/plans/{publicId}/prices"
+      },
+      {
+        "file": "get-api-v1-platform-role-assignments.ts",
+        "key": "GET /api/v1/platform/role-assignments"
+      },
+      {
+        "file": "get-api-v1-platform-roles.ts",
+        "key": "GET /api/v1/platform/roles"
+      },
+      {
+        "file": "get-api-v1-platform-users.ts",
+        "key": "GET /api/v1/platform/users"
+      },
+      {
+        "file": "get-api-v1-platform-users-publicid.ts",
+        "key": "GET /api/v1/platform/users/{publicId}"
+      },
+      {
+        "file": "get-api-v1-platform-users-publicid-sessions.ts",
+        "key": "GET /api/v1/platform/users/{publicId}/sessions"
+      },
+      {
+        "file": "patch-api-v1-platform-companies-publicid.ts",
+        "key": "PATCH /api/v1/platform/companies/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-companies-publicid-access-policy.ts",
+        "key": "PATCH /api/v1/platform/companies/{publicId}/access-policy"
+      },
+      {
+        "file": "patch-api-v1-platform-companies-publicid-subscription-trial.ts",
+        "key": "PATCH /api/v1/platform/companies/{publicId}/subscription/trial"
+      },
+      {
+        "file": "patch-api-v1-platform-lead-conversion-requests-publicid-plan.ts",
+        "key": "PATCH /api/v1/platform/lead-conversion-requests/{publicId}/plan"
+      },
+      {
+        "file": "patch-api-v1-platform-leads-publicid.ts",
+        "key": "PATCH /api/v1/platform/leads/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-leads-publicid-contacts-contactpublicid.ts",
+        "key": "PATCH /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-me-profile.ts",
+        "key": "PATCH /api/v1/platform/me/profile"
+      },
+      {
+        "file": "patch-api-v1-platform-plan-prices-publicid.ts",
+        "key": "PATCH /api/v1/platform/plan-prices/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-plans-publicid.ts",
+        "key": "PATCH /api/v1/platform/plans/{publicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-roles-rolepublicid.ts",
+        "key": "PATCH /api/v1/platform/roles/{rolePublicId}"
+      },
+      {
+        "file": "patch-api-v1-platform-users-publicid.ts",
+        "key": "PATCH /api/v1/platform/users/{publicId}"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions.ts",
+        "key": "POST /api/v1/platform/access-sessions"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-close.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close"
+      },
+      {
+        "file": "post-api-v1-platform-announcements.ts",
+        "key": "POST /api/v1/platform/announcements"
+      },
+      {
+        "file": "post-api-v1-platform-auth-accept-invitation.ts",
+        "key": "POST /api/v1/platform/auth/accept-invitation"
+      },
+      {
+        "file": "post-api-v1-platform-auth-login.ts",
+        "key": "POST /api/v1/platform/auth/login"
+      },
+      {
+        "file": "post-api-v1-platform-auth-logout.ts",
+        "key": "POST /api/v1/platform/auth/logout"
+      },
+      {
+        "file": "post-api-v1-platform-auth-logout-all.ts",
+        "key": "POST /api/v1/platform/auth/logout-all"
+      },
+      {
+        "file": "post-api-v1-platform-auth-password-reset-confirm.ts",
+        "key": "POST /api/v1/platform/auth/password-reset/confirm"
+      },
+      {
+        "file": "post-api-v1-platform-auth-password-reset-request.ts",
+        "key": "POST /api/v1/platform/auth/password-reset/request"
+      },
+      {
+        "file": "post-api-v1-platform-auth-refresh.ts",
+        "key": "POST /api/v1/platform/auth/refresh"
+      },
+      {
+        "file": "post-api-v1-platform-companies.ts",
+        "key": "POST /api/v1/platform/companies"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-activation-evaluate.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/activation/evaluate"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-freeze.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/freeze"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-restore.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/restore"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-suspend.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/suspend"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-unfreeze.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/unfreeze"
+      },
+      {
+        "file": "post-api-v1-platform-companies-publicid-unsuspend.ts",
+        "key": "POST /api/v1/platform/companies/{publicId}/unsuspend"
+      },
+      {
+        "file": "post-api-v1-platform-company-subscriptions-expire-trials.ts",
+        "key": "POST /api/v1/platform/company-subscriptions/expire-trials"
+      },
+      {
+        "file": "post-api-v1-platform-email-template-variants-key-migrate.ts",
+        "key": "POST /api/v1/platform/email-template-variants/{key}/migrate"
+      },
+      {
+        "file": "post-api-v1-platform-emails-deliveries-context-publicid-cancel.ts",
+        "key": "POST /api/v1/platform/emails/deliveries/{context}/{publicId}/cancel"
+      },
+      {
+        "file": "post-api-v1-platform-emails-deliveries-context-publicid-retry.ts",
+        "key": "POST /api/v1/platform/emails/deliveries/{context}/{publicId}/retry"
+      },
+      {
+        "file": "post-api-v1-platform-emails-sending-context-pause.ts",
+        "key": "POST /api/v1/platform/emails/sending/{context}/pause"
+      },
+      {
+        "file": "post-api-v1-platform-emails-sending-context-resume.ts",
+        "key": "POST /api/v1/platform/emails/sending/{context}/resume"
+      },
+      {
+        "file": "post-api-v1-platform-emails-test-send.ts",
+        "key": "POST /api/v1/platform/emails/test-send"
+      },
+      {
+        "file": "post-api-v1-platform-lead-conversion-requests.ts",
+        "key": "POST /api/v1/platform/lead-conversion-requests"
+      },
+      {
+        "file": "post-api-v1-platform-lead-conversion-requests-publicid-approve.ts",
+        "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/approve"
+      },
+      {
+        "file": "post-api-v1-platform-lead-conversion-requests-publicid-onboarding-delivery-retry.ts",
+        "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/onboarding-delivery/retry"
+      },
+      {
+        "file": "post-api-v1-platform-lead-conversion-requests-publicid-reject.ts",
+        "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/reject"
+      },
+      {
+        "file": "post-api-v1-platform-lead-conversion-requests-immediate.ts",
+        "key": "POST /api/v1/platform/lead-conversion-requests/immediate"
+      },
+      {
+        "file": "post-api-v1-platform-leads.ts",
+        "key": "POST /api/v1/platform/leads"
+      },
+      {
+        "file": "post-api-v1-platform-leads-leadpublicid-sending-domain.ts",
+        "key": "POST /api/v1/platform/leads/{leadPublicId}/sending-domain"
+      },
+      {
+        "file": "post-api-v1-platform-leads-leadpublicid-sending-domain-verify.ts",
+        "key": "POST /api/v1/platform/leads/{leadPublicId}/sending-domain/verify"
+      },
+      {
+        "file": "post-api-v1-platform-leads-publicid-activities.ts",
+        "key": "POST /api/v1/platform/leads/{publicId}/activities"
+      },
+      {
+        "file": "post-api-v1-platform-leads-publicid-archive.ts",
+        "key": "POST /api/v1/platform/leads/{publicId}/archive"
+      },
+      {
+        "file": "post-api-v1-platform-leads-publicid-contacts.ts",
+        "key": "POST /api/v1/platform/leads/{publicId}/contacts"
+      },
+      {
+        "file": "post-api-v1-platform-leads-publicid-unarchive.ts",
+        "key": "POST /api/v1/platform/leads/{publicId}/unarchive"
+      },
+      {
+        "file": "post-api-v1-platform-me-email.ts",
+        "key": "POST /api/v1/platform/me/email"
+      },
+      {
+        "file": "post-api-v1-platform-me-password.ts",
+        "key": "POST /api/v1/platform/me/password"
+      },
+      {
+        "file": "post-api-v1-platform-notifications-read.ts",
+        "key": "POST /api/v1/platform/notifications/read"
+      },
+      {
+        "file": "post-api-v1-platform-notifications-seen.ts",
+        "key": "POST /api/v1/platform/notifications/seen"
+      },
+      {
+        "file": "post-api-v1-platform-plans.ts",
+        "key": "POST /api/v1/platform/plans"
+      },
+      {
+        "file": "post-api-v1-platform-plans-publicid-prices.ts",
+        "key": "POST /api/v1/platform/plans/{publicId}/prices"
+      },
+      {
+        "file": "post-api-v1-platform-role-assignments.ts",
+        "key": "POST /api/v1/platform/role-assignments"
+      },
+      {
+        "file": "post-api-v1-platform-roles.ts",
+        "key": "POST /api/v1/platform/roles"
+      },
+      {
+        "file": "post-api-v1-platform-users.ts",
+        "key": "POST /api/v1/platform/users"
+      },
+      {
+        "file": "post-api-v1-platform-users-publicid-invitation.ts",
+        "key": "POST /api/v1/platform/users/{publicId}/invitation"
+      },
+      {
+        "file": "post-api-v1-platform-users-publicid-password-reset.ts",
+        "key": "POST /api/v1/platform/users/{publicId}/password-reset"
+      },
+      {
+        "file": "post-api-v1-platform-users-publicid-suspend.ts",
+        "key": "POST /api/v1/platform/users/{publicId}/suspend"
+      },
+      {
+        "file": "post-api-v1-platform-users-publicid-unsuspend.ts",
+        "key": "POST /api/v1/platform/users/{publicId}/unsuspend"
+      },
+      {
+        "file": "put-api-v1-platform-notification-settings-typekey.ts",
+        "key": "PUT /api/v1/platform/notification-settings/{typeKey}"
+      }
+    ],
+    "public": [
+      {
+        "file": "get-api-v1-public-plans.ts",
+        "key": "GET /api/v1/public/plans"
+      },
+      {
+        "file": "get-health.ts",
+        "key": "GET /health"
+      }
+    ]
+  }
+}

@@ -69,7 +69,7 @@ function BucketSection({
       <ul>
         {rows.map((row) => (
           <NotificationRow
-            key={row.item.id}
+            key={row.item.publicId}
             item={row.item}
             state={row.state}
             onActivate={() => onActivate(row)}

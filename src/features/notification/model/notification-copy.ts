@@ -1,11 +1,13 @@
 import type { TFunction } from "i18next";
 import type { SupportedLocale } from "@/shared/i18n";
 import {
-  ANNOUNCEMENT_TYPE_KEY,
+  ANNOUNCEMENT_TYPE_KEYS,
   announcementParamsSchema,
-  NOTIFICATION_CATALOG,
+  knownNotificationEntry,
+  NEUTRAL_NOTIFICATION,
   type NotificationTypeEntry,
 } from "./notification-catalog";
+import type { NotificationTier } from "./notification-tier";
 
 export interface NotificationCopy {
   readonly title: string;
@@ -14,22 +16,24 @@ export interface NotificationCopy {
 
 interface CopySource {
   readonly typeKey: string;
+  readonly typeVersion?: number;
   readonly params: Record<string, unknown>;
 }
 
-/** `null` when the type key is not in the mirror — an unknown row is skipped, never guessed at. */
+/** Every row renders: a type or version the audience mirror does not know gets neutral copy. */
 export function resolveNotificationCopy(
+  tier: NotificationTier | null,
   source: CopySource,
   t: TFunction,
   locale: SupportedLocale,
-): NotificationCopy | null {
-  const entry = NOTIFICATION_CATALOG.get(source.typeKey);
+): NotificationCopy {
+  const entry = knownNotificationEntry(tier, source);
 
   if (!entry) {
-    return null;
+    return neutralCopy(t);
   }
 
-  if (source.typeKey === ANNOUNCEMENT_TYPE_KEY) {
+  if (ANNOUNCEMENT_TYPE_KEYS.has(source.typeKey)) {
     const authored = announcementParamsSchema.safeParse(source.params);
 
     if (authored.success) {
@@ -43,6 +47,13 @@ export function resolveNotificationCopy(
   return {
     title: t(`${entry.copyKey}.title`, values),
     body: t(`${entry.copyKey}.body`, values),
+  };
+}
+
+function neutralCopy(t: TFunction): NotificationCopy {
+  return {
+    title: t(`${NEUTRAL_NOTIFICATION.copyKey}.title`),
+    body: t(`${NEUTRAL_NOTIFICATION.copyKey}.body`),
   };
 }
 

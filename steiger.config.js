@@ -65,21 +65,21 @@ const noEntitiesLayerRule = {
 };
 
 const noPortalCrossImportsRule = {
-  name: "edara/no-admin-company-cross-imports",
+  name: "edara/no-platform-company-cross-imports",
   check(root) {
     const portalFiles = findFiles(
       root,
       (file) =>
         /\.(?:ts|tsx)$/.test(file.path) &&
-        (file.path.includes(`${path.sep}pages${path.sep}admin${path.sep}`) ||
+        (file.path.includes(`${path.sep}pages${path.sep}platform${path.sep}`) ||
           file.path.includes(`${path.sep}pages${path.sep}company${path.sep}`)),
     );
 
     const diagnostics = portalFiles.flatMap((file) => {
       const source = fs.readFileSync(file.path, "utf8");
       const normalizedFilePath = normalizePath(file.path);
-      const isAdminFile = normalizedFilePath.includes("/pages/admin/");
-      const forbiddenPortalPath = isAdminFile ? "/pages/company" : "/pages/admin";
+      const isPlatformFile = normalizedFilePath.includes("/pages/platform/");
+      const forbiddenPortalPath = isPlatformFile ? "/pages/company" : "/pages/platform";
 
       const hasForbiddenImport = findImportSpecifiers(source).some((importSpecifier) => {
         if (importSpecifier.startsWith("@/pages/")) {
@@ -133,7 +133,7 @@ export default defineConfig([
       // ADR-0001 intentionally keeps features/auth for the reused password-change interaction
       // alongside shared/auth for session/token infrastructure.
       "fsd/ambiguous-slice-names": "off",
-      "edara/no-admin-company-cross-imports": "error",
+      "edara/no-platform-company-cross-imports": "error",
       "edara/no-entities-layer": "error",
     },
   },

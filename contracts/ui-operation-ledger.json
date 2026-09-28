@@ -1,0 +1,1140 @@
+[
+  {
+    "key": "DELETE /api/v1/company/email-template-assignments/{emailTypeKey}",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/me/sessions/{sessionId}",
+    "audience": "company",
+    "consumers": ["src/shared/company-self/index.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/roles/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/role/api/role.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/users/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/users/{publicId}/role",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/users/{publicId}/sessions/{sessionPublicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/company/users/bulk",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments/{emailTypeKey}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/companies/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/leads/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/leads/{publicId}/activities/{activityPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/plan-prices/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/plan-detail-page.tsx"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/plans/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/plan-detail-page.tsx"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/role-assignments/{assignmentPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/roles/{rolePublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/roles/api/roles.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/users/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/users/{publicId}/sessions",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "DELETE /api/v1/platform/users/{publicId}/sessions/{sessionPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/access-policy",
+    "audience": "company",
+    "consumers": ["src/shared/api/company-operation.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/activation",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/dashboard/api/company-dashboard.ts",
+      "src/pages/company/profile/api/company-profile.ts",
+      "src/pages/company/setup/api/company-setup.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/audit-trail",
+    "audience": "company",
+    "consumers": ["src/pages/company/audit/api/audit.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/audit-trail/actors",
+    "audience": "company",
+    "consumers": ["src/pages/company/audit/api/audit.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-readiness",
+    "audience": "company",
+    "consumers": ["src/shared/api/company-operation.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-settings",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-template-assignments",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-template-assignments/{emailTypeKey}/effective",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-types",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-types/{key}",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-types/{key}/preview",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/email-types/{key}/variants",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/me",
+    "audience": "company",
+    "consumers": ["src/shared/api/company-api.ts", "src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/me/profile",
+    "audience": "company",
+    "consumers": ["src/shared/company-self/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/me/sessions",
+    "audience": "company",
+    "consumers": ["src/shared/company-self/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/notification-settings",
+    "audience": "company",
+    "consumers": ["src/pages/company/notification-routing/api/notification-routing.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/notifications",
+    "audience": "company",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/notifications/unread-count",
+    "audience": "company",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/permissions",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/notification-routing/api/notification-routing.ts",
+      "src/pages/company/role/api/role.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/profile",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/profile/api/company-profile.ts",
+      "src/pages/company/setup/api/company-setup.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/registry",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/dashboard/api/company-dashboard.ts",
+      "src/pages/company/profile/api/company-profile.ts",
+      "src/pages/company/setup/api/company-setup.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/roles",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/notification-routing/api/notification-routing.ts",
+      "src/pages/company/person/api/person.ts",
+      "src/pages/company/roles/api/roles.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/roles/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/role/api/role.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/sending-domain",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/sending-domain/readiness",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/setup",
+    "audience": "company",
+    "consumers": [
+      "src/pages/company/dashboard/api/company-dashboard.ts",
+      "src/pages/company/profile/api/company-profile.ts",
+      "src/pages/company/setup/api/company-setup.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/company/subscription",
+    "audience": "company",
+    "consumers": ["src/pages/company/dashboard/api/company-dashboard.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/users",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/users/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/users/{publicId}/role",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/users/{publicId}/sessions",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/company/users/generate-code",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/audit-trail",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends/{requestId}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-settings",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/profile",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles/{rolePublicId}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/sending-domain",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/setup",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/announcements",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/announcements/api/announcements.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/audit-trail",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/audit/api/audit.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/audit-trail/actors",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/audit/api/audit-actors.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/companies",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/announcements/api/announcements.ts",
+      "src/pages/platform/audit/api/audit-companies.ts",
+      "src/pages/platform/companies/api/companies.ts",
+      "src/pages/platform/company-detail/api/company-detail.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/{publicId}",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/access-session/api/access-session.ts",
+      "src/pages/platform/company-detail/api/company-detail.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/{publicId}/access-policy",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/{publicId}/activation",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/{publicId}/commercial-config",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/{publicId}/subscription",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/companies/cursor",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/company-detail/api/company-detail.ts",
+      "src/pages/platform/subscriptions/api/subscriptions.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/email-template-variants/{key}/removal-readiness",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/emails/api/emails.ts",
+      "src/pages/platform/emails/ui/variant-migration.tsx"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/email-types",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/email-types/{key}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/email-types/{key}/preview",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/email-types/{key}/variants",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/emails/api/emails.ts",
+      "src/pages/platform/emails/ui/variant-migration.tsx"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/emails/deliveries",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-deliveries/api/email-deliveries.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/emails/deliveries/{context}/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-deliveries/api/email-deliveries.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/emails/sending",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-sending/api/email-sending.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/lead-conversion-requests",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/conversion-requests/api/review.ts",
+      "src/pages/platform/lead-detail/api/submission.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/lead-conversion-requests/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/lead-conversion-requests/{publicId}/onboarding-delivery",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/leads/api/registry.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads/{leadPublicId}/sending-domain",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads/{leadPublicId}/sending-domain/readiness",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads/{publicId}/activities",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/leads/{publicId}/conversion-eligibility",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/lead-detail/api/crm.ts",
+      "src/pages/platform/lead-detail/ui/lead-conversion.tsx"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/me",
+    "audience": "platform",
+    "consumers": ["src/shared/api/platform-api.ts", "src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/me/profile",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-self/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/me/sessions",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-self/index.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/notification-settings",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/notifications/api/notification-settings.ts",
+      "src/pages/platform/notifications/ui/platform-notification-settings-page.tsx"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/notifications",
+    "audience": "platform",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/notifications/unread-count",
+    "audience": "platform",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/plan-prices/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/api/catalogue.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/plans",
+    "audience": "platform",
+    "consumers": [
+      "src/features/platform-conversion-setup/api/plans.ts",
+      "src/pages/platform/plans/api/catalogue.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/plans/{publicId}",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/plans/api/catalogue.ts",
+      "src/pages/platform/plans/ui/catalogue-editor.tsx",
+      "src/pages/platform/plans/ui/plan-detail-page.tsx"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/plans/{publicId}/effective-price",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/api/catalogue.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/plans/{publicId}/prices",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/api/catalogue.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/role-assignments",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/roles",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/notifications/api/notification-settings.ts",
+      "src/pages/platform/people/api/people.ts",
+      "src/pages/platform/person/api/person.ts",
+      "src/pages/platform/roles/api/roles.ts"
+    ]
+  },
+  {
+    "key": "GET /api/v1/platform/users",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/people/api/people.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/users/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/users/{publicId}/sessions",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "GET /api/v1/public/plans",
+    "audience": "public",
+    "consumers": ["src/pages/public-plans/api/public-plans.ts"]
+  },
+  {
+    "key": "GET /health",
+    "audience": "public",
+    "headless": true,
+    "reason": "Operational health probe; no product UI"
+  },
+  {
+    "key": "PATCH /api/v1/company/me/profile",
+    "audience": "company",
+    "consumers": ["src/shared/company-self/index.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/company/profile",
+    "audience": "company",
+    "consumers": ["src/pages/company/profile/api/company-profile.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/company/roles/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/role/api/role.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/company/users/{publicId}",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/company/users/bulk",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/profile",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/companies/{publicId}",
+    "audience": "platform",
+    "consumers": [
+      "src/features/platform-company-registry/ui/registry-form.tsx",
+      "src/pages/platform/company-detail/api/company-detail.ts"
+    ]
+  },
+  {
+    "key": "PATCH /api/v1/platform/companies/{publicId}/access-policy",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/companies/{publicId}/subscription/trial",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/lead-conversion-requests/{publicId}/plan",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/leads/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/features/platform-lead-registry/ui/lead-registry-form.tsx"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/me/profile",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-self/index.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/plan-prices/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/catalogue-editor.tsx"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/plans/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/catalogue-editor.tsx"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/roles/{rolePublicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/roles/api/roles.ts"]
+  },
+  {
+    "key": "PATCH /api/v1/platform/users/{publicId}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/accept-invitation",
+    "audience": "company",
+    "consumers": ["src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/login",
+    "audience": "company",
+    "consumers": ["src/shared/api/company-api.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/logout",
+    "audience": "company",
+    "consumers": ["src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/logout-all",
+    "audience": "company",
+    "consumers": ["src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/password-reset/confirm",
+    "audience": "company",
+    "consumers": ["src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/password-reset/request",
+    "audience": "company",
+    "consumers": ["src/shared/company-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/auth/refresh",
+    "audience": "company",
+    "consumers": ["src/shared/auth/company-session-api.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/email-template-assignments",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/emails/test-send",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-templates/api/email-templates.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/me/email",
+    "audience": "company",
+    "consumers": ["src/shared/company-self/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/me/password",
+    "audience": "company",
+    "consumers": ["src/features/auth/api/change-password.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/notifications/read",
+    "audience": "company",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/notifications/seen",
+    "audience": "company",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/roles",
+    "audience": "company",
+    "consumers": ["src/pages/company/roles/api/roles.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/roles/transfer-ownership",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/sending-domain",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/sending-domain/verify",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/setup/{stepPublicId}/complete",
+    "audience": "company",
+    "consumers": ["src/pages/company/setup/api/company-setup.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/setup/{stepPublicId}/skip",
+    "audience": "company",
+    "consumers": ["src/pages/company/setup/api/company-setup.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/setup/{stepPublicId}/start",
+    "audience": "company",
+    "consumers": ["src/pages/company/setup/api/company-setup.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/users",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/users/{publicId}/invitation",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/users/{publicId}/password-reset",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/users/{publicId}/role",
+    "audience": "company",
+    "consumers": ["src/pages/company/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/company/users/bulk",
+    "audience": "company",
+    "consumers": ["src/pages/company/people/api/people.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/skip",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/start",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/announcements",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/announcements/api/announcements.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/accept-invitation",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/login",
+    "audience": "platform",
+    "consumers": ["src/shared/api/platform-api.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/logout",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/logout-all",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/password-reset/confirm",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/password-reset/request",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-auth/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/auth/refresh",
+    "audience": "platform",
+    "consumers": ["src/shared/auth/platform-session-api.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/companies",
+    "audience": "platform",
+    "consumers": [
+      "src/features/platform-company-registry/ui/registry-form.tsx",
+      "src/pages/platform/company-detail/api/company-detail.ts"
+    ]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/activation/evaluate",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/freeze",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/restore",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/companies/ui/restore-company.tsx",
+      "src/pages/platform/company-detail/api/company-detail.ts"
+    ]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/suspend",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/unfreeze",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/companies/{publicId}/unsuspend",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/company-subscriptions/expire-trials",
+    "audience": "platform",
+    "consumers": [
+      "src/pages/platform/company-detail/api/company-detail.ts",
+      "src/pages/platform/subscriptions/ui/platform-subscriptions-page.tsx"
+    ]
+  },
+  {
+    "key": "POST /api/v1/platform/email-template-variants/{key}/migrate",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/emails/deliveries/{context}/{publicId}/cancel",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-deliveries/api/email-deliveries.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/emails/deliveries/{context}/{publicId}/retry",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-deliveries/api/email-deliveries.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/emails/sending/{context}/pause",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-sending/api/email-sending.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/emails/sending/{context}/resume",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/email-sending/api/email-sending.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/emails/test-send",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/lead-conversion-requests",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/ui/lead-conversion.tsx"]
+  },
+  {
+    "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/approve",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/onboarding-delivery/retry",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/lead-conversion-requests/{publicId}/reject",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/conversion-requests/api/review.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/lead-conversion-requests/immediate",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/ui/lead-conversion.tsx"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads",
+    "audience": "platform",
+    "consumers": ["src/features/platform-lead-registry/ui/lead-registry-form.tsx"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{leadPublicId}/sending-domain",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{leadPublicId}/sending-domain/verify",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{publicId}/activities",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{publicId}/archive",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{publicId}/contacts",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/leads/{publicId}/unarchive",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/me/email",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-self/index.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/me/password",
+    "audience": "platform",
+    "consumers": ["src/features/auth/api/change-password.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/notifications/read",
+    "audience": "platform",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/notifications/seen",
+    "audience": "platform",
+    "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/plans",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/catalogue-editor.tsx"]
+  },
+  {
+    "key": "POST /api/v1/platform/plans/{publicId}/prices",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/plans/ui/catalogue-editor.tsx"]
+  },
+  {
+    "key": "POST /api/v1/platform/role-assignments",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/roles",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/roles/api/roles.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/users",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/people/api/people.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/users/{publicId}/invitation",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/users/{publicId}/password-reset",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/users/{publicId}/suspend",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/users/{publicId}/unsuspend",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/person/api/person.ts"]
+  },
+  {
+    "key": "PUT /api/v1/company/email-settings",
+    "audience": "company",
+    "consumers": ["src/pages/company/email-settings/api/email-settings.ts"]
+  },
+  {
+    "key": "PUT /api/v1/company/notification-settings/{typeKey}",
+    "audience": "company",
+    "consumers": ["src/pages/company/notification-routing/api/notification-routing.ts"]
+  },
+  {
+    "key": "PUT /api/v1/company/roles/{publicId}/permissions",
+    "audience": "company",
+    "consumers": ["src/pages/company/role/api/role.ts"]
+  },
+  {
+    "key": "PUT /api/v1/platform/access-sessions/{sessionPublicId}/email-settings",
+    "audience": "delegated",
+    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "PUT /api/v1/platform/notification-settings/{typeKey}",
+    "audience": "platform",
+    "consumers": ["src/pages/platform/notifications/api/notification-settings.ts"]
+  }
+]

@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import type { CompanySession, CompanyUser } from "@/shared/auth";
+import { useCompanySession, usePlatformSession } from "@/shared/auth";
 import { ForcedPasswordChangeModal } from "./forced-password-change-modal";
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -14,11 +14,14 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
+// `ky` (the audience client's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { post: changePasswordPostMock, get: meGetMock },
+vi.mock("@/shared/api/company-client", () => ({
+  companyApiClient: Object.assign(
+    (path: string, options: { method: string }) =>
+      options.method === "POST" ? changePasswordPostMock(path, options) : meGetMock(path, options),
+    { audience: "company", post: changePasswordPostMock, get: meGetMock },
+  ),
 }));
 
 function renderModal() {
@@ -28,13 +31,13 @@ function renderModal() {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <ForcedPasswordChangeModal />
+      <ForcedPasswordChangeModal audience="company" />
     </QueryClientProvider>,
   );
 }
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
+const baseUser: CompanyUser = {
+  publicId: "cdebc050-5b45-4c15-a199-44ce6a4161ba",
   employeeCode: "EMP-001",
   firstName: "Jane",
   lastName: "Doe",
@@ -44,15 +47,19 @@ const baseUser: SessionUser = {
   mustChangePassword: false,
   permissions: [],
   isOwner: false,
-  isPlatformAdmin: false,
+  companyPublicId: "379dd5ae-49e0-4bbe-90b9-1125f0802729",
+  locale: "en",
+  timezone: "UTC",
+  photoUrl: null,
 };
 
-function buildSession(userOverrides: Partial<SessionUser> = {}): AuthSession {
+function buildSession(userOverrides: Partial<CompanyUser> = {}): CompanySession {
   return {
     accessToken: "access-token",
     refreshToken: "refresh-token",
-    sessionId: "session-1",
+    sessionId: "b2b0369d-e6f3-4b8a-aa86-8c6053b19b19",
     expiresIn: 900,
+    mustChangePassword: false,
     user: { ...baseUser, ...userOverrides },
   };
 }
@@ -63,11 +70,12 @@ describe("ForcedPasswordChangeModal", () => {
     navigateMock.mockClear();
     changePasswordPostMock.mockReset();
     meGetMock.mockReset();
-    useAuthStore.setState({ session: null, status: "anonymous" });
+    useCompanySession.getState().clearSession();
+    usePlatformSession.getState().clearSession();
   });
 
   it("does not render when mustChangePassword is false", () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: false }),
       status: "authenticated",
     });
@@ -78,7 +86,7 @@ describe("ForcedPasswordChangeModal", () => {
   });
 
   it("renders the blocking dialog with the change-password form when mustChangePassword is true", () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });
@@ -92,7 +100,7 @@ describe("ForcedPasswordChangeModal", () => {
   });
 
   it("renders no close/dismiss button", () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });
@@ -103,7 +111,7 @@ describe("ForcedPasswordChangeModal", () => {
   });
 
   it("does not dismiss when the backdrop is clicked", () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });
@@ -118,18 +126,24 @@ describe("ForcedPasswordChangeModal", () => {
   });
 
   it("hydrates /auth/me and enters tenant context after a successful password change", async () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });
 
-    changePasswordPostMock.mockReturnValue({ json: () => Promise.resolve({ ok: true }) });
-    meGetMock.mockReturnValue({
-      json: () => Promise.resolve({ ...baseUser, mustChangePassword: false, isOwner: true }),
-    });
+    changePasswordPostMock.mockReturnValue(new Response(null, { status: 204 }));
+    const wireUser = baseUser;
+    meGetMock.mockReturnValue(
+      new Response(JSON.stringify({ ...wireUser, mustChangePassword: false, isOwner: true }), {
+        status: 200,
+      }),
+    );
 
     renderModal();
 
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /change password/i })).toBeEnabled(),
+    );
     fireEvent.change(screen.getByLabelText(/current password/i), {
       target: { value: "TempPass1!" },
     });
@@ -142,24 +156,24 @@ describe("ForcedPasswordChangeModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /change password/i }));
 
     await waitFor(() => {
-      expect(useAuthStore.getState().session?.user.mustChangePassword).toBe(false);
+      expect(useCompanySession.getState().session?.user.mustChangePassword).toBe(false);
     });
-    expect(useAuthStore.getState().status).toBe("authenticated");
+    expect(useCompanySession.getState().status).toBe("authenticated");
     expect(changePasswordPostMock).toHaveBeenCalledWith(
-      "auth/change-password",
+      "api/v1/company/me/password",
       expect.objectContaining({
         json: { currentPassword: "TempPass1!", newPassword: "NewSecret1!" },
       }),
     );
     expect(meGetMock).toHaveBeenCalledWith(
-      "auth/me",
-      expect.objectContaining({ headers: { Authorization: "Bearer access-token" } }),
+      "api/v1/company/me",
+      expect.objectContaining({ method: "GET" }),
     );
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/company/dashboard" });
+    expect(navigateMock).toHaveBeenCalledWith({ href: "/company/dashboard" });
   });
 
   it("does not dismiss when Escape is pressed", () => {
-    useAuthStore.setState({
+    useCompanySession.setState({
       session: buildSession({ mustChangePassword: true }),
       status: "must_change_password",
     });

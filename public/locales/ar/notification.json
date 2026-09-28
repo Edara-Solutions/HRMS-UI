@@ -20,10 +20,6 @@
   "notifications.platform.lead-created.body": "انضم عميل محتمل جديد إلى القائمة وهو جاهز للمراجعة.",
   "notifications.platform.conversion-requested.title": "طلب تحويل جديد",
   "notifications.platform.conversion-requested.body": "هناك شركة في انتظار قرارك بشأن التحويل.",
-  "notifications.platform.company-activated.title": "تم تفعيل الشركة",
-  "notifications.platform.company-activated.body": "شركتك الآن مفعّلة على إدارة.",
-  "notifications.platform.conversion-decided.title": "طلب التحويل {{decision}}",
-  "notifications.platform.conversion-decided.body": "قامت إدارة بمراجعة طلب التحويل الخاص بك.",
   "notifications.platform.announcement.title": "إعلان",
   "notifications.platform.announcement.body": "تم نشر إعلان جديد.",
   "notifications.company.subscription-changed.title": "تم تحديث الاشتراك",
@@ -46,5 +42,13 @@
   "style.sheet.name": "لوحة جانبية",
   "style.sheet.hint": "لوحة تنزلق من الجانب فوق الصفحة بصفوف أوسع. الأنسب لمعالجة الإشعارات.",
   "style.flat.name": "قائمة مضغوطة",
-  "style.flat.hint": "الأحدث أولاً بلا عناوين أيام، مع تصفية الكل أو غير المقروءة. الأنسب للإشعارات الكثيرة."
+  "style.flat.hint": "الأحدث أولاً بلا عناوين أيام، مع تصفية الكل أو غير المقروءة. الأنسب للإشعارات الكثيرة.",
+  "notifications.company.activated.title": "تم تفعيل الشركة",
+  "notifications.company.activated.body": "شركتك الآن مفعّلة على إدارة.",
+  "notifications.company.conversion-decided.title": "طلب التحويل {{decision}}",
+  "notifications.company.conversion-decided.body": "قامت إدارة بمراجعة طلب التحويل الخاص بك.",
+  "notifications.company.announcement.title": "إعلان",
+  "notifications.company.announcement.body": "تم نشر إعلان جديد.",
+  "notifications.unknown.title": "إشعار جديد",
+  "notifications.unknown.body": "يوجد تحديث في مساحة عملك."
 }

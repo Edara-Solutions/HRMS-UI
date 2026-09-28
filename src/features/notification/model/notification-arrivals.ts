@@ -1,13 +1,17 @@
 import { create } from "zustand";
-import { useAuthStore } from "@/shared/auth";
-import type { NotificationFeedItem } from "../api/notification-feed";
-import { NOTIFICATION_CATALOG } from "./notification-catalog";
+import type { NotificationFeedItem } from "../api/notification-transport";
+import { knownNotificationEntry } from "./notification-catalog";
+import type { NotificationTier } from "./notification-tier";
 import type { ToastRequest } from "./toast-store";
 
 interface PresentedNotificationsState {
-  /** Ids any client path has already surfaced this session. */
-  readonly ids: ReadonlySet<number>;
-  recordAll: (ids: readonly number[]) => void;
+  /** Public IDs any client path has already surfaced this session. */
+  readonly ids: ReadonlySet<string>;
+  /** The `audience:userPublicId` the ledger belongs to. */
+  readonly identity: string | null;
+  recordAll: (ids: readonly string[]) => void;
+  /** Claims the ledger; a different identity taking over starts it empty. */
+  adopt: (identity: string) => void;
   clear: () => void;
 }
 
@@ -16,7 +20,8 @@ interface PresentedNotificationsState {
  * them, and a presented row never toasts again.
  */
 export const usePresentedNotifications = create<PresentedNotificationsState>()((set) => ({
-  ids: new Set<number>(),
+  ids: new Set<string>(),
+  identity: null,
 
   recordAll: (ids) =>
     set((state) => {
@@ -29,14 +34,22 @@ export const usePresentedNotifications = create<PresentedNotificationsState>()((
       return { ids: next };
     }),
 
-  clear: () => set({ ids: new Set<number>() }),
+  adopt: (identity) =>
+    set((state) => {
+      if (state.identity === identity) return state;
+      // An unclaimed ledger holds this session's own presentations, so it is kept, not wiped.
+      if (state.identity === null) return { identity };
+      return { ids: new Set<string>(), identity };
+    }),
+
+  clear: () => set({ ids: new Set<string>(), identity: null }),
 }));
 
 /** Marks feed rows as surfaced so no later poll or merge can announce them again. */
 export function recordPresentedNotifications(items: readonly NotificationFeedItem[]) {
   if (items.length === 0) return;
 
-  usePresentedNotifications.getState().recordAll(items.map((item) => item.id));
+  usePresentedNotifications.getState().recordAll(items.map((item) => item.publicId));
 }
 
 /** Rows never surfaced yet, keeping the newest-first order they arrived in. */
@@ -45,7 +58,7 @@ export function unpresentedNotifications(
 ): readonly NotificationFeedItem[] {
   const presented = usePresentedNotifications.getState().ids;
 
-  return items.filter((item) => !presented.has(item.id));
+  return items.filter((item) => !presented.has(item.publicId));
 }
 
 /**
@@ -53,22 +66,22 @@ export function unpresentedNotifications(
  * in the bell, unknown types have nothing renderable to say, and a catch-up after a hidden
  * stretch collapses into a single card instead of bursting.
  */
-export function planArrivalToast(arrivals: readonly NotificationFeedItem[]): ToastRequest | null {
+export function planArrivalToast(
+  tier: NotificationTier,
+  arrivals: readonly NotificationFeedItem[],
+): ToastRequest | null {
   const announcement = arrivals.find(
-    (item) => NOTIFICATION_CATALOG.get(item.typeKey)?.importance === "high",
+    (item) => knownNotificationEntry(tier, item)?.importance === "high",
   );
 
   if (!announcement) {
     return null;
   }
 
-  return { typeKey: announcement.typeKey, params: announcement.params };
+  return {
+    tier,
+    typeKey: announcement.typeKey,
+    typeVersion: announcement.typeVersion,
+    params: announcement.params,
+  };
 }
-
-// The ledger belongs to one identity; a shared browser would otherwise hand the next session's
-// first poll a stale "already presented" list.
-useAuthStore.subscribe((state, previous) => {
-  if (state.session?.user.publicId !== previous.session?.user.publicId) {
-    usePresentedNotifications.getState().clear();
-  }
-});

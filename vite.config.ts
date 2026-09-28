@@ -28,15 +28,22 @@ export default defineConfig({
     },
   },
   build: {
-    // ApexCharts is an intentional core dashboard dependency. Keep it out of
-    // the app shell, then budget the known chart vendor chunk explicitly.
+    // Budget the shared vendor chunk separately from route-specific contracts.
     chunkSizeWarningLimit: 650,
     rollupOptions: {
       output: {
+        onlyExplicitManualChunks: true,
         manualChunks(id) {
-          if (id.includes("apexcharts") || id.includes("react-apexcharts")) {
-            return "charts";
-          }
+          const path = id.replaceAll("\\", "/");
+          if (path.includes("/node_modules/")) return "vendor";
+          if (
+            path.includes("/src/shared/public-api/") ||
+            /\/src\/shared\/api\/(public-api|config)\.ts$/.test(path)
+          )
+            return "public-transport";
+          if (/\/src\/shared\/(ui|lib|config|i18n)\//.test(path)) return "presentation";
+          if (/\/src\/shared\/api\/generated\/(runtime|metadata)\.ts$/.test(path))
+            return "contract-runtime";
         },
       },
     },

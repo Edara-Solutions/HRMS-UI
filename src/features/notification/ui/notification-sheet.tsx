@@ -118,7 +118,7 @@ export function NotificationSheet({
                   center.activate(row);
                   onClose();
                 }}
-                onMarkRead={(row) => center.markRead(row.item.id)}
+                onMarkRead={(row) => center.markRead(row.item.publicId)}
               />
             </div>
 

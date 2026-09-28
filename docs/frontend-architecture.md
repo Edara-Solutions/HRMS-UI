@@ -7,6 +7,10 @@
 > *looks*, load the `edara-hrms-ui` skill. This doc governs **where code goes**.
 
 We use a **pragmatic, minimal [Feature-Sliced Design](https://fsd.how)**.
+The split-tier existing-contract migration is complete through [S12's removal and reachability gate](s12-legacy-removal-reachability.md), extended by [bounded Company email diagnostics](company-email-diagnostics.md). The [exact operation ledger](../contracts/ui-operation-ledger.json) assigns 212 mounted UI operations and the health probe to consumers. Company and Platform portals remain isolated, with separate sessions, clients and identity cache roots. Delegated support uses its own operation audience under Platform identity and a live Access Session ([S11](s11-platform-access-sessions.md)). Synthetic diagnostics add four dedicated delegated operations from the pinned accepted backend runtime.
+
+Platform pages use `requestPlatformOperation`/`platformQueryKey`; Company pages use `requestCompanyOperation`/`companyReadQuery`. Mutations reconcile refused authority through their audience recovery helpers. Root-reserved actions additionally require the current `SUPER_ADMIN` role. Rendered email HTML stays in `shared/ui/email-preview-frame` with sanitisation, an empty sandbox and deny-all CSP. Future workflows need a published owning contract and reviewed reachability before mounting.
+
 The guiding rule is FSD's own: **start in `pages/`, extract downward only when
 the same code is *already* used in more than one place.** When unsure, keep it
 in the page.
@@ -23,9 +27,9 @@ app       → routing, providers, global styles, route guards. No business logic
 pages     → one slice per screen. Owns its UI, forms, modals, data-fetching hooks.
 widgets   → large composite blocks reused across many pages. Today: app shell only.
 features  → a reusable user interaction used in 2+ places. Today: auth forms and
-            the Audit Trail filter bar, which both portals render.
+            the Audit Trail filter bar, which both portals render, and the safe Platform Company registry form shared by create and edit.
 shared    → infrastructure with NO business logic: ui kit, lib, api client,
-            auth/session, i18n, config, charts. Organised by segment, no slices.
+            auth/session, i18n and config. Organised by segment, no slices.
 ```
 
 **We do not use an `entities` layer.** Domain types come from the backend's
@@ -39,33 +43,33 @@ src/
   app/
     routes/            # TanStack routesDirectory — thin route files only
       __root.tsx
-      login/index.tsx
-      admin/
-        route.tsx      # admin portal shell (layout)
+      plans/index.tsx
+      company_/  platform_/   # credential routes outside authenticated shells
+      platform/
+        route.tsx      # platform portal shell (layout)
         companies/index.tsx        $publicId.tsx
         leads/index.tsx            $publicId.tsx
-        dashboard/index.tsx  audit/  plans/  subscriptions/  login/
+        dashboard/index.tsx  audit/  plans/  subscriptions/  access-sessions/
       company/
         route.tsx      # company portal shell
         dashboard/index.tsx
-      accept-invitation/  change-password/  forbidden/
     providers/         # QueryClientProvider, RouterProvider, i18n + theme runtime
     guards/            # route guards (auth/permission gating)
     styles/globals.css
-    main.tsx
+  main.tsx
   pages/
-    login/
-    admin/{companies,company-detail,leads,lead-detail,dashboard,audit,plans,subscriptions,login}/
+    public-plans/  audience-auth/  audience-password/  account/
+    platform/{companies,company-detail,leads,lead-detail,audit,plans,subscriptions,access-session}/
     company/dashboard/
-    accept-invitation/  change-password/  forbidden/
+    refusal/            # audience recovery and the Platform workspace home
   widgets/
     app-shell/
   features/
     auth/
     audit-filters/     # the filter bar both Audit Trails render
   shared/
-    ui/  lib/  charts/
-    api/               # ky client, query-client, error-mapper, generated schema.d.ts
+    ui/  lib/
+    api/               # audience clients, query clients and per-operation generated contracts
     auth/              # token/session store, permission checks
     i18n/  config/
 ```
@@ -76,7 +80,7 @@ Every slice in `pages/`, `widgets/`, `features/` is a folder with these
 optional segments and **one `index.ts` public API**:
 
 ```
-pages/admin/companies/
+pages/platform/companies/
   ui/            # components: the page + its modals, forms, table rows
   api/           # React Query hooks that call the backend for THIS slice
   model/         # slice-local types, zod schemas, small state, derived logic
@@ -91,18 +95,18 @@ Use whatever segments you need; a tiny page may be just `ui/` + `index.ts`.
 ## 2. The four hard rules (Steiger enforces these)
 
 1. **Import downward only.** `app → pages → widgets → features → shared`.
-2. **No cross-slice imports.** `pages/admin/leads` must not import from
-   `pages/admin/companies`. If they must share, push the shared bit down to
+2. **No cross-slice imports.** `pages/platform/leads` must not import from
+   `pages/platform/companies`. If they must share, push the shared bit down to
    `shared/` (or, rarely, a `feature`/`widget`) — never sideways.
 3. **Enter every slice through its `index.ts`.** Import
-   `from "@/pages/admin/companies"`, never
-   `from "@/pages/admin/companies/ui/CompaniesTable"`.
+   `from "@/pages/platform/companies"`, never
+   `from "@/pages/platform/companies/ui/CompaniesTable"`.
 4. **No business logic in `shared/`.** `shared/` is infrastructure only.
    Domain rules live in the page/feature that owns them.
 
 ### Portal isolation (important)
 
-`admin/*` and `company/*` are **separate worlds** that will one day be split
+`platform/*` and `company/*` are **separate worlds** that will one day be split
 into separate apps. **They must never import from each other.** Anything
 genuinely common goes to `shared/`. Each portal has its own shell widget/route.
 
@@ -145,24 +149,24 @@ layout nesting) and renders a page from `@/pages/*`. No screen logic lives in a
 route file.
 
 ```tsx
-// src/app/routes/admin/companies/index.tsx
+// src/app/routes/platform/companies/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AdminCompaniesPage } from "@/pages/admin/companies";
+import { PlatformCompaniesPage } from "@/pages/platform/companies";
 
 const searchSchema = z.object({
   q: z.string().max(120).optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
 });
 
-export const Route = createFileRoute("/admin/companies/")({
+export const Route = createFileRoute("/platform/companies/")({
   validateSearch: searchSchema.parse,
-  component: AdminCompaniesPage,
+  component: PlatformCompaniesPage,
 });
 ```
 
 - `route.tsx` inside a folder = that folder's layout/shell (e.g.
-  `admin/route.tsx` is the admin portal shell).
+  `platform/route.tsx` is the platform portal shell).
 - `$publicId.tsx` = a dynamic segment.
 - `__root.tsx` = the app root.
 - The generated `routeTree.gen.ts` is committed output — never edit by hand.
@@ -174,52 +178,38 @@ export const Route = createFileRoute("/admin/companies/")({
 The backend owns the domain. **Do not hand-roll `Company`, `Lead`,
 `SubscriptionStatus`, … in a slice.** Generate them:
 
-```bash
-# backend must be running on :3000
-bun run openapi:types      # writes src/shared/api/schema.d.ts
-```
+Regenerate the audience artifacts from the vendored contract with `bun run openapi:audiences`. `bun run openapi:gen` additionally refreshes the vendored snapshot and audit metadata. `bun run openapi:check` checks provenance, deterministic generation and bilingual audit labels.
 
-Then derive slice types from the generated schema:
+Derive request and response types from the owning operation module or its public audience export. Never import a combined runtime contract into UI. A generated operation owns its request/response validation, audience and authorization metadata; the typed audience transport executes it. This is why we need no `entities` layer.
 
-```ts
-import type { components } from "@/shared/api/schema";
-type Company = components["schemas"]["Company"];
-```
-
-`shared/api/schema.d.ts` is the **single source of domain truth** and maps 1:1
-to the backend's bounded contexts (auth, companies, leads, plans, rbac, users).
-This is why we need no `entities` layer.
-
-Backend↔frontend map (all real except dashboards):
+Backend↔frontend ownership map:
 
 | Backend context | Frontend slice(s)                         |
 | --------------- | ----------------------------------------- |
-| auth / rbac     | `pages/*/login`, `features/auth`, `shared/auth` |
-| companies       | `pages/admin/companies`, `company-detail` |
-| leads           | `pages/admin/leads`, `lead-detail`        |
-| plans           | `pages/admin/plans`                       |
-| audit           | `pages/admin/audit`                        |
-| *(none yet)*    | `pages/*/dashboard` → still on `fixtures.ts` (placeholder) |
+| auth / rbac     | `pages/audience-auth`, `audience-password`, `account`, `features/auth`, `shared/auth` |
+| companies       | `pages/platform/companies`, `company-detail` |
+| leads           | `pages/platform/leads`, `lead-detail`        |
+| plans           | `pages/platform/plans`                       |
+| audit           | `pages/platform/audit`                        |
+| company registry / activation / subscription / setup | `pages/company/dashboard`, `profile`, `setup` |
 
 Per-slice **React Query hooks** (`useCompanies`, `useCreateLead`) live in that
 slice's `api/` segment and consume the generated types + the shared client.
 
 ---
 
-## 6. Worked example — add an "Admin → Departments" screen
+## 6. Worked example — add an "Platform → Departments" screen
 
-1. **Slice:** create `src/pages/admin/departments/` with `ui/`, `api/`,
+1. **Slice:** create `src/pages/platform/departments/` with `ui/`, `api/`,
    `index.ts`.
-2. **Types:** if the backend exposes departments, run `bun run openapi:types`
-   and use `components["schemas"]["Department"]`. Otherwise define a temporary
-   `model/department.ts` and mark it placeholder.
+2. **Contract:** require a published Platform departments operation, regenerate its audience artifact, and derive types from that operation. Keep unpublished workflows unmounted.
 3. **Data:** `api/departments.ts` → `useDepartments()` React Query hook using
-   `@/shared/api` client.
-4. **UI:** `ui/AdminDepartmentsPage.tsx` (plus any modal/form in the same
+   the generated operation and `requestPlatformOperation` with an identity-scoped query key.
+4. **UI:** `ui/PlatformDepartmentsPage.tsx` (plus any modal/form in the same
    `ui/`). Build it with `edara-hrms-ui` primitives from `@/shared/ui`.
-5. **Public API:** `index.ts` → `export { AdminDepartmentsPage } from "./ui/AdminDepartmentsPage";`
-6. **Route:** `src/app/routes/admin/departments/index.tsx` — thin, renders
-   `AdminDepartmentsPage` from `@/pages/admin/departments`.
+5. **Public API:** `index.ts` → `export { PlatformDepartmentsPage } from "./ui/PlatformDepartmentsPage";`
+6. **Route:** `src/app/routes/platform/departments/index.tsx` — thin, renders
+   `PlatformDepartmentsPage` from `@/pages/platform/departments`.
 7. **Verify:** `bun run typecheck && bun run lint && bun run test`. `lint`
    includes Steiger, which will fail if you crossed a layer or skipped a
    public API.
@@ -229,9 +219,9 @@ slice's `api/` segment and consume the generated types + the shared client.
 ## 7. Checklist before you commit UI
 
 - [ ] Screen lives in `pages/<portal>/<name>/`, entered via its `index.ts`.
-- [ ] No cross-slice or upward imports; no `admin ↔ company` import.
+- [ ] No cross-slice or upward imports; no `platform ↔ company` import.
 - [ ] Single-use blocks stayed in the page (didn't pre-extract to widgets/features).
-- [ ] Domain types come from `@/shared/api/schema`, not hand-rolled.
+- [ ] Domain types and validators come from the owning generated operation.
 - [ ] Route file is thin (config + render page only).
 - [ ] Domain-based kebab-case filenames (no `types.ts`/`utils.ts`).
 - [ ] `bun run typecheck && bun run lint && bun run test` all green.
@@ -286,8 +276,7 @@ exactly one owner, so they never double-report or conflict:
   `ui / api / model / lib`.
 - **Public API** — a slice's `index.ts`; the only import surface outsiders may
   use.
-- **Portal** — one of the two isolated worlds: **Admin** (operator CRM/SaaS
+- **Portal** — one of the two isolated worlds: **Platform** (operator CRM/SaaS
   management) and **Company** (tenant/employee app). See root `CONTEXT.md` for
   the domain language. Portals never import each other.
-- **Placeholder slice** — a screen still running on `fixtures.ts` demo data
-  because its backend endpoints aren't wired yet (currently: the dashboards).
+- **Reachable consumer** — a production request consumer mounted through runtime imports from the HTML entry, with explicit operation ownership in the reviewed ledger.

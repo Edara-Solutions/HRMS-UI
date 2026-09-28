@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
 import {
@@ -9,7 +10,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { hasPermission, useAuthStore } from "@/shared/auth";
+import { useCurrentAudience, useCurrentSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
@@ -22,6 +23,7 @@ interface SidebarProps {
   portalIcon: ReactNode;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  footer?: ReactNode;
 }
 
 export function Sidebar({
@@ -31,15 +33,10 @@ export function Sidebar({
   portalIcon,
   collapsed,
   onToggleCollapsed,
+  footer,
 }: SidebarProps) {
-  const user = useAuthStore((state) => state.session?.user);
-  const visibleGroups = groups.reduce<NavGroup[]>((result, group) => {
-    const items = group.items.filter(
-      (item) => !item.permission || hasPermission(user, item.permission),
-    );
-    if (items.length > 0) result.push({ ...group, items });
-    return result;
-  }, []);
+  const locale = usePreferencesStore((state) => state.locale);
+  const visibleGroups = groups;
   const { pathname } = useLocation();
   const matchingItems = visibleGroups.reduce<NavItem[]>((result, group) => {
     for (const item of group.items) {
@@ -87,7 +84,7 @@ export function Sidebar({
             type="button"
             onClick={onToggleCollapsed}
             className="ms-auto flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-text-faint)] transition-[background-color,color,transform] duration-[var(--motion-fast)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)] active:scale-95"
-            aria-label="Collapse sidebar"
+            aria-label={locale === "ar" ? "طي الشريط الجانبي" : "Collapse sidebar"}
           >
             <PanelLeft size={17} strokeWidth={1.9} className="shrink-0 rtl:-scale-x-100" />
           </button>
@@ -118,7 +115,7 @@ export function Sidebar({
       </nav>
 
       {/* Footer */}
-      <SidebarFooter collapsed={collapsed} />
+      {footer ?? <SessionFooter collapsed={collapsed} />}
     </aside>
   );
 }
@@ -134,6 +131,7 @@ function SidebarBrandToggle({
   label: string;
   onToggle: () => void;
 }) {
+  const locale = usePreferencesStore((state) => state.locale);
   if (!collapsed) {
     return (
       <div className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-text)] text-[13px] font-bold leading-none text-[var(--color-surface)]">
@@ -153,8 +151,8 @@ function SidebarBrandToggle({
         "hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)] active:scale-95",
         "focus-visible:bg-[var(--color-surface-2)] focus-visible:text-[var(--color-text)]",
       )}
-      aria-label={`Expand ${label} sidebar`}
-      title={`Expand ${label} sidebar`}
+      aria-label={locale === "ar" ? `توسيع الشريط الجانبي ${label}` : `Expand ${label} sidebar`}
+      title={locale === "ar" ? `توسيع الشريط الجانبي ${label}` : `Expand ${label} sidebar`}
     >
       <span className="absolute inset-0 rounded-[var(--radius-md)] bg-[var(--color-text)] transition-opacity duration-[var(--motion-fast)] group-hover:opacity-0 group-focus-visible:opacity-0" />
       <span className="relative transition-opacity duration-[var(--motion-fast)] group-hover:opacity-0 group-focus-visible:opacity-0">
@@ -289,8 +287,25 @@ function UserMenu({
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
-  const clearSession = useAuthStore((s) => s.clearSession);
+  const audience = useCurrentAudience();
+  const locale = usePreferencesStore((state) => state.locale);
   const navigate = useNavigate();
+  const logout = useMutation({
+    retry: false,
+    mutationFn: async () => {
+      if (audience === "company") return (await import("@/shared/company-auth")).signOutCompany();
+      if (audience === "platform")
+        return (await import("@/shared/platform-auth")).signOutPlatform();
+      throw new Error("Session unavailable");
+    },
+    onSuccess: (result) => {
+      onClose();
+      void navigate({
+        to: audience === "platform" ? "/platform/login" : "/company/login",
+        search: { localSignOutOnly: !result.remoteConfirmed },
+      });
+    },
+  });
   const menuRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({
     position: "fixed",
@@ -343,9 +358,7 @@ function UserMenu({
   }, [triggerRef]);
 
   function handleLogout() {
-    clearSession();
-    onClose();
-    navigate({ to: "/login" });
+    if (!logout.isPending) logout.mutate();
   }
 
   const itemClass =
@@ -358,13 +371,23 @@ function UserMenu({
       className="z-50 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
       role="menu"
     >
-      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
+      <Link
+        to={audience === "platform" ? "/platform/me/profile" : "/company/me/profile"}
+        className={itemClass}
+        onClick={onClose}
+        role="menuitem"
+      >
         <User size={14} className="shrink-0 opacity-70" />
-        <span>Profile</span>
+        <span>{locale === "ar" ? "الملف الشخصي" : "Profile"}</span>
       </Link>
-      <Link to="/company/dashboard" className={itemClass} onClick={onClose} role="menuitem">
+      <Link
+        to={audience === "platform" ? "/platform/me/security" : "/company/me/security"}
+        className={itemClass}
+        onClick={onClose}
+        role="menuitem"
+      >
         <Settings size={14} className="shrink-0 opacity-70" />
-        <span>Settings</span>
+        <span>{locale === "ar" ? "الإعدادات" : "Settings"}</span>
       </Link>
       <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />
       <button
@@ -374,18 +397,20 @@ function UserMenu({
           "text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]",
         )}
         onClick={handleLogout}
+        disabled={logout.isPending}
         role="menuitem"
       >
         <LogOut size={14} className="shrink-0" />
-        <span>Sign out</span>
+        <span>{locale === "ar" ? "تسجيل الخروج" : "Sign out"}</span>
       </button>
     </div>,
     document.body,
   );
 }
 
-function SidebarFooter({ collapsed }: { collapsed: boolean }) {
-  const user = useAuthStore((state) => state.session?.user);
+export function SessionFooter({ collapsed = false }: { collapsed?: boolean }) {
+  const locale = usePreferencesStore((state) => state.locale);
+  const user = useCurrentSession()?.user;
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -403,7 +428,7 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
         )}
         aria-haspopup="menu"
         aria-expanded={menuOpen}
-        aria-label="User menu"
+        aria-label={locale === "ar" ? "قائمة المستخدم" : "User menu"}
       >
         <Avatar
           size="sm"
@@ -417,7 +442,13 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
                 {user ? `${user.firstName} ${user.lastName}` : "User"}
               </p>
               <p className="truncate text-[11px] text-[var(--color-text-faint)]">
-                {user?.status === "ACTIVE" ? "Employee" : (user?.status ?? "")}
+                {user && "roleNames" in user
+                  ? [locale === "ar" ? "مستخدم المنصة" : "Platform User", ...user.roleNames].join(
+                      " · ",
+                    )
+                  : locale === "ar"
+                    ? "مستخدم الشركة"
+                    : "Company User"}
               </p>
             </div>
             <ChevronUp

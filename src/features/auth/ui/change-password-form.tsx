@@ -1,143 +1,137 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { HTTPError } from "ky";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { mapHttpStatusToAppError } from "@/shared/api";
+import {
+  loadCompanyPasswordContract,
+  loadPlatformPasswordContract,
+  OperationRefusal,
+} from "@/shared/api";
+import {
+  type AudienceName,
+  readCredentialContext,
+  retainCredentialContext,
+  useAudienceSession,
+} from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
 import { Label } from "@/shared/ui/label";
 import { PasswordInput } from "@/shared/ui/password-input";
 import { useChangePassword } from "../api/change-password";
 
-function changePasswordErrorMessage(error: unknown): string {
-  if (error instanceof HTTPError) {
-    const appError = mapHttpStatusToAppError(error.response.status);
-
-    if (appError.kind === "validation") {
-      return "Your current password is incorrect, or the new password doesn't meet the requirements (at least 8 characters, with uppercase, lowercase, a digit, and a special character).";
-    }
-
-    if (appError.kind === "rate_limited") {
-      return "Too many attempts. Please wait a moment and try again.";
-    }
-  }
-
-  return "Something went wrong. Please try again.";
+interface ChangePasswordFormProps {
+  audience: AudienceName;
 }
 
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z
-      .string()
-      .min(8, "New password must be at least 8 characters")
-      .max(128, "New password must be 128 characters or less"),
-    confirmPassword: z.string().min(1, "Please confirm your new password"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
-
-export function ChangePasswordForm() {
-  const changePassword = useChangePassword();
+export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
+  const { t } = useTranslation("auth");
+  const changePassword = useChangePassword(audience);
   const navigate = useNavigate();
-  const [apiError, setApiError] = useState<string | null>(null);
-
+  const { generation } = useAudienceSession(audience);
+  const [feedback, setFeedback] = useState<string | null>(() =>
+    readCredentialContext(audience, generation)?.passwordAttempted
+      ? t("account.uncertainChange")
+      : null,
+  );
+  const {
+    data: contract,
+    isError: contractUnavailable,
+    refetch: reloadContract,
+  } = useQuery({
+    queryKey: [audience, "password-contract"],
+    queryFn: () =>
+      audience === "company" ? loadCompanyPasswordContract() : loadPlatformPasswordContract(),
+    staleTime: Infinity,
+    retry: false,
+  });
+  const schema = contract?.requestSchema.shape.body
+    .extend({ confirmPassword: z.string().min(1) })
+    .refine((input) => input.newPassword === input.confirmPassword, {
+      path: ["confirmPassword"],
+      message: "Passwords do not match",
+    });
+  type PasswordFormData = z.infer<NonNullable<typeof schema>>;
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
+  } = useForm<PasswordFormData>({
+    resolver: schema ? zodResolver(schema) : undefined,
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  async function onSubmit(data: ChangePasswordFormData) {
-    setApiError(null);
-
+  async function submit(input: PasswordFormData) {
+    if (!schema || changePassword.isPending) return;
+    setFeedback(null);
+    retainCredentialContext(audience, generation, { passwordAttempted: true });
     try {
       const session = await changePassword.mutateAsync({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
+        currentPassword: input.currentPassword,
+        newPassword: input.newPassword,
       });
-
-      if (session.user.mustChangePassword) {
-        void navigate({ to: "/change-password" });
-      } else if (session.user.isPlatformAdmin) {
-        void navigate({ to: "/admin/dashboard" });
-      } else {
-        void navigate({ to: "/company/dashboard" });
-      }
+      retainCredentialContext(audience, generation, { passwordAttempted: false });
+      await navigate({
+        href: session.user.mustChangePassword
+          ? `/${audience}/change-password`
+          : `/${audience}/dashboard`,
+      });
     } catch (error) {
-      setApiError(changePasswordErrorMessage(error));
+      setFeedback(
+        t(
+          error instanceof OperationRefusal && error.status === 429
+            ? "journey.rateLimited"
+            : "account.uncertainChange",
+        ),
+      );
     }
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      {apiError && (
-        <div className="rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-sm text-[var(--color-danger)]">
-          {apiError}
+    <Form onSubmit={handleSubmit(submit)} aria-busy={changePassword.isPending}>
+      {feedback ? (
+        <p role="status" className="text-sm text-[var(--color-text-muted)]">
+          {feedback}
+        </p>
+      ) : null}
+      {contractUnavailable ? <p role="status">{t("journey.unavailable")}</p> : null}
+      {(["currentPassword", "newPassword", "confirmPassword"] as const).map((name) => (
+        <div key={name} className="space-y-1.5">
+          <Label htmlFor={`password-change-${name}`}>
+            {t(name === "currentPassword" ? "account.currentPassword" : `journey.${name}`)}
+          </Label>
+          <PasswordInput
+            id={`password-change-${name}`}
+            autoComplete={name === "currentPassword" ? "current-password" : "new-password"}
+            required
+            maxLength={128}
+            aria-invalid={!!errors[name]}
+            disabled={changePassword.isPending || !schema}
+            {...register(name)}
+          />
+          {errors[name] ? (
+            <p className="text-xs text-[var(--color-danger)]">
+              {t(name === "confirmPassword" ? "journey.passwordMismatch" : "journey.invalidField")}
+            </p>
+          ) : null}
         </div>
-      )}
-
-      <div className="space-y-1.5">
-        <Label htmlFor="currentPassword">Current password</Label>
-        <PasswordInput
-          id="currentPassword"
-          autoComplete="current-password"
-          aria-invalid={!!errors.currentPassword}
-          {...register("currentPassword")}
-        />
-        {errors.currentPassword && (
-          <p className="text-xs text-[var(--color-danger)]">{errors.currentPassword.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="newPassword">New password</Label>
-        <PasswordInput
-          id="newPassword"
-          autoComplete="new-password"
-          aria-invalid={!!errors.newPassword}
-          {...register("newPassword")}
-        />
-        {errors.newPassword && (
-          <p className="text-xs text-[var(--color-danger)]">{errors.newPassword.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword">Confirm new password</Label>
-        <PasswordInput
-          id="confirmPassword"
-          autoComplete="new-password"
-          aria-invalid={!!errors.confirmPassword}
-          {...register("confirmPassword")}
-        />
-        {errors.confirmPassword && (
-          <p className="text-xs text-[var(--color-danger)]">{errors.confirmPassword.message}</p>
-        )}
-      </div>
-
+      ))}
       <Button
-        intent="cta"
         type="submit"
+        intent="cta"
         size="block"
-        disabled={changePassword.isPending}
+        disabled={changePassword.isPending || !schema}
         isLoading={changePassword.isPending}
       >
-        Change password
+        {t("account.changePassword")}
       </Button>
+      {contractUnavailable ? (
+        <Button intent="action" onClick={() => void reloadContract()}>
+          {t("journey.retry")}
+        </Button>
+      ) : null}
     </Form>
   );
 }

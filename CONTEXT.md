@@ -6,7 +6,7 @@ and this file disagree, one of them is wrong — fix it in the same change.
 ## Notification center
 
 **Notification** — a server-generated event card addressed to one identity scope
-(company member or platform admin). Carries a type key, importance, params, and
+(company member or platform platform). Carries a type key, importance, params, and
 lifecycle timestamps.
 
 **Unseen** — a notification the user's eyes never landed on (`seen_at` and

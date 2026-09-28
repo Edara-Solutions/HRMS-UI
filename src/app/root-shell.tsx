@@ -1,25 +1,25 @@
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useLocation } from "@tanstack/react-router";
 import { ForcedPasswordChangeModal } from "@/features/auth";
+import { RefusalPage } from "@/pages/refusal";
+import { isPlatformPortalEnabled, routeDeclarations } from "@/shared/auth";
 import { LocaleRuntime } from "@/shared/i18n";
 
 export function RootLayout() {
+  const pathname = useLocation({ select: (location) => location.pathname }).replace(/\/$/, "");
+  const route = routeDeclarations.find((candidate) => candidate.path === pathname);
+  const passwordGate =
+    route &&
+    route.category !== "public" &&
+    route.category !== "credential" &&
+    (route.audience !== "platform" || isPlatformPortalEnabled());
   return (
-    <main className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
+    <div className="min-h-dvh bg-[var(--color-bg)] text-[var(--color-text)]">
       <LocaleRuntime />
       <Outlet />
-      <ForcedPasswordChangeModal />
-    </main>
+      {passwordGate && <ForcedPasswordChangeModal audience={route.audience} />}
+    </div>
   );
 }
-
 export function NotFoundPage() {
-  return (
-    <section className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center px-4 sm:px-6">
-      <p className="text-sm font-medium text-[var(--color-text-muted)]">404</p>
-      <h1 className="mt-2 text-3xl font-semibold">Page not found</h1>
-      <p className="mt-3 max-w-prose text-sm text-[var(--color-text-muted)]">
-        This route is not part of the current frontend foundation slice.
-      </p>
-    </section>
-  );
+  return <RefusalPage kind="not-found" />;
 }
