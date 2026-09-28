@@ -19,6 +19,7 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { EnumSelect } from "@/shared/ui/enum-select";
 import { Label } from "@/shared/ui/label";
+import { QueryPanel } from "@/shared/ui/query-panel";
 import { Skeleton } from "@/shared/ui/skeleton";
 import {
   assignTemplate,
@@ -110,10 +111,35 @@ export function CompanyEmailTemplatesPage() {
               ))}
             </ul>
           </nav>
-          <EmailTypeDetail key={selected.key} type={selected} />
+          <VerifiedEmailTypeDetail key={selected.key} typeKey={selected.key} />
         </div>
       )}
     </div>
+  );
+}
+
+interface VerifiedEmailTypeDetailProps {
+  typeKey: string;
+}
+function VerifiedEmailTypeDetail({ typeKey }: VerifiedEmailTypeDetailProps) {
+  const { t } = useTranslation("communications");
+  const access = useCompanyAccess();
+  const { data, error, isPending, refetch } = useQuery({
+    ...emailTemplateQueries(access.user?.publicId ?? "").detail(typeKey),
+    enabled: access.availability("GET /api/v1/company/email-types/{key}").state === "enabled",
+    retry: false,
+  });
+  if (isCompanyBlocked(error)) throw error;
+  if (error instanceof OperationRefusal && [403, 404].includes(error.status)) throw error;
+  return (
+    <QueryPanel
+      title={t("templates.types")}
+      pending={isPending}
+      error={error}
+      retry={() => void refetch()}
+    >
+      {data && <EmailTypeDetail type={data} />}
+    </QueryPanel>
   );
 }
 

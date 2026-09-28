@@ -7,13 +7,12 @@ export {
   requestAudienceOperation,
   sendAudienceCommand,
 } from "./audience-operation";
-export { apiClient } from "./client";
 export {
   isCompanyBlocked,
   useCompanyAccess,
   useCompanyMutationRecovery,
 } from "./company-access";
-export { companyApi, loadCompanyIdentity, loginCompany } from "./company-api";
+export { loadCompanyIdentity, loginCompany } from "./company-api";
 export { companyApiClient } from "./company-client";
 export { companyCommunicationsOperations } from "./company-communications-operations";
 export {
@@ -48,17 +47,6 @@ export type {
 } from "./generated/authorization";
 export { operationAuthorization } from "./generated/authorization";
 export { ContractViolation } from "./generated/runtime";
-export type {
-  components as leadComponents,
-  paths as leadPaths,
-} from "./lead-contract";
-export {
-  parseLeadActivityListResponse,
-  parseLeadConversionEligibility,
-  parseLeadCreateResult,
-  parseLeadDetails,
-  parseLeadListResponse,
-} from "./lead-runtime-contract";
 export { classifyMutationFailure, type MutationOutcome } from "./mutation-outcome";
 export {
   companyNotificationOperations,
@@ -73,7 +61,7 @@ export {
   usePlatformAccess,
   usePlatformMutationRecovery,
 } from "./platform-access";
-export { loadPlatformIdentity, loginPlatform, platformApi } from "./platform-api";
+export { loadPlatformIdentity, loginPlatform } from "./platform-api";
 export { delegatedApiClient, platformApiClient } from "./platform-client";
 export { platformCommunicationsOperations } from "./platform-communications-operations";
 export { platformCompanyOperations } from "./platform-company-operations";
@@ -88,7 +76,6 @@ export { platformPeopleOperations } from "./platform-people-operations";
 export { platformPlanOperations } from "./platform-plan-operations";
 export { platformQueryClient } from "./platform-query-client";
 export { queryClient } from "./query-client";
-export type { components, paths } from "./schema";
 
 export async function loadCompanyPasswordContract() {
   return import("./generated/company/post-api-v1-company-me-password");

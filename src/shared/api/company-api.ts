@@ -7,8 +7,6 @@ import { operation as companyLogin } from "./generated/company/post-api-v1-compa
 import { ContractViolation } from "./generated/runtime";
 import { executeOperationRequest } from "./operation-request";
 
-export { companyApiClient as companyApi } from "./company-client";
-
 export async function loadCompanyIdentity(skipRefresh = false) {
   const expected = useCompanySession.getState().session?.user;
   const body = await executeOperationRequest(companyApiClient, companyMe, {}, { skipRefresh });

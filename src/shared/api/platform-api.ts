@@ -7,8 +7,6 @@ import { ContractViolation } from "./generated/runtime";
 import { executeOperationRequest } from "./operation-request";
 import { platformApiClient } from "./platform-client";
 
-export { platformApiClient as platformApi } from "./platform-client";
-
 export async function loadPlatformIdentity(skipRefresh = false) {
   const expected = usePlatformSession.getState().session?.user;
   const body = await executeOperationRequest(platformApiClient, platformMe, {}, { skipRefresh });

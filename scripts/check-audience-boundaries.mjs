@@ -61,6 +61,45 @@ export function assertNoInternalRuntimeImports(files = sourceFiles(sourceRoot)) 
     throw new Error(`Internal generated runtime imports:\n${violations.join("\n")}`);
 }
 
+export function assertNoCrossAudiencePageImports(files = sourceFiles(sourceRoot)) {
+  const config = ts.readConfigFile(join(root, "tsconfig.app.json"), ts.sys.readFile);
+  const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, root);
+  for (const path of files) {
+    const owner = path.replaceAll("\\", "/").match(/\/src\/pages\/(company|platform)\//)?.[1];
+    if (!owner || /\.test\./.test(path)) continue;
+    const source = ts.createSourceFile(
+      path,
+      readFileSync(path, "utf8"),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+    function check(specifier) {
+      const module = ts.resolveModuleName(specifier, path, parsed.options, ts.sys).resolvedModule;
+      const target = module?.resolvedFileName
+        .replaceAll("\\", "/")
+        .match(/\/src\/pages\/(company|platform)\//)?.[1];
+      if (target && target !== owner)
+        throw new Error(`Cross-audience page import: ${path} -> ${specifier}`);
+    }
+    function inspect(node) {
+      if (
+        (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+        node.moduleSpecifier &&
+        ts.isStringLiteral(node.moduleSpecifier)
+      )
+        check(node.moduleSpecifier.text);
+      if (
+        ts.isCallExpression(node) &&
+        node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+        ts.isStringLiteral(node.arguments[0])
+      )
+        check(node.arguments[0].text);
+      ts.forEachChild(node, inspect);
+    }
+    inspect(source);
+  }
+}
+
 function directImports(chunk) {
   const imports = new Set();
   const source = ts.createSourceFile(
@@ -135,8 +174,28 @@ export function inspectPublicBundle(assets = assetsRoot) {
   return { entry: entry[0][0], chunks: [...reachable].sort(), bytes };
 }
 
+/** Scan every emitted chunk, including lazy authenticated routes. */
+export function assertNoRetiredBundleMarkers(assets = assetsRoot) {
+  if (!existsSync(assets))
+    throw new Error("Production assets are missing; run `bun run build` first.");
+  for (const name of readdirSync(assets).filter((name) => extname(name) === ".js")) {
+    const code = readFileSync(join(assets, name), "utf8");
+    if (
+      /hrms-auth|hrms-prefs|isPlatformAdmin|platformAdminOnly|VITE_ENABLE_ADMIN|generated\/internal/.test(
+        code,
+      ) ||
+      /\/api\/v1\/(?:admin|auth|companies|users|roles|plans|leads|emails|email-types|email-template-variants|email-template-assignments)(?:[/"'`?]|$)/.test(
+        code,
+      )
+    )
+      throw new Error(`Production chunk contains retired runtime surface: ${name}`);
+  }
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   assertNoInternalRuntimeImports();
+  assertNoCrossAudiencePageImports();
+  assertNoRetiredBundleMarkers();
   const report = inspectPublicBundle();
   console.log(
     `Public route bundle: ${basename(report.entry)}, ${report.chunks.length} chunks, ${report.bytes} bytes.`,

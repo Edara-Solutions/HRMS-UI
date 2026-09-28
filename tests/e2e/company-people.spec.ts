@@ -227,7 +227,13 @@ test("conceals malformed and foreign people, and refuses unpermitted areas", asy
   await expect(
     page.getByRole("heading", { name: arabic ? "يبدو أنك ضللت الطريق" : "You missed your way" }),
   ).toBeVisible();
+  const foreignResponse = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === `/api/v1/company/users/${foreign}` &&
+      response.status() === 404,
+  );
   await page.goto(`/company/people/${foreign}`);
+  await foreignResponse;
   await expect(
     page.getByRole("heading", { name: arabic ? "يبدو أنك ضللت الطريق" : "You missed your way" }),
   ).toBeVisible();

@@ -7,7 +7,10 @@
 > *looks*, load the `edara-hrms-ui` skill. This doc governs **where code goes**.
 
 We use a **pragmatic, minimal [Feature-Sliced Design](https://fsd.how)**.
-During the split-tier migration, the business slice examples below describe source ownership, not mounted routes. Only public plans, audience authentication, SELF and the Company organization workflows (operational dashboard, organization profile, setup), Company people and access control (roster, person detail, roles, ownership), and Company communications (email settings and sending domain, email templates, notification routing, the notification bell) and the Company audit trail, and Platform people and roles (roster, invitation, person detail with lifecycle, recovery, sessions and role assignments, role catalogue and grants), and Platform Companies (registry, lifecycle, policy, activation, commercial configuration, subscriptions and confirmed global trial expiry), and Platform CRM (leads, contacts, activity, sending domains, conversion requests, review, plan correction and original-owner onboarding delivery), and Platform plans (plan definitions, price CRUD and explicit market effective-price inspection) and Platform communications (notification lifecycle/routing, bilingual announcements, global audit, synthetic email previews/test-send, approved variant migration, context-qualified delivery commands and sending controls) are currently reachable. See [S10 operation ownership and acceptance evidence](s10-platform-communications.md). Platform pages read through `requestPlatformOperation`/`platformQueryKey` with `platform + Platform User` cache roots; `usePlatformAccess` adds the current root (`SUPER_ADMIN`) prerequisite to the four root-reserved authority actions, and `usePlatformMutationRecovery` re-reads `/me` after a refusal or conflict. Rendered email HTML is shown only through `shared/ui/email-preview-frame` (sanitised by `isolateEmailHtml`, empty `sandbox`, deny-all CSP). Company mutations use `sendCompanyCommand` for bodyless commands and `useCompanyMutationRecovery` to record access refusals and re-read actor authority before any retry. Company pages read through `requestCompanyOperation`/`companyReadQuery` in `shared/api`: generated operations, a session-derived Company scope and `company + Company User` cache roots. Explicit CompanyShell and PlatformShell compose the audience-neutral app-shell widget. Future business/notification workflows must pass their owning contract migration gates before mounting; this intermediate state is nondeployable until the parent epic's final removal/reachability check.
+The split-tier existing-contract migration is complete through [S12's removal and reachability gate](s12-legacy-removal-reachability.md). The [exact operation ledger](../contracts/ui-operation-ledger.json) assigns 208 mounted UI operations and the health probe to consumers. Company and Platform portals remain isolated, with separate sessions, clients and identity cache roots. Delegated support uses its own operation audience under Platform identity and a live Access Session ([S11](s11-platform-access-sessions.md)). Company synthetic diagnostics remain blocked on issue 95/backend 290, so epic 81 remains open and complete release parity is not yet established.
+
+Platform pages use `requestPlatformOperation`/`platformQueryKey`; Company pages use `requestCompanyOperation`/`companyReadQuery`. Mutations reconcile refused authority through their audience recovery helpers. Root-reserved actions additionally require the current `SUPER_ADMIN` role. Rendered email HTML stays in `shared/ui/email-preview-frame` with sanitisation, an empty sandbox and deny-all CSP. Future workflows need a published owning contract and reviewed reachability before mounting.
+
 The guiding rule is FSD's own: **start in `pages/`, extract downward only when
 the same code is *already* used in more than one place.** When unsure, keep it
 in the page.
@@ -26,7 +29,7 @@ widgets   → large composite blocks reused across many pages. Today: app shell 
 features  → a reusable user interaction used in 2+ places. Today: auth forms and
             the Audit Trail filter bar, which both portals render, and the safe Platform Company registry form shared by create and edit.
 shared    → infrastructure with NO business logic: ui kit, lib, api client,
-            auth/session, i18n, config, charts. Organised by segment, no slices.
+            auth/session, i18n and config. Organised by segment, no slices.
 ```
 
 **We do not use an `entities` layer.** Domain types come from the backend's
@@ -40,33 +43,33 @@ src/
   app/
     routes/            # TanStack routesDirectory — thin route files only
       __root.tsx
-      login/index.tsx
+      plans/index.tsx
+      company_/  platform_/   # credential routes outside authenticated shells
       platform/
         route.tsx      # platform portal shell (layout)
         companies/index.tsx        $publicId.tsx
         leads/index.tsx            $publicId.tsx
-        dashboard/index.tsx  audit/  plans/  subscriptions/  login/
+        dashboard/index.tsx  audit/  plans/  subscriptions/  access-sessions/
       company/
         route.tsx      # company portal shell
         dashboard/index.tsx
-      accept-invitation/  change-password/  forbidden/
     providers/         # QueryClientProvider, RouterProvider, i18n + theme runtime
     guards/            # route guards (auth/permission gating)
     styles/globals.css
-    main.tsx
+  main.tsx
   pages/
-    login/
-    platform/{companies,company-detail,leads,lead-detail,dashboard,audit,plans,subscriptions,login}/
+    public-plans/  audience-auth/  audience-password/  account/
+    platform/{companies,company-detail,leads,lead-detail,audit,plans,subscriptions,access-session}/
     company/dashboard/
-    accept-invitation/  change-password/  forbidden/
+    refusal/            # audience recovery and the Platform workspace home
   widgets/
     app-shell/
   features/
     auth/
     audit-filters/     # the filter bar both Audit Trails render
   shared/
-    ui/  lib/  charts/
-    api/               # ky client, query-client, error-mapper, generated schema.d.ts
+    ui/  lib/
+    api/               # audience clients, query clients and per-operation generated contracts
     auth/              # token/session store, permission checks
     i18n/  config/
 ```
@@ -175,27 +178,15 @@ export const Route = createFileRoute("/platform/companies/")({
 The backend owns the domain. **Do not hand-roll `Company`, `Lead`,
 `SubscriptionStatus`, … in a slice.** Generate them:
 
-```bash
-# backend must be running on :3000
-bun run openapi:types      # writes src/shared/api/schema.d.ts
-```
+Regenerate the audience artifacts from the vendored contract with `bun run openapi:audiences`. `bun run openapi:gen` additionally refreshes the vendored snapshot and audit metadata. `bun run openapi:check` checks provenance, deterministic generation and bilingual audit labels.
 
-Then derive slice types from the generated schema:
+Derive request and response types from the owning operation module or its public audience export. Never import a combined runtime contract into UI. A generated operation owns its request/response validation, audience and authorization metadata; the typed audience transport executes it. This is why we need no `entities` layer.
 
-```ts
-import type { components } from "@/shared/api/schema";
-type Company = components["schemas"]["Company"];
-```
-
-`shared/api/schema.d.ts` is the **single source of domain truth** and maps 1:1
-to the backend's bounded contexts (auth, companies, leads, plans, rbac, users).
-This is why we need no `entities` layer.
-
-Backend↔frontend map (all real except dashboards):
+Backend↔frontend ownership map:
 
 | Backend context | Frontend slice(s)                         |
 | --------------- | ----------------------------------------- |
-| auth / rbac     | `pages/*/login`, `features/auth`, `shared/auth` |
+| auth / rbac     | `pages/audience-auth`, `audience-password`, `account`, `features/auth`, `shared/auth` |
 | companies       | `pages/platform/companies`, `company-detail` |
 | leads           | `pages/platform/leads`, `lead-detail`        |
 | plans           | `pages/platform/plans`                       |
@@ -211,11 +202,9 @@ slice's `api/` segment and consume the generated types + the shared client.
 
 1. **Slice:** create `src/pages/platform/departments/` with `ui/`, `api/`,
    `index.ts`.
-2. **Types:** if the backend exposes departments, run `bun run openapi:types`
-   and use `components["schemas"]["Department"]`. Otherwise define a temporary
-   `model/department.ts` and mark it placeholder.
+2. **Contract:** require a published Platform departments operation, regenerate its audience artifact, and derive types from that operation. Keep unpublished workflows unmounted.
 3. **Data:** `api/departments.ts` → `useDepartments()` React Query hook using
-   `@/shared/api` client.
+   the generated operation and `requestPlatformOperation` with an identity-scoped query key.
 4. **UI:** `ui/PlatformDepartmentsPage.tsx` (plus any modal/form in the same
    `ui/`). Build it with `edara-hrms-ui` primitives from `@/shared/ui`.
 5. **Public API:** `index.ts` → `export { PlatformDepartmentsPage } from "./ui/PlatformDepartmentsPage";`
@@ -232,7 +221,7 @@ slice's `api/` segment and consume the generated types + the shared client.
 - [ ] Screen lives in `pages/<portal>/<name>/`, entered via its `index.ts`.
 - [ ] No cross-slice or upward imports; no `platform ↔ company` import.
 - [ ] Single-use blocks stayed in the page (didn't pre-extract to widgets/features).
-- [ ] Domain types come from `@/shared/api/schema`, not hand-rolled.
+- [ ] Domain types and validators come from the owning generated operation.
 - [ ] Route file is thin (config + render page only).
 - [ ] Domain-based kebab-case filenames (no `types.ts`/`utils.ts`).
 - [ ] `bun run typecheck && bun run lint && bun run test` all green.
@@ -290,5 +279,4 @@ exactly one owner, so they never double-report or conflict:
 - **Portal** — one of the two isolated worlds: **Platform** (operator CRM/SaaS
   management) and **Company** (tenant/employee app). See root `CONTEXT.md` for
   the domain language. Portals never import each other.
-- **Placeholder slice** — a screen still running on `fixtures.ts` demo data
-  because its backend endpoints aren't wired yet (currently: the Platform dashboard).
+- **Reachable consumer** — a production request consumer mounted through runtime imports from the HTML entry, with explicit operation ownership in the reviewed ledger.

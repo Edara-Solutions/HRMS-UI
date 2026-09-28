@@ -18,7 +18,13 @@ import {
   communicationsBrowser,
 } from "./platform-communications-fixtures";
 
-for (const route of ["announcements", "email-sending", "email-deliveries", "audit"])
+for (const route of [
+  "announcements",
+  "email-sending",
+  "email-deliveries",
+  "audit",
+  "audit/catalog",
+])
   for (const crossed of [false, true])
     test(`${route} presentation ${crossed}`, async ({ page }, info) => {
       const { calls } = await communicationsBrowser(page, info.project.name === "chromium-rtl", {
@@ -33,7 +39,10 @@ for (const route of ["announcements", "email-sending", "email-deliveries", "audi
       await assertCommunicationsLayout(page);
       await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
       await assertCommunicationsLayout(page);
-      await page.screenshot({ path: info.outputPath(`${route}-${crossed}.png`), fullPage: true });
+      await page.screenshot({
+        path: info.outputPath(`${route}-${crossed}.png`),
+        fullPage: route !== "audit/catalog",
+      });
       expect(
         calls.every(
           (call) => call.key.includes("/platform/") && call.token === "Bearer access-canary",

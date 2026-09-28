@@ -55,7 +55,7 @@ function describesEvent(event: AuditEventMetadata, query: string): boolean {
 
 const actorLabelKeys = {
   USER: "chrome.actorUser",
-  PLATFORM_ADMIN: "chrome.platformAdmin",
+  PLATFORM_USER: "chrome.actorKind.PLATFORM_USER",
   SYSTEM: "chrome.actorSystem",
   ANONYMOUS: "chrome.actorAnonymous",
   ATTRIBUTION_FAILED: "chrome.actorAnonymous",

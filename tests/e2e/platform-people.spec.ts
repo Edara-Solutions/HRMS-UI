@@ -87,6 +87,10 @@ async function open(
     const override = overrides[key];
     if (override) return override(route);
     if (key === "GET /api/v1/platform/me") return route.fulfill({ json: session.user });
+    if (key === "GET /api/v1/platform/notifications")
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    if (key === "GET /api/v1/platform/notifications/unread-count")
+      return route.fulfill({ json: { unreadCount: 0 } });
     if (key === "GET /api/v1/platform/users")
       return route.fulfill({
         json: platformRosterBody([platformIds.actor, platformIds.colleague, platformIds.root]),

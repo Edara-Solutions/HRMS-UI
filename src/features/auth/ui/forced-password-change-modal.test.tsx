@@ -14,7 +14,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   return { ...actual, useNavigate: () => navigateMock };
 });
 
-// `ky` (the apiClient's HTTP layer) constructs AbortSignals that jsdom's fetch
+// `ky` (the audience client's HTTP layer) constructs AbortSignals that jsdom's fetch
 // rejects as cross-realm — stub the client boundary instead of the network.
 vi.mock("@/shared/api/company-client", () => ({
   companyApiClient: Object.assign(

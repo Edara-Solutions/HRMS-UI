@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
+  ContractViolation,
   companyQueryKey,
   companyReadQuery,
   companyCommunicationsOperations as operations,
@@ -12,6 +13,25 @@ import type { PreviewLocale } from "../model/email-templates";
 export function emailTemplateQueries(userPublicId: string) {
   return {
     types: companyReadQuery(userPublicId, operations.emailTypes),
+    detail: (key: string) =>
+      queryOptions({
+        queryKey: companyQueryKey(userPublicId, operations.emailType, key),
+        queryFn: async ({ signal }) => {
+          const type = await requestCompanyOperation(
+            operations.emailType,
+            { params: { key } },
+            signal,
+          );
+          if (type.key !== key || type.context !== "COMPANY")
+            throw new ContractViolation({
+              audience: "company",
+              key: operations.emailType.key,
+              status: 200,
+              phase: "response",
+            });
+          return type;
+        },
+      }),
     assignments: companyReadQuery(userPublicId, operations.templateAssignments),
     variants: (key: string) =>
       queryOptions({

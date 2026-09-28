@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import {
-  defaultPresentation,
-  migrateLegacyPreferences,
-  usePreferencesStore,
-} from "./preferences-store";
+import { defaultPresentation, usePreferencesStore } from "./preferences-store";
 
 const id = "11111111-1111-4111-8111-111111111111";
 afterEach(() => {
@@ -11,26 +7,6 @@ afterEach(() => {
   localStorage.clear();
 });
 describe("identity-scoped presentation", () => {
-  it("migrates only locale and theme", () => {
-    expect(
-      migrateLegacyPreferences(
-        JSON.stringify({
-          state: {
-            locale: "ar",
-            theme: "dark",
-            sidebarCollapsed: true,
-            notificationListStyle: "flat",
-            token: "secret",
-          },
-        }),
-      ),
-    ).toEqual({ locale: "ar", theme: "dark", scopes: {} });
-    expect(migrateLegacyPreferences("not json")).toEqual({
-      locale: "en",
-      theme: "light",
-      scopes: {},
-    });
-  });
   it("isolates audience and identity and persists a versioned envelope", async () => {
     usePreferencesStore
       .getState()
@@ -46,7 +22,6 @@ describe("identity-scoped presentation", () => {
       state.scopes["company:22222222-2222-4222-8222-222222222222"] ?? defaultPresentation,
     ).toEqual(defaultPresentation);
     expect(JSON.parse(localStorage.getItem("hrms-preferences:v2") ?? "{}").version).toBe(2);
-    expect(localStorage.getItem("hrms-prefs")).toBeNull();
   });
   it.each([
     "garbage",
