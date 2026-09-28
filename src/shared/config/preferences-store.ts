@@ -37,16 +37,6 @@ interface PreferencesState {
   ) => void;
 }
 
-/** Only global display choices are unambiguous in the old identity-less storage. */
-export function migrateLegacyPreferences(raw: string | null) {
-  try {
-    const envelope = z.object({ state: globalSchema }).parse(JSON.parse(raw ?? "null"));
-    return { ...envelope.state, scopes: {} };
-  } catch {
-    return defaults;
-  }
-}
-
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
@@ -85,7 +75,7 @@ export const usePreferencesStore = create<PreferencesState>()(
           }
           return JSON.stringify({
             version: 2,
-            state: migrateLegacyPreferences(localStorage.getItem("hrms-prefs")),
+            state: defaults,
           });
         },
         setItem: (name, value) => localStorage.setItem(name, value),

@@ -41,10 +41,10 @@ async function configure(page: Page, arabic: boolean) {
   await page.addInitScript(
     (locale) => {
       localStorage.setItem(
-        "hrms-prefs",
+        "hrms-preferences:v2",
         JSON.stringify({
-          version: 0,
-          state: { locale, theme: locale === "ar" ? "dark" : "light" },
+          version: 2,
+          state: { locale, theme: locale === "ar" ? "dark" : "light", scopes: {} },
         }),
       );
     },
@@ -102,6 +102,12 @@ test("signs into both audiences independently and signs out only the selected sl
     } else if (path.endsWith("/auth/logout")) {
       expect(request.headers().authorization).toBe("Bearer company-access");
       await route.fulfill({ status: 204 });
+    } else if (path.endsWith("/notifications")) {
+      expect(request.headers().authorization).toBe(`Bearer ${own.accessToken}`);
+      await route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    } else if (path.endsWith("/notifications/unread-count")) {
+      expect(request.headers().authorization).toBe(`Bearer ${own.accessToken}`);
+      await route.fulfill({ json: { unreadCount: 0 } });
     } else {
       throw new Error(`Unexpected migrated request: ${request.method()} ${path}`);
     }
@@ -179,6 +185,10 @@ test("forced password completion and offline cleanup do not block the other port
       return route.fulfill({ json: { ...company.user, mustChangePassword: true } });
     if (path === "/api/v1/platform/me") return route.fulfill({ json: platform.user });
     if (path === "/api/v1/platform/me/profile") return route.fulfill({ json: platformProfile });
+    if (path.endsWith("/notifications"))
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    if (path.endsWith("/notifications/unread-count"))
+      return route.fulfill({ json: { unreadCount: 0 } });
     throw new Error(`Unexpected request: ${path}`);
   });
   await page.goto("/platform/me/profile");
@@ -268,6 +278,10 @@ for (const audience of ["company", "platform"] as const) {
       }
       if (path === `/api/v1/${audience}/me/profile`)
         return route.fulfill({ json: audience === "company" ? profile : platformProfile });
+      if (path.endsWith("/notifications"))
+        return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+      if (path.endsWith("/notifications/unread-count"))
+        return route.fulfill({ json: { unreadCount: 0 } });
       throw new Error(`Unexpected invitation request: ${path}`);
     });
     await page.goto(
@@ -308,6 +322,10 @@ test("same-audience tabs converge on logout-all without clearing Platform", asyn
       logoutCalls += 1;
       return route.fulfill({ status: 204 });
     }
+    if (path.endsWith("/notifications"))
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    if (path.endsWith("/notifications/unread-count"))
+      return route.fulfill({ json: { unreadCount: 0 } });
     throw new Error(`Unexpected cross-tab request: ${path}`);
   });
   await page.goto("/company/me/security");
@@ -349,6 +367,10 @@ test("quarantine retains safe email context but discards passwords before manual
       offline = true;
       return route.abort();
     }
+    if (path.endsWith("/notifications"))
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    if (path.endsWith("/notifications/unread-count"))
+      return route.fulfill({ json: { unreadCount: 0 } });
     throw new Error(`Unexpected email request: ${path}`);
   });
   await page.goto("/company/me/security");

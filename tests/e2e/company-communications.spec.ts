@@ -18,6 +18,7 @@ import {
 } from "../../src/test/company-communications-fixtures";
 import { catalogueBody, rolesBody } from "../../src/test/company-people-fixtures";
 import { notificationItem, notificationPage } from "../../src/test/notification-fixtures";
+import { problemBody } from "../../src/test/operation-fakes";
 
 const everyPermission = [
   "companies:email-settings:read",
@@ -135,6 +136,8 @@ async function open(
         return route.fulfill({ json: { ready: false, reason: "NOT_VERIFIED" } });
       case "GET /api/v1/company/email-types":
         return route.fulfill({ json: emailTypesBody() });
+      case "GET /api/v1/company/email-types/company.payslip-ready":
+        return route.fulfill({ json: emailTypesBody().items[0] });
       case "GET /api/v1/company/email-template-assignments":
         return route.fulfill({ json: { items: [] } });
       case "GET /api/v1/company/email-types/company.payslip-ready/variants":
@@ -243,6 +246,37 @@ test("previews a Company template in an inert frame that loads nothing remote", 
   await expectCalmLayout(page);
 });
 
+test("a Company-wide refusal on email type detail hides template controls and keeps SELF recovery", async ({
+  page,
+}, info) => {
+  const arabic = info.project.name === "chromium-rtl";
+  const { requests } = await open(page, {
+    arabic,
+    overrides: {
+      "GET /api/v1/company/email-types/company.payslip-ready": (route) =>
+        route.fulfill({
+          status: 403,
+          json: problemBody(403, { code: "COMPANY_ACCESS_DENIED", mode: "BLOCKED" }),
+        }),
+    },
+  });
+  await page.goto("/company/email/templates");
+  await expect(
+    page.getByRole("heading", {
+      name: arabic ? "مساحة عمل شركتك غير متاحة" : "Your company workspace is unavailable",
+    }),
+  ).toBeVisible();
+  await expect(page.locator("iframe")).toHaveCount(0);
+  expect(requests.some(({ key }) => key.endsWith("/preview") || key.endsWith("/variants"))).toBe(
+    false,
+  );
+  await expect(page.locator("body")).not.toContainText("internal-detail-canary");
+  const recovery = page.locator('a[href="/company/me/profile"]');
+  await expect(recovery).toBeVisible();
+  await recovery.focus();
+  await expect(recovery).toBeFocused();
+});
+
 test("routes a notification type by role after confirmation", async ({ page }, info) => {
   const arabic = info.project.name === "chromium-rtl";
   const copy = arabic ? ar : en;
@@ -284,6 +318,6 @@ test("renders withheld and unavailable audit history without inventing identity"
   await page.goto("/company/audit");
   await expect(page.getByText(audit["chrome.identityWithheld"]).first()).toBeVisible();
   await expect(page.getByText(audit["audit.event.unavailable"])).toBeVisible();
-  await expect(page.locator("body")).not.toContainText(audit["chrome.platformAdmin"]);
+  await expect(page.locator("body")).not.toContainText(audit["chrome.actorKind.PLATFORM_USER"]);
   await expectCalmLayout(page);
 });

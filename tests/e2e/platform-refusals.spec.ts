@@ -40,6 +40,10 @@ test("keeps no-work SELF recovery, explicit branding and scoped collapse usable"
     if (path === "/api/v1/company/notifications")
       return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
     if (path === "/api/v1/platform/me") return route.fulfill({ json: platform.user });
+    if (path === "/api/v1/platform/notifications")
+      return route.fulfill({ json: { items: [], nextCursor: null, hasMore: false } });
+    if (path === "/api/v1/platform/notifications/unread-count")
+      return route.fulfill({ json: { unreadCount: 0 } });
     throw new Error(`Unexpected S2 operation ${path}`);
   });
   await page.goto("/platform/dashboard");

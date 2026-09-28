@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { companySessionFixture } from "../../src/test/audience-fixtures";
 
 const cataloguePlan = {
   publicId: "11111111-1111-4111-8111-111111111111",
@@ -24,28 +25,16 @@ const resolvedPrice = {
 };
 
 const forcedPasswordSession = {
+  version: 1,
   state: {
-    status: "must_change_password",
-    session: {
-      accessToken: "must-never-leave-browser",
-      refreshToken: "must-never-refresh",
-      sessionId: "session-1",
-      expiresIn: 900,
-      user: {
-        publicId: "user-1",
-        employeeCode: "EMP-1",
-        firstName: "Public",
-        lastName: "Viewer",
-        email: "viewer@example.com",
-        status: "ACTIVE",
-        companyCode: "ACME",
-        mustChangePassword: true,
-        permissions: [],
-        isOwner: false,
-      },
-    },
+    audience: "company",
+    generation: "public-canary",
+    eventKind: "replacement",
+    session: companySessionFixture(
+      { mustChangePassword: true },
+      { accessToken: "must-never-leave-browser", refreshToken: "must-never-refresh" },
+    ),
   },
-  version: 0,
 };
 
 test("keeps the catalogue public, bilingual, theme-aware, and explicit about market pricing", async ({
@@ -54,7 +43,7 @@ test("keeps the catalogue public, bilingual, theme-aware, and explicit about mar
   const publicRequests: Array<{ authorization: string | undefined; url: URL }> = [];
   const unexpectedRequests: string[] = [];
   await page.addInitScript((session) => {
-    localStorage.setItem("hrms-auth", JSON.stringify(session));
+    localStorage.setItem("hrms-company-session:v1", JSON.stringify(session));
   }, forcedPasswordSession);
   const isNarrow = testInfo.project.name === "chromium-rtl";
   await page.setViewportSize(isNarrow ? { width: 360, height: 800 } : { width: 1280, height: 900 });

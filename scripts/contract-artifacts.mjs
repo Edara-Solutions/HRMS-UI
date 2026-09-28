@@ -5,9 +5,6 @@
 import { join } from "node:path";
 import { contractsDir, frontendRoot } from "./contract-provenance.mjs";
 
-/** Both audit portals now read generated audience operations; no parallel runtime schemas remain. */
-export const auditRuntimeContracts = [];
-
 /** The two artifacts derived from the Audit Trail label key set. */
 export const auditLabelArtifacts = {
   manifestPath: join(contractsDir, "audit-label-keys.json"),
@@ -33,15 +30,11 @@ export const derivedArtifacts = [
     outputs: [join(contractsDir, "provenance.json")],
   },
   {
-    generator: "contract:legacy-check",
-    outputs: auditRuntimeContracts.map(({ outputPath }) => outputPath),
-  },
-  {
-    generator: "contract:legacy-check",
+    generator: "audit:labels",
     outputs: [auditLabelArtifacts.manifestPath, auditLabelArtifacts.enumFieldsPath],
   },
   {
-    generator: "contract:legacy-check",
+    generator: "audit:catalog",
     outputs: [auditCatalogArtifact.metadataPath],
   },
 ];

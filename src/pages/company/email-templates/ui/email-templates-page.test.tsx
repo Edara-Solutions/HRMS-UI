@@ -35,6 +35,10 @@ async function openVariants() {
 function renderTemplates({ permissions = editor, assignments = [] as unknown[] } = {}) {
   const net = operationNetwork.install();
   net.on("GET /api/v1/company/email-types", () => ({ status: 200, body: emailTypesBody() }));
+  net.on("GET /api/v1/company/email-types/{key}", () => ({
+    status: 200,
+    body: emailTypesBody().items[0],
+  }));
   net.on("GET /api/v1/company/email-template-assignments", () => ({
     status: 200,
     body: { items: assignments },

@@ -120,7 +120,7 @@ afterEach(() => {
   useBulkReadCursor.setState({ cursors: {} });
   useCompanySession.getState().clearSession();
   usePreferencesStore.setState({ scopes: {} });
-  localStorage.removeItem("hrms-prefs");
+  localStorage.removeItem("hrms-preferences:v2");
 });
 
 describe("notification list shapes", () => {

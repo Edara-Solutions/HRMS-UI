@@ -6,7 +6,13 @@ describe("Audit Event catalog metadata", () => {
   it("reads one entry per catalog event out of the contract's annotations", () => {
     const collected = collectAuditCatalogMetadata();
 
-    expect(collected).toHaveLength(60);
+    expect(collected).toHaveLength(79);
+    expect(collected.map((event) => event.eventType)).toEqual(
+      expect.arrayContaining(["platform.role.created", "platform.access_session.opened"]),
+    );
+    expect(
+      collected.find((event) => event.eventType === "platform.role.created")?.actors,
+    ).toContain("PLATFORM_USER");
     for (const event of collected) {
       expect(event.description.length).toBeGreaterThan(0);
       expect(["ACTIVE", "DEPRECATED"]).toContain(event.lifecycle);
