@@ -12,6 +12,11 @@ vi.hoisted(() => {
 
 import { usePlatformSession } from "@/shared/auth";
 import { platformSessionFixture } from "../../test/audience-fixtures";
+import {
+  diagnosticCatalogueBody,
+  diagnosticPreviewBody,
+  diagnosticReceiptBody,
+} from "../../test/email-diagnostics-fixtures";
 import { json, problem, stubNetwork } from "../../test/network-fixtures";
 import {
   accessSessionOperations,
@@ -32,6 +37,51 @@ afterEach(() => {
 });
 
 describe("delegated Company operations", () => {
+  it("sends all four diagnostics with exact Platform token, method, fixed session and closed input", async () => {
+    const root = `/api/v1/platform/access-sessions/${sessionPublicId}/email-diagnostics`;
+    const requestId = "77777777-7777-4777-8777-777777777777";
+    const body = { requestId, emailTypeKey: "employee-invitation", locale: "en" };
+    const requests = stubNetwork({
+      [`GET ${root}/types`]: () => json(diagnosticCatalogueBody()),
+      [`GET ${root}/types/employee-invitation/preview`]: () => json(diagnosticPreviewBody()),
+      [`POST ${root}/test-sends`]: () => json(diagnosticReceiptBody(requestId), 202),
+      [`GET ${root}/test-sends/${requestId}`]: () => json(diagnosticReceiptBody(requestId)),
+    });
+    const params = { sessionPublicId };
+    await requestDelegatedOperation(operations.diagnosticTypes, { params });
+    await requestDelegatedOperation(operations.diagnosticPreview, {
+      params: { ...params, key: "employee-invitation" },
+      query: { locale: "en" },
+    });
+    await requestDelegatedOperation(operations.diagnosticSend, { params, body });
+    await requestDelegatedOperation(operations.diagnosticResult, {
+      params: { ...params, requestId },
+    });
+    expect(requests.map((request) => request.key)).toEqual([
+      `GET ${root}/types`,
+      `GET ${root}/types/employee-invitation/preview`,
+      `POST ${root}/test-sends`,
+      `GET ${root}/test-sends/${requestId}`,
+    ]);
+    expect(requests.every((request) => request.authorization === "Bearer access-canary")).toBe(
+      true,
+    );
+    expect(requests[2].body).toEqual(body);
+  });
+
+  it.each([
+    operations.diagnosticTypes,
+    operations.diagnosticPreview,
+    operations.diagnosticSend,
+    operations.diagnosticResult,
+  ])("rejects a direct Platform client for $key before sending", async (operation) => {
+    const requests = stubNetwork({});
+    await expect(executeOperationRequest(platformApiClient, operation, {})).rejects.toBeInstanceOf(
+      ContractViolation,
+    );
+    expect(requests).toEqual([]);
+  });
+
   it("sends through the delegated client with the Platform sign-in token", async () => {
     const requests = stubNetwork({
       [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-readiness`]: () =>

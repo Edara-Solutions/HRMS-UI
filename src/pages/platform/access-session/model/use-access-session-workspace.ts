@@ -14,6 +14,7 @@ import {
   delegatedQueries,
 } from "../api/access-session";
 import { type AccessSession, canClose, sessionLiveness } from "./session";
+import { useEmailDiagnostics } from "./use-email-diagnostics";
 
 const maxTimerDelay = 2_147_483_647;
 
@@ -43,7 +44,7 @@ function useExpiryClock(expiresAt: string | undefined) {
   return now;
 }
 
-export type ContentState = "pending" | "open" | "inactive" | "ineligible";
+export type ContentState = "pending" | "open" | "inactive" | "ineligible" | "concealed";
 
 function contentState(session: AccessSession | undefined, now: number, permitted: boolean) {
   if (!session) return "pending";
@@ -71,7 +72,9 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
   } = useQuery({ ...queries.session, enabled: access.user !== undefined });
   const now = useExpiryClock(session?.expiresAt);
   const permitted = access.facts.permissions?.includes(delegationOpenPermission) ?? false;
-  const state = contentState(session, now, permitted);
+  const [terminal, setTerminal] = useState<ContentState>();
+  const projectedState = contentState(session, now, permitted);
+  const state = projectedState === "inactive" ? projectedState : (terminal ?? projectedState);
   const [activity, setActivity] = useState<readonly ActivityEntry[]>([]);
   const sessionKey = queries.session.queryKey;
   const root = delegated.root;
@@ -87,12 +90,29 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
 
   const reconcile = useCallback(
     async (error: unknown): Promise<MutationOutcome> => {
+      if (
+        error instanceof OperationRefusal &&
+        (error.status === 401 ||
+          (error.status === 404 && error.key.includes("/email-diagnostics/")) ||
+          error.code === "ACCESS_SESSION_INACTIVE" ||
+          error.code === "PERMISSION_DENIED")
+      ) {
+        setTerminal(
+          error.code === "ACCESS_SESSION_INACTIVE"
+            ? "inactive"
+            : error.status === 404
+              ? "concealed"
+              : "ineligible",
+        );
+        void queryClient.cancelQueries({ queryKey: root });
+        queryClient.removeQueries({ queryKey: root });
+      }
       const outcome = await recover(error);
       if (outcome.kind !== "invalid")
         await queryClient.invalidateQueries({ queryKey: sessionKey, exact: true });
       return outcome;
     },
-    [recover, queryClient, sessionKey],
+    [recover, queryClient, sessionKey, root],
   );
 
   useEffect(() => {
@@ -118,6 +138,7 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
   });
 
   const liveness = state === "open" ? "live" : "inactive";
+  const diagnostics = useEmailDiagnostics(session, state === "open", reconcile);
 
   return {
     access,
@@ -132,6 +153,7 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
     record,
     reconcile,
     close,
+    diagnostics,
     closable: session !== undefined && canClose(session),
     availability: (operation: { key: string }) =>
       access.delegatedAvailability(operation.key, liveness),

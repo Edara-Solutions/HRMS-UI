@@ -1,5 +1,8 @@
 import { operation as unassignTemplate } from "./generated/delegated/delete-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments-emailtypekey";
 import { operation as auditTrail } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-audit-trail";
+import { operation as diagnosticResult } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-test-sends-requestid";
+import { operation as diagnosticTypes } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-types";
+import { operation as diagnosticPreview } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-types-key-preview";
 import { operation as emailReadiness } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-readiness";
 import { operation as emailSettings } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-settings";
 import { operation as templateAssignments } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments";
@@ -12,6 +15,7 @@ import { operation as users } from "./generated/delegated/get-api-v1-platform-ac
 import { operation as user } from "./generated/delegated/get-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid";
 import { operation as updateProfile } from "./generated/delegated/patch-api-v1-platform-access-sessions-sessionpublicid-profile";
 import { operation as updateUser } from "./generated/delegated/patch-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid";
+import { operation as diagnosticSend } from "./generated/delegated/post-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-test-sends";
 import { operation as assignTemplate } from "./generated/delegated/post-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments";
 import { operation as completeStep } from "./generated/delegated/post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-complete";
 import { operation as skipStep } from "./generated/delegated/post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-skip";
@@ -24,6 +28,10 @@ import { operation as close } from "./generated/platform/post-api-v1-platform-ac
 export const accessSessionOperations = { open, session, close };
 
 export const delegatedCompanyOperations = {
+  diagnosticTypes,
+  diagnosticPreview,
+  diagnosticSend,
+  diagnosticResult,
   users,
   user,
   updateUser,

@@ -30986,6 +30986,411 @@
                   }
                 },
                 {
+                  "description": "A Platform operator accepted a synthetic Company email diagnostic to their registered mailbox.",
+                  "x-audit-lifecycle": "ACTIVE",
+                  "x-audit-outcome-policy": "SUCCESS_ONLY",
+                  "x-audit-personal-data": "none",
+                  "x-audit-actors": [
+                    "PLATFORM_USER"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "eventType",
+                    "eventVersion",
+                    "occurredAt",
+                    "scope",
+                    "companyPublicId",
+                    "outcome",
+                    "actor",
+                    "traceId",
+                    "origin",
+                    "targets",
+                    "details",
+                    "recordingBinding",
+                    "recordedAt"
+                  ],
+                  "properties": {
+                    "eventType": {
+                      "type": "string",
+                      "enum": [
+                        "platform.company_email_diagnostic.accepted"
+                      ]
+                    },
+                    "eventVersion": {
+                      "type": "number",
+                      "enum": [
+                        1
+                      ]
+                    },
+                    "occurredAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY"
+                      ]
+                    },
+                    "companyPublicId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "outcome": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "SUCCESS"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FAILURE"
+                          ]
+                        }
+                      ]
+                    },
+                    "actor": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "publicId",
+                            "name"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "USER"
+                              ]
+                            },
+                            "publicId": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "publicId",
+                            "name"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "PLATFORM_USER"
+                              ]
+                            },
+                            "publicId": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "component"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "SYSTEM"
+                              ]
+                            },
+                            "component": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "EMAIL_WORKER"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "SCHEDULER"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "SCRIPT"
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "ANONYMOUS"
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "ATTRIBUTION_FAILED"
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "additionalProperties": false,
+                          "type": "object",
+                          "required": [
+                            "kind"
+                          ],
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "ERASED_USER"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "traceId": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "origin": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "ip",
+                        "userAgent",
+                        "country",
+                        "city"
+                      ],
+                      "properties": {
+                        "ip": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "userAgent": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "country": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "city": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "targets": {
+                      "type": "array",
+                      "items": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "targetType",
+                          "publicId"
+                        ],
+                        "properties": {
+                          "targetType": {
+                            "type": "string"
+                          },
+                          "publicId": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "details": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "accessSessionPublicId",
+                        "reason",
+                        "emailTypeKey",
+                        "locale",
+                        "requestId",
+                        "deliveryPublicId"
+                      ],
+                      "properties": {
+                        "accessSessionPublicId": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "SUPPORT_REQUEST"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INCIDENT_RESPONSE"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "PROVISIONING"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "CUSTOMER_REQUEST"
+                              ]
+                            }
+                          ]
+                        },
+                        "emailTypeKey": {
+                          "minLength": 1,
+                          "maxLength": 120,
+                          "type": "string"
+                        },
+                        "locale": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "en"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "ar"
+                              ]
+                            }
+                          ]
+                        },
+                        "requestId": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "deliveryPublicId": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "recordingBinding": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "TRANSACTIONAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "STANDALONE"
+                          ]
+                        }
+                      ]
+                    },
+                    "recordedAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  }
+                },
+                {
                   "description": "A Platform User opened an Access Session to one Company.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
@@ -117671,6 +118076,12 @@
                   {
                     "type": "string",
                     "enum": [
+                      "platform.company_email_diagnostic.accepted"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
                       "platform.access_session.opened"
                     ]
                   },
@@ -119320,6 +119731,12 @@
                     "type": "string",
                     "enum": [
                       "platform.user.sessions-revoked"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "platform.company_email_diagnostic.accepted"
                     ]
                   },
                   {
@@ -133956,6 +134373,2344 @@
                           "type": "null"
                         }
                       ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types": {
+      "get": {
+        "summary": "List synthetic Company email diagnostic types",
+        "tags": [
+          "Company Email Diagnostics"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionPublicId",
+            "required": true
+          }
+        ],
+        "x-edara-audience": "PLATFORM",
+        "x-edara-authorization": "D",
+        "x-edara-permission": "delegation:email-diagnostics:preview",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "description",
+                          "supportedLocales"
+                        ],
+                        "properties": {
+                          "key": {
+                            "minLength": 1,
+                            "maxLength": 120,
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "supportedLocales": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "en"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "ar"
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId",
+                    "code"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ACCESS_SESSION_INACTIVE"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PERMISSION_DENIED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId",
+                        "code",
+                        "retryAfterSeconds"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "DIAGNOSTIC_RATE_LIMITED"
+                          ]
+                        },
+                        "retryAfterSeconds": {
+                          "minimum": 1,
+                          "maximum": 600,
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview": {
+      "get": {
+        "summary": "Preview a synthetic email for the session Company",
+        "tags": [
+          "Company Email Diagnostics"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "en"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ar"
+                  ]
+                }
+              ]
+            },
+            "in": "query",
+            "name": "locale",
+            "required": true
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionPublicId",
+            "required": true
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 120,
+              "type": "string"
+            },
+            "in": "path",
+            "name": "key",
+            "required": true
+          }
+        ],
+        "x-edara-audience": "PLATFORM",
+        "x-edara-authorization": "D",
+        "x-edara-permission": "delegation:email-diagnostics:preview",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "emailTypeKey",
+                    "templateKey",
+                    "context",
+                    "locale",
+                    "subject",
+                    "preheader",
+                    "html",
+                    "text",
+                    "senderIdentity"
+                  ],
+                  "properties": {
+                    "emailTypeKey": {
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "templateKey": {
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "context": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY"
+                      ]
+                    },
+                    "locale": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "en"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ar"
+                          ]
+                        }
+                      ]
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "preheader": {
+                      "type": "string"
+                    },
+                    "html": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "senderIdentity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "address",
+                        "replyTo"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "replyTo": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId",
+                    "code"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ACCESS_SESSION_INACTIVE"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PERMISSION_DENIED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId",
+                        "code",
+                        "retryAfterSeconds"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "DIAGNOSTIC_RATE_LIMITED"
+                          ]
+                        },
+                        "retryAfterSeconds": {
+                          "minimum": 1,
+                          "maximum": 600,
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends": {
+      "post": {
+        "summary": "Accept a synthetic diagnostic to the operator's registered mailbox",
+        "tags": [
+          "Company Email Diagnostics"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "requestId",
+                  "emailTypeKey",
+                  "locale"
+                ],
+                "properties": {
+                  "requestId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "emailTypeKey": {
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "locale": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "en"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "ar"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionPublicId",
+            "required": true
+          }
+        ],
+        "x-edara-audience": "PLATFORM",
+        "x-edara-authorization": "D",
+        "x-edara-permission": "delegation:email-diagnostics:test-send",
+        "responses": {
+          "202": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "requestId",
+                    "emailTypeKey",
+                    "locale",
+                    "deliveryPublicId",
+                    "context",
+                    "isTest",
+                    "status"
+                  ],
+                  "properties": {
+                    "requestId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "emailTypeKey": {
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "locale": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "en"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ar"
+                          ]
+                        }
+                      ]
+                    },
+                    "deliveryPublicId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "context": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY"
+                      ]
+                    },
+                    "isTest": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "QUEUED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PROCESSING"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "RETRY_SCHEDULED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "SENT"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FAILED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "CANCELLED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId",
+                    "code"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ACCESS_SESSION_INACTIVE"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PERMISSION_DENIED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId",
+                    "code"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "EMAIL_DIAGNOSTIC_NOT_READY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "DIAGNOSTIC_REQUEST_CONFLICT"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId",
+                        "code",
+                        "retryAfterSeconds"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "DIAGNOSTIC_RATE_LIMITED"
+                          ]
+                        },
+                        "retryAfterSeconds": {
+                          "minimum": 1,
+                          "maximum": 600,
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends/{requestId}": {
+      "get": {
+        "summary": "Reconcile an accepted diagnostic from this Access Session",
+        "tags": [
+          "Company Email Diagnostics"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionPublicId",
+            "required": true
+          },
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "requestId",
+            "required": true
+          }
+        ],
+        "x-edara-audience": "PLATFORM",
+        "x-edara-authorization": "D",
+        "x-edara-permission": "delegation:email-diagnostics:test-send",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "requestId",
+                    "emailTypeKey",
+                    "locale",
+                    "deliveryPublicId",
+                    "context",
+                    "isTest",
+                    "status"
+                  ],
+                  "properties": {
+                    "requestId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "emailTypeKey": {
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "locale": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "en"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ar"
+                          ]
+                        }
+                      ]
+                    },
+                    "deliveryPublicId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "context": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY"
+                      ]
+                    },
+                    "isTest": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "QUEUED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PROCESSING"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "RETRY_SCHEDULED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "SENT"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FAILED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "CANCELLED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId",
+                    "code"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ACCESS_SESSION_INACTIVE"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "PERMISSION_DENIED"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId",
+                        "code",
+                        "retryAfterSeconds"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "DIAGNOSTIC_RATE_LIMITED"
+                          ]
+                        },
+                        "retryAfterSeconds": {
+                          "minimum": 1,
+                          "maximum": 600,
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "title",
+                        "status",
+                        "detail",
+                        "instance",
+                        "traceId"
+                      ],
+                      "properties": {
+                        "type": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "minimum": 400,
+                          "maximum": 599,
+                          "type": "integer"
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "instance": {
+                          "format": "uri-reference",
+                          "type": "string"
+                        },
+                        "traceId": {
+                          "pattern": "^[0-9a-f]{32}$",
+                          "type": "string"
+                        },
+                        "invalidParams": {
+                          "type": "array",
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
                     }
                   }
                 }

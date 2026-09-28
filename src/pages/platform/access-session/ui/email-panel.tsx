@@ -28,6 +28,7 @@ import {
 import type { AccessSessionWorkspace } from "../model/use-access-session-workspace";
 import { useDelegatedCommand } from "../model/use-delegated-command";
 import { CommandFeedback } from "./command-feedback";
+import { EmailDiagnosticsPanel } from "./email-diagnostics-panel";
 import { TextField } from "./text-field";
 
 const ltrSettings = new Set([
@@ -50,6 +51,7 @@ export function EmailPanel({ workspace }: PanelProps) {
     workspace.availability(operation).state === "enabled";
   return (
     <div className="space-y-6">
+      <EmailDiagnosticsPanel workspace={workspace} />
       {granted(operations.emailSettings) && <EmailSettingsSection workspace={workspace} />}
       <div className="grid gap-6 lg:grid-cols-2">
         {granted(operations.emailReadiness) && <ReadinessSection workspace={workspace} />}

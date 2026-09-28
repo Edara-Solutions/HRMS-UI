@@ -6,9 +6,13 @@ describe("Audit Event catalog metadata", () => {
   it("reads one entry per catalog event out of the contract's annotations", () => {
     const collected = collectAuditCatalogMetadata();
 
-    expect(collected).toHaveLength(79);
+    expect(collected).toHaveLength(80);
     expect(collected.map((event) => event.eventType)).toEqual(
-      expect.arrayContaining(["platform.role.created", "platform.access_session.opened"]),
+      expect.arrayContaining([
+        "platform.role.created",
+        "platform.access_session.opened",
+        "platform.company_email_diagnostic.accepted",
+      ]),
     );
     expect(
       collected.find((event) => event.eventType === "platform.role.created")?.actors,
@@ -30,5 +34,14 @@ describe("Audit Event catalog metadata", () => {
   it("answers with nothing for an event type this build has never heard of", () => {
     expect(auditEventMetadata("company.profile.completed")?.scope).toBe("COMPANY");
     expect(auditEventMetadata("not.an.event")).toBeUndefined();
+  });
+
+  it("keeps diagnostics Company scoped, Platform visible and free of personal data", () => {
+    expect(auditEventMetadata("platform.company_email_diagnostic.accepted")).toMatchObject({
+      scope: "COMPANY",
+      audience: "PLATFORM",
+      personalData: "none",
+      actors: ["PLATFORM_USER"],
+    });
   });
 });
