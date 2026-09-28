@@ -51,7 +51,6 @@ export function CompanyEmailTemplatesPage() {
   if (!access.user) return null;
 
   const types = companyEmailTypes(data?.items ?? []);
-  const selected = types.find((type) => type.key === selectedKey) ?? types[0];
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -85,35 +84,52 @@ export function CompanyEmailTemplatesPage() {
             </Button>
           )}
         </div>
-      ) : types.length === 0 || !selected ? (
-        <Card>
-          <EmptyState icon={Mail} title={t("templates.empty")} />
-        </Card>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <nav aria-label={t("templates.types")}>
-            <ul className="space-y-1">
-              {types.map((type) => (
-                <li key={type.key}>
-                  <button
-                    type="button"
-                    aria-current={type.key === selected.key ? "true" : undefined}
-                    onClick={() => setSelectedKey(type.key)}
-                    className={cn(
-                      "w-full rounded-[var(--radius-md)] px-3 py-2 text-start text-sm transition-colors hover:bg-[var(--color-surface-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
-                      type.key === selected.key &&
-                        "bg-[var(--color-primary-soft)] font-medium text-[var(--color-primary)]",
-                    )}
-                  >
-                    <span className="block break-words">{type.description}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <VerifiedEmailTypeDetail key={selected.key} typeKey={selected.key} />
-        </div>
+        <EmailTypeCatalogue types={types} selectedKey={selectedKey} onSelect={setSelectedKey} />
       )}
+    </div>
+  );
+}
+
+interface EmailTypeCatalogueProps {
+  types: EmailType[];
+  selectedKey: string | null;
+  onSelect: (key: string) => void;
+}
+
+function EmailTypeCatalogue({ types, selectedKey, onSelect }: EmailTypeCatalogueProps) {
+  const { t } = useTranslation("communications");
+  const selected = types.find((type) => type.key === selectedKey) ?? types[0];
+  if (!selected) {
+    return (
+      <Card>
+        <EmptyState icon={Mail} title={t("templates.empty")} />
+      </Card>
+    );
+  }
+  return (
+    <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <nav aria-label={t("templates.types")}>
+        <ul className="space-y-1">
+          {types.map((type) => (
+            <li key={type.key}>
+              <button
+                type="button"
+                aria-current={type.key === selected.key ? "true" : undefined}
+                onClick={() => onSelect(type.key)}
+                className={cn(
+                  "w-full rounded-[var(--radius-md)] px-3 py-2 text-start text-sm transition-colors hover:bg-[var(--color-surface-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
+                  type.key === selected.key &&
+                    "bg-[var(--color-primary-soft)] font-medium text-[var(--color-primary)]",
+                )}
+              >
+                <span className="block break-words">{type.description}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <VerifiedEmailTypeDetail key={selected.key} typeKey={selected.key} />
     </div>
   );
 }
