@@ -17,6 +17,7 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table";
 import { PageHeader } from "@/shared/ui/page-header";
 import { registryCursorQuery } from "../api/subscriptions";
+import { PlatformSubscriptionsDemo } from "./platform-subscriptions-demo";
 
 const companyLink = (publicId: string, label: string) => (
   <Link
@@ -89,6 +90,7 @@ export function PlatformSubscriptionsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader title={t("subscriptions.title")} description={t("subscriptions.description")} />
+      <PlatformSubscriptionsDemo />
       {expire.state !== "hidden" && (
         <Card as="section">
           <CardContent className="space-y-4 p-4">
@@ -160,12 +162,13 @@ export function PlatformSubscriptionsPage() {
                   },
                 ]}
                 renderMobileItem={(company) => (
-                  <div className="p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-4">
                     {canOpenCompany ? (
                       companyLink(company.publicId, company.name)
                     ) : (
                       <bdi>{company.name}</bdi>
                     )}
+                    {canOpenCompany && companyLink(company.publicId, t("subscriptions.view"))}
                   </div>
                 )}
               />

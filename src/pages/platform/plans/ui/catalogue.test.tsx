@@ -61,6 +61,14 @@ afterEach(() => {
   navigations.length = 0;
 });
 describe("Platform catalogue", () => {
+  it("shows the authored features, limits and direct edit action in the catalogue", async () => {
+    open(false);
+    expect((await screen.findAllByText("Overview")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("columnheader", { name: "Limits" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Updated" })).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "Edit plan" })[0]);
+    expect(await screen.findByRole("dialog", { name: "Edit plan" })).toBeInTheDocument();
+  });
   it("owns identity/resource keys and reads without guessing a market", async () => {
     const net = open();
     await screen.findByRole("heading", { name: "Growth خطة" });

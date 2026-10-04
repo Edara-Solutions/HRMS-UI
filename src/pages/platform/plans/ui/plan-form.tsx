@@ -48,7 +48,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
   const featureChangesDisabled = unknownFeatures.length > 0;
   const fieldInvalid = (name: string) => rejected.has(name) || invalidFields.includes(name);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (disabled) return;
     const nextLimits = Object.fromEntries(
@@ -91,7 +91,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
     if ("features" in body && features.length === 0) issues.add("features");
     setRejected(issues);
     if (parsed.success && issues.size === 0 && Object.keys(body).length > 0) onSubmit(parsed.data);
-  }
+  };
 
   return (
     <form className="mt-5 space-y-6" onSubmit={submit} noValidate>

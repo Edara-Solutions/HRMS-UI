@@ -27,6 +27,8 @@ it("keeps illustrative overview data separate from permission-gated live links",
   expect(within(demo).getByText("Demo data")).toBeInTheDocument();
   expect(within(demo).getByText(/not current company or billing data/)).toBeInTheDocument();
   expect(within(demo).getByText("Sample revenue trend")).toBeInTheDocument();
+  expect(within(demo).getByText("Swift Systems")).toBeInTheDocument();
+  expect(within(demo).getByText("Target · 210K SAR")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Plans" })).toHaveAttribute("href", "/platform/plans");
   expect(screen.queryByRole("link", { name: "Leads" })).not.toBeInTheDocument();
 });

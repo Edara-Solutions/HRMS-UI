@@ -40,6 +40,23 @@ afterEach(() => {
   usePlatformSession.getState().clearSession();
 });
 describe("Global Platform trial expiry", () => {
+  it("keeps the historical sample overview separate from live Company subscription actions", async () => {
+    const net = open(["companies:read"]);
+    const liveLink = await screen.findByRole("link", { name: "View subscription" });
+    const demo = screen.getByRole("region", { name: "Sample subscription overview" });
+
+    expect(demo).toHaveTextContent("Illustrative data");
+    expect(within(demo).getAllByText("Nexus Technologies").length).toBeGreaterThan(0);
+    expect(liveLink).toHaveAttribute(
+      "href",
+      "/platform/companies/33333333-3333-4333-8333-333333333333",
+    );
+
+    fireEvent.click(within(demo).getByRole("button", { name: "Trial" }));
+    expect(within(demo).queryByText("Nexus Technologies")).toBeNull();
+    expect(within(demo).getAllByText("CloudNine Solutions").length).toBeGreaterThan(0);
+    expect(net.count("GET /api/v1/platform/companies/cursor")).toBe(1);
+  });
   it("requires a global confirmation and shows only the authoritative count", async () => {
     const net = open();
     net.on(key, () => ({ status: 200, body: { expiredCount: 7 } }));

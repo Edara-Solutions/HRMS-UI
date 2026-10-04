@@ -34,7 +34,7 @@ const companyLink = (publicId: string, label: string) => (
   </Link>
 );
 export function PlatformCompaniesPage({ search }: Props) {
-  const { t } = useTranslation("platform-companies");
+  const { t, i18n } = useTranslation("platform-companies");
   const access = usePlatformAccess();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
@@ -48,6 +48,12 @@ export function PlatformCompaniesPage({ search }: Props) {
   if (access.availability(operations.companies.key).state === "hidden")
     throw new RouteAccessRefusal("platform");
   const create = access.availability(operations.create.key);
+  const formatCreated = (value: string) =>
+    new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(value));
   const rows =
     data?.data.filter((company) =>
       `${company.name} ${company.companyCode} ${company.country}`
@@ -101,7 +107,7 @@ export function PlatformCompaniesPage({ search }: Props) {
             <DataTable
               items={rows}
               getRowKey={(company) => company.publicId}
-              minWidth="720px"
+              minWidth="860px"
               columns={[
                 {
                   id: "name",
@@ -129,6 +135,13 @@ export function PlatformCompaniesPage({ search }: Props) {
                   cell: (company) => t(company.isActive ? "yes" : "no"),
                 },
                 {
+                  id: "created",
+                  header: t("createdAt"),
+                  cell: (company) => (
+                    <time dateTime={company.createdAt}>{formatCreated(company.createdAt)}</time>
+                  ),
+                },
+                {
                   id: "action",
                   header: t("registry.action"),
                   cell: (company) => companyLink(company.publicId, t("registry.view")),
@@ -145,6 +158,9 @@ export function PlatformCompaniesPage({ search }: Props) {
                   <p className="text-sm text-[var(--color-text-muted)]">
                     <bdi>{company.companyCode}</bdi> · {company.country} ·{" "}
                     {t(company.isActive ? "yes" : "no")}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    <time dateTime={company.createdAt}>{formatCreated(company.createdAt)}</time>
                   </p>
                 </div>
               )}

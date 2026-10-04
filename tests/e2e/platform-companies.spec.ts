@@ -1,6 +1,8 @@
 import { expect, type Page, type Route, test } from "@playwright/test";
 import ar from "../../public/locales/ar/platform-companies.json" with { type: "json" };
+import arDashboard from "../../public/locales/ar/platform-dashboard.json" with { type: "json" };
 import en from "../../public/locales/en/platform-companies.json" with { type: "json" };
+import enDashboard from "../../public/locales/en/platform-dashboard.json" with { type: "json" };
 import { companySessionFixture, platformSessionFixture } from "../../src/test/audience-fixtures";
 import { problemBody } from "../../src/test/operation-fakes";
 import {
@@ -112,6 +114,22 @@ async function noOverflow(page: Page) {
     true,
   );
 }
+test("Platform overview separates sample history from permission-gated live routes", async ({
+  page,
+}, info) => {
+  const arabic = info.project.name === "chromium-rtl";
+  const copy = arabic ? arDashboard : enDashboard;
+  const { requests } = await open(page, arabic, false, {}, [...companyPermissions, "plans:read"]);
+  await page.goto("/platform/dashboard");
+  const demo = page.getByRole("region", { name: copy.sampleTitle });
+  await expect(demo).toContainText("Swift Systems");
+  await expect(page.getByRole("main").getByRole("link", { name: copy.plans })).toHaveAttribute(
+    "href",
+    "/platform/plans",
+  );
+  expect(requests.some((request) => request.key.includes("/api/v1/company/"))).toBe(false);
+  await noOverflow(page);
+});
 for (const crossed of [false, true])
   test(`Company workspace separates states and confirmed activation ${crossed ? "crossed themes" : "default themes"}`, async ({
     page,
@@ -200,6 +218,31 @@ test("registry create and known-ID restoration use dedicated safe contracts", as
     .click();
   await expect(page).toHaveURL(new RegExp(`/platform/companies/${companyIds.company}`));
   expect(requests.filter((request) => request.key.endsWith("/restore"))).toHaveLength(1);
+});
+test("subscription samples filter independently of live Company actions", async ({
+  page,
+}, info) => {
+  const arabic = info.project.name === "chromium-rtl";
+  const copy = arabic ? ar : en;
+  const { requests } = await open(page, arabic);
+  await page.goto("/platform/subscriptions");
+  const demo = page.getByRole("region", { name: copy["subscriptionDemo.title"] });
+  await expect(demo).toContainText(copy["subscriptionDemo.badge"]);
+  await expect(demo).toContainText("Nexus Technologies");
+  await expect(page.getByRole("link", { name: copy["subscriptions.view"] })).toHaveAttribute(
+    "href",
+    `/platform/companies/${companyIds.company}`,
+  );
+  await demo
+    .getByRole("group", { name: copy["subscriptionDemo.statusFilter"] })
+    .getByRole("button", { name: copy["subscriptionDemo.status.TRIAL"] })
+    .click();
+  await expect(demo).not.toContainText("Nexus Technologies");
+  await expect(demo).toContainText("CloudNine Solutions");
+  expect(
+    requests.filter((request) => request.key === "GET /api/v1/platform/companies/cursor"),
+  ).toHaveLength(1);
+  await noOverflow(page);
 });
 test("failed global expiry remains indeterminate and reconciles without retry", async ({
   page,

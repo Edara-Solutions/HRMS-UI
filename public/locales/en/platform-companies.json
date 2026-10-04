@@ -144,5 +144,20 @@
   "support.failure.refused": "You are not allowed to open a support session.",
   "support.failure.stale": "The Company is no longer available. Reload the page.",
   "support.failure.contract": "The response could not be verified. Nothing was assumed.",
-  "support.failure.uncertain": "The outcome could not be confirmed. Any opened session expires by itself; check the audit trail before opening another."
+  "support.failure.uncertain": "The outcome could not be confirmed. Any opened session expires by itself; check the audit trail before opening another.",
+  "subscriptionDemo.badge": "Illustrative data",
+  "subscriptionDemo.title": "Sample subscription overview",
+  "subscriptionDemo.help": "Historical example records show the former status overview. These figures and rows are samples; use Company subscription workspaces below for current information and actions.",
+  "subscriptionDemo.statusFilter": "Filter sample subscriptions by status",
+  "subscriptionDemo.all": "All",
+  "subscriptionDemo.search": "Search sample company or plan",
+  "subscriptionDemo.empty": "No sample subscriptions match.",
+  "subscriptionDemo.count": "{{shown}} of {{total}} sample companies",
+  "subscriptionDemo.flags": "Site flags",
+  "subscriptionDemo.flag.frozen": "Frozen",
+  "subscriptionDemo.status.ACTIVE": "Active",
+  "subscriptionDemo.status.TRIAL": "Trial",
+  "subscriptionDemo.status.FROZEN": "Frozen",
+  "subscriptionDemo.status.CANCELLED": "Cancelled",
+  "subscriptionDemo.status.EXPIRED": "Expired"
 }

@@ -96,7 +96,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
   const createFormSchema = z
     .preprocess((value) => {
       if (!value || typeof value !== "object") return value;
-      const input = value as Record<string, unknown>;
+      const input = Object.fromEntries(Object.entries(value));
       const primaryContact = input.primaryContact;
       return {
         ...input,

@@ -43,6 +43,7 @@ describe("Platform Company registry", () => {
       input: { query: { page: 1, limit: 20 } },
     });
     expect(screen.getByText("Registry isActive (read-only)")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Created at" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Activate" })).toBeNull();
   });
   it("creates only safe registry fields and navigates to its public ID", async () => {

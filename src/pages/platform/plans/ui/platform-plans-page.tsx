@@ -10,7 +10,8 @@ import { Card, CardContent } from "@/shared/ui/card";
 import { DataTable } from "@/shared/ui/data-table";
 import { PageHeader } from "@/shared/ui/page-header";
 import { QueryPanel } from "@/shared/ui/query-panel";
-import { type CatalogueFilters, plansQuery } from "../api/catalogue";
+import { type CatalogueFilters, type Plan, plansQuery } from "../api/catalogue";
+import { supportedPlanFeatures } from "../model/catalogue-form";
 import { CatalogueEditor } from "./catalogue-editor";
 import { CatalogueFilterForm } from "./catalogue-filters";
 
@@ -28,9 +29,10 @@ const planLink = (publicId: string, label: string) => (
   </Link>
 );
 export function PlatformPlansPage({ search }: Props) {
-  const { t } = useTranslation("platform-plans");
+  const { t, i18n } = useTranslation("platform-plans");
   const access = usePlatformAccess();
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<Plan | null>(null);
   const { data, error, isPending, refetch } = useQuery({
     ...plansQuery(access.user?.publicId ?? "", search),
     enabled: access.availability(operations.plans.key).state === "enabled",
@@ -41,6 +43,15 @@ export function PlatformPlansPage({ search }: Props) {
     throw new RouteAccessRefusal("platform");
   const plans = data?.data ?? [];
   const canOpen = access.availability(operations.plan.key).state === "enabled";
+  const canEdit = access.availability(operations.update.key).state === "enabled";
+  const featureLabel = (code: string) =>
+    supportedPlanFeatures.has(code) ? t(`feature.${code}`) : code;
+  const updatedDate = (value: string) =>
+    new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(value));
   return (
     <div className="mx-auto min-w-0 max-w-6xl space-y-6 [overflow-wrap:anywhere]">
       <PageHeader
@@ -94,7 +105,7 @@ export function PlatformPlansPage({ search }: Props) {
           <DataTable
             items={plans}
             getRowKey={(plan) => plan.publicId}
-            minWidth="720px"
+            minWidth="980px"
             columns={[
               {
                 id: "name",
@@ -116,7 +127,28 @@ export function PlatformPlansPage({ search }: Props) {
               {
                 id: "features",
                 header: t("featuresColumn"),
-                cell: (plan) => t("featureCount", { count: plan.features.length }),
+                cell: (plan) => (
+                  <div className="flex max-w-xs flex-wrap gap-1">
+                    {plan.features.map((feature) => (
+                      <Badge key={feature} variant="default">
+                        <bdi>{featureLabel(feature)}</bdi>
+                      </Badge>
+                    ))}
+                  </div>
+                ),
+              },
+              {
+                id: "limits",
+                header: t("limits"),
+                cell: (plan) => (
+                  <div className="space-y-0.5 text-xs">
+                    {Object.entries(plan.limits ?? {}).map(([key, value]) => (
+                      <p key={key}>
+                        {t(key)}: <bdi>{value}</bdi>
+                      </p>
+                    ))}
+                  </div>
+                ),
               },
               {
                 id: "visibility",
@@ -133,9 +165,25 @@ export function PlatformPlansPage({ search }: Props) {
                 ),
               },
               {
+                id: "updated",
+                header: t("updated"),
+                cell: (plan) => (
+                  <time dateTime={plan.updatedAt}>{updatedDate(plan.updatedAt)}</time>
+                ),
+              },
+              {
                 id: "action",
                 header: t("action"),
-                cell: (plan) => (canOpen ? planLink(plan.publicId, t("manage")) : null),
+                cell: (plan) => (
+                  <div className="flex flex-wrap gap-1">
+                    {canOpen && planLink(plan.publicId, t("manage"))}
+                    {canEdit && plan.deletedAt === null && (
+                      <Button intent="utility" onClick={() => setEditing(plan)}>
+                        {t("editPlan")}
+                      </Button>
+                    )}
+                  </div>
+                ),
               },
             ]}
             renderMobileItem={(plan) => (
@@ -153,12 +201,36 @@ export function PlatformPlansPage({ search }: Props) {
                   {t("featureCount", { count: plan.features.length })} · {t("duration")}:{" "}
                   {plan.duration} · {t(plan.isPublic ? "public" : "private")}
                 </p>
+                <div className="flex flex-wrap gap-1">
+                  {plan.features.map((feature) => (
+                    <Badge key={feature} variant="default">
+                      <bdi>{featureLabel(feature)}</bdi>
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  {Object.entries(plan.limits ?? {})
+                    .map(([key, value]) => `${t(key)}: ${value}`)
+                    .join(" · ")}
+                </p>
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  {t("updated")}:{" "}
+                  <time dateTime={plan.updatedAt}>{updatedDate(plan.updatedAt)}</time>
+                </p>
+                {canEdit && plan.deletedAt === null && (
+                  <Button intent="utility" onClick={() => setEditing(plan)}>
+                    {t("editPlan")}
+                  </Button>
+                )}
               </div>
             )}
           />
         )}
       </QueryPanel>
       {creating && <CatalogueEditor target={{ kind: "plan" }} close={() => setCreating(false)} />}
+      {editing && (
+        <CatalogueEditor target={{ kind: "plan", plan: editing }} close={() => setEditing(null)} />
+      )}
     </div>
   );
 }

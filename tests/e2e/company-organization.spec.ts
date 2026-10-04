@@ -145,6 +145,11 @@ test("composes the operational dashboard from session-scoped reads", async ({ pa
   await page.goto("/company/dashboard");
   await expect(page.getByRole("heading", { level: 1, name: "Edara Labs" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("dir", arabic ? "rtl" : "ltr");
+  const demo = page.getByRole("region", { name: copy["dashboard.demo.title"] });
+  await expect(demo).toContainText(copy["dashboard.demo.badge"]);
+  await expect(demo).toContainText(copy["dashboard.demo.events"]);
+  await expect(demo).toContainText(copy["dashboard.demo.departmentMix"]);
+  await expect(demo).toContainText(copy["dashboard.demo.shortcuts"]);
   await expect(page.getByText(copy["requirement.COMPANY_PROFILE_INCOMPLETE"])).toBeVisible();
   await expect(page.getByText(copy["email.ready"])).toBeVisible();
   await expect(page.getByText("Growth")).toBeVisible();

@@ -103,6 +103,11 @@ describe("Company operational dashboard", () => {
     const demo = screen.getByRole("region", { name: "Sample overview · May 2026" });
     expect(within(demo).getByText("Demo data")).toBeVisible();
     expect(within(demo).getByText(/not current company records/)).toBeVisible();
+    expect(within(demo).getByText("Sample upcoming events")).toBeVisible();
+    expect(within(demo).getByText("Sample department mix")).toBeVisible();
+    expect(within(demo).getByText("Sample module shortcuts")).toBeVisible();
+    expect(within(demo).getByText("Omar Amin")).toBeVisible();
+    expect(within(demo).getByText("Lina Riad")).toBeVisible();
     for (const canary of organizationCanaries)
       expect(document.body.textContent).not.toContain(canary);
   });

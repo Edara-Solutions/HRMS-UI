@@ -14,6 +14,7 @@
   "featureCount_other": "{{count}} features",
   "action": "Action",
   "manage": "Manage",
+  "updated": "Updated",
   "planFormHelp": "Choose the plan features, limits, visibility and status. Changes are checked against the current contract before saving.",
   "priceFormHelp": "Enter an explicit market price for this plan.",
   "durationReadOnly": "Duration remains read-only after creation.",

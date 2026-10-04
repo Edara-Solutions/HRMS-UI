@@ -51,12 +51,11 @@ export function PlatformEmailSendingPage() {
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <span
+                    <Icon
+                      size={18}
+                      className="mt-0.5 shrink-0 text-[var(--color-primary)]"
                       aria-hidden="true"
-                      className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
-                    >
-                      <Icon size={16} />
-                    </span>
+                    />
                     <div>
                       <h3 className="font-semibold">{t(`context.${item.context}`)}</h3>
                       <p className="mt-1 text-xs text-[var(--color-text-muted)]">

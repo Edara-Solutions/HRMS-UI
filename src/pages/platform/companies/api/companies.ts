@@ -12,13 +12,14 @@ export function companiesQuery(userPublicId: string, page: number) {
     select: (data) => ({
       ...data,
       data: data.data.map(
-        ({ publicId, name, companyCode, country, lifecycleStatus, isActive }) => ({
+        ({ publicId, name, companyCode, country, lifecycleStatus, isActive, createdAt }) => ({
           publicId,
           name,
           companyCode,
           country,
           lifecycleStatus,
           isActive,
+          createdAt,
         }),
       ),
     }),
