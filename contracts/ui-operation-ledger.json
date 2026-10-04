@@ -373,7 +373,8 @@
       "src/pages/platform/announcements/api/announcements.ts",
       "src/pages/platform/audit/api/audit-companies.ts",
       "src/pages/platform/companies/api/companies.ts",
-      "src/pages/platform/company-detail/api/company-detail.ts"
+      "src/pages/platform/company-detail/api/company-detail.ts",
+      "src/pages/platform/email-deliveries/api/delivery-filter-options.ts"
     ]
   },
   {
@@ -423,7 +424,10 @@
   {
     "key": "GET /api/v1/platform/email-types",
     "audience": "platform",
-    "consumers": ["src/pages/platform/emails/api/emails.ts"]
+    "consumers": [
+      "src/pages/platform/email-deliveries/api/delivery-filter-options.ts",
+      "src/pages/platform/emails/api/emails.ts"
+    ]
   },
   {
     "key": "GET /api/v1/platform/email-types/{key}",

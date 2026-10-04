@@ -2,7 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePlatformCommand } from "@/features/platform-communications-command";
-import { platformCommunicationsOperations as operations, usePlatformAccess } from "@/shared/api";
+import {
+  platformCommunicationsOperations as operations,
+  platformCompanyOperations,
+  usePlatformAccess,
+} from "@/shared/api";
 import { RouteAccessRefusal } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { formatInstant } from "@/shared/lib/format-instant";
@@ -17,12 +21,17 @@ import { PageHeader } from "@/shared/ui/page-header";
 import { QueryPanel } from "@/shared/ui/query-panel";
 import { SchemaForm } from "@/shared/ui/schema-form";
 import {
+  companyFilterOptionsQuery,
+  emailTypeFilterOptionsQuery,
+} from "../api/delivery-filter-options";
+import {
   changeDelivery,
   deliveriesQuery,
   deliveryQuery,
   type EmailContext,
 } from "../api/email-deliveries";
 import { platformDeliveriesSearchSchema } from "../model/page-search";
+import { SearchableFilterSelect } from "./searchable-filter-select";
 
 export function PlatformEmailDeliveriesPage() {
   const { t } = useTranslation("platform-email-deliveries");
@@ -34,6 +43,16 @@ export function PlatformEmailDeliveriesPage() {
   const { data, error, isPending, refetch } = useQuery({
     ...deliveriesQuery(access.user?.publicId ?? "", query),
     enabled: access.availability(operations.deliveries.key).state === "enabled",
+    retry: false,
+  });
+  const companyOptions = useQuery({
+    ...companyFilterOptionsQuery(access.user?.publicId ?? ""),
+    enabled: access.availability(platformCompanyOperations.companies.key).state === "enabled",
+    retry: false,
+  });
+  const emailTypeOptions = useQuery({
+    ...emailTypeFilterOptionsQuery(access.user?.publicId ?? ""),
+    enabled: access.availability(operations.emailTypes.key).state === "enabled",
     retry: false,
   });
   if (!access.user) return null;
@@ -65,16 +84,55 @@ export function PlatformEmailDeliveriesPage() {
             ),
             value: query.status,
           },
-          ...(
-            [
-              "companyPublicId",
-              "emailTypeKey",
-              "businessReference",
-              "recipientEmail",
-              "createdFrom",
-              "createdTo",
-            ] as const
-          ).map((name) => ({ name, label: t(`filter.${name}`), value: query[name] })),
+          {
+            name: "companyPublicId",
+            label: t("filters.company.label"),
+            value: query.companyPublicId,
+            control:
+              access.availability(platformCompanyOperations.companies.key).state === "enabled" &&
+              !companyOptions.isError ? (
+                <SearchableFilterSelect
+                  id="delivery-filter-company"
+                  name="companyPublicId"
+                  label={t("filters.company.label")}
+                  initialValue={query.companyPublicId ?? ""}
+                  placeholder={t("filters.company.placeholder")}
+                  options={companyOptions.data}
+                  loading={companyOptions.isPending}
+                  error={companyOptions.isError}
+                  loadingLabel={t("filters.optionsLoading")}
+                  errorLabel={t("filters.optionsError")}
+                  emptyLabel={t("filters.optionsEmpty")}
+                  clearLabel={t("filters.company.clear")}
+                />
+              ) : undefined,
+          },
+          {
+            name: "emailTypeKey",
+            label: t("filters.emailType.label"),
+            value: query.emailTypeKey,
+            control:
+              access.availability(operations.emailTypes.key).state === "enabled" &&
+              !emailTypeOptions.isError ? (
+                <SearchableFilterSelect
+                  id="delivery-filter-email-type"
+                  name="emailTypeKey"
+                  label={t("filters.emailType.label")}
+                  initialValue={query.emailTypeKey ?? ""}
+                  placeholder={t("filters.emailType.placeholder")}
+                  options={emailTypeOptions.data}
+                  loading={emailTypeOptions.isPending}
+                  error={emailTypeOptions.isError}
+                  loadingLabel={t("filters.optionsLoading")}
+                  errorLabel={t("filters.optionsError")}
+                  emptyLabel={t("filters.optionsEmpty")}
+                  clearLabel={t("filters.emailType.clear")}
+                />
+              ) : undefined,
+          },
+          ...(["businessReference", "recipientEmail", "createdFrom", "createdTo"] as const).map(
+            (name) => ({ name, label: t(`filter.${name}`), value: query[name] }),
+          ),
         ]}
         onSubmit={(body) => {
           const next = operations.deliveries.requestSchema.shape.query.parse(body);

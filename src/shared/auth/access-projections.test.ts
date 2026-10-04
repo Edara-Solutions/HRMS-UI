@@ -101,10 +101,20 @@ describe("shared access projections", () => {
       "not-found",
     );
   });
-  it("never treats root or Owner as an operation permission", () => {
-    expect(projectActionAvailability(read, { ...company, root: true, owner: true })).toEqual({
-      state: "hidden",
+  it("projects the backend Company Owner bypass within Company mode and audience boundaries", () => {
+    expect(projectRouteAccess("/company/dashboard", { ...company, owner: true })).toBe("allow");
+    expect(projectActionAvailability(read, { ...company, owner: true })).toEqual({
+      state: "enabled",
     });
+    expect(projectActionAvailability(write, { ...company, owner: true })).toEqual({
+      state: "enabled",
+    });
+    expect(
+      projectActionAvailability(write, { ...company, owner: true, companyMode: "READ_ONLY" }),
+    ).toEqual({ state: "disabled", reason: "restricted-mode" });
+    expect(
+      projectActionAvailability("GET /api/v1/platform/users", { ...company, owner: true }),
+    ).toEqual({ state: "hidden" });
     expect(projectActionAvailability(read, { ...company, permissions: ["users:read"] })).toEqual({
       state: "enabled",
     });

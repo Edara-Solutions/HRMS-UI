@@ -106,7 +106,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5 sm:col-span-2">
+        <div className="space-y-1.5">
           <Label htmlFor="plan-name">{t("name")}</Label>
           <Input
             id="plan-name"
@@ -118,7 +118,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
             onChange={(event) => setName(event.target.value)}
           />
         </div>
-        <div className="space-y-1.5 sm:col-span-2">
+        <div className="space-y-1.5">
           <Label htmlFor="plan-description">{t("description")}</Label>
           <Textarea
             id="plan-description"

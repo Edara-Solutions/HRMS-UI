@@ -379,7 +379,8 @@ export function projectActionAvailability(
   const delegated = policy.audience === "delegated";
   const audience = delegated ? "platform" : policy.audience;
   if (!facts.authenticated || facts.audience !== audience) return { state: "hidden" };
-  if (policy.permission && !facts.permissions?.includes(policy.permission))
+  const companyOwner = policy.audience === "company" && facts.owner === true;
+  if (policy.permission && !facts.permissions?.includes(policy.permission) && !companyOwner)
     return { state: "hidden" };
   if (delegated) {
     if (!facts.delegatedScopeMatches || !facts.delegatedGrant) return { state: "hidden" };
@@ -436,7 +437,8 @@ export function projectRouteAccess(pathname: string, facts: AccessFacts): Access
     if (available.state === "disabled" && available.reason === "access-session-inactive")
       return "access-session-inactive";
   }
-  if (!facts.permissions?.length) return "no-work-access";
+  if (!facts.permissions?.length && !(route.audience === "company" && facts.owner))
+    return "no-work-access";
   return "allow";
 }
 

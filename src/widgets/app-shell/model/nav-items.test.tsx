@@ -19,14 +19,14 @@ describe("owned workflow navigation", () => {
     ]);
     expect(items.every((item) => !("indicator" in item))).toBe(true);
   });
-  it("localizes the same registry without synthesizing Owner grants", () => {
+  it("shows the backend Owner's Company workflows with localized labels", () => {
     const facts = { audience: "company", authenticated: true, owner: true } as const;
-    expect(buildNavGroups(facts, "ar")[0]?.items[1]?.label).toBe("ملفي الشخصي");
+    expect(buildNavGroups(facts, "ar")[0]?.items[1]?.label).toBe("ملف المؤسسة");
     expect(
       buildNavGroups(facts, "en")
         .flatMap((group) => group.items)
-        .some((item) => item.href.includes("users")),
-    ).toBe(false);
+        .some((item) => item.href === "/company/profile"),
+    ).toBe(true);
   });
   it("adds the organization workflows only when their reads are granted", () => {
     const items = buildNavGroups(

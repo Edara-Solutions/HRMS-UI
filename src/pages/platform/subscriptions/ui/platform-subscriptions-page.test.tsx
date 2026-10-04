@@ -42,15 +42,17 @@ afterEach(() => {
 describe("Global Platform trial expiry", () => {
   it("keeps the historical sample overview separate from live Company subscription actions", async () => {
     const net = open(["companies:read"]);
-    const liveLink = await screen.findByRole("link", { name: "View subscription" });
+    const liveLinks = await screen.findAllByRole("link", { name: "View subscription" });
     const demo = screen.getByRole("region", { name: "Sample subscription overview" });
 
     expect(demo).toHaveTextContent("Illustrative data");
     expect(within(demo).getAllByText("Nexus Technologies").length).toBeGreaterThan(0);
-    expect(liveLink).toHaveAttribute(
-      "href",
-      "/platform/companies/33333333-3333-4333-8333-333333333333",
-    );
+    expect(liveLinks).toHaveLength(2);
+    for (const link of liveLinks)
+      expect(link).toHaveAttribute(
+        "href",
+        "/platform/companies/33333333-3333-4333-8333-333333333333",
+      );
 
     fireEvent.click(within(demo).getByRole("button", { name: "Trial" }));
     expect(within(demo).queryByText("Nexus Technologies")).toBeNull();
