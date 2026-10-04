@@ -43,7 +43,7 @@ describe("Global Platform trial expiry", () => {
   it("requires a global confirmation and shows only the authoritative count", async () => {
     const net = open();
     net.on(key, () => ({ status: 200, body: { expiredCount: 7 } }));
-    await screen.findByRole("link", { name: "Acme Company" });
+    await screen.findAllByRole("link", { name: "Acme Company" });
     expect(net.count(key)).toBe(0);
     await run();
     expect(await screen.findByText("7 trials expired.")).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("Global Platform trial expiry", () => {
   });
   it("keeps expiry hidden from registry-only operators", async () => {
     open(["companies:read"]);
-    await screen.findByRole("link", { name: "Acme Company" });
+    await screen.findAllByRole("link", { name: "Acme Company" });
     expect(screen.queryByRole("button", { name: "Run due-trial expiry" })).toBeNull();
   });
   it("does not retry a failed offline run", async () => {

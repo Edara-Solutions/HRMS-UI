@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { z } from "zod";
+import { z } from "zod";
 import {
   ContractViolation,
   platformLeadOperations as operations,
@@ -19,6 +19,7 @@ interface Props {
   disabled?: boolean;
   onPendingChange?: (pending: boolean) => void;
   onSaved?: (publicId: string) => Promise<void>;
+  onCancel?: () => void;
 }
 const readOperations = [
   operations.leads,
@@ -28,13 +29,16 @@ const readOperations = [
 ];
 const textFields = ["companyName", "website", "industry", "country", "city"] as const;
 
-export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: Props) {
+export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onCancel }: Props) {
   const { t } = useTranslation("platform-leads");
   const access = usePlatformAccess();
   const recover = usePlatformMutationRecovery();
   const queryClient = useQueryClient();
   const locked = useRef(false);
   const [feedback, setFeedback] = useState<string>();
+  const [duplicate, setDuplicate] = useState<z.output<
+    (typeof operations.create.responses)[201]
+  > | null>(null);
   const operation = lead ? operations.update : operations.create;
   const available = access.availability(operation.key);
   const userPublicId = access.user?.publicId ?? "";
@@ -65,6 +69,11 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: P
       return result;
     },
     onSuccess: async (result) => {
+      const created = !lead ? operations.create.responses[201].safeParse(result) : null;
+      if (created?.success && created.data.meta.duplicate) {
+        setDuplicate(created.data);
+        return;
+      }
       setFeedback(t("done"));
       await onSaved?.(result.lead.publicId);
     },
@@ -84,6 +93,28 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: P
   });
   if (available.state === "hidden") return null;
   const bodySchema = operations.create.requestSchema.shape.body;
+  const createFormSchema = z
+    .preprocess((value) => {
+      if (!value || typeof value !== "object") return value;
+      const input = value as Record<string, unknown>;
+      const primaryContact = input.primaryContact;
+      return {
+        ...input,
+        status: "NEW",
+        primaryContact:
+          primaryContact && typeof primaryContact === "object"
+            ? { ...primaryContact, isPrimary: true }
+            : primaryContact,
+      };
+    }, bodySchema)
+    .superRefine((value, context) => {
+      if (!value.primaryContact?.name?.trim())
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["primaryContact", "name"],
+          message: t("contact.nameRequired"),
+        });
+    });
   const statuses = bodySchema.shape.status.options.map((item) => item.value);
   const statusOptions =
     lead && !statuses.some((status) => status === lead.status)
@@ -97,6 +128,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: P
       label: t(`field.${name}`),
       value: lead?.[name] ?? "",
       nullable: !!lead,
+      ...(name === "companyName" ? { section: t("section.company") } : {}),
     })),
     {
       name: "companySizeRange",
@@ -104,6 +136,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: P
       required: true,
       value: lead?.companySizeRange ?? "5_TO_20",
       options: options(bodySchema.shape.companySizeRange.options.map((item) => item.value)),
+      section: t("section.qualification"),
     },
     {
       name: "source",
@@ -112,43 +145,76 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved }: P
       value: lead?.source ?? "CRM",
       options: options(bodySchema.shape.source.options.map((item) => item.value)),
     },
-    {
-      name: "status",
-      label: t("field.status"),
-      required: true,
-      value: lead?.status ?? "NEW",
-      options: options(statusOptions),
-    },
-    {
-      name: "lostReason",
-      label: t("field.lostReason"),
-      value: lead?.lostReason ?? "",
-      nullable: !!lead,
-      options: options([
-        "TOO_EXPENSIVE",
-        "MISSING_FEATURES",
-        "NOT_FIT",
-        "COMPETITOR_CHOSEN",
-        "NO_BUDGET",
-        "NO_DECISION",
-        "NO_RESPONSE",
-      ]),
-    },
+    ...(lead
+      ? [
+          {
+            name: "status",
+            label: t("field.status"),
+            required: true,
+            value: lead.status,
+            options: options(statusOptions),
+          },
+          {
+            name: "lostReason",
+            label: t("field.lostReason"),
+            value: lead.lostReason ?? "",
+            nullable: true,
+            options: options([
+              "TOO_EXPENSIVE",
+              "MISSING_FEATURES",
+              "NOT_FIT",
+              "COMPETITOR_CHOSEN",
+              "NO_BUDGET",
+              "NO_DECISION",
+              "NO_RESPONSE",
+            ]),
+          },
+        ]
+      : []),
   ];
   if (!lead)
     fields.push(
       ...["name", "email", "phone", "jobTitle"].map((name) => ({
         name: `primaryContact.${name}`,
         label: t(`contact.${name}`),
+        ...(name === "name" ? { section: t("section.contact") } : {}),
       })),
+    );
+  if (duplicate)
+    return (
+      <div className="mt-5 space-y-4">
+        <div className="rounded-[var(--radius-md)] border border-[var(--color-success)] bg-[var(--color-success-soft)] p-4">
+          <output className="block font-semibold">{t("duplicate.title")}</output>
+          <p className="mt-2 text-sm">{t("duplicate.description")}</p>
+          <p className="mt-2 font-medium" dir="auto">
+            {duplicate.lead.companyName ?? t("unnamed")}
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            {t("attempts", { count: duplicate.lead.numberOfAttempts })}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-end gap-2">
+          {onCancel && (
+            <Button intent="dismissive" onClick={onCancel}>
+              {t("cancel")}
+            </Button>
+          )}
+          <Button intent="cta" onClick={() => void onSaved?.(duplicate.lead.publicId)}>
+            {t("duplicate.view")}
+          </Button>
+        </div>
+      </div>
     );
   return (
     <div className="space-y-3">
       <SchemaForm
-        schema={lead ? operations.update.requestSchema.shape.body : bodySchema}
+        schema={lead ? operations.update.requestSchema.shape.body : createFormSchema}
         fields={fields}
         changedOnly={!!lead}
         label={t(lead ? "save" : "create")}
+        cancelLabel={t("cancel")}
+        onCancel={onCancel}
+        cancelDisabled={mutation.isPending}
         invalidLabel={t("invalid")}
         disabled={
           disabled || mutation.isPending || mutation.isError || available.state !== "enabled"

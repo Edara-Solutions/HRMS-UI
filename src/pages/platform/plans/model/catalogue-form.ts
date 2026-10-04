@@ -17,7 +17,7 @@ export function planFormSchema(plan?: Plan) {
           .split(",")
           .map((feature) => feature.trim())
           .filter(Boolean);
-      else if (!plan) body.features = [];
+      else if (!plan && !("features" in value)) body.features = [];
       if ("limits" in value && typeof value.limits === "object" && value.limits !== null) {
         // PATCH replaces the limits object. Retain unchanged limits and allow explicit removal.
         const limits: Record<string, unknown> = { ...(plan?.limits ?? {}) };

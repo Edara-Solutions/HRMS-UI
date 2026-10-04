@@ -33,7 +33,7 @@ afterEach(() => {
 describe("Platform Company registry", () => {
   it("uses the exact Platform page contract and separates metadata from lifecycle", async () => {
     const net = open();
-    expect(await screen.findByRole("link", { name: "Acme Company" })).toHaveAttribute(
+    expect((await screen.findAllByRole("link", { name: "Acme Company" }))[0]).toHaveAttribute(
       "href",
       expect.stringContaining("/platform/companies/"),
     );
@@ -48,7 +48,7 @@ describe("Platform Company registry", () => {
   it("creates only safe registry fields and navigates to its public ID", async () => {
     const net = open();
     net.on("POST /api/v1/platform/companies", () => ({ status: 201, body: companyBody() }));
-    await screen.findByText("Acme Company");
+    await screen.findAllByText("Acme Company");
     fireEvent.click(screen.getByRole("button", { name: "Create Company" }));
     const dialog = await screen.findByRole("dialog");
     for (const [label, value] of [
@@ -77,7 +77,7 @@ describe("Platform Company registry", () => {
   });
   it("hides create without its exact permission", async () => {
     open(["companies:read"]);
-    await screen.findByText("Acme Company");
+    await screen.findAllByText("Acme Company");
     expect(screen.queryByRole("button", { name: "Create Company" })).toBeNull();
   });
   it("renders no request with only a Company identity", () => {

@@ -62,11 +62,15 @@ import enPlatformCompanies from "../../public/locales/en/platform-companies.json
 i18next.addResourceBundle("en", "platform-companies", enPlatformCompanies);
 i18next.addResourceBundle("ar", "platform-companies", arPlatformCompanies);
 
+import arPlatformDashboard from "../../public/locales/ar/platform-dashboard.json";
 import arPlatformLeads from "../../public/locales/ar/platform-leads.json";
+import enPlatformDashboard from "../../public/locales/en/platform-dashboard.json";
 import enPlatformLeads from "../../public/locales/en/platform-leads.json";
 
 i18next.addResourceBundle("en", "platform-leads", enPlatformLeads);
 i18next.addResourceBundle("ar", "platform-leads", arPlatformLeads);
+i18next.addResourceBundle("en", "platform-dashboard", enPlatformDashboard);
+i18next.addResourceBundle("ar", "platform-dashboard", arPlatformDashboard);
 
 import arPlatformNotifications from "../../public/locales/ar/platform-notifications.json";
 import arPlatformPlans from "../../public/locales/ar/platform-plans.json";

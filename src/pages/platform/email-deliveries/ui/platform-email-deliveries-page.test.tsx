@@ -27,6 +27,8 @@ it("renders only the minimized declared operational projection", async () => {
     }),
   }));
   show();
+  await screen.findByRole("columnheader", { name: "Email type" });
+  expect(screen.getByRole("columnheader", { name: "Attempts" })).toBeInTheDocument();
   const dialog = await screen.findByRole("dialog");
   await within(dialog).findByText("s***@company.test");
   expect(document.body).not.toHaveTextContent("provider-message-canary");

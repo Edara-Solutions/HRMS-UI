@@ -81,20 +81,29 @@ export function PlatformEmailsPage() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <nav aria-label={t("types.label")}>
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {types.map((type) => (
                 <li key={type.key}>
                   <button
                     type="button"
+                    aria-label={type.description}
                     aria-current={type.key === selected.key ? "true" : undefined}
                     onClick={() => setSelectedKey(type.key)}
                     className={cn(
-                      "w-full rounded-[var(--radius-md)] px-3 py-2 text-start text-sm transition-colors hover:bg-[var(--color-surface-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
+                      "w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-start text-sm transition-colors hover:bg-[var(--color-surface-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]",
                       type.key === selected.key &&
-                        "bg-[var(--color-primary-soft)] font-medium text-[var(--color-primary)]",
+                        "border-[var(--color-primary)] bg-[var(--color-primary-soft)]",
                     )}
                   >
-                    <span className="block break-words">{type.description}</span>
+                    <span className="block break-words font-semibold text-[var(--color-text)]">
+                      {type.description}
+                    </span>
+                    <span className="mt-2 flex flex-wrap gap-1.5">
+                      <Badge variant="primary">{contextLabel(type.context, t)}</Badge>
+                      <Badge variant={type.criticality === "CRITICAL" ? "warning" : "default"}>
+                        {criticalityLabel(type.criticality, t)}
+                      </Badge>
+                    </span>
                   </button>
                 </li>
               ))}
