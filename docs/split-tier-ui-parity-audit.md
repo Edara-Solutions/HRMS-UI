@@ -31,9 +31,13 @@ The old dashboards and Admin subscriptions table used checked-in sample data. Th
 | Company setup | Step checklist, start/complete/skip commands, dependencies and activation readiness. | Current page retains ordered steps, prerequisites, commands and confirmation. Verify old controls remain discoverable in narrow/Arabic layouts. | Current setup and activation reads/step commands exist. |
 | Email settings | Sender identity/theme form and readiness. | Current email page splits sender settings and sending domain, with readiness and a template link. Preserve this clearer contract separation, while reviewing form density. | Current email settings/readiness/sending-domain operations exist. |
 | Audit trail | Shared filter bar and scoped audit table. | Current Company audit retains those components and cursor navigation. | Current Company audit endpoint exists. |
-| People, roles | No old Company tab. | New audience-specific user and role management, including detail screens. Assess create/edit/remove actions against exact permissions and current page tests. | Current Company users and roles operations exist. |
+| People, roles | `People` appeared in the old sidebar, but `/company/people` had no route or page; there was no old Company Roles tab. | New audience-specific user and role management now has real list/detail screens. Assess create/edit/remove actions against exact permissions and current page tests. | Current Company users and roles operations exist. |
 | Notification routing, email templates | No old dedicated Company tab. | New Company communications pages. Audit their forms, preview and permission states on their own current contract. | Current Company notification and email-type operations exist. |
 | My profile, security, sessions | No old dedicated Company self-service tab. | New personal account pages; do not conflate them with Organization profile. | Current Company self-service operations exist. |
+
+### Navigation-only entries on `origin/dev`
+
+The old Company sidebar also displayed **Org Chart, Time Off, Attendance, Payroll, Recruitment, Onboarding, Performance, Documents, Approvals and Reports**. The old Admin sidebar displayed **Reports and Settings**. These were links in `src/widgets/app-shell/model/nav-items.tsx`, but `git ls-tree -r --name-only origin/dev src/app/routes/company src/app/routes/admin` shows no matching route file or page implementation. `git grep` finds their paths only in the old navigation and inert dashboard shortcut definitions. They therefore had no old page functionality to restore. The split-tier navigation omits these dead destinations; rebuilding their screens requires separate product/backend contracts. The old Company `People` link was likewise navigation-only, while the split-tier Company People tab is a working new workflow. This distinction prevents missing navigation labels from being misreported as lost implemented features.
 
 ## Reusable UI and structural findings
 
