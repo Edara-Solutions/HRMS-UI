@@ -1,94 +1,47 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, PermissionAction, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
-import type { NavGroup } from "../model/nav-items";
-import { adminNavGroups, companyNavGroups } from "../model/nav-items";
+import { AudienceSessionProvider, useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
+import { buildNavGroups } from "../model/nav-items";
 import { Sidebar } from "./sidebar";
 
-// The sidebar only needs a location and a navigate; a full router would add no coverage.
-vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
-  return {
-    ...actual,
-    Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
-    useLocation: () => ({ pathname: "/" }),
-    useNavigate: () => vi.fn(),
-  };
-});
-
-function signIn(overrides: Partial<SessionUser> & { permissions: PermissionAction[] }) {
-  useAuthStore.setState({
-    status: "authenticated",
-    session: {
-      accessToken: "access",
-      refreshToken: "refresh",
-      sessionId: "session",
-      expiresIn: 900,
-      user: {
-        publicId: "11111111-1111-4111-8111-111111111111",
-        employeeCode: "E-1",
-        firstName: "Dana",
-        lastName: "Reed",
-        email: "dana@example.com",
-        status: "ACTIVE",
-        companyCode: "NW",
-        companyPublicId: null,
-        mustChangePassword: false,
-        isOwner: false,
-        isPlatformAdmin: false,
-        ...overrides,
-      },
-    } satisfies AuthSession,
-  });
-}
-
-function renderSidebar(groups: NavGroup[]) {
-  render(
-    <Sidebar
-      groups={groups}
-      portalLabel="Edara"
-      portalSubtitle="Portal"
-      portalIcon={<span>E</span>}
-      collapsed={false}
-      onToggleCollapsed={vi.fn()}
-    />,
-  );
-}
-
+vi.mock("@tanstack/react-router", () => ({
+  useLocation: () => ({ pathname: "/company/me/profile" }),
+  Link: ({ to, children, ...props }: { to: string; children: React.ReactNode }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+  useNavigate: () => vi.fn(),
+}));
 afterEach(() => {
   cleanup();
-  useAuthStore.setState({ session: null, status: "anonymous" });
+  useCompanySession.getState().clearSession();
 });
-
-describe.each([
-  { portal: "Company", groups: companyNavGroups, label: "Audit log" },
-  { portal: "Admin", groups: adminNavGroups, label: "Audit Log" },
-])("$portal audit nav entry", ({ groups, label }) => {
-  it("is hidden for an identity without audit-events:read", () => {
-    signIn({ permissions: ["users:read"] });
-    renderSidebar(groups);
-
-    expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
-  });
-
-  it("is shown for an identity granted audit-events:read", () => {
-    signIn({ permissions: ["audit-events:read"] });
-    renderSidebar(groups);
-
-    expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
-  });
-
-  // Both portals bypass the permission list for these identities, exactly as the backend
-  // guard does, so neither may be hidden by the new nav field.
-  it.each([
-    { identity: "an owner", grants: { isOwner: true } },
-    { identity: "a platform admin", grants: { isPlatformAdmin: true } },
-  ])("is shown for $identity holding no explicit grant", ({ grants }) => {
-    signIn({ permissions: [], ...grants });
-    renderSidebar(groups);
-
-    expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
+describe("sidebar from projected registry", () => {
+  it.each([false, true])("keeps SELF reachable with collapsed=%s", (collapsed) => {
+    useCompanySession.getState().setSession(companySessionFixture());
+    render(
+      <AudienceSessionProvider audience="company">
+        <Sidebar
+          groups={buildNavGroups(
+            { audience: "company", authenticated: true, permissions: [] },
+            "en",
+          )}
+          portalLabel="Edara"
+          portalSubtitle="People Operations"
+          portalIcon={<span>E</span>}
+          collapsed={collapsed}
+          onToggleCollapsed={vi.fn()}
+          footer={<span>Identity</span>}
+        />
+      </AudienceSessionProvider>,
+    );
+    const links = screen.getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toContain("/company/me/profile");
+    expect(
+      links.find((link) => link.getAttribute("href") === "/company/me/profile"),
+    ).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByText("Payroll")).not.toBeInTheDocument();
   });
 });

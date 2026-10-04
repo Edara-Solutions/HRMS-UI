@@ -1,0 +1,105 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ContractViolation, useCompanyAccess } from "@/shared/api";
+import { usePreferencesStore } from "@/shared/config";
+import { Button } from "@/shared/ui/button";
+import { EmailPreviewFrame } from "@/shared/ui/email-preview-frame";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { emailTemplateQueries } from "../api/email-templates";
+import { type EmailType, type PreviewLocale, previewLocale } from "../model/email-templates";
+
+export function TemplatePreview({ type }: { type: EmailType }) {
+  const { t } = useTranslation("communications");
+  const interfaceLocale = usePreferencesStore((state) => state.locale);
+  const access = useCompanyAccess();
+  const [locale, setLocale] = useState<PreviewLocale>(() => previewLocale(type, interfaceLocale));
+  const [view, setView] = useState<"html" | "text">("html");
+  const { data, error, isPending, isError, refetch } = useQuery(
+    emailTemplateQueries(access.user?.publicId ?? "").preview(type.key, locale),
+  );
+
+  return (
+    <section aria-labelledby="template-preview" className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 id="template-preview" className="text-sm font-semibold">
+          {t("templates.preview")}
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <fieldset className="flex gap-1">
+            <legend className="sr-only">{t("templates.previewLocale")}</legend>
+            {type.supportedLocales.map((option) => (
+              <Button
+                key={option}
+                intent="toggle"
+                size="sm"
+                pressed={locale === option}
+                onClick={() => setLocale(option)}
+              >
+                {t(`locale.${option}`)}
+              </Button>
+            ))}
+          </fieldset>
+          <fieldset className="flex gap-1">
+            <legend className="sr-only">{t("templates.previewFormat")}</legend>
+            {(["html", "text"] as const).map((option) => (
+              <Button
+                key={option}
+                intent="toggle"
+                size="sm"
+                pressed={view === option}
+                onClick={() => setView(option)}
+              >
+                {t(`templates.format.${option}`)}
+              </Button>
+            ))}
+          </fieldset>
+        </div>
+      </div>
+      {isPending ? (
+        <Skeleton className="h-72 w-full" />
+      ) : isError ? (
+        <div className="space-y-2 text-sm">
+          <p>
+            {error instanceof ContractViolation
+              ? t("state.contractUnavailable")
+              : t("state.loadFailed")}
+          </p>
+          {!(error instanceof ContractViolation) && (
+            <Button intent="action" size="sm" onClick={() => void refetch()}>
+              {t("state.retry")}
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2 rounded-[var(--radius-md)] border border-[var(--color-border)] p-3 text-sm">
+          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1">
+            <dt className="text-[var(--color-text-muted)]">{t("templates.subject")}</dt>
+            <dd className="break-words" dir={data.locale === "ar" ? "rtl" : "ltr"}>
+              {data.subject}
+            </dd>
+            <dt className="text-[var(--color-text-muted)]">{t("templates.preheader")}</dt>
+            <dd className="break-words" dir={data.locale === "ar" ? "rtl" : "ltr"}>
+              {data.preheader}
+            </dd>
+          </dl>
+          {view === "html" ? (
+            <EmailPreviewFrame
+              title={t("templates.previewFrame", { subject: data.subject })}
+              html={data.html}
+              className="h-96 w-full rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)]"
+            />
+          ) : (
+            <pre
+              className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] p-3 text-xs"
+              dir={data.locale === "ar" ? "rtl" : "ltr"}
+            >
+              {data.text}
+            </pre>
+          )}
+          <p className="text-xs text-[var(--color-text-muted)]">{t("templates.syntheticNote")}</p>
+        </div>
+      )}
+    </section>
+  );
+}

@@ -12,6 +12,14 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const frontendRoot = resolve(here, "..");
 export const contractsDir = join(frontendRoot, "contracts");
 export const openApiPath = join(contractsDir, "openapi.json");
+export const audienceOpenApiPaths = {
+  company: join(contractsDir, "openapi.company.json"),
+  delegated: join(contractsDir, "openapi.delegated.json"),
+  platform: join(contractsDir, "openapi.platform.json"),
+  public: join(contractsDir, "openapi.public.json"),
+};
+export const audienceContractManifestPath = join(contractsDir, "AUDIENCE_CONTRACT_MANIFEST.json");
+export const contractProvenancePath = join(contractsDir, "provenance.json");
 export const producingCommitPath = join(contractsDir, "PRODUCING_COMMIT");
 export const producingRefPath = join(contractsDir, "PRODUCING_REF");
 

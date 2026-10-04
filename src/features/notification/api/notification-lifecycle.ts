@@ -1,12 +1,15 @@
 import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/shared/api";
 import { notificationKeys } from "../model/notification-keys";
 import { useBulkReadCursor } from "../model/notification-read-state";
-import { type NotificationTier, useNotificationTier } from "../model/notification-tier";
-import type { NotificationFeedItem, NotificationFeedPage } from "./notification-feed";
-import { forgetUnreadCountRevision, type UnreadNotificationCount } from "./unread-count";
+import { type NotificationScope, scopeKey, useNotificationScope } from "../model/notification-tier";
+import {
+  type NotificationFeedItem,
+  type NotificationFeedPage,
+  sendNotificationRead,
+  sendNotificationsSeen,
+} from "./notification-transport";
 
-/** Server cap on one seen batch (HRMS_Back_End#198 §5); a fuller panel marks its newest rows. */
+/** Server cap on one seen batch; a fuller panel marks its newest rows. */
 export const SEEN_BATCH_LIMIT = 200;
 
 interface CachedFeed {
@@ -16,40 +19,44 @@ interface CachedFeed {
 
 interface FeedSnapshot {
   readonly feed: CachedFeed | undefined;
-  readonly count: UnreadNotificationCount | undefined;
+  readonly count: number | undefined;
 }
 
-function requireTier(tier: NotificationTier | null): NotificationTier {
-  if (!tier) {
-    throw new Error("Notification tier requires a session");
+function requireScope(scope: NotificationScope | null): NotificationScope {
+  if (!scope) {
+    throw new Error("Notification lifecycle requires a session");
   }
 
-  return tier;
+  return scope;
 }
 
-function takeSnapshot(queryClient: QueryClient): FeedSnapshot {
+function takeSnapshot(queryClient: QueryClient, scope: NotificationScope): FeedSnapshot {
   return {
-    feed: queryClient.getQueryData<CachedFeed>(notificationKeys.list(null)),
-    count: queryClient.getQueryData<UnreadNotificationCount>(notificationKeys.count()),
+    feed: queryClient.getQueryData<CachedFeed>(notificationKeys.list(scope)),
+    count: queryClient.getQueryData<number>(notificationKeys.count(scope)),
   };
 }
 
-function restore(queryClient: QueryClient, snapshot: FeedSnapshot) {
-  queryClient.setQueryData(notificationKeys.list(null), snapshot.feed);
-  queryClient.setQueryData(notificationKeys.count(), snapshot.count);
+function restore(queryClient: QueryClient, scope: NotificationScope, snapshot: FeedSnapshot) {
+  queryClient.setQueryData(notificationKeys.list(scope), snapshot.feed);
+  queryClient.setQueryData(notificationKeys.count(scope), snapshot.count);
 }
 
-function cachedItems(queryClient: QueryClient): readonly NotificationFeedItem[] {
-  const feed = queryClient.getQueryData<CachedFeed>(notificationKeys.list(null));
+function cachedItems(
+  queryClient: QueryClient,
+  scope: NotificationScope,
+): readonly NotificationFeedItem[] {
+  const feed = queryClient.getQueryData<CachedFeed>(notificationKeys.list(scope));
 
   return feed?.pages.flatMap((page) => page.items) ?? [];
 }
 
 function patchFeed(
   queryClient: QueryClient,
+  scope: NotificationScope,
   patch: (item: NotificationFeedItem) => NotificationFeedItem,
 ) {
-  queryClient.setQueryData(notificationKeys.list(null), (current: CachedFeed | undefined) => {
+  queryClient.setQueryData(notificationKeys.list(scope), (current: CachedFeed | undefined) => {
     if (!current) return current;
 
     return {
@@ -59,11 +66,13 @@ function patchFeed(
   });
 }
 
-function patchCount(queryClient: QueryClient, next: (unreadCount: number) => number) {
-  queryClient.setQueryData(
-    notificationKeys.count(),
-    (current: UnreadNotificationCount | undefined) =>
-      current ? { ...current, unreadCount: Math.max(0, next(current.unreadCount)) } : current,
+function patchCount(
+  queryClient: QueryClient,
+  scope: NotificationScope,
+  next: (unreadCount: number) => number,
+) {
+  queryClient.setQueryData(notificationKeys.count(scope), (current: number | undefined) =>
+    current === undefined ? current : Math.max(0, next(current)),
   );
 }
 
@@ -71,82 +80,84 @@ function patchCount(queryClient: QueryClient, next: (unreadCount: number) => num
  * The polling count would otherwise land mid-mutation and undo the optimistic drain. The list is
  * left alone: it never refetches on its own, and cancelling it would abort a "show older" page.
  */
-function cancelCountPoll(queryClient: QueryClient) {
-  return queryClient.cancelQueries({ queryKey: notificationKeys.count() });
+function cancelCountPoll(queryClient: QueryClient, scope: NotificationScope) {
+  return queryClient.cancelQueries({ queryKey: notificationKeys.count(scope) });
 }
 
-function refreshCountAndFeed(queryClient: QueryClient, tier: NotificationTier | null) {
-  // A tier is guaranteed by the time a mutation settles; the guard is only here because the
-  // session can end mid-flight, and there is then no revision left worth forgetting.
-  if (tier) forgetUnreadCountRevision(tier);
+function refreshCountAndFeed(queryClient: QueryClient, scope: NotificationScope | null) {
+  if (!scope) return Promise.resolve();
 
   return Promise.all([
-    queryClient.invalidateQueries({ queryKey: notificationKeys.count() }),
-    queryClient.invalidateQueries({ queryKey: notificationKeys.list(null) }),
+    queryClient.invalidateQueries({ queryKey: notificationKeys.count(scope) }),
+    queryClient.invalidateQueries({ queryKey: notificationKeys.list(scope) }),
   ]);
 }
 
-/** Marks the rows an open panel rendered as seen — the write that drains the badge. */
+/**
+ * Marks the rows an open panel rendered as seen — the write that drains the badge. Seen is not
+ * read: a seen row keeps its unread state until it is opened or everything is marked read.
+ */
 export function useMarkNotificationsSeen() {
-  const tier = useNotificationTier();
+  const scope = useNotificationScope();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ids: readonly number[]) => {
-      await apiClient.post(`${requireTier(tier)}/notifications/seen`, { json: { ids: [...ids] } });
-    },
-    onMutate: async (ids) => {
-      await cancelCountPoll(queryClient);
+    mutationFn: (publicIds: readonly string[]) =>
+      sendNotificationsSeen(requireScope(scope).tier, publicIds),
+    onMutate: async (publicIds) => {
+      const current = requireScope(scope);
+      await cancelCountPoll(queryClient, current);
 
-      const snapshot = takeSnapshot(queryClient);
-      const marked = new Set(ids);
+      const snapshot = takeSnapshot(queryClient, current);
+      const marked = new Set(publicIds);
       const seenAt = new Date().toISOString();
-      const drained = cachedItems(queryClient).filter(
-        (item) => marked.has(item.id) && item.seenAt === null && item.readAt === null,
+      const drained = cachedItems(queryClient, current).filter(
+        (item) => marked.has(item.publicId) && item.seenAt === null && item.readAt === null,
       ).length;
 
-      patchFeed(queryClient, (item) =>
-        marked.has(item.id) && item.seenAt === null ? { ...item, seenAt } : item,
+      patchFeed(queryClient, current, (item) =>
+        marked.has(item.publicId) && item.seenAt === null ? { ...item, seenAt } : item,
       );
-      patchCount(queryClient, (unreadCount) => unreadCount - drained);
+      patchCount(queryClient, current, (unreadCount) => unreadCount - drained);
 
       return snapshot;
     },
     onError: (_error, _ids, snapshot) => {
-      if (snapshot) restore(queryClient, snapshot);
+      if (snapshot && scope) restore(queryClient, scope, snapshot);
     },
-    onSettled: () => refreshCountAndFeed(queryClient, tier),
+    onSettled: () => refreshCountAndFeed(queryClient, scope),
   });
 }
 
 /** Marks the row the reader just activated as read. */
 export function useMarkNotificationRead() {
-  const tier = useNotificationTier();
+  const scope = useNotificationScope();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      await apiClient.post(`${requireTier(tier)}/notifications/read`, { json: { id } });
-    },
-    onMutate: async (id) => {
-      await cancelCountPoll(queryClient);
+    mutationFn: (publicId: string) => sendNotificationRead(requireScope(scope).tier, { publicId }),
+    onMutate: async (publicId) => {
+      const current = requireScope(scope);
+      await cancelCountPoll(queryClient, current);
 
-      const snapshot = takeSnapshot(queryClient);
-      const target = cachedItems(queryClient).find((item) => item.id === id);
+      const snapshot = takeSnapshot(queryClient, current);
+      const target = cachedItems(queryClient, current).find((item) => item.publicId === publicId);
       const readAt = new Date().toISOString();
 
-      patchFeed(queryClient, (item) => (item.id === id ? { ...item, readAt } : item));
+      patchFeed(queryClient, current, (item) =>
+        item.publicId === publicId ? { ...item, readAt } : item,
+      );
 
       if (target?.seenAt === null && target.readAt === null) {
-        patchCount(queryClient, (unreadCount) => unreadCount - 1);
+        patchCount(queryClient, current, (unreadCount) => unreadCount - 1);
       }
 
       return snapshot;
     },
     onError: (_error, _id, snapshot) => {
-      if (snapshot) restore(queryClient, snapshot);
+      if (snapshot && scope) restore(queryClient, scope, snapshot);
     },
-    onSettled: () => refreshCountAndFeed(queryClient, tier),
+    onSettled: () => refreshCountAndFeed(queryClient, scope),
   });
 }
 
@@ -155,33 +166,33 @@ export function useMarkNotificationRead() {
  * mirrored cursor — not the cached rows — is what mutes them.
  */
 export function useMarkAllNotificationsRead() {
-  const tier = useNotificationTier();
+  const scope = useNotificationScope();
   const queryClient = useQueryClient();
   const setCursorAt = useBulkReadCursor((state) => state.setCursorAt);
 
   return useMutation({
-    mutationFn: async () => {
-      await apiClient.post(`${requireTier(tier)}/notifications/read`, { json: { all: true } });
-    },
+    mutationFn: () => sendNotificationRead(requireScope(scope).tier, { all: true }),
     onMutate: async () => {
-      await cancelCountPoll(queryClient);
+      const current = requireScope(scope);
+      const key = scopeKey(current);
+      await cancelCountPoll(queryClient, current);
 
       const snapshot = {
-        ...takeSnapshot(queryClient),
-        cursorAt: useBulkReadCursor.getState().cursorAt,
+        ...takeSnapshot(queryClient, current),
+        cursorAt: useBulkReadCursor.getState().cursors[key] ?? null,
       };
 
-      setCursorAt(new Date().toISOString());
-      patchCount(queryClient, () => 0);
+      setCursorAt(key, new Date().toISOString());
+      patchCount(queryClient, current, () => 0);
 
       return snapshot;
     },
     onError: (_error, _variables, snapshot) => {
-      if (!snapshot) return;
+      if (!snapshot || !scope) return;
 
-      restore(queryClient, snapshot);
-      setCursorAt(snapshot.cursorAt);
+      restore(queryClient, scope, snapshot);
+      setCursorAt(scopeKey(scope), snapshot.cursorAt);
     },
-    onSettled: () => refreshCountAndFeed(queryClient, tier),
+    onSettled: () => refreshCountAndFeed(queryClient, scope),
   });
 }

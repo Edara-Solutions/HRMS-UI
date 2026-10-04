@@ -1,128 +1,122 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { CompanySession, PlatformSession } from "@/shared/auth";
+import { useCompanySession, usePlatformSession } from "@/shared/auth";
 import {
-  isAdminConsoleEnabled,
-  requireAdminConsoleEnabled,
+  isPlatformPortalEnabled,
+  redirectIfMustChangePassword,
   requireAuthenticated,
+  requirePlatformPortalEnabled,
 } from "./auth-guards";
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
+const tokens = {
+  accessToken: "access",
+  refreshToken: "refresh",
+  sessionId: "b2b0369d-e6f3-4b8a-aa86-8c6053b19b19",
+  expiresIn: 900,
+  mustChangePassword: false,
+};
+const identity = {
+  publicId: "cdebc050-5b45-4c15-a199-44ce6a4161ba",
   firstName: "Jane",
   lastName: "Doe",
   email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
   mustChangePassword: false,
+  photoUrl: null,
+  locale: "en",
+  timezone: "UTC",
   permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
+};
+const company: CompanySession = {
+  ...tokens,
+  user: {
+    ...identity,
+    status: "ACTIVE",
+    employeeCode: "EMP-001",
+    companyCode: "ACME",
+    companyPublicId: "379dd5ae-49e0-4bbe-90b9-1125f0802729",
+    isOwner: false,
+  },
+};
+const platform: PlatformSession = {
+  ...tokens,
+  user: { ...identity, status: "ACTIVE", roleNames: [] },
 };
 
-function buildSession(userOverrides: Partial<SessionUser> = {}): AuthSession {
-  return {
-    accessToken: "access-token",
-    refreshToken: "refresh-token",
-    sessionId: "session-1",
-    expiresIn: 900,
-    user: { ...baseUser, ...userOverrides },
-  };
-}
+afterEach(() => {
+  useCompanySession.getState().clearSession();
+  usePlatformSession.getState().clearSession();
+  vi.unstubAllEnvs();
+});
 
-function redirectTarget(fn: () => unknown): unknown {
-  try {
-    fn();
-    throw new Error("Expected a redirect to be thrown");
-  } catch (thrown) {
-    return thrown;
-  }
-}
-
-describe("requireAuthenticated", () => {
-  afterEach(() => {
-    useAuthStore.setState({ session: null, status: "anonymous" });
+describe("audience route guard", () => {
+  beforeEach(() => vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "true"));
+  it("refuses a known Company route the identity may not open, inside its audience", async () => {
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, permissions: ["users:read"] } });
+    await expect(requireAuthenticated({ returnTo: "/company/setup" })).rejects.toMatchObject({
+      name: "RouteAccessRefusal",
+      audience: "company",
+      decision: "forbidden",
+    });
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, permissions: ["company-setup:read"] } });
+    await expect(requireAuthenticated({ returnTo: "/company/setup" })).resolves.toBeTruthy();
   });
-
-  it("redirects to /login when there is no session", () => {
-    useAuthStore.setState({ session: null, status: "anonymous" });
-
-    expect(redirectTarget(() => requireAuthenticated())).toMatchObject({
-      options: { to: "/login" },
+  it("requires Company authentication even when Platform is signed in", async () => {
+    usePlatformSession.getState().setSession(platform);
+    await expect(requireAuthenticated()).rejects.toMatchObject({
+      options: { to: "/company/login" },
     });
   });
 
-  it("redirects to /change-password when mustChangePassword is true, even on an unrelated route", () => {
-    useAuthStore.setState({
-      session: buildSession({ mustChangePassword: true }),
-      status: "must_change_password",
-    });
-
-    expect(
-      redirectTarget(() => requireAuthenticated({ requiredPermissions: ["users:read"] })),
-    ).toMatchObject({ options: { to: "/change-password" } });
-  });
-
-  it("does not redirect once the session reflects mustChangePassword === false", () => {
-    const session = buildSession({ mustChangePassword: false });
-    useAuthStore.setState({ session, status: "authenticated" });
-
-    expect(requireAuthenticated()).toEqual(session);
-  });
-
-  it("bounces a non-platform-admin to /company/dashboard from a platformAdminOnly route", () => {
-    useAuthStore.setState({
-      session: buildSession({ isPlatformAdmin: false }),
-      status: "authenticated",
-    });
-
-    expect(redirectTarget(() => requireAuthenticated({ platformAdminOnly: true }))).toMatchObject({
-      options: { to: "/company/dashboard" },
+  it("requires Platform authentication even when the Company Owner is signed in", async () => {
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, isOwner: true } });
+    await expect(requireAuthenticated({ audience: "platform" })).rejects.toMatchObject({
+      options: { to: "/platform/login" },
     });
   });
 
-  it("bounces a tenant owner (isOwner) from a platformAdminOnly route — owner is company-scoped, not global", () => {
-    useAuthStore.setState({
-      session: buildSession({ isOwner: true, isPlatformAdmin: false }),
-      status: "authenticated",
-    });
-
-    expect(redirectTarget(() => requireAuthenticated({ platformAdminOnly: true }))).toMatchObject({
-      options: { to: "/company/dashboard" },
-    });
+  it("admits only the route's matching established identity", async () => {
+    useCompanySession.getState().setSession(company);
+    usePlatformSession.getState().setSession(platform);
+    await expect(requireAuthenticated()).resolves.toEqual(company);
+    await expect(requireAuthenticated({ audience: "platform" })).resolves.toEqual(platform);
   });
 
-  it("admits a platform admin to a platformAdminOnly route", () => {
-    const session = buildSession({ isPlatformAdmin: true });
-    useAuthStore.setState({ session, status: "authenticated" });
+  it("does not let Company password completion block the Platform identity", async () => {
+    useCompanySession
+      .getState()
+      .setSession({ ...company, user: { ...company.user, mustChangePassword: true } });
+    usePlatformSession.getState().setSession(platform);
+    await expect(requireAuthenticated()).rejects.toMatchObject({
+      options: { to: "/company/change-password" },
+    });
+    await expect(requireAuthenticated({ audience: "platform" })).resolves.toEqual(platform);
+    expect(() => redirectIfMustChangePassword("/platform/dashboard")).not.toThrow();
+    expect(() => redirectIfMustChangePassword("/plans")).not.toThrow();
+  });
 
-    expect(requireAuthenticated({ platformAdminOnly: true })).toEqual(session);
+  it("refuses a known Company route without its required permission", async () => {
+    useCompanySession.getState().setSession(company);
+    await expect(
+      requireAuthenticated({ requiredPermissions: ["users:read"] }),
+    ).rejects.toMatchObject({ options: { to: "/forbidden" } });
   });
 });
 
 describe("admin console build flag", () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
+  it("conceals absent-build routes", () => {
+    vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "false");
+    expect(isPlatformPortalEnabled()).toBe(false);
+    expect(() => requirePlatformPortalEnabled()).toThrow();
   });
-
-  it("isAdminConsoleEnabled reflects VITE_ENABLE_ADMIN", () => {
-    vi.stubEnv("VITE_ENABLE_ADMIN", "true");
-    expect(isAdminConsoleEnabled()).toBe(true);
-
-    vi.stubEnv("VITE_ENABLE_ADMIN", "false");
-    expect(isAdminConsoleEnabled()).toBe(false);
-  });
-
-  it("requireAdminConsoleEnabled throws notFound when the flag is off", () => {
-    vi.stubEnv("VITE_ENABLE_ADMIN", "false");
-
-    expect(() => requireAdminConsoleEnabled()).toThrow();
-  });
-
-  it("requireAdminConsoleEnabled does not throw when the flag is on", () => {
-    vi.stubEnv("VITE_ENABLE_ADMIN", "true");
-
-    expect(() => requireAdminConsoleEnabled()).not.toThrow();
+  it("permits enabled-build routes to proceed to their audience guard", () => {
+    vi.stubEnv("VITE_ENABLE_PLATFORM_PORTAL", "true");
+    expect(isPlatformPortalEnabled()).toBe(true);
+    expect(() => requirePlatformPortalEnabled()).not.toThrow();
   });
 });

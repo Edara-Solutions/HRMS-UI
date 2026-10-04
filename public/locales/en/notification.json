@@ -20,10 +20,6 @@
   "notifications.platform.lead-created.body": "A new lead joined the pipeline and is ready for review.",
   "notifications.platform.conversion-requested.title": "Conversion request submitted",
   "notifications.platform.conversion-requested.body": "A company is waiting for your conversion decision.",
-  "notifications.platform.company-activated.title": "Company activated",
-  "notifications.platform.company-activated.body": "Your company is now active on Edara.",
-  "notifications.platform.conversion-decided.title": "Conversion request {{decision}}",
-  "notifications.platform.conversion-decided.body": "Edara has reviewed your conversion request.",
   "notifications.platform.announcement.title": "Announcement",
   "notifications.platform.announcement.body": "A new announcement was published.",
   "notifications.company.subscription-changed.title": "Subscription updated",
@@ -46,5 +42,13 @@
   "style.sheet.name": "Sheet",
   "style.sheet.hint": "A side sheet over the page, with roomier rows. Best for working through the feed.",
   "style.flat.name": "Compact list",
-  "style.flat.hint": "Newest first with no day headings, filtered to All or Unread. Best for a busy feed."
+  "style.flat.hint": "Newest first with no day headings, filtered to All or Unread. Best for a busy feed.",
+  "notifications.company.activated.title": "Company activated",
+  "notifications.company.activated.body": "Your company is now active on Edara.",
+  "notifications.company.conversion-decided.title": "Conversion request {{decision}}",
+  "notifications.company.conversion-decided.body": "Edara has reviewed your conversion request.",
+  "notifications.company.announcement.title": "Announcement",
+  "notifications.company.announcement.body": "A new announcement was published.",
+  "notifications.unknown.title": "New notification",
+  "notifications.unknown.body": "There is an update in your workspace."
 }

@@ -4,51 +4,24 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import i18next from "i18next";
 import { I18nextProvider } from "react-i18next";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
-import type { NotificationFeedItem } from "../api/notification-feed";
+import { AudienceSessionProvider, useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
+import { notificationId, notificationItem } from "../../../test/notification-fixtures";
+import { operationNetwork } from "../../../test/operation-request-mock";
 import { useBulkReadCursor } from "../model/notification-read-state";
 import { NotificationBell } from "./notification-bell";
 
 const navigateMock = vi.hoisted(() => vi.fn());
-const apiGetMock = vi.hoisted(() => vi.fn());
-const apiPostMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-router")>()),
   useNavigate: () => navigateMock,
 }));
 
-// `ky` builds AbortSignals that jsdom's fetch rejects as cross-realm — stub the client boundary
-// instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: apiGetMock, post: apiPostMock },
-}));
-
 const testI18n = i18next.createInstance();
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
+const session = companySessionFixture();
+const scopeKey = `company:${session.user.publicId}`;
 
 /**
  * A fixed midday "now": the recency buckets are calendar days, so a suite that reads the real
@@ -57,69 +30,57 @@ const session: AuthSession = {
 const now = new Date("2026-08-25T12:00:00Z");
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 60 * 60 * 1000).toISOString();
 
-const leadRow: NotificationFeedItem = {
-  id: 1,
-  scope: "platform",
-  typeKey: "platform.lead-created",
-  typeVersion: 1,
-  importance: "normal",
+const subscriptionRow = notificationItem(1, hoursAgo(1), {
+  typeKey: "company.subscription-changed",
+  importance: "high",
+  params: { planName: "Growth", status: "active" },
+});
+const informationalRow = notificationItem(2, hoursAgo(30), { typeKey: "company.user-joined" });
+const unknownRow = notificationItem(3, hoursAgo(2), {
+  typeKey: "company.future-type",
   params: {},
-  actor: { kind: "system" },
-  subject: { type: "lead", publicId: "lead-1" },
-  createdAt: hoursAgo(1),
-  seenAt: null,
-  readAt: null,
-};
+});
 
-const informationalRow: NotificationFeedItem = {
-  ...leadRow,
-  id: 2,
-  typeKey: "company.user-joined",
-  subject: null,
-  createdAt: hoursAgo(30),
-};
-
-type LifecycleBody = { ids: number[] } | { id?: number; all?: true };
+const seenKey = "POST /api/v1/company/notifications/seen";
+const readKey = "POST /api/v1/company/notifications/read";
 
 /**
  * A feed the writes actually move, so a reopen sees the rows the previous open marked — the only
  * way to tell "one seen request per open" from "one seen request ever".
  */
-function stubEndpoints({ unreadCount = 0, items = [] as NotificationFeedItem[] } = {}) {
-  const feed = { unreadCount, items };
+function stubEndpoints({ unreadCount = 0, items = [] as unknown[], failWrites = false } = {}) {
+  const feed = { unreadCount, items: [...items] };
+  const net = operationNetwork.install();
 
-  apiGetMock.mockImplementation((path: string) => {
-    if (path.endsWith("unread-count")) {
-      return Promise.resolve(
-        new Response(JSON.stringify({ unreadCount: feed.unreadCount }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
-    }
-
-    return { json: async () => ({ items: feed.items, nextCursor: null, hasMore: false }) };
-  });
-
-  apiPostMock.mockImplementation((_path: string, options: { json: LifecycleBody }) => {
-    const body = options.json;
-
-    if ("ids" in body) {
-      const marked = new Set(body.ids);
-      feed.items = feed.items.map((item) =>
-        marked.has(item.id) ? { ...item, seenAt: now.toISOString() } : item,
-      );
-    }
-
+  net.on("GET /api/v1/company/notifications/unread-count", () => ({
+    status: 200,
+    body: { unreadCount: feed.unreadCount },
+  }));
+  net.on("GET /api/v1/company/notifications", () => ({
+    status: 200,
+    body: { items: feed.items, nextCursor: null, hasMore: false },
+  }));
+  net.on(seenKey, (input) => {
+    if (failWrites) throw new TypeError("Failed to fetch");
+    const marked = new Set((input as { body: { publicIds: string[] } }).body.publicIds);
+    feed.items = feed.items.map((item) =>
+      typeof item === "object" &&
+      item !== null &&
+      "publicId" in item &&
+      marked.has(String(item.publicId))
+        ? { ...item, seenAt: now.toISOString() }
+        : item,
+    );
     feed.unreadCount = 0;
-    return Promise.resolve(new Response(null, { status: 204 }));
+    return { status: 200, body: { seenCount: marked.size } };
+  });
+  net.on(readKey, () => {
+    if (failWrites) throw new TypeError("Failed to fetch");
+    feed.unreadCount = 0;
+    return { status: 204 };
   });
 
-  return feed;
-}
-
-function seenRequests() {
-  return apiPostMock.mock.calls.filter(([path]) => path.endsWith("/seen"));
+  return net;
 }
 
 function renderBell() {
@@ -127,9 +88,11 @@ function renderBell() {
 
   return render(
     <I18nextProvider i18n={testI18n}>
-      <QueryClientProvider client={queryClient}>
-        <NotificationBell />
-      </QueryClientProvider>
+      <AudienceSessionProvider audience="company">
+        <QueryClientProvider client={queryClient}>
+          <NotificationBell />
+        </QueryClientProvider>
+      </AudienceSessionProvider>
     </I18nextProvider>,
   );
 }
@@ -141,6 +104,7 @@ describe("NotificationBell", () => {
       fallbackLng: "en",
       ns: ["notification"],
       defaultNS: "notification",
+      keySeparator: false,
       interpolation: { escapeValue: false },
       resources: {
         en: {
@@ -152,18 +116,18 @@ describe("NotificationBell", () => {
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["Date"], now, shouldAdvanceTime: true });
-    useAuthStore.setState({ session, status: "authenticated" });
+    useCompanySession.getState().setSession(session);
   });
 
   afterEach(() => {
     vi.useRealTimers();
     cleanup();
-    vi.clearAllMocks();
-    useBulkReadCursor.setState({ cursorAt: null });
-    useAuthStore.setState({ session: null, status: "anonymous" });
+    navigateMock.mockReset();
+    useBulkReadCursor.setState({ cursors: {} });
+    useCompanySession.getState().clearSession();
   });
 
-  it("caps the badge at 99+ and announces the count on the bell", async () => {
+  it("caps the badge at 99+ and announces the declared count on the bell", async () => {
     stubEndpoints({ unreadCount: 128 });
     renderBell();
 
@@ -171,16 +135,17 @@ describe("NotificationBell", () => {
     expect(screen.getByRole("button", { name: "Notifications, 128 unread" })).toBeInTheDocument();
   });
 
-  it("hides the badge while nothing is unread", async () => {
-    stubEndpoints();
+  it("takes the badge from the count read even when the feed holds unread rows", async () => {
+    const net = stubEndpoints({ unreadCount: 0, items: [subscriptionRow] });
     renderBell();
 
     expect(await screen.findByRole("button", { name: "Notifications" })).toBeInTheDocument();
-    expect(screen.queryByText("0")).not.toBeInTheDocument();
+    expect(screen.queryByText("1")).not.toBeInTheDocument();
+    expect(net.count("GET /api/v1/company/notifications")).toBe(0);
   });
 
   it("opens the panel on the bell, groups rows by recency, and closes on Escape", async () => {
-    stubEndpoints({ items: [leadRow, informationalRow] });
+    stubEndpoints({ items: [subscriptionRow, informationalRow] });
     renderBell();
 
     const bell = await screen.findByRole("button", { name: "Notifications" });
@@ -190,7 +155,7 @@ describe("NotificationBell", () => {
     fireEvent.click(bell);
     expect(bell).toHaveAttribute("aria-expanded", "true");
 
-    expect(await screen.findByText("New lead registered")).toBeInTheDocument();
+    expect(await screen.findByText("Subscription updated")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Today" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Yesterday" })).toBeInTheDocument();
 
@@ -200,16 +165,18 @@ describe("NotificationBell", () => {
     expect(bell).toHaveFocus();
   });
 
-  it("navigates from a clickable row and leaves informational rows without an affordance", async () => {
-    stubEndpoints({ items: [leadRow, informationalRow] });
+  it("navigates from a clickable row and leaves informational and unknown rows inert", async () => {
+    stubEndpoints({ items: [subscriptionRow, unknownRow, informationalRow] });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: "Notifications" }));
-    fireEvent.click(await screen.findByRole("button", { name: /New lead registered/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Subscription updated/ }));
 
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/admin/leads" });
+    expect(navigateMock).toHaveBeenCalledWith({ href: "/company/dashboard" });
     expect(screen.queryByRole("button", { name: /New member joined/ })).not.toBeInTheDocument();
-    expect(screen.getByText("New member joined")).toBeInTheDocument();
+    expect(screen.getByText("New notification")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /New notification/ })).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toContain("company.future-type");
   });
 
   it("shows the empty state when the feed has no rows", async () => {
@@ -221,74 +188,80 @@ describe("NotificationBell", () => {
     expect(await screen.findByText("You're all caught up")).toBeInTheDocument();
   });
 
-  it("marks the rendered rows seen once per open and drains the badge", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
+  it("marks the rendered rows seen once per open by public ID", async () => {
+    const net = stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow] });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: "Notifications, 2 unread" }));
-    await screen.findByText("New lead registered");
+    await screen.findByText("Subscription updated");
 
-    await waitFor(() => expect(seenRequests()).toHaveLength(1));
-    expect(seenRequests()[0]).toEqual(["company/notifications/seen", { json: { ids: [1, 2] } }]);
+    await waitFor(() => expect(net.count(seenKey)).toBe(1));
+    expect(net.calls.find((call) => call.key === seenKey)?.input).toEqual({
+      body: { publicIds: [notificationId(1), notificationId(2)] },
+    });
     expect(await screen.findByRole("button", { name: "Notifications" })).toBeInTheDocument();
   });
 
   it("sends no seen request when reopened with nothing left unseen", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
+    const net = stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow] });
     renderBell();
 
     const bell = await screen.findByRole("button", { name: /Notifications/ });
     fireEvent.click(bell);
-    await waitFor(() => expect(seenRequests()).toHaveLength(1));
+    await waitFor(() => expect(net.count(seenKey)).toBe(1));
 
     fireEvent.keyDown(document, { key: "Escape" });
     await waitFor(() => expect(bell).toHaveAttribute("aria-expanded", "false"));
     fireEvent.click(bell);
 
-    await waitFor(() => expect(screen.getByText("New lead registered")).toBeInTheDocument());
-    expect(seenRequests()).toHaveLength(1);
+    await waitFor(() => expect(screen.getByText("Subscription updated")).toBeInTheDocument());
+    expect(net.count(seenKey)).toBe(1);
   });
 
   it("marks only the activated row read", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
+    const net = stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow] });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: /Notifications/ }));
-    fireEvent.click(await screen.findByRole("button", { name: /New lead registered/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Subscription updated/ }));
 
     await waitFor(() =>
-      expect(apiPostMock).toHaveBeenCalledWith("company/notifications/read", { json: { id: 1 } }),
+      expect(net.calls.find((call) => call.key === readKey)?.input).toEqual({
+        body: { publicId: notificationId(1) },
+      }),
     );
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/admin/leads" });
+    expect(navigateMock).toHaveBeenCalledWith({ href: "/company/dashboard" });
   });
 
-  it("advances the bulk-read cursor from the panel header and mutes the rows", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
+  it("advances this identity's bulk-read cursor from the panel header and mutes the rows", async () => {
+    const net = stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow] });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: /Notifications/ }));
-    await screen.findByText("New lead registered");
+    await screen.findByText("Subscription updated");
     fireEvent.click(screen.getByRole("button", { name: "Mark all read" }));
 
     await waitFor(() =>
-      expect(apiPostMock).toHaveBeenCalledWith("company/notifications/read", {
-        json: { all: true },
-      }),
+      expect(
+        net.calls.some(
+          (call) => call.key === readKey && JSON.stringify(call.input).includes('"all":true'),
+        ),
+      ).toBe(true),
     );
-    expect(useBulkReadCursor.getState().cursorAt).not.toBeNull();
+    expect(useBulkReadCursor.getState().cursors[scopeKey]).toBeDefined();
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Mark all read" })).toBeDisabled(),
     );
   });
 
   it("cycles Tab inside the open panel", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
+    stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow] });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: /Notifications/ }));
 
     const markAll = await screen.findByRole("button", { name: "Mark all read" });
-    const row = await screen.findByRole("button", { name: /New lead registered/ });
+    const row = await screen.findByRole("button", { name: /Subscription updated/ });
 
     row.focus();
     fireEvent.keyDown(document, { key: "Tab" });
@@ -297,8 +270,7 @@ describe("NotificationBell", () => {
   });
 
   it("rolls the badge back and surfaces the failure when marking seen fails", async () => {
-    stubEndpoints({ unreadCount: 2, items: [leadRow, informationalRow] });
-    apiPostMock.mockRejectedValue(new Error("network down"));
+    stubEndpoints({ unreadCount: 2, items: [subscriptionRow, informationalRow], failWrites: true });
     renderBell();
 
     fireEvent.click(await screen.findByRole("button", { name: /Notifications/ }));

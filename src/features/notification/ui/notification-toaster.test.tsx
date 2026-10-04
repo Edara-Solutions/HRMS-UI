@@ -3,28 +3,25 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import i18next from "i18next";
 import { I18nextProvider } from "react-i18next";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { operationNetwork } from "../../../test/operation-request-mock";
 import { type ToastRequest, useToastStore } from "../model/toast-store";
 import { NotificationToaster } from "./notification-toaster";
-
-const apiGetMock = vi.hoisted(() => vi.fn());
-const apiPostMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: apiGetMock, post: apiPostMock },
-}));
 
 // Arrival watching is its own concern with its own suite; the toaster tests exercise presentation.
 vi.mock("../lib/use-notification-arrivals", () => ({ useNotificationArrivals: () => {} }));
 
 const testI18n = i18next.createInstance();
 
-const infoToast: ToastRequest = { typeKey: "platform.lead-created" };
+const infoToast: ToastRequest = { tier: "platform", typeKey: "platform.lead-created" };
 const successToast: ToastRequest = {
+  tier: "company",
   typeKey: "company.role-assigned",
   params: { roleName: "Payroll Manager" },
 };
-const warningToast: ToastRequest = { typeKey: "platform.conversion-requested" };
+const warningToast: ToastRequest = {
+  tier: "platform",
+  typeKey: "platform.conversion-requested",
+};
 const dangerToast: ToastRequest = { ...infoToast, tone: "danger" };
 
 /** The exit motion runs before the toast leaves the stack, so every removal costs 120ms more. */
@@ -186,13 +183,13 @@ describe("NotificationToaster", () => {
     fireEvent.click(screen.getByRole("button", { name: "Dismiss notification" }));
     advanceBy(EXIT_MS);
 
-    expect(apiGetMock).not.toHaveBeenCalled();
-    expect(apiPostMock).not.toHaveBeenCalled();
+    expect(operationNetwork.current.calls).toEqual([]);
   });
 
-  it("ignores a type key the catalog mirror does not know", () => {
+  it("ignores a type the audience mirror does not know or does not own", () => {
     renderToaster();
-    showToast({ typeKey: "platform.not-in-the-mirror" });
+    showToast({ tier: "platform", typeKey: "platform.not-in-the-mirror" });
+    showToast({ tier: "company", typeKey: "platform.lead-created" });
 
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
   });
