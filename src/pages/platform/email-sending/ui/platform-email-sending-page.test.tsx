@@ -72,6 +72,30 @@ it("does not invent absent sending contexts", async () => {
   await screen.findByText("Sending is not configured.");
   expect(screen.queryByRole("button", { name: "Pause sending" })).not.toBeInTheDocument();
 });
+it("shows context status and a localized update time without exposing actor identifiers", async () => {
+  const { network, show } = communicationsRender(<PlatformEmailSendingPage />, [
+    "emails:sending:read",
+  ]);
+  network.on(operations.sendingStatus.key, () => ({
+    status: 200,
+    body: sendingBody({
+      items: [
+        {
+          context: "COMPANY",
+          paused: true,
+          reason: "Maintenance",
+          updatedAt: "2026-09-26T09:00:00.000Z",
+          updatedBy: 12345,
+        },
+      ],
+    }),
+  }));
+  show();
+  expect(await screen.findByRole("heading", { name: "Company" })).toBeInTheDocument();
+  expect(screen.getByText("Paused")).toBeInTheDocument();
+  expect(document.querySelector("time[dateTime='2026-09-26T09:00:00.000Z']")).toBeInTheDocument();
+  expect(document.body).not.toHaveTextContent("12345");
+});
 
 import { operationNetwork } from "../../../../test/operation-request-mock";
 

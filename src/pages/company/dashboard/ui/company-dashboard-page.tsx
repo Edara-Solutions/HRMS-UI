@@ -8,6 +8,7 @@ import { Badge } from "@/shared/ui/badge";
 import { ProgressBar } from "@/shared/ui/progress-bar";
 import { companyDashboardQueries } from "../api/company-dashboard";
 import { summarizeSetup, trialDaysRemaining } from "../model/company-dashboard";
+import { CompanyDashboardDemo } from "./company-dashboard-demo";
 import { DashboardPanel } from "./dashboard-panel";
 
 const linkClassName =
@@ -44,7 +45,7 @@ export function CompanyDashboardPage() {
   if (!access.user) return null;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-[1480px] space-y-6">
       <header className="space-y-2">
         <p className="text-sm text-[var(--color-text-muted)]">
           {t("dashboard.greeting", { name: access.user.firstName })}
@@ -60,6 +61,13 @@ export function CompanyDashboardPage() {
           )}
         </div>
       </header>
+
+      <CompanyDashboardDemo />
+
+      <div>
+        <h2 className="text-base font-semibold">{t("dashboard.liveTitle")}</h2>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">{t("dashboard.liveHelp")}</p>
+      </div>
 
       {!hasPanels ? (
         <p className="text-sm text-[var(--color-text-muted)]">{t("dashboard.noOverview")}</p>

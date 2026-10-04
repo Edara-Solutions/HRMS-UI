@@ -246,16 +246,17 @@ export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
               {t("bulk.delete")}
             </Button>
           )}
-          {[canBulkUpdate, canBulkDelete].map((availability) =>
-            availability.state === "disabled" ? (
-              <p
-                key={availability.reason}
-                className="w-full text-xs text-[var(--color-text-muted)]"
-              >
-                {t(`restriction.${availability.reason}`)}
-              </p>
-            ) : null,
-          )}
+          {[
+            ...new Set(
+              [canBulkUpdate, canBulkDelete].flatMap((availability) =>
+                availability.state === "disabled" ? [availability.reason] : [],
+              ),
+            ),
+          ].map((reason) => (
+            <p key={reason} className="w-full text-xs text-[var(--color-text-muted)]">
+              {t(`restriction.${reason}`)}
+            </p>
+          ))}
         </section>
       )}
 

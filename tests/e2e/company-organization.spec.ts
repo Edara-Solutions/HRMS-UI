@@ -36,15 +36,16 @@ interface Recorded {
 interface Scenario {
   arabic: boolean;
   permissions?: string[];
+  isOwner?: boolean;
   mode?: string;
   reads?: Record<string, (route: Route) => Promise<void>>;
 }
 
 async function open(
   page: Page,
-  { arabic, permissions = everyPermission, mode = "NORMAL", reads = {} }: Scenario,
+  { arabic, permissions = everyPermission, isOwner = true, mode = "NORMAL", reads = {} }: Scenario,
 ) {
-  const session = companySessionFixture({ permissions, isOwner: true });
+  const session = companySessionFixture({ permissions, isOwner });
   await page.setViewportSize(arabic ? { width: 390, height: 844 } : { width: 1280, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.addInitScript(
@@ -145,6 +146,11 @@ test("composes the operational dashboard from session-scoped reads", async ({ pa
   await page.goto("/company/dashboard");
   await expect(page.getByRole("heading", { level: 1, name: "Edara Labs" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("dir", arabic ? "rtl" : "ltr");
+  const demo = page.getByRole("region", { name: copy["dashboard.demo.title"] });
+  await expect(demo).toContainText(copy["dashboard.demo.badge"]);
+  await expect(demo).toContainText(copy["dashboard.demo.events"]);
+  await expect(demo).toContainText(copy["dashboard.demo.departmentMix"]);
+  await expect(demo).toContainText(copy["dashboard.demo.shortcuts"]);
   await expect(page.getByText(copy["requirement.COMPANY_PROFILE_INCOMPLETE"])).toBeVisible();
   await expect(page.getByText(copy["email.ready"])).toBeVisible();
   await expect(page.getByText("Growth")).toBeVisible();
@@ -259,7 +265,11 @@ test("shows the Company blocked state while SELF stays reachable", async ({ page
 
 test("refuses a known organization route without its read permission", async ({ page }, info) => {
   const arabic = info.project.name === "chromium-rtl";
-  const requests = await open(page, { arabic, permissions: ["company-profiles:read"] });
+  const requests = await open(page, {
+    arabic,
+    isOwner: false,
+    permissions: ["company-profiles:read"],
+  });
   await page.goto("/company/setup");
   await expect(
     page.getByRole("heading", {
@@ -267,4 +277,16 @@ test("refuses a known organization route without its read permission", async ({ 
     }),
   ).toBeVisible();
   expect(requests.some((request) => request.key === "GET /api/v1/company/setup")).toBe(false);
+});
+
+test("lets a Company Owner work without explicit grants, as the backend does", async ({
+  page,
+}, info) => {
+  const arabic = info.project.name === "chromium-rtl";
+  const requests = await open(page, { arabic, permissions: [], isOwner: true });
+  await page.goto("/company/setup");
+  await expect(
+    page.getByRole("heading", { name: arabic ? "إعداد الشركة" : "Company setup" }),
+  ).toBeVisible();
+  expect(requests.some((request) => request.key === "GET /api/v1/company/setup")).toBe(true);
 });

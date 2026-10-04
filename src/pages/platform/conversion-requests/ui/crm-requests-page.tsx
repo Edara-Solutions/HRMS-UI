@@ -7,15 +7,30 @@ import {
   usePlatformAccess,
 } from "@/shared/api";
 import { RouteAccessRefusal } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
+import { formatInstant } from "@/shared/lib/format-instant";
+import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { DataTable } from "@/shared/ui/data-table";
 import { DateEdgeField } from "@/shared/ui/date-edge-field";
 import { PageHeader } from "@/shared/ui/page-header";
 import { QueryPanel } from "@/shared/ui/query-panel";
 import { requestListQuery } from "../api/review";
 import type { RequestSearch } from "../model/page-search";
+
+const requestLink = (publicId: string, label: string) => (
+  <Link
+    to="/platform/conversion-requests/$publicId"
+    params={{ publicId }}
+    className="font-semibold text-[var(--color-primary)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+  >
+    <bdi>{label}</bdi>
+  </Link>
+);
 export function PlatformConversionRequestsPage({ search }: { search: RequestSearch }) {
   const { t } = useTranslation("platform-leads");
   const access = usePlatformAccess();
+  const locale = usePreferencesStore((state) => state.locale);
   const navigate = useNavigate();
   const { data, error, isPending, isFetching, refetch } = useQuery({
     ...requestListQuery(access.user?.publicId ?? "", search),
@@ -84,25 +99,69 @@ export function PlatformConversionRequestsPage({ search }: { search: RequestSear
       >
         {data && (
           <>
-            <ul className="divide-y divide-[var(--color-border)]">
-              {data.items.map((item) => (
-                <li
-                  key={item.publicId}
-                  className="flex flex-wrap items-center justify-between gap-3 py-4"
-                >
-                  <Link
-                    to="/platform/conversion-requests/$publicId"
-                    params={{ publicId: item.publicId }}
-                    className="underline"
-                  >
-                    {item.name ?? t("unnamed")}
-                  </Link>
-                  <span>
-                    {item.plan} · {t(`enum.${item.status}`)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {data.items.length > 0 && (
+              <DataTable
+                items={data.items}
+                getRowKey={(item) => item.publicId}
+                minWidth="680px"
+                columns={[
+                  {
+                    id: "lead",
+                    header: t("field.companyName"),
+                    cell: (item) => requestLink(item.publicId, item.name ?? t("unnamed")),
+                  },
+                  { id: "plan", header: t("plan.title"), cell: (item) => <bdi>{item.plan}</bdi> },
+                  {
+                    id: "status",
+                    header: t("field.status"),
+                    cell: (item) => (
+                      <Badge
+                        variant={
+                          item.status === "APPROVED"
+                            ? "success"
+                            : item.status === "REJECTED"
+                              ? "danger"
+                              : "warning"
+                        }
+                      >
+                        {t(`enum.${item.status}`)}
+                      </Badge>
+                    ),
+                  },
+                  {
+                    id: "created",
+                    header: t("history.createdAt"),
+                    cell: (item) => formatInstant(item.createdAt, locale),
+                  },
+                  {
+                    id: "action",
+                    header: t("requests.action"),
+                    cell: (item) => requestLink(item.publicId, t("requests.view")),
+                  },
+                ]}
+                renderMobileItem={(item) => (
+                  <div className="space-y-2 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      {requestLink(item.publicId, item.name ?? t("unnamed"))}
+                      <Badge
+                        variant={
+                          item.status === "APPROVED"
+                            ? "success"
+                            : item.status === "REJECTED"
+                              ? "danger"
+                              : "warning"
+                        }
+                      >
+                        {t(`enum.${item.status}`)}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      <bdi>{item.plan}</bdi> · {formatInstant(item.createdAt, locale)}
+                    </p>
+                  </div>
+                )}
+              />
+            )}
             {!data.items.length && <p>{t("empty")}</p>}
             <div className="flex flex-wrap items-center gap-3">
               <Button

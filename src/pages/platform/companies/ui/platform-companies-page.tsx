@@ -10,8 +10,10 @@ import {
   usePlatformAccess,
 } from "@/shared/api";
 import { RouteAccessRefusal } from "@/shared/auth";
+import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
+import { DataTable } from "@/shared/ui/data-table";
 import { Dialog, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -22,8 +24,17 @@ import { RestoreCompany } from "./restore-company";
 interface Props {
   search: CompaniesSearch;
 }
+const companyLink = (publicId: string, label: string) => (
+  <Link
+    to="/platform/companies/$publicId"
+    params={{ publicId }}
+    className="font-semibold text-[var(--color-primary)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+  >
+    <bdi>{label}</bdi>
+  </Link>
+);
 export function PlatformCompaniesPage({ search }: Props) {
-  const { t } = useTranslation("platform-companies");
+  const { t, i18n } = useTranslation("platform-companies");
   const access = usePlatformAccess();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
@@ -37,6 +48,12 @@ export function PlatformCompaniesPage({ search }: Props) {
   if (access.availability(operations.companies.key).state === "hidden")
     throw new RouteAccessRefusal("platform");
   const create = access.availability(operations.create.key);
+  const formatCreated = (value: string) =>
+    new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(value));
   const rows =
     data?.data.filter((company) =>
       `${company.name} ${company.companyCode} ${company.country}`
@@ -87,33 +104,67 @@ export function PlatformCompaniesPage({ search }: Props) {
           ) : rows.length === 0 ? (
             <p>{t(search.q ? "noMatches" : "empty")}</p>
           ) : (
-            rows.map((company) => (
-              <article
-                key={company.publicId}
-                className="space-y-3 border-b border-[var(--color-border)] pb-4"
-              >
-                <Link
-                  to="/platform/companies/$publicId"
-                  params={{ publicId: company.publicId }}
-                  className="font-semibold underline-offset-4 hover:underline"
-                >
-                  {company.name}
-                </Link>
-                <dl className="grid gap-3 text-sm sm:grid-cols-4">
-                  {[
-                    [t("field.companyCode"), company.companyCode],
-                    [t("field.country"), company.country],
-                    [t("lifecycle.title"), t(`state.${company.lifecycleStatus}`)],
-                    [t("registry.isActive"), t(company.isActive ? "yes" : "no")],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <dt className="text-[var(--color-text-muted)]">{label}</dt>
-                      <dd>{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </article>
-            ))
+            <DataTable
+              items={rows}
+              getRowKey={(company) => company.publicId}
+              minWidth="860px"
+              columns={[
+                {
+                  id: "name",
+                  header: t("field.name"),
+                  cell: (company) => companyLink(company.publicId, company.name),
+                },
+                {
+                  id: "code",
+                  header: t("field.companyCode"),
+                  cell: (company) => <bdi>{company.companyCode}</bdi>,
+                },
+                { id: "country", header: t("field.country"), cell: (company) => company.country },
+                {
+                  id: "lifecycle",
+                  header: t("lifecycle.title"),
+                  cell: (company) => (
+                    <Badge variant={company.lifecycleStatus === "ACTIVE" ? "success" : "default"}>
+                      {t(`state.${company.lifecycleStatus}`)}
+                    </Badge>
+                  ),
+                },
+                {
+                  id: "active",
+                  header: t("registry.isActive"),
+                  cell: (company) => t(company.isActive ? "yes" : "no"),
+                },
+                {
+                  id: "created",
+                  header: t("createdAt"),
+                  cell: (company) => (
+                    <time dateTime={company.createdAt}>{formatCreated(company.createdAt)}</time>
+                  ),
+                },
+                {
+                  id: "action",
+                  header: t("registry.action"),
+                  cell: (company) => companyLink(company.publicId, t("registry.view")),
+                },
+              ]}
+              renderMobileItem={(company) => (
+                <div className="space-y-2 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    {companyLink(company.publicId, company.name)}
+                    <Badge variant={company.lifecycleStatus === "ACTIVE" ? "success" : "default"}>
+                      {t(`state.${company.lifecycleStatus}`)}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    <bdi>{company.companyCode}</bdi> · {company.country} ·{" "}
+                    {t(company.isActive ? "yes" : "no")}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    <time dateTime={company.createdAt}>{formatCreated(company.createdAt)}</time>
+                  </p>
+                </div>
+              )}
+            />
           )}
         </CardContent>
       </Card>

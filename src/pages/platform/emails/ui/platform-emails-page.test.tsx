@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 import { platformCommunicationsOperations as operations } from "@/shared/api";
 import { platformEmailTypesBody } from "../../../../test/platform-communications-fixtures";
@@ -9,7 +9,9 @@ it("limits the interactive catalogue to Platform email types", async () => {
   const { network, show } = communicationsRender(<PlatformEmailsPage />, ["email-types:read"]);
   network.on(operations.emailTypes.key, () => ({ status: 200, body: platformEmailTypesBody() }));
   show();
-  await screen.findByRole("button", { name: "Company invitation email" });
+  const type = await screen.findByRole("button", { name: "Company invitation email" });
+  expect(within(type).getByText("Edara")).toBeInTheDocument();
+  expect(within(type).getByText("Critical")).toBeInTheDocument();
   expect(screen.queryByText("Payslip ready")).not.toBeInTheDocument();
   expect(network.calls.every((call) => call.audience === "platform")).toBe(true);
 });

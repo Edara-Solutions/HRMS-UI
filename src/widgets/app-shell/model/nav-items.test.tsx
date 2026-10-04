@@ -1,3 +1,5 @@
+import { Home } from "lucide-react";
+import { isValidElement } from "react";
 import { describe, expect, it } from "vitest";
 import { buildNavGroups } from "./nav-items";
 
@@ -17,14 +19,14 @@ describe("owned workflow navigation", () => {
     ]);
     expect(items.every((item) => !("indicator" in item))).toBe(true);
   });
-  it("localizes the same registry without synthesizing Owner grants", () => {
+  it("shows the backend Owner's Company workflows with localized labels", () => {
     const facts = { audience: "company", authenticated: true, owner: true } as const;
-    expect(buildNavGroups(facts, "ar")[0]?.items[1]?.label).toBe("ملفي الشخصي");
+    expect(buildNavGroups(facts, "ar")[0]?.items[1]?.label).toBe("ملف المؤسسة");
     expect(
       buildNavGroups(facts, "en")
         .flatMap((group) => group.items)
-        .some((item) => item.href.includes("users")),
-    ).toBe(false);
+        .some((item) => item.href === "/company/profile"),
+    ).toBe(true);
   });
   it("adds the organization workflows only when their reads are granted", () => {
     const items = buildNavGroups(
@@ -54,5 +56,25 @@ describe("owned workflow navigation", () => {
     expect(hrefs).toContainEqual(["/company/people", "الأفراد"]);
     expect(hrefs).toContainEqual(["/company/roles", "الأدوار"]);
     expect(hrefs.some(([href]) => href?.includes("$"))).toBe(false);
+  });
+  it("gives platform workflows distinct icons instead of the Home fallback", () => {
+    const items = buildNavGroups(
+      {
+        audience: "platform",
+        authenticated: true,
+        permissions: [
+          "plans:read",
+          "leads:read",
+          "companies:read",
+          "lead-conversion-requests:read",
+        ],
+      },
+      "en",
+    ).flatMap((group) => group.items);
+    for (const path of ["plans", "leads", "companies", "conversion-requests"]) {
+      const icon = items.find((item) => item.href === `/platform/${path}`)?.icon;
+      expect(isValidElement(icon), path).toBe(true);
+      if (isValidElement(icon)) expect(icon.type, path).not.toBe(Home);
+    }
   });
 });

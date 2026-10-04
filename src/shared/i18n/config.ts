@@ -25,6 +25,7 @@ void i18next
       "communications",
       "platform-people",
       "platform-companies",
+      "platform-dashboard",
       "platform-leads",
       "platform-plans",
       "platform-announcements",

@@ -40,6 +40,7 @@ export function redirectIfMustChangePassword(pathname: string) {
     mustChangePassword: state.status === "must_change_password",
     platformEnabled: isPlatformPortalEnabled(),
     permissions: state.session?.user.permissions,
+    owner: audience === "company" ? useCompanySession.getState().session?.user.isOwner : false,
   });
   if (decision === "credential-completion")
     throw redirect({
@@ -76,6 +77,7 @@ export async function requireAuthenticated(options: AuthGuardOptions = {}) {
         mustChangePassword: !options.allowPasswordChange && status === "must_change_password",
         platformEnabled: isPlatformPortalEnabled(),
         permissions: session?.user.permissions,
+        owner: audience === "company" ? useCompanySession.getState().session?.user.isOwner : false,
       })
     : null;
   if (decision === "not-found") throw notFound();

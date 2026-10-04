@@ -2,17 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePlatformCommand } from "@/features/platform-communications-command";
-import { platformCommunicationsOperations as operations, usePlatformAccess } from "@/shared/api";
+import {
+  platformCommunicationsOperations as operations,
+  platformCompanyOperations,
+  usePlatformAccess,
+} from "@/shared/api";
 import { RouteAccessRefusal } from "@/shared/auth";
+import { usePreferencesStore } from "@/shared/config";
+import { formatInstant } from "@/shared/lib/format-instant";
 import { usePageNavigate, usePageSearch } from "@/shared/lib/page-navigation";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { DataTable } from "@/shared/ui/data-table";
 import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
 import { PageHeader } from "@/shared/ui/page-header";
 import { QueryPanel } from "@/shared/ui/query-panel";
 import { SchemaForm } from "@/shared/ui/schema-form";
+import {
+  companyFilterOptionsQuery,
+  emailTypeFilterOptionsQuery,
+} from "../api/delivery-filter-options";
 import {
   changeDelivery,
   deliveriesQuery,
@@ -20,9 +31,11 @@ import {
   type EmailContext,
 } from "../api/email-deliveries";
 import { platformDeliveriesSearchSchema } from "../model/page-search";
+import { SearchableFilterSelect } from "./searchable-filter-select";
 
 export function PlatformEmailDeliveriesPage() {
   const { t } = useTranslation("platform-email-deliveries");
+  const locale = usePreferencesStore((state) => state.locale);
   const access = usePlatformAccess();
   const search = usePageSearch(platformDeliveriesSearchSchema);
   const navigate = usePageNavigate(platformDeliveriesSearchSchema);
@@ -30,6 +43,16 @@ export function PlatformEmailDeliveriesPage() {
   const { data, error, isPending, refetch } = useQuery({
     ...deliveriesQuery(access.user?.publicId ?? "", query),
     enabled: access.availability(operations.deliveries.key).state === "enabled",
+    retry: false,
+  });
+  const companyOptions = useQuery({
+    ...companyFilterOptionsQuery(access.user?.publicId ?? ""),
+    enabled: access.availability(platformCompanyOperations.companies.key).state === "enabled",
+    retry: false,
+  });
+  const emailTypeOptions = useQuery({
+    ...emailTypeFilterOptionsQuery(access.user?.publicId ?? ""),
+    enabled: access.availability(operations.emailTypes.key).state === "enabled",
     retry: false,
   });
   if (!access.user) return null;
@@ -61,16 +84,55 @@ export function PlatformEmailDeliveriesPage() {
             ),
             value: query.status,
           },
-          ...(
-            [
-              "companyPublicId",
-              "emailTypeKey",
-              "businessReference",
-              "recipientEmail",
-              "createdFrom",
-              "createdTo",
-            ] as const
-          ).map((name) => ({ name, label: t(`filter.${name}`), value: query[name] })),
+          {
+            name: "companyPublicId",
+            label: t("filters.company.label"),
+            value: query.companyPublicId,
+            control:
+              access.availability(platformCompanyOperations.companies.key).state === "enabled" &&
+              !companyOptions.isError ? (
+                <SearchableFilterSelect
+                  id="delivery-filter-company"
+                  name="companyPublicId"
+                  label={t("filters.company.label")}
+                  initialValue={query.companyPublicId ?? ""}
+                  placeholder={t("filters.company.placeholder")}
+                  options={companyOptions.data}
+                  loading={companyOptions.isPending}
+                  error={companyOptions.isError}
+                  loadingLabel={t("filters.optionsLoading")}
+                  errorLabel={t("filters.optionsError")}
+                  emptyLabel={t("filters.optionsEmpty")}
+                  clearLabel={t("filters.company.clear")}
+                />
+              ) : undefined,
+          },
+          {
+            name: "emailTypeKey",
+            label: t("filters.emailType.label"),
+            value: query.emailTypeKey,
+            control:
+              access.availability(operations.emailTypes.key).state === "enabled" &&
+              !emailTypeOptions.isError ? (
+                <SearchableFilterSelect
+                  id="delivery-filter-email-type"
+                  name="emailTypeKey"
+                  label={t("filters.emailType.label")}
+                  initialValue={query.emailTypeKey ?? ""}
+                  placeholder={t("filters.emailType.placeholder")}
+                  options={emailTypeOptions.data}
+                  loading={emailTypeOptions.isPending}
+                  error={emailTypeOptions.isError}
+                  loadingLabel={t("filters.optionsLoading")}
+                  errorLabel={t("filters.optionsError")}
+                  emptyLabel={t("filters.optionsEmpty")}
+                  clearLabel={t("filters.emailType.clear")}
+                />
+              ) : undefined,
+          },
+          ...(["businessReference", "recipientEmail", "createdFrom", "createdTo"] as const).map(
+            (name) => ({ name, label: t(`filter.${name}`), value: query[name] }),
+          ),
         ]}
         onSubmit={(body) => {
           const next = operations.deliveries.requestSchema.shape.query.parse(body);
@@ -79,36 +141,103 @@ export function PlatformEmailDeliveriesPage() {
       />
       <QueryPanel title={t("title")} pending={isPending} error={error} retry={() => void refetch()}>
         {!data?.items.length && <p>{t("empty.title")}</p>}
-        <ul className="divide-y divide-[var(--color-border)]">
-          {data?.items.map((item) => (
-            <li
-              key={`${item.context}:${item.publicId}`}
-              className="flex flex-wrap items-center gap-3 py-3"
-            >
-              <span className="min-w-0 flex-1">{item.maskedRecipient}</span>
-              <span>{t(`context.${item.context}`)}</span>
-              <Badge variant={item.status === "FAILED" ? "danger" : "default"}>
-                {t(`status.${item.status}`)}
-              </Badge>
-              {access.availability(operations.delivery.key).state === "enabled" && (
-                <Button
-                  intent="action"
-                  onClick={() =>
-                    void navigate({
-                      search: {
-                        ...search,
-                        deliveryId: item.publicId,
-                        deliveryContext: item.context,
-                      },
-                    })
-                  }
-                >
-                  {t("table.details")}
-                </Button>
-              )}
-            </li>
-          ))}
-        </ul>
+        {data && data.items.length > 0 && (
+          <DataTable
+            items={data.items}
+            getRowKey={(item) => `${item.context}:${item.publicId}`}
+            minWidth="940px"
+            columns={[
+              {
+                id: "recipient",
+                header: t("table.recipient"),
+                cell: (item) => <bdi dir="ltr">{item.maskedRecipient}</bdi>,
+              },
+              {
+                id: "type",
+                header: t("table.emailType"),
+                cell: (item) => <bdi>{item.emailTypeKey}</bdi>,
+              },
+              {
+                id: "context",
+                header: t("table.context"),
+                cell: (item) => t(`context.${item.context}`),
+              },
+              {
+                id: "status",
+                header: t("table.status"),
+                cell: (item) => (
+                  <Badge variant={item.status === "FAILED" ? "danger" : "default"}>
+                    {t(`status.${item.status}`)}
+                  </Badge>
+                ),
+              },
+              {
+                id: "attempts",
+                header: t("table.attempts"),
+                align: "end",
+                cell: (item) => <span className="tabular-nums">{item.attempts}</span>,
+              },
+              {
+                id: "created",
+                header: t("table.created"),
+                cell: (item) => formatInstant(item.createdAt, locale),
+              },
+              {
+                id: "action",
+                header: t("table.details"),
+                cell: (item) =>
+                  access.availability(operations.delivery.key).state === "enabled" && (
+                    <Button
+                      intent="action"
+                      onClick={() =>
+                        void navigate({
+                          search: {
+                            ...search,
+                            deliveryId: item.publicId,
+                            deliveryContext: item.context,
+                          },
+                        })
+                      }
+                    >
+                      {t("table.details")}
+                    </Button>
+                  ),
+              },
+            ]}
+            renderMobileItem={(item) => (
+              <div className="space-y-2 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <bdi dir="ltr" className="font-medium">
+                    {item.maskedRecipient}
+                  </bdi>
+                  <Badge variant={item.status === "FAILED" ? "danger" : "default"}>
+                    {t(`status.${item.status}`)}
+                  </Badge>
+                </div>
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  <bdi>{item.emailTypeKey}</bdi> · {t(`context.${item.context}`)} ·{" "}
+                  {formatInstant(item.createdAt, locale)}
+                </p>
+                {access.availability(operations.delivery.key).state === "enabled" && (
+                  <Button
+                    intent="action"
+                    onClick={() =>
+                      void navigate({
+                        search: {
+                          ...search,
+                          deliveryId: item.publicId,
+                          deliveryContext: item.context,
+                        },
+                      })
+                    }
+                  >
+                    {t("table.details")}
+                  </Button>
+                )}
+              </div>
+            )}
+          />
+        )}
         <div className="mt-4 flex gap-3">
           <Button
             disabled={(query.page ?? 1) <= 1}

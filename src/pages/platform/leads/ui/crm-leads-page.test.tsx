@@ -49,7 +49,7 @@ afterEach(() => {
 describe("Lead registry", () => {
   it("reads the generated wrapped items and persists filters through page navigation", async () => {
     const net = open();
-    await screen.findByRole("link", { name: "Acme Lead" });
+    await screen.findAllByRole("link", { name: "Acme Lead" });
     expect(net.calls[0]).toMatchObject({
       audience: "platform",
       input: { query: { page: 1, pageSize: 10, isArchived: false } },
@@ -68,7 +68,7 @@ describe("Lead registry", () => {
       status: 201,
       body: { lead: leadBody(), contacts: [contactBody()], meta: { duplicate: false } },
     }));
-    await screen.findByRole("link", { name: "Acme Lead" });
+    await screen.findAllByRole("link", { name: "Acme Lead" });
     fireEvent.click(screen.getByRole("button", { name: "Create lead" }));
     const dialog = await screen.findByRole("dialog");
     fireEvent.change(within(dialog).getByLabelText("Company name"), {
@@ -92,9 +92,30 @@ describe("Lead registry", () => {
         companySizeRange: "5_TO_20",
         source: "CRM",
         status: "NEW",
-        primaryContact: { name: "Owner", email: "owner@example.test" },
+        primaryContact: { name: "Owner", email: "owner@example.test", isPrimary: true },
       },
     });
+    await waitFor(() =>
+      expect(navigations.at(-1)).toMatchObject({
+        to: "/platform/leads/$publicId",
+        params: { publicId: leadIds.lead },
+      }),
+    );
+  });
+  it("explains a normalized duplicate before navigating to the existing lead", async () => {
+    const net = open();
+    net.on(operations.create.key, () => ({
+      status: 201,
+      body: { lead: leadBody(), contacts: [contactBody()], meta: { duplicate: true } },
+    }));
+    await screen.findAllByRole("link", { name: "Acme Lead" });
+    fireEvent.click(screen.getByRole("button", { name: "Create lead" }));
+    const dialog = within(await screen.findByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Contact name"), { target: { value: "Owner" } });
+    fireEvent.click(dialog.getByRole("button", { name: "Create lead" }));
+    await dialog.findByText("Existing lead updated");
+    expect(navigations).toHaveLength(0);
+    fireEvent.click(dialog.getByRole("button", { name: "View existing lead" }));
     await waitFor(() =>
       expect(navigations.at(-1)).toMatchObject({
         to: "/platform/leads/$publicId",

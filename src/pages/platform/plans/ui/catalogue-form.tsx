@@ -1,72 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { platformPlanOperations as operations } from "@/shared/api";
-import { type SchemaField, SchemaForm } from "@/shared/ui/schema-form";
-import type { Plan, Price } from "../api/catalogue";
-import { planFormSchema, planLimits, supportedPlanFeatures } from "../model/catalogue-form";
+import { SchemaForm } from "@/shared/ui/schema-form";
+import type { Price } from "../api/catalogue";
 
-interface PlanProps {
-  plan?: Plan;
-  disabled: boolean;
-  invalidFields?: readonly string[];
-  onSubmit: (body: unknown) => void;
-}
-export function PlanForm({ plan, disabled, invalidFields, onSubmit }: PlanProps) {
-  const { t } = useTranslation("platform-plans");
-  const fields: SchemaField[] = [
-    { name: "name", label: t("name"), required: true, value: plan?.name },
-    {
-      name: "description",
-      label: t("description"),
-      type: "textarea",
-      nullable: true,
-      value: plan?.description ?? "",
-    },
-    {
-      name: "duration",
-      label: t("duration"),
-      type: "number",
-      required: true,
-      value: String(plan?.duration ?? 30),
-    },
-    {
-      name: "features",
-      label: t("features"),
-      type: "textarea",
-      required: true,
-      value:
-        plan?.features.filter((feature) => supportedPlanFeatures.has(feature)).join(", ") ?? "",
-    },
-    ...planLimits.map((name) => ({
-      name: `limits.${name}`,
-      required: true,
-      label: t(name),
-      type: "number" as const,
-      value: String(plan?.limits?.[name] ?? ""),
-    })),
-    { name: "isPublic", label: t("public"), type: "checkbox", value: plan?.isPublic ?? false },
-    { name: "isActive", label: t("active"), type: "checkbox", value: plan?.isActive ?? true },
-  ];
-  const schema = planFormSchema(plan);
-  return (
-    <>
-      <p>{t("featureHelp")}</p>
-      <SchemaForm
-        schema={schema}
-        fields={
-          plan?.name === "Default Full Access"
-            ? fields.filter((field) => !["name", "isPublic"].includes(field.name))
-            : fields
-        }
-        changedOnly={!!plan}
-        label={t("save")}
-        invalidLabel={t("invalid")}
-        disabled={disabled}
-        serverInvalidFields={invalidFields}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
-}
 interface PriceProps {
   price?: Price;
   disabled: boolean;

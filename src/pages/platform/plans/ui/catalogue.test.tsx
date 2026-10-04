@@ -61,6 +61,14 @@ afterEach(() => {
   navigations.length = 0;
 });
 describe("Platform catalogue", () => {
+  it("shows the authored features, limits and direct edit action in the catalogue", async () => {
+    open(false);
+    expect((await screen.findAllByText("Overview")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("columnheader", { name: "Limits" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Updated" })).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "Edit plan" })[0]);
+    expect(await screen.findByRole("dialog", { name: "Edit plan" })).toBeInTheDocument();
+  });
   it("owns identity/resource keys and reads without guessing a market", async () => {
     const net = open();
     await screen.findByRole("heading", { name: "Growth خطة" });
@@ -75,17 +83,17 @@ describe("Platform catalogue", () => {
   it("creates definitions using generated validation and nested limits", async () => {
     const net = open(false);
     net.on(operations.create.key, () => ({ status: 201, body: planBody() }));
-    await screen.findByRole("link", { name: "Growth خطة" });
+    await screen.findAllByRole("link", { name: "Growth خطة" });
     fireEvent.click(screen.getByRole("button", { name: "Create plan" }));
     const dialog = within(await screen.findByRole("dialog"));
-    fireEvent.click(dialog.getByRole("button", { name: "Save" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Create plan" }));
     expect(net.count(operations.create.key)).toBe(0);
     fireEvent.change(dialog.getByLabelText("Name"), { target: { value: "New plan" } });
-    fireEvent.change(dialog.getByLabelText("Feature codes (comma separated)"), {
-      target: { value: "ATTENDANCE, ANALYTICS" },
-    });
+    fireEvent.click(dialog.getByRole("button", { name: "Overview" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Attendance" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Analytics" }));
     fireEvent.change(dialog.getByLabelText("Maximum users"), { target: { value: "50" } });
-    fireEvent.click(dialog.getByRole("button", { name: "Save" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Create plan" }));
     await waitFor(() => expect(net.count(operations.create.key)).toBe(1));
     expect(net.calls.find((call) => call.key === operations.create.key)?.input).toMatchObject({
       body: {
@@ -113,6 +121,29 @@ describe("Platform catalogue", () => {
       body: { description: "Changed" },
     });
     expect(net.count(operations.plan.key)).toBeGreaterThan(1);
+  });
+  it("preserves backend-only features while editing other plan fields", async () => {
+    const net = open(
+      true,
+      planPermissions,
+      planDetailBody({ features: ["OVERVIEW", "BACKEND_ONLY"] }),
+    );
+    net.on(operations.update.key, () => ({
+      status: 200,
+      body: planBody({ description: "Changed" }),
+    }));
+    await screen.findByRole("heading", { name: "Growth خطة" });
+    fireEvent.click(screen.getByRole("button", { name: "Edit plan" }));
+    const dialog = within(await screen.findByRole("dialog"));
+    expect(dialog.getByRole("button", { name: "Overview" })).toBeDisabled();
+    expect(dialog.getByText(/BACKEND_ONLY/)).toBeInTheDocument();
+    fireEvent.change(dialog.getByLabelText("Description"), { target: { value: "Changed" } });
+    fireEvent.click(dialog.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(net.count(operations.update.key)).toBe(1));
+    expect(net.calls.find((call) => call.key === operations.update.key)?.input).toEqual({
+      params: { publicId: planId },
+      body: { description: "Changed" },
+    });
   });
   it("does not overwrite a concurrent definition edit", async () => {
     const net = open();
@@ -209,8 +240,8 @@ describe("Platform catalogue", () => {
     expect(screen.getByRole("button", { name: "Delete plan" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Edit plan" }));
     const dialog = within(await screen.findByRole("dialog"));
-    expect(dialog.queryByLabelText("Name")).not.toBeInTheDocument();
-    expect(dialog.queryByLabelText("Published")).not.toBeInTheDocument();
+    expect(dialog.getByLabelText("Name")).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Published" })).toBeDisabled();
   });
   for (const body of [
     { ...planDetailBody(), publicId: priceId },
@@ -230,14 +261,14 @@ describe("Platform catalogue", () => {
     net.on(operations.create.key, () => {
       throw new TypeError("offline-canary");
     });
-    await screen.findByRole("link", { name: "Growth خطة" });
+    await screen.findAllByRole("link", { name: "Growth خطة" });
     fireEvent.click(screen.getByRole("button", { name: "Create plan" }));
     const dialog = within(await screen.findByRole("dialog"));
     fireEvent.change(dialog.getByLabelText("Name"), { target: { value: "New plan" } });
-    fireEvent.click(dialog.getByRole("button", { name: "Save" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Create plan" }));
     await dialog.findByRole("alert");
     expect(dialog.getByLabelText("Name")).toHaveValue("New plan");
-    expect(dialog.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Create plan" })).toBeDisabled();
     expect(net.count(operations.create.key)).toBe(1);
     expect(document.body.textContent).not.toContain("canary");
   });
@@ -247,11 +278,11 @@ describe("Platform catalogue", () => {
       status: 400,
       body: problemBody(400, { invalidParams: ["name", "secret-canary"] }),
     }));
-    await screen.findByRole("link", { name: "Growth خطة" });
+    await screen.findAllByRole("link", { name: "Growth خطة" });
     fireEvent.click(screen.getByRole("button", { name: "Create plan" }));
     const dialog = within(await screen.findByRole("dialog"));
     fireEvent.change(dialog.getByLabelText("Name"), { target: { value: "New plan" } });
-    fireEvent.click(dialog.getByRole("button", { name: "Save" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Create plan" }));
     await dialog.findByRole("alert");
     expect(dialog.getByLabelText("Name")).toHaveAttribute("aria-invalid", "true");
     expect(document.body.textContent).not.toContain("canary");
@@ -293,6 +324,6 @@ describe("Platform catalogue", () => {
       finish();
     });
     await waitFor(() => expect(net.count(operations.update.key)).toBe(0));
-    expect(document.body.textContent).not.toContain("Changed");
+    expect(net.count(operations.update.key)).toBe(0);
   });
 });

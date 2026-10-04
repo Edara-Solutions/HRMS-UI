@@ -23,6 +23,7 @@ export function useCompanyAccess() {
       audience: "company",
       authenticated: true,
       permissions: user.permissions,
+      owner: user.isOwner,
     }).state !== "hidden";
   const policy = useQuery({ ...policyQuery, enabled: canReadPolicy });
   const facts: AccessFacts = {

@@ -4,7 +4,7 @@ import {
   requestPlatformOperation,
   usePlatformAccess,
 } from "@/shared/api";
-import { Dialog, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
+import { Dialog, DialogDescription, DialogTitle, useDialogIds } from "@/shared/ui/dialog";
 import {
   type Plan,
   type Price,
@@ -13,8 +13,9 @@ import {
   verifyTarget,
 } from "../api/catalogue";
 import { useCatalogueCommand } from "../model/use-catalogue-command";
-import { PlanForm, PriceForm } from "./catalogue-form";
+import { PriceForm } from "./catalogue-form";
 import { CommandFeedback } from "./command-feedback";
+import { PlanForm } from "./plan-form";
 export type EditorTarget =
   | { kind: "plan"; plan?: Plan }
   | { kind: "price"; plan: Plan; price?: Price };
@@ -26,7 +27,7 @@ export function CatalogueEditor({ target, close }: Props) {
   const { t } = useTranslation("platform-plans");
   const access = usePlatformAccess();
   const command = useCatalogueCommand();
-  const { titleId } = useDialogIds();
+  const { titleId, descriptionId } = useDialogIds();
   const operation =
     target.kind === "plan"
       ? target.plan
@@ -85,6 +86,8 @@ export function CatalogueEditor({ target, close }: Props) {
       }}
       dismissible={!command.pending}
       titleId={titleId}
+      descriptionId={descriptionId}
+      className="max-h-[90vh] max-w-2xl overflow-y-auto"
     >
       <DialogTitle id={titleId}>
         {t(
@@ -97,6 +100,9 @@ export function CatalogueEditor({ target, close }: Props) {
               : "createPrice",
         )}
       </DialogTitle>
+      <DialogDescription id={descriptionId}>
+        {t(target.kind === "plan" ? "planFormHelp" : "priceFormHelp")}
+      </DialogDescription>
       <CommandFeedback command={command} />
       {target.kind === "plan" ? (
         <PlanForm
@@ -104,6 +110,7 @@ export function CatalogueEditor({ target, close }: Props) {
           disabled={disabled}
           invalidFields={command.outcome?.kind === "invalid" ? command.outcome.fields : []}
           onSubmit={(body) => void save(body)}
+          onCancel={close}
         />
       ) : (
         <PriceForm

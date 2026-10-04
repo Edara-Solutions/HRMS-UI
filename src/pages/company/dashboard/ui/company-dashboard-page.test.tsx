@@ -79,7 +79,7 @@ afterEach(() => {
 });
 
 describe("Company operational dashboard", () => {
-  it("composes every permitted organization read without fixture analytics", async () => {
+  it("separates the labelled demo overview from permitted organization reads", async () => {
     renderDashboard();
     expect(await screen.findByRole("heading", { level: 1, name: "Edara Labs" })).toBeVisible();
     const activation = screen.getByRole("region", { name: "Activation" });
@@ -100,7 +100,14 @@ describe("Company operational dashboard", () => {
         "The sending domain is not verified yet.",
       ),
     ).toBeVisible();
-    expect(document.body.textContent).not.toMatch(/Headcount|Approvals|Payroll/);
+    const demo = screen.getByRole("region", { name: "Sample overview · May 2026" });
+    expect(within(demo).getByText("Demo data")).toBeVisible();
+    expect(within(demo).getByText(/not current company records/)).toBeVisible();
+    expect(within(demo).getByText("Sample upcoming events")).toBeVisible();
+    expect(within(demo).getByText("Sample department mix")).toBeVisible();
+    expect(within(demo).getByText("Sample module shortcuts")).toBeVisible();
+    expect(within(demo).getByText("Omar Amin")).toBeVisible();
+    expect(within(demo).getByText("Lina Riad")).toBeVisible();
     for (const canary of organizationCanaries)
       expect(document.body.textContent).not.toContain(canary);
   });

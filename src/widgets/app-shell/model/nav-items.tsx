@@ -1,6 +1,9 @@
 import {
+  ArrowRightLeft,
   BellRing,
   Building2,
+  ContactRound,
+  CreditCard,
   History,
   Home,
   KeyRound,
@@ -10,6 +13,7 @@ import {
   MailCheck,
   Megaphone,
   Monitor,
+  Package,
   Send,
   UserRound,
   Users,
@@ -36,6 +40,11 @@ export interface NavGroup {
 }
 const icons: Record<string, ReactNode> = {
   dashboard: <Home size={17} />,
+  plans: <Package size={17} />,
+  leads: <ContactRound size={17} />,
+  "conversion-requests": <ArrowRightLeft size={17} />,
+  companies: <Building2 size={17} />,
+  subscriptions: <CreditCard size={17} />,
   "me/profile": <UserRound size={17} />,
   "me/security": <LockKeyhole size={17} />,
   "me/sessions": <Monitor size={17} />,

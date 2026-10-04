@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { Fragment, type ReactNode, useId, useState } from "react";
 import type { z } from "zod";
 import { Button } from "./button";
 import { Input } from "./input";
@@ -12,6 +12,8 @@ export interface SchemaField {
   value?: string | boolean;
   required?: boolean;
   nullable?: boolean;
+  section?: string;
+  control?: ReactNode;
 }
 interface Props {
   schema: z.ZodTypeAny;
@@ -22,6 +24,9 @@ interface Props {
   changedOnly?: boolean;
   serverInvalidFields?: readonly string[];
   onSubmit: (body: unknown) => void;
+  onCancel?: () => void;
+  cancelLabel?: string;
+  cancelDisabled?: boolean;
 }
 /** A schema-validated form with an explicit field whitelist; transport stays with its owner. */
 export function SchemaForm({
@@ -33,6 +38,9 @@ export function SchemaForm({
   changedOnly,
   serverInvalidFields,
   onSubmit,
+  onCancel,
+  cancelLabel,
+  cancelDisabled,
 }: Props) {
   const id = useId();
   const [invalid, setInvalid] = useState(false);
@@ -77,69 +85,89 @@ export function SchemaForm({
       }}
     >
       {fields.map((field) => (
-        <div key={field.name} className="min-w-0 space-y-1.5">
-          <Label htmlFor={`${id}-${field.name}`}>{field.label}</Label>
-          {field.options ? (
-            <select
-              id={`${id}-${field.name}`}
-              name={field.name}
-              aria-label={field.label}
-              required={field.required}
-              defaultValue={String(field.value ?? "")}
-              disabled={disabled}
-              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
-              className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
-            >
-              {!field.required && <option value="">—</option>}
-              {field.options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : field.type === "textarea" ? (
-            <textarea
-              id={`${id}-${field.name}`}
-              name={field.name}
-              aria-label={field.label}
-              required={field.required}
-              defaultValue={String(field.value ?? "")}
-              disabled={disabled}
-              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
-              className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
-            />
-          ) : field.type === "checkbox" ? (
-            <input
-              id={`${id}-${field.name}`}
-              name={field.name}
-              aria-label={field.label}
-              required={field.required}
-              type="checkbox"
-              defaultChecked={field.value === true}
-              disabled={disabled}
-            />
-          ) : (
-            <Input
-              id={`${id}-${field.name}`}
-              name={field.name}
-              aria-label={field.label}
-              required={field.required}
-              type={field.type ?? "text"}
-              defaultValue={String(field.value ?? "")}
-              disabled={disabled}
-              aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
-            />
+        <Fragment key={field.name}>
+          {field.section && (
+            <h3 className="sm:col-span-2 border-b border-[var(--color-border)] pb-2 text-sm font-semibold text-[var(--color-text)]">
+              {field.section}
+            </h3>
           )}
-        </div>
+          <div className="min-w-0 space-y-1.5">
+            {!field.control && <Label htmlFor={`${id}-${field.name}`}>{field.label}</Label>}
+            {field.control ??
+              (field.options ? (
+                <select
+                  id={`${id}-${field.name}`}
+                  name={field.name}
+                  aria-label={field.label}
+                  required={field.required}
+                  defaultValue={String(field.value ?? "")}
+                  disabled={disabled}
+                  aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
+                  className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
+                >
+                  {!field.required && <option value="">—</option>}
+                  {field.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : field.type === "textarea" ? (
+                <textarea
+                  id={`${id}-${field.name}`}
+                  name={field.name}
+                  aria-label={field.label}
+                  required={field.required}
+                  defaultValue={String(field.value ?? "")}
+                  disabled={disabled}
+                  aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
+                  className="min-w-0 max-w-full w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2"
+                />
+              ) : field.type === "checkbox" ? (
+                <input
+                  id={`${id}-${field.name}`}
+                  name={field.name}
+                  aria-label={field.label}
+                  required={field.required}
+                  type="checkbox"
+                  defaultChecked={field.value === true}
+                  disabled={disabled}
+                />
+              ) : (
+                <Input
+                  id={`${id}-${field.name}`}
+                  name={field.name}
+                  aria-label={field.label}
+                  required={field.required}
+                  type={field.type ?? "text"}
+                  defaultValue={String(field.value ?? "")}
+                  disabled={disabled}
+                  aria-invalid={rejected.has(field.name) || serverRejected.has(field.name)}
+                />
+              ))}
+          </div>
+        </Fragment>
       ))}
       {invalid && (
         <p role="alert" className="sm:col-span-2">
           {invalidLabel}
         </p>
       )}
-      <Button type="submit" intent="action" disabled={disabled}>
-        {label}
-      </Button>
+      <div className="flex flex-wrap justify-end gap-2 sm:col-span-2">
+        {onCancel && (
+          <Button
+            type="button"
+            intent="dismissive"
+            disabled={cancelDisabled ?? disabled}
+            onClick={onCancel}
+          >
+            {cancelLabel}
+          </Button>
+        )}
+        <Button type="submit" intent={onCancel ? "cta" : "action"} disabled={disabled}>
+          {label}
+        </Button>
+      </div>
     </form>
   );
 }

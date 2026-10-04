@@ -14,8 +14,20 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { DataTable } from "@/shared/ui/data-table";
 import { PageHeader } from "@/shared/ui/page-header";
 import { registryCursorQuery } from "../api/subscriptions";
+import { PlatformSubscriptionsDemo } from "./platform-subscriptions-demo";
+
+const companyLink = (publicId: string, label: string) => (
+  <Link
+    to="/platform/companies/$publicId"
+    params={{ publicId }}
+    className="font-semibold text-[var(--color-primary)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+  >
+    <bdi>{label}</bdi>
+  </Link>
+);
 export function PlatformSubscriptionsPage() {
   const { t } = useTranslation("platform-companies");
   const access = usePlatformAccess();
@@ -31,6 +43,7 @@ export function PlatformSubscriptionsPage() {
     enabled: access.availability(operations.cursor.key).state === "enabled",
   });
   const expire = access.availability(operations.expireTrials.key);
+  const canOpenCompany = access.availability(operations.company.key).state === "enabled";
   const reconcile = () =>
     Promise.all(
       [
@@ -77,6 +90,7 @@ export function PlatformSubscriptionsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader title={t("subscriptions.title")} description={t("subscriptions.description")} />
+      <PlatformSubscriptionsDemo />
       {expire.state !== "hidden" && (
         <Card as="section">
           <CardContent className="space-y-4 p-4">
@@ -123,19 +137,41 @@ export function PlatformSubscriptionsPage() {
             ) : data.companies.length === 0 ? (
               <p>{t("empty")}</p>
             ) : (
-              <ul className="space-y-3">
-                {data.companies.map((company) => (
-                  <li key={company.publicId}>
-                    <Link
-                      to="/platform/companies/$publicId"
-                      params={{ publicId: company.publicId }}
-                      className="underline"
-                    >
-                      {company.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <DataTable
+                items={data.companies}
+                getRowKey={(company) => company.publicId}
+                minWidth="480px"
+                columns={[
+                  {
+                    id: "company",
+                    header: t("field.name"),
+                    cell: (company) =>
+                      canOpenCompany ? (
+                        companyLink(company.publicId, company.name)
+                      ) : (
+                        <bdi>{company.name}</bdi>
+                      ),
+                  },
+                  {
+                    id: "action",
+                    header: t("registry.action"),
+                    cell: (company) =>
+                      canOpenCompany
+                        ? companyLink(company.publicId, t("subscriptions.view"))
+                        : null,
+                  },
+                ]}
+                renderMobileItem={(company) => (
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-4">
+                    {canOpenCompany ? (
+                      companyLink(company.publicId, company.name)
+                    ) : (
+                      <bdi>{company.name}</bdi>
+                    )}
+                    {canOpenCompany && companyLink(company.publicId, t("subscriptions.view"))}
+                  </div>
+                )}
+              />
             )}
             <div className="flex flex-wrap gap-3">
               <Button

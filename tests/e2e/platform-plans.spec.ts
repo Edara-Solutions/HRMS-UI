@@ -187,8 +187,10 @@ test("delivers all catalogue commands and explicit price inspection", async ({ p
   await page.getByRole("button", { name: copy.createPlan, exact: true }).click();
   let dialog = page.getByRole("dialog");
   await dialog.getByLabel(copy.name, { exact: true }).fill("New plan");
-  await dialog.getByLabel(copy.features, { exact: true }).fill("ATTENDANCE, ANALYTICS");
-  await dialog.getByRole("button", { name: copy.save, exact: true }).click();
+  await dialog.getByRole("button", { name: copy["feature.OVERVIEW"], exact: true }).click();
+  await dialog.getByRole("button", { name: copy["feature.ATTENDANCE"], exact: true }).click();
+  await dialog.getByRole("button", { name: copy["feature.ANALYTICS"], exact: true }).click();
+  await dialog.getByRole("button", { name: copy.createPlan, exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await page.getByRole("link", { name: "Growth خطة" }).click();
   await page.getByRole("button", { name: copy.editPlan, exact: true }).click();

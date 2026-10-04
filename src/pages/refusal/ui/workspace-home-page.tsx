@@ -16,6 +16,7 @@ export function WorkspaceHomePage({ children }: WorkspaceHomePageProps) {
     audience: audience ?? undefined,
     authenticated: !!session,
     permissions: session?.user.permissions,
+    owner: audience === "company" && !!session && "isOwner" in session.user && session.user.isOwner,
   });
   if (decision === "no-work-access") return <RefusalPage kind="no-work-access" />;
   if (children) return children;

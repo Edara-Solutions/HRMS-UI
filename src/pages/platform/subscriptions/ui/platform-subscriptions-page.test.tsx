@@ -40,10 +40,29 @@ afterEach(() => {
   usePlatformSession.getState().clearSession();
 });
 describe("Global Platform trial expiry", () => {
+  it("keeps the historical sample overview separate from live Company subscription actions", async () => {
+    const net = open(["companies:read"]);
+    const liveLinks = await screen.findAllByRole("link", { name: "View subscription" });
+    const demo = screen.getByRole("region", { name: "Sample subscription overview" });
+
+    expect(demo).toHaveTextContent("Illustrative data");
+    expect(within(demo).getAllByText("Nexus Technologies").length).toBeGreaterThan(0);
+    expect(liveLinks).toHaveLength(2);
+    for (const link of liveLinks)
+      expect(link).toHaveAttribute(
+        "href",
+        "/platform/companies/33333333-3333-4333-8333-333333333333",
+      );
+
+    fireEvent.click(within(demo).getByRole("button", { name: "Trial" }));
+    expect(within(demo).queryByText("Nexus Technologies")).toBeNull();
+    expect(within(demo).getAllByText("CloudNine Solutions").length).toBeGreaterThan(0);
+    expect(net.count("GET /api/v1/platform/companies/cursor")).toBe(1);
+  });
   it("requires a global confirmation and shows only the authoritative count", async () => {
     const net = open();
     net.on(key, () => ({ status: 200, body: { expiredCount: 7 } }));
-    await screen.findByRole("link", { name: "Acme Company" });
+    await screen.findAllByRole("link", { name: "Acme Company" });
     expect(net.count(key)).toBe(0);
     await run();
     expect(await screen.findByText("7 trials expired.")).toBeInTheDocument();
@@ -80,7 +99,7 @@ describe("Global Platform trial expiry", () => {
   });
   it("keeps expiry hidden from registry-only operators", async () => {
     open(["companies:read"]);
-    await screen.findByRole("link", { name: "Acme Company" });
+    await screen.findAllByRole("link", { name: "Acme Company" });
     expect(screen.queryByRole("button", { name: "Run due-trial expiry" })).toBeNull();
   });
   it("does not retry a failed offline run", async () => {

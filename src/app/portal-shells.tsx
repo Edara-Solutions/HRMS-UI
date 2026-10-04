@@ -21,7 +21,12 @@ export function CompanyShell({ children }: { children: ReactNode }) {
         icon: <span>E</span>,
       }}
       groups={buildNavGroups(
-        { audience: "company", authenticated: true, permissions: session.user.permissions },
+        {
+          audience: "company",
+          authenticated: true,
+          permissions: session.user.permissions,
+          owner: session.user.isOwner,
+        },
         locale,
       )}
       preferenceScope={`company:${session.user.publicId}`}
