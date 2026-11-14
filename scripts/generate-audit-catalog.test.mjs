@@ -6,7 +6,7 @@ describe("Audit Event catalog metadata", () => {
   it("reads one entry per catalog event out of the contract's annotations", () => {
     const collected = collectAuditCatalogMetadata();
 
-    expect(collected).toHaveLength(80);
+    expect(collected).toHaveLength(78);
     expect(collected.map((event) => event.eventType)).toEqual(
       expect.arrayContaining([
         "platform.role.created",
