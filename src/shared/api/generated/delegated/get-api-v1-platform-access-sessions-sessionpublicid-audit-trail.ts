@@ -72,17 +72,15 @@ export const requestSchema = z
               z.literal("auth.credential.reset_completed"),
               z.literal("auth.invitation.issued"),
               z.literal("auth.invitation.accepted"),
-              z.literal("platform_admin.session.started"),
-              z.literal("platform_admin.session.started"),
-              z.literal("platform_admin.session.ended"),
-              z.literal("platform_admin.session.revoked"),
-              z.literal("platform_admin.session.refreshed"),
-              z.literal("platform_admin.credential.password_changed"),
-              z.literal("platform_admin.credential.reset_forced"),
-              z.literal("platform_admin.credential.reset_requested"),
-              z.literal("platform_admin.credential.reset_completed"),
-              z.literal("platform_admin.invitation.issued"),
-              z.literal("platform_admin.invitation.accepted"),
+              z.literal("platform.session.started"),
+              z.literal("platform.session.started"),
+              z.literal("platform.session.ended"),
+              z.literal("platform.session.revoked"),
+              z.literal("platform.session.refreshed"),
+              z.literal("platform.credential.password-changed"),
+              z.literal("platform.credential.reset-requested"),
+              z.literal("platform.credential.reset-completed"),
+              z.literal("platform.invitation.accepted"),
               z.literal("auth.session.rejected"),
               z.literal("platform.role.created"),
               z.literal("platform.role.updated"),
@@ -3597,7 +3595,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.session.started"),
+              eventType: z.literal("platform.session.started"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3663,7 +3661,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.session.started"),
+              eventType: z.literal("platform.session.started"),
               eventVersion: z.literal(2),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3732,7 +3730,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.session.ended"),
+              eventType: z.literal("platform.session.ended"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3792,7 +3790,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.session.revoked"),
+              eventType: z.literal("platform.session.revoked"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3852,7 +3850,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.session.refreshed"),
+              eventType: z.literal("platform.session.refreshed"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3912,7 +3910,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.credential.password_changed"),
+              eventType: z.literal("platform.credential.password-changed"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -3972,67 +3970,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.credential.reset_forced"),
-              eventVersion: z.literal(1),
-              occurredAt: z.string().datetime({ offset: true }),
-              scope: z.literal("PLATFORM"),
-              companyPublicId: z.null(),
-              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
-              actor: z.union([
-                z
-                  .object({
-                    kind: z.literal("USER"),
-                    publicId: z.string().uuid(),
-                    name: z.union([z.string(), z.null()]),
-                  })
-                  .strict(),
-                z
-                  .object({
-                    kind: z.literal("PLATFORM_USER"),
-                    publicId: z.string().uuid(),
-                    name: z.union([z.string(), z.null()]),
-                  })
-                  .strict(),
-                z
-                  .object({
-                    kind: z.literal("SYSTEM"),
-                    component: z.union([
-                      z.literal("EMAIL_WORKER"),
-                      z.literal("SCHEDULER"),
-                      z.literal("SCRIPT"),
-                    ]),
-                  })
-                  .strict(),
-                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
-                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
-                z.object({ kind: z.literal("ERASED_USER") }).strict(),
-              ]),
-              traceId: z.union([z.string(), z.null()]),
-              origin: z
-                .object({
-                  ip: z.union([z.string(), z.null()]),
-                  userAgent: z.union([z.string(), z.null()]),
-                  country: z.union([z.string(), z.null()]),
-                  city: z.union([z.string(), z.null()]),
-                })
-                .strict(),
-              targets: z.array(
-                z
-                  .object({
-                    targetType: z.string(),
-                    publicId: z.string(),
-                    name: z.union([z.string(), z.null()]).optional(),
-                  })
-                  .strict(),
-              ),
-              details: z.object({}).strict(),
-              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
-              recordedAt: z.string().datetime({ offset: true }),
-            })
-            .strict(),
-          z
-            .object({
-              eventType: z.literal("platform_admin.credential.reset_requested"),
+              eventType: z.literal("platform.credential.reset-requested"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -4092,7 +4030,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.credential.reset_completed"),
+              eventType: z.literal("platform.credential.reset-completed"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),
@@ -4152,67 +4090,7 @@ export const responseSchemas = {
             .strict(),
           z
             .object({
-              eventType: z.literal("platform_admin.invitation.issued"),
-              eventVersion: z.literal(1),
-              occurredAt: z.string().datetime({ offset: true }),
-              scope: z.literal("PLATFORM"),
-              companyPublicId: z.null(),
-              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
-              actor: z.union([
-                z
-                  .object({
-                    kind: z.literal("USER"),
-                    publicId: z.string().uuid(),
-                    name: z.union([z.string(), z.null()]),
-                  })
-                  .strict(),
-                z
-                  .object({
-                    kind: z.literal("PLATFORM_USER"),
-                    publicId: z.string().uuid(),
-                    name: z.union([z.string(), z.null()]),
-                  })
-                  .strict(),
-                z
-                  .object({
-                    kind: z.literal("SYSTEM"),
-                    component: z.union([
-                      z.literal("EMAIL_WORKER"),
-                      z.literal("SCHEDULER"),
-                      z.literal("SCRIPT"),
-                    ]),
-                  })
-                  .strict(),
-                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
-                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
-                z.object({ kind: z.literal("ERASED_USER") }).strict(),
-              ]),
-              traceId: z.union([z.string(), z.null()]),
-              origin: z
-                .object({
-                  ip: z.union([z.string(), z.null()]),
-                  userAgent: z.union([z.string(), z.null()]),
-                  country: z.union([z.string(), z.null()]),
-                  city: z.union([z.string(), z.null()]),
-                })
-                .strict(),
-              targets: z.array(
-                z
-                  .object({
-                    targetType: z.string(),
-                    publicId: z.string(),
-                    name: z.union([z.string(), z.null()]).optional(),
-                  })
-                  .strict(),
-              ),
-              details: z.object({ reissued: z.boolean() }).strict(),
-              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
-              recordedAt: z.string().datetime({ offset: true }),
-            })
-            .strict(),
-          z
-            .object({
-              eventType: z.literal("platform_admin.invitation.accepted"),
+              eventType: z.literal("platform.invitation.accepted"),
               eventVersion: z.literal(1),
               occurredAt: z.string().datetime({ offset: true }),
               scope: z.literal("PLATFORM"),

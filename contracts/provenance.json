@@ -1,11 +1,11 @@
 {
-  "commit": "d96d4916aec1cc04f1a7215db50e1772432aef2d",
+  "commit": "6ae304016ffb2217c5d0c0b2c1cc7794768b3dbc",
   "ref": "refactor/split-tier-users",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "a96127d4add2ba8662d3babad368ff40a5638474ac2ef21c8df3ad80bafdc909"
+      "sha256": "5e5bfa07ad29541eaa2e07a1b64aa81ff1bc8488112c49d54bed240649c4fd3c"
     },
     "company": {
       "file": "contracts/openapi.company.json",
@@ -13,11 +13,11 @@
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",
-      "sha256": "00e46d0e2f96ebf1f37bfc3886e8b6916915e37b2f7eb8c479184e6950f16311"
+      "sha256": "7ba7d972d33156c10e062a543fcbd5e57fd36be61f35695f403e4b9bd5197afb"
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "cc4759bcf9069c80d9eed4c8749c112db67503c3a1569b0cae7beba8fde5e3be"
+      "sha256": "ec66904300eb282f8b382ba5b1d87ccd13e47d49adfbd86d7a3e23215f4a7894"
     },
     "public": {
       "file": "contracts/openapi.public.json",
