@@ -28,6 +28,8 @@ pages     → one slice per screen. Owns its UI, forms, modals, data-fetching ho
 widgets   → large composite blocks reused across many pages. Today: app shell only.
 features  → a reusable user interaction used in 2+ places. Today: auth forms and
             the Audit Trail filter bar, which both portals render, and the safe Platform Company registry form shared by create and edit.
+            Exception: dev-only tooling (`features/dev-*`, mounted from `app` behind
+            `import.meta.env.DEV`) may live here with a single consumer.
 shared    → infrastructure with NO business logic: ui kit, lib, api client,
             auth/session, i18n and config. Organised by segment, no slices.
 ```

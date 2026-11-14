@@ -1,8 +1,17 @@
 import { Outlet, useLocation } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import { ForcedPasswordChangeModal } from "@/features/auth";
 import { RefusalPage } from "@/pages/refusal";
 import { isPlatformPortalEnabled, routeDeclarations } from "@/shared/auth";
 import { LocaleRuntime } from "@/shared/i18n";
+
+const DevPersonaSwitcher = import.meta.env.DEV
+  ? lazy(() =>
+      import("@/features/dev-persona-switcher").then((module) => ({
+        default: module.DevPersonaSwitcher,
+      })),
+    )
+  : null;
 
 export function RootLayout() {
   const pathname = useLocation({ select: (location) => location.pathname }).replace(/\/$/, "");
@@ -17,6 +26,11 @@ export function RootLayout() {
       <LocaleRuntime />
       <Outlet />
       {passwordGate && <ForcedPasswordChangeModal audience={route.audience} />}
+      {DevPersonaSwitcher && (
+        <Suspense fallback={null}>
+          <DevPersonaSwitcher />
+        </Suspense>
+      )}
     </div>
   );
 }
