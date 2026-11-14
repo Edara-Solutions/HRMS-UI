@@ -1,7 +1,14 @@
 # HRMS UI — domain glossary
 
-The language of the HRMS frontend. Terms here are implementation-free; when code
-and this file disagree, one of them is wrong — fix it in the same change.
+The presentation language of the HRMS frontend. The single domain glossary lives in
+the backend repo's `CONTEXT.md`; it is canonical for every domain term, and this
+file never redefines one. The backend's `docs/domain-map.md` maps each domain
+section to its UI slices. Terms here are implementation-free; when code and this
+file disagree, one of them is wrong — fix it in the same change.
+
+The notification entries below predate that rule and conflict with the backend
+glossary (list style options, the meaning of Unread). They are under review in
+the split-tier reconciliation and will be reduced to presentation-only terms.
 
 ## Notification center
 
