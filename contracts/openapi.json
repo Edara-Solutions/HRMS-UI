@@ -22360,10 +22360,10 @@
                   }
                 },
                 {
-                  "description": "A sign-in attempt redeemed credentials against a known account. (Platform Admin)",
+                  "description": "A sign-in attempt redeemed credentials against a known account.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "ALLOW_FAILURE",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED",
@@ -22390,7 +22390,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.session.started"
+                        "platform.session.started"
                       ]
                     },
                     "eventVersion": {
@@ -22718,10 +22718,10 @@
                   }
                 },
                 {
-                  "description": "A sign-in attempt redeemed credentials against a known account, together with the IP address and resolved place it came from. (Platform Admin)",
+                  "description": "A sign-in attempt redeemed credentials against a known account, together with the IP address and resolved place it came from.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "ALLOW_FAILURE",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED",
@@ -22748,7 +22748,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.session.started"
+                        "platform.session.started"
                       ]
                     },
                     "eventVersion": {
@@ -23109,10 +23109,10 @@
                   }
                 },
                 {
-                  "description": "The session holder ended one session or all of their sessions. (Platform Admin)",
+                  "description": "The session holder ended one session or all of their sessions.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -23138,7 +23138,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.session.ended"
+                        "platform.session.ended"
                       ]
                     },
                     "eventVersion": {
@@ -23451,10 +23451,10 @@
                   }
                 },
                 {
-                  "description": "A session was taken away by someone or something other than its holder. (Platform Admin)",
+                  "description": "A session was taken away by someone or something other than its holder.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "ALLOW_FAILURE",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED",
@@ -23481,7 +23481,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.session.revoked"
+                        "platform.session.revoked"
                       ]
                     },
                     "eventVersion": {
@@ -23794,10 +23794,10 @@
                   }
                 },
                 {
-                  "description": "A refresh token was rotated and the session continued. (Platform Admin)",
+                  "description": "A refresh token was rotated and the session continued.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -23823,7 +23823,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.session.refreshed"
+                        "platform.session.refreshed"
                       ]
                     },
                     "eventVersion": {
@@ -24136,10 +24136,10 @@
                   }
                 },
                 {
-                  "description": "An account holder replaced their own password. (Platform Admin)",
+                  "description": "An account holder replaced their own password.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -24165,7 +24165,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.credential.password_changed"
+                        "platform.credential.password-changed"
                       ]
                     },
                     "eventVersion": {
@@ -24478,10 +24478,10 @@
                   }
                 },
                 {
-                  "description": "An operator reset an account's credentials and revoked its sessions. (Platform Admin)",
+                  "description": "An anonymous request from a sign-in surface issued a one-time password-reset link for an account.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -24507,342 +24507,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.credential.reset_forced"
-                      ]
-                    },
-                    "eventVersion": {
-                      "type": "number",
-                      "enum": [
-                        1
-                      ]
-                    },
-                    "occurredAt": {
-                      "format": "date-time",
-                      "type": "string"
-                    },
-                    "scope": {
-                      "type": "string",
-                      "enum": [
-                        "PLATFORM"
-                      ]
-                    },
-                    "companyPublicId": {
-                      "type": "null"
-                    },
-                    "outcome": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "SUCCESS"
-                          ]
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "FAILURE"
-                          ]
-                        }
-                      ]
-                    },
-                    "actor": {
-                      "anyOf": [
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "publicId",
-                            "name"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "USER"
-                              ]
-                            },
-                            "publicId": {
-                              "format": "uuid",
-                              "type": "string"
-                            },
-                            "name": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "publicId",
-                            "name"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "PLATFORM_USER"
-                              ]
-                            },
-                            "publicId": {
-                              "format": "uuid",
-                              "type": "string"
-                            },
-                            "name": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "component"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "SYSTEM"
-                              ]
-                            },
-                            "component": {
-                              "anyOf": [
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "EMAIL_WORKER"
-                                  ]
-                                },
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "SCHEDULER"
-                                  ]
-                                },
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "SCRIPT"
-                                  ]
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ANONYMOUS"
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ATTRIBUTION_FAILED"
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ERASED_USER"
-                              ]
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "traceId": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "origin": {
-                      "additionalProperties": false,
-                      "type": "object",
-                      "required": [
-                        "ip",
-                        "userAgent",
-                        "country",
-                        "city"
-                      ],
-                      "properties": {
-                        "ip": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "userAgent": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "country": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "city": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    "targets": {
-                      "type": "array",
-                      "items": {
-                        "additionalProperties": false,
-                        "type": "object",
-                        "required": [
-                          "targetType",
-                          "publicId"
-                        ],
-                        "properties": {
-                          "targetType": {
-                            "type": "string"
-                          },
-                          "publicId": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    },
-                    "details": {
-                      "additionalProperties": false,
-                      "type": "object",
-                      "properties": {}
-                    },
-                    "recordingBinding": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "TRANSACTIONAL"
-                          ]
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "STANDALONE"
-                          ]
-                        }
-                      ]
-                    },
-                    "recordedAt": {
-                      "format": "date-time",
-                      "type": "string"
-                    }
-                  }
-                },
-                {
-                  "description": "An anonymous request from a sign-in surface issued a one-time password-reset link for an account. (Platform Admin)",
-                  "x-audit-lifecycle": "ACTIVE",
-                  "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
-                  "x-audit-actors": [
-                    "PLATFORM_USER",
-                    "ATTRIBUTION_FAILED"
-                  ],
-                  "additionalProperties": false,
-                  "type": "object",
-                  "required": [
-                    "eventType",
-                    "eventVersion",
-                    "occurredAt",
-                    "scope",
-                    "companyPublicId",
-                    "outcome",
-                    "actor",
-                    "traceId",
-                    "origin",
-                    "targets",
-                    "details",
-                    "recordingBinding",
-                    "recordedAt"
-                  ],
-                  "properties": {
-                    "eventType": {
-                      "type": "string",
-                      "enum": [
-                        "platform_admin.credential.reset_requested"
+                        "platform.credential.reset-requested"
                       ]
                     },
                     "eventVersion": {
@@ -25155,10 +24820,10 @@
                   }
                 },
                 {
-                  "description": "A password-reset link was redeemed into a new password and the account's sessions were revoked. (Platform Admin)",
+                  "description": "A password-reset link was redeemed into a new password and the account's sessions were revoked.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -25184,7 +24849,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.credential.reset_completed"
+                        "platform.credential.reset-completed"
                       ]
                     },
                     "eventVersion": {
@@ -25490,352 +25155,10 @@
                   }
                 },
                 {
-                  "description": "One-time invitation credentials were issued for an account. (Platform Admin)",
-                  "x-audit-lifecycle": "ACTIVE",
-                  "x-audit-outcome-policy": "SUCCESS_ONLY",
-                  "x-audit-personal-data": "erase",
-                  "x-audit-actors": [
-                    "PLATFORM_USER",
-                    "ATTRIBUTION_FAILED"
-                  ],
-                  "additionalProperties": false,
-                  "type": "object",
-                  "required": [
-                    "eventType",
-                    "eventVersion",
-                    "occurredAt",
-                    "scope",
-                    "companyPublicId",
-                    "outcome",
-                    "actor",
-                    "traceId",
-                    "origin",
-                    "targets",
-                    "details",
-                    "recordingBinding",
-                    "recordedAt"
-                  ],
-                  "properties": {
-                    "eventType": {
-                      "type": "string",
-                      "enum": [
-                        "platform_admin.invitation.issued"
-                      ]
-                    },
-                    "eventVersion": {
-                      "type": "number",
-                      "enum": [
-                        1
-                      ]
-                    },
-                    "occurredAt": {
-                      "format": "date-time",
-                      "type": "string"
-                    },
-                    "scope": {
-                      "type": "string",
-                      "enum": [
-                        "PLATFORM"
-                      ]
-                    },
-                    "companyPublicId": {
-                      "type": "null"
-                    },
-                    "outcome": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "SUCCESS"
-                          ]
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "FAILURE"
-                          ]
-                        }
-                      ]
-                    },
-                    "actor": {
-                      "anyOf": [
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "publicId",
-                            "name"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "USER"
-                              ]
-                            },
-                            "publicId": {
-                              "format": "uuid",
-                              "type": "string"
-                            },
-                            "name": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "publicId",
-                            "name"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "PLATFORM_USER"
-                              ]
-                            },
-                            "publicId": {
-                              "format": "uuid",
-                              "type": "string"
-                            },
-                            "name": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind",
-                            "component"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "SYSTEM"
-                              ]
-                            },
-                            "component": {
-                              "anyOf": [
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "EMAIL_WORKER"
-                                  ]
-                                },
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "SCHEDULER"
-                                  ]
-                                },
-                                {
-                                  "type": "string",
-                                  "enum": [
-                                    "SCRIPT"
-                                  ]
-                                }
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ANONYMOUS"
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ATTRIBUTION_FAILED"
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "additionalProperties": false,
-                          "type": "object",
-                          "required": [
-                            "kind"
-                          ],
-                          "properties": {
-                            "kind": {
-                              "type": "string",
-                              "enum": [
-                                "ERASED_USER"
-                              ]
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    "traceId": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "origin": {
-                      "additionalProperties": false,
-                      "type": "object",
-                      "required": [
-                        "ip",
-                        "userAgent",
-                        "country",
-                        "city"
-                      ],
-                      "properties": {
-                        "ip": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "userAgent": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "country": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "city": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    "targets": {
-                      "type": "array",
-                      "items": {
-                        "additionalProperties": false,
-                        "type": "object",
-                        "required": [
-                          "targetType",
-                          "publicId"
-                        ],
-                        "properties": {
-                          "targetType": {
-                            "type": "string"
-                          },
-                          "publicId": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    },
-                    "details": {
-                      "additionalProperties": false,
-                      "type": "object",
-                      "required": [
-                        "reissued"
-                      ],
-                      "properties": {
-                        "reissued": {
-                          "type": "boolean"
-                        }
-                      }
-                    },
-                    "recordingBinding": {
-                      "anyOf": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "TRANSACTIONAL"
-                          ]
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "STANDALONE"
-                          ]
-                        }
-                      ]
-                    },
-                    "recordedAt": {
-                      "format": "date-time",
-                      "type": "string"
-                    }
-                  }
-                },
-                {
-                  "description": "An invitation was redeemed into a permanent password. (Platform Admin)",
+                  "description": "An invitation was redeemed into a permanent password.",
                   "x-audit-lifecycle": "ACTIVE",
                   "x-audit-outcome-policy": "ALLOW_FAILURE",
-                  "x-audit-personal-data": "erase",
+                  "x-audit-personal-data": "none",
                   "x-audit-actors": [
                     "PLATFORM_USER",
                     "ATTRIBUTION_FAILED"
@@ -25861,7 +25184,7 @@
                     "eventType": {
                       "type": "string",
                       "enum": [
-                        "platform_admin.invitation.accepted"
+                        "platform.invitation.accepted"
                       ]
                     },
                     "eventVersion": {
@@ -117926,67 +117249,55 @@
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.started"
+                      "platform.session.started"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.started"
+                      "platform.session.started"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.ended"
+                      "platform.session.ended"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.revoked"
+                      "platform.session.revoked"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.refreshed"
+                      "platform.session.refreshed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.password_changed"
+                      "platform.credential.password-changed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_forced"
+                      "platform.credential.reset-requested"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_requested"
+                      "platform.credential.reset-completed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_completed"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "enum": [
-                      "platform_admin.invitation.issued"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "enum": [
-                      "platform_admin.invitation.accepted"
+                      "platform.invitation.accepted"
                     ]
                   },
                   {
@@ -119586,67 +118897,55 @@
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.started"
+                      "platform.session.started"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.started"
+                      "platform.session.started"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.ended"
+                      "platform.session.ended"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.revoked"
+                      "platform.session.revoked"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.session.refreshed"
+                      "platform.session.refreshed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.password_changed"
+                      "platform.credential.password-changed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_forced"
+                      "platform.credential.reset-requested"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_requested"
+                      "platform.credential.reset-completed"
                     ]
                   },
                   {
                     "type": "string",
                     "enum": [
-                      "platform_admin.credential.reset_completed"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "enum": [
-                      "platform_admin.invitation.issued"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "enum": [
-                      "platform_admin.invitation.accepted"
+                      "platform.invitation.accepted"
                     ]
                   },
                   {
