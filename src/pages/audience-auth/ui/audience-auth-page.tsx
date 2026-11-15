@@ -11,6 +11,7 @@ import {
   useCompanySession,
   usePlatformSession,
 } from "@/shared/auth";
+import { fieldErrorMap, fieldErrors as toFieldErrors } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -61,7 +62,10 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
     search.localSignOutOnly ? t("journey.localOnlySignOut") : null,
   );
   const [completed, setCompleted] = useState(false);
-  const [invalidFields, setInvalidFields] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const linkIncomplete =
+    (mode === "invitation" || mode === "reset") &&
+    (!search.token || (audience === "company" && !search.companyPublicId));
   const service = useQuery({
     queryKey: [audience, "credential-service"],
     queryFn: () => loadCredentialService(audience),
@@ -126,27 +130,27 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
     if (mode === "login" || mode === "invitation") input.clientType = "web";
     if (mode === "invitation" || mode === "reset") {
       if (input.newPassword !== input.confirmPassword) {
-        setInvalidFields(["confirmPassword"]);
-        setFeedback(t("journey.passwordMismatch"));
+        setFieldErrors({ confirmPassword: t("journey.passwordMismatch") });
+        setFeedback(t("journey.checkFields"));
         return;
       }
       delete input.confirmPassword;
       input.token = search.token ?? "";
       if (audience === "company") input.companyPublicId = search.companyPublicId ?? "";
     }
-    const parsed = service.data.schemas[mode].safeParse(input);
+    const parsed = service.data.schemas[mode].safeParse(input, { errorMap: fieldErrorMap(t) });
     if (!parsed.success) {
-      setInvalidFields(parsed.error.issues.map((issue) => String(issue.path[0] ?? "")));
+      const errors = toFieldErrors(
+        parsed.error.issues,
+        new Set(credentialFields(audience, mode).map((field) => field.name)),
+      );
+      setFieldErrors(errors);
       setFeedback(
-        t(
-          mode === "invitation" || mode === "reset"
-            ? "journey.invalidLinkOrFields"
-            : "journey.checkFields",
-        ),
+        t(Object.keys(errors).length > 0 ? "journey.checkFields" : "journey.invalidLinkOrFields"),
       );
       return;
     }
-    setInvalidFields([]);
+    setFieldErrors({});
     try {
       const result = await action.mutateAsync(parsed.data);
       if (result) {
@@ -225,44 +229,64 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
             </Button>
           </div>
         </div>
+      ) : linkIncomplete ? (
+        <p
+          role="status"
+          className="mt-5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm"
+        >
+          {t("journey.invalidLink")}
+        </p>
       ) : !completed ? (
         <form
+          noValidate
           onSubmit={(event) => void submit(event)}
           className="mt-7 space-y-5"
           aria-busy={pending}
         >
-          {credentialFields(audience, mode).map((field) => (
-            <div key={field.name} className="space-y-1.5">
-              <Label htmlFor={`credential-${field.name}`}>{t(`journey.${field.name}`)}</Label>
-              {field.type === "password" ? (
-                <PasswordInput
-                  id={`credential-${field.name}`}
-                  name={field.name}
-                  required
-                  maxLength={128}
-                  autoComplete={field.autoComplete}
-                  aria-invalid={invalidFields.includes(field.name)}
-                  disabled={pending}
-                />
-              ) : (
-                <Input
-                  id={`credential-${field.name}`}
-                  name={field.name}
-                  type={field.type}
-                  required
-                  maxLength={
-                    field.name === "companyCode" ? 10 : field.name === "employeeCode" ? 50 : 255
-                  }
-                  autoComplete={field.autoComplete}
-                  aria-invalid={invalidFields.includes(field.name)}
-                  disabled={pending}
-                />
-              )}
-              {invalidFields.includes(field.name) ? (
-                <p className="text-xs text-[var(--color-danger)]">{t("journey.invalidField")}</p>
-              ) : null}
-            </div>
-          ))}
+          {credentialFields(audience, mode).map((field) => {
+            const error = fieldErrors[field.name];
+            const validity = {
+              "aria-invalid": Boolean(error),
+              "aria-describedby": error ? `credential-${field.name}-error` : undefined,
+            };
+            return (
+              <div key={field.name} className="space-y-1.5">
+                <Label htmlFor={`credential-${field.name}`}>{t(`journey.${field.name}`)}</Label>
+                {field.type === "password" ? (
+                  <PasswordInput
+                    id={`credential-${field.name}`}
+                    name={field.name}
+                    required
+                    maxLength={128}
+                    autoComplete={field.autoComplete}
+                    {...validity}
+                    disabled={pending}
+                  />
+                ) : (
+                  <Input
+                    id={`credential-${field.name}`}
+                    name={field.name}
+                    type={field.type}
+                    required
+                    maxLength={
+                      field.name === "companyCode" ? 10 : field.name === "employeeCode" ? 50 : 255
+                    }
+                    autoComplete={field.autoComplete}
+                    {...validity}
+                    disabled={pending}
+                  />
+                )}
+                {error ? (
+                  <p
+                    id={`credential-${field.name}-error`}
+                    className="text-xs text-[var(--color-danger)]"
+                  >
+                    {error}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
           <Button type="submit" intent="cta" size="block" disabled={pending} isLoading={pending}>
             {t(`journey.${mode}Action`)}
           </Button>

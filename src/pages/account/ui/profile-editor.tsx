@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { fieldErrorMap, fieldErrors as toFieldErrors } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -22,7 +23,7 @@ export function ProfileEditor({ identity, service }: ProfileEditorProps) {
   });
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [invalidFields, setInvalidFields] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const update = useMutation({
     mutationFn: async (input: unknown) => service.updateProfile(input),
     retry: false,
@@ -43,13 +44,13 @@ export function ProfileEditor({ identity, service }: ProfileEditorProps) {
       const next = value === "" && name !== "locale" && name !== "timezone" ? null : value;
       if (next !== existing[name]) patch[name] = next;
     }
-    const parsed = service.schemas.profile.safeParse(patch);
+    const parsed = service.schemas.profile.safeParse(patch, { errorMap: fieldErrorMap(t) });
     if (!parsed.success) {
-      setInvalidFields(parsed.error.issues.map((issue) => String(issue.path[0] ?? "")));
+      setFieldErrors(toFieldErrors(parsed.error.issues, new Set(editableFields)));
       setFeedback(t("journey.checkFields"));
       return;
     }
-    setInvalidFields([]);
+    setFieldErrors({});
     if (Object.keys(parsed.data).length === 0) {
       setFeedback(t("account.noChanges"));
       return;
@@ -94,6 +95,7 @@ export function ProfileEditor({ identity, service }: ProfileEditorProps) {
         </p>
       ) : null}
       <form
+        noValidate
         onSubmit={(event) => void submit(event)}
         className="space-y-4"
         aria-busy={update.isPending}
@@ -109,12 +111,15 @@ export function ProfileEditor({ identity, service }: ProfileEditorProps) {
                 setDraft((current) => ({ ...current, [name]: event.target.value }))
               }
               required={name === "locale" || name === "timezone"}
-              aria-invalid={invalidFields.includes(name)}
+              aria-invalid={Boolean(fieldErrors[name])}
+              aria-describedby={fieldErrors[name] ? `profile-${name}-error` : undefined}
               disabled={update.isPending}
               autoComplete="off"
             />
-            {invalidFields.includes(name) ? (
-              <p className="text-xs text-[var(--color-danger)]">{t("journey.invalidField")}</p>
+            {fieldErrors[name] ? (
+              <p id={`profile-${name}-error`} className="text-xs text-[var(--color-danger)]">
+                {fieldErrors[name]}
+              </p>
             ) : null}
           </div>
         ))}

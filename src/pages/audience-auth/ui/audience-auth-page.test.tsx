@@ -196,20 +196,68 @@ describe("audience credential page", () => {
     expect(actions.navigate).toHaveBeenCalledWith({ href: "/company/dashboard" });
   });
 
-  it("does not redeem a Company recovery link missing its Company scope", async () => {
+  it("flags a Company recovery link missing its Company scope before asking for a password", async () => {
     window.history.replaceState(null, "", "/company/reset-password?token=reset-canary");
     renderPage("reset");
+    expect(
+      await screen.findByText("This link is incomplete or no longer valid. Request a new one."),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
+    expect(actions.reset).not.toHaveBeenCalled();
+  });
+
+  it("flags an invitation link without its token on arrival", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/company/accept-invitation?companyPublicId=ace09ed2-c5bd-4474-bac9-78a7bb659da3",
+    );
+    renderPage("invitation");
+    expect(
+      await screen.findByText("This link is incomplete or no longer valid. Request a new one."),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
+  });
+
+  it("names the specific problem under each field", async () => {
+    renderPage();
+    fireEvent.change(await screen.findByLabelText("Company code"), {
+      target: { value: "CODE-TOO-LONG" },
+    });
+    submitForm("Sign in");
+    expect(await screen.findByText("Use at most 10 characters.")).toBeInTheDocument();
+    expect(screen.getAllByText("This field is required.")).toHaveLength(2);
+    expect(actions.signIn).not.toHaveBeenCalled();
+  });
+
+  it("asks for a valid email when requesting recovery", async () => {
+    window.history.replaceState(null, "", "/company/forgot-password");
+    renderPage("recovery");
+    fireEvent.change(await screen.findByLabelText("Company code"), { target: { value: "EDARA" } });
+    fireEvent.change(screen.getByLabelText("Email address"), { target: { value: "not-an-email" } });
+    submitForm("Send reset link");
+    expect(await screen.findByText("Enter a valid email address.")).toBeInTheDocument();
+    expect(actions.recovery).not.toHaveBeenCalled();
+  });
+
+  it("shows a password mismatch under the confirmation field", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/company/accept-invitation?companyPublicId=ace09ed2-c5bd-4474-bac9-78a7bb659da3&token=invite",
+    );
+    renderPage("invitation");
     fireEvent.change(await screen.findByLabelText("New password"), {
       target: { value: "New-password-1!" },
     });
     fireEvent.change(screen.getByLabelText("Confirm new password"), {
-      target: { value: "New-password-1!" },
+      target: { value: "Other-password-1!" },
     });
-    submitForm("Reset password");
-    expect(
-      await screen.findByText(/Check your password and invitation or reset link/),
-    ).toBeInTheDocument();
-    expect(actions.reset).not.toHaveBeenCalled();
+    submitForm("Accept invitation");
+    const confirm = screen.getByLabelText("Confirm new password");
+    expect(confirm).toHaveAttribute("aria-invalid", "true");
+    expect(confirm).toHaveAccessibleDescription("The passwords do not match.");
+    expect(actions.invitation).not.toHaveBeenCalled();
   });
 
   it("reports recovery neutrally and does not authenticate", async () => {
