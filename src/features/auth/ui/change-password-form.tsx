@@ -16,7 +16,7 @@ import {
   retainCredentialContext,
   useAudienceSession,
 } from "@/shared/auth";
-import { fieldErrorMap } from "@/shared/i18n";
+import { fieldErrorMap, passwordRuleHint } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
 import { Label } from "@/shared/ui/label";
@@ -98,28 +98,46 @@ export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
         </p>
       ) : null}
       {contractUnavailable ? <p role="status">{t("journey.unavailable")}</p> : null}
-      {(["currentPassword", "newPassword", "confirmPassword"] as const).map((name) => (
-        <div key={name} className="space-y-1.5">
-          <Label htmlFor={`password-change-${name}`}>
-            {t(name === "currentPassword" ? "account.currentPassword" : `journey.${name}`)}
-          </Label>
-          <PasswordInput
-            id={`password-change-${name}`}
-            autoComplete={name === "currentPassword" ? "current-password" : "new-password"}
-            required
-            maxLength={128}
-            aria-invalid={!!errors[name]}
-            aria-describedby={errors[name] ? `password-change-${name}-error` : undefined}
-            disabled={changePassword.isPending || !schema}
-            {...register(name)}
-          />
-          {errors[name] ? (
-            <p id={`password-change-${name}-error`} className="text-xs text-[var(--color-danger)]">
-              {errors[name].message}
-            </p>
-          ) : null}
-        </div>
-      ))}
+      {(["currentPassword", "newPassword", "confirmPassword"] as const).map((name) => {
+        const hint = passwordRuleHint(t, contract?.requestSchema.shape.body, name);
+        const describedBy = [
+          hint ? `password-change-${name}-hint` : null,
+          errors[name] ? `password-change-${name}-error` : null,
+        ].filter(Boolean);
+        return (
+          <div key={name} className="space-y-1.5">
+            <Label htmlFor={`password-change-${name}`}>
+              {t(name === "currentPassword" ? "account.currentPassword" : `journey.${name}`)}
+            </Label>
+            <PasswordInput
+              id={`password-change-${name}`}
+              autoComplete={name === "currentPassword" ? "current-password" : "new-password"}
+              required
+              maxLength={128}
+              aria-invalid={!!errors[name]}
+              aria-describedby={describedBy.length > 0 ? describedBy.join(" ") : undefined}
+              disabled={changePassword.isPending || !schema}
+              {...register(name)}
+            />
+            {hint ? (
+              <p
+                id={`password-change-${name}-hint`}
+                className="text-xs text-[var(--color-text-muted)]"
+              >
+                {hint}
+              </p>
+            ) : null}
+            {errors[name] ? (
+              <p
+                id={`password-change-${name}-error`}
+                className="text-xs text-[var(--color-danger)]"
+              >
+                {errors[name].message}
+              </p>
+            ) : null}
+          </div>
+        );
+      })}
       <Button
         type="submit"
         intent="cta"

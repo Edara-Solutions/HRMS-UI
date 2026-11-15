@@ -240,6 +240,46 @@ describe("audience credential page", () => {
     expect(actions.recovery).not.toHaveBeenCalled();
   });
 
+  it("keeps the password rule off sign-in fields", async () => {
+    renderPage();
+    expect(await screen.findByLabelText("Company code")).not.toHaveAccessibleDescription();
+    expect(screen.getByLabelText("Password")).not.toHaveAccessibleDescription();
+  });
+
+  it("states the Company password rule before the user types", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/company/accept-invitation?companyPublicId=ace09ed2-c5bd-4474-bac9-78a7bb659da3&token=invite",
+    );
+    renderPage("invitation");
+    expect(await screen.findByLabelText("New password")).toHaveAccessibleDescription(
+      "Use at least 8 characters, with upper and lower case letters, a number and a symbol.",
+    );
+  });
+
+  it("names the missing character types when the password breaks the rule", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/company/accept-invitation?companyPublicId=ace09ed2-c5bd-4474-bac9-78a7bb659da3&token=invite",
+    );
+    renderPage("invitation");
+    fireEvent.change(await screen.findByLabelText("New password"), {
+      target: { value: "longenoughbutplain" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "longenoughbutplain" },
+    });
+    submitForm("Accept invitation");
+    expect(
+      await screen.findByText(
+        "Include upper and lower case letters, a number and a symbol (!@#$%^&*()_+-=).",
+      ),
+    ).toBeInTheDocument();
+    expect(actions.invitation).not.toHaveBeenCalled();
+  });
+
   it("shows a password mismatch under the confirmation field", async () => {
     window.history.replaceState(
       null,

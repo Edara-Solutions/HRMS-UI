@@ -11,7 +11,7 @@ import {
   useCompanySession,
   usePlatformSession,
 } from "@/shared/auth";
-import { fieldErrorMap, fieldErrors as toFieldErrors } from "@/shared/i18n";
+import { fieldErrorMap, passwordRuleHint, fieldErrors as toFieldErrors } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -245,9 +245,14 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
         >
           {credentialFields(audience, mode).map((field) => {
             const error = fieldErrors[field.name];
+            const hint = passwordRuleHint(t, service.data?.schemas[mode], field.name);
+            const describedBy = [
+              hint ? `credential-${field.name}-hint` : null,
+              error ? `credential-${field.name}-error` : null,
+            ].filter(Boolean);
             const validity = {
               "aria-invalid": Boolean(error),
-              "aria-describedby": error ? `credential-${field.name}-error` : undefined,
+              "aria-describedby": describedBy.length > 0 ? describedBy.join(" ") : undefined,
             };
             return (
               <div key={field.name} className="space-y-1.5">
@@ -276,6 +281,14 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
                     disabled={pending}
                   />
                 )}
+                {hint ? (
+                  <p
+                    id={`credential-${field.name}-hint`}
+                    className="text-xs text-[var(--color-text-muted)]"
+                  >
+                    {hint}
+                  </p>
+                ) : null}
                 {error ? (
                   <p
                     id={`credential-${field.name}-error`}
