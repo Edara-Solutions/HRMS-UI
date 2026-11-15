@@ -105,7 +105,7 @@ function PersonWorkspace({
   const target = personTarget(actor, person, assignment, roles?.items ?? []);
   const name = `${person.firstName} ${person.lastName}`;
   const availability = (operation: OperationKey, command: PersonCommand) =>
-    access.availability(operation, targetFacts(target, command));
+    access.availability(operation, targetFacts(target, person.status, command));
 
   return (
     <>

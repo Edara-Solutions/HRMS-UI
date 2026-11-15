@@ -70,15 +70,25 @@ describe("target predicates", () => {
   });
 
   it("keeps self, Owner continuity and Owner-only transfer as distinct facts", () => {
-    expect(targetFacts({ self: true, owner: false }, "password-reset")).toEqual({
+    expect(targetFacts({ self: true, owner: false }, "ACTIVE", "password-reset")).toEqual({
       target: { self: true },
     });
-    expect(targetFacts({ self: false, owner: true }, "delete")).toEqual({
+    expect(targetFacts({ self: false, owner: true }, "ACTIVE", "delete")).toEqual({
       target: { self: false, preservesOwner: false },
     });
-    expect(targetFacts({ self: false, owner: false }, "transfer")).toEqual({
+    expect(targetFacts({ self: false, owner: false }, "ACTIVE", "transfer")).toEqual({
       requiresOwner: true,
       target: { self: false },
+    });
+  });
+
+  it("offers a reissued invitation only to an employee who has not activated", () => {
+    const colleague = { self: false, owner: false };
+    expect(targetFacts(colleague, "ONBOARDING", "invitation")).toEqual({
+      target: { self: false, lifecycleAllowed: true },
+    });
+    expect(targetFacts(colleague, "ACTIVE", "invitation")).toEqual({
+      target: { self: false, lifecycleAllowed: false },
     });
   });
 });
