@@ -16,6 +16,7 @@ import {
   retainCredentialContext,
   useAudienceSession,
 } from "@/shared/auth";
+import { fieldErrorMap } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Form } from "@/shared/ui/form";
 import { Label } from "@/shared/ui/label";
@@ -51,7 +52,7 @@ export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
     .extend({ confirmPassword: z.string().min(1) })
     .refine((input) => input.newPassword === input.confirmPassword, {
       path: ["confirmPassword"],
-      message: "Passwords do not match",
+      message: t("journey.passwordMismatch"),
     });
   type PasswordFormData = z.infer<NonNullable<typeof schema>>;
   const {
@@ -59,7 +60,7 @@ export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<PasswordFormData>({
-    resolver: schema ? zodResolver(schema) : undefined,
+    resolver: schema ? zodResolver(schema, { errorMap: fieldErrorMap(t) }) : undefined,
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
@@ -90,7 +91,7 @@ export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(submit)} aria-busy={changePassword.isPending}>
+    <Form noValidate onSubmit={handleSubmit(submit)} aria-busy={changePassword.isPending}>
       {feedback ? (
         <p role="status" className="text-sm text-[var(--color-text-muted)]">
           {feedback}
@@ -108,12 +109,13 @@ export function ChangePasswordForm({ audience }: ChangePasswordFormProps) {
             required
             maxLength={128}
             aria-invalid={!!errors[name]}
+            aria-describedby={errors[name] ? `password-change-${name}-error` : undefined}
             disabled={changePassword.isPending || !schema}
             {...register(name)}
           />
           {errors[name] ? (
-            <p className="text-xs text-[var(--color-danger)]">
-              {t(name === "confirmPassword" ? "journey.passwordMismatch" : "journey.invalidField")}
+            <p id={`password-change-${name}-error`} className="text-xs text-[var(--color-danger)]">
+              {errors[name].message}
             </p>
           ) : null}
         </div>
