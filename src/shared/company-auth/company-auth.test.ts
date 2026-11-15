@@ -307,7 +307,7 @@ describe("generated audience credential journeys", () => {
         expect(await request.json()).toEqual({
           companyPublicId: companySessionFixture().user.companyPublicId,
           token: "link-token",
-          newPassword: "new-secret",
+          newPassword: "New-secret-1!",
         });
         return new Response(null, { status: 204 });
       }),
@@ -315,7 +315,7 @@ describe("generated audience credential journeys", () => {
     await company.confirmCompanyRecovery({
       companyPublicId: companySessionFixture().user.companyPublicId,
       token: "link-token",
-      newPassword: "new-secret",
+      newPassword: "New-secret-1!",
     });
     expect(companyStore.getState().session).toBeNull();
   });

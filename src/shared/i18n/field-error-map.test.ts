@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { fieldErrorMap, fieldErrors } from "./field-error-map";
+import { fieldErrorMap, fieldErrors, passwordRuleHint } from "./field-error-map";
 
 const translate = (key: string, values?: { count?: number }) =>
   values?.count === undefined ? key : `${key}=${values.count}`;
@@ -36,6 +36,32 @@ describe("fieldErrorMap", () => {
     expect(parsed.success ? {} : fieldErrors(parsed.error.issues, new Set(["a"]))).toEqual({
       a: "auth:journey.fieldRequired",
     });
+  });
+
+  it("names missing password character types only for the new password", () => {
+    const schema = z.object({ newPassword: z.string().regex(/\d/), code: z.string().regex(/\d/) });
+    const parsed = schema.safeParse(
+      { newPassword: "x", code: "x" },
+      { errorMap: fieldErrorMap(translate) },
+    );
+    expect(parsed.success ? [] : parsed.error.issues.map((issue) => issue.message)).toEqual([
+      "auth:journey.fieldPasswordCharacters",
+      "auth:journey.invalidField",
+    ]);
+  });
+
+  it("states the password rule from the schema's minimum length", () => {
+    const schema = z.object({ newPassword: z.string().min(12).max(128), email: z.string() });
+    expect(passwordRuleHint(translate, schema, "newPassword")).toBe("auth:journey.passwordRule=12");
+    expect(passwordRuleHint(translate, schema, "email")).toBeNull();
+    expect(
+      passwordRuleHint(
+        translate,
+        z.object({ currentPassword: z.string().min(1) }),
+        "currentPassword",
+      ),
+    ).toBeNull();
+    expect(passwordRuleHint(translate, undefined, "newPassword")).toBeNull();
   });
 
   it("falls back to a generic message for anything else", () => {

@@ -31228,8 +31228,9 @@
                     "type": "string"
                   },
                   "newPassword": {
-                    "minLength": 1,
+                    "minLength": 12,
                     "maxLength": 128,
+                    "pattern": "^(?=[\\s\\S]*[A-Z])(?=[\\s\\S]*[a-z])(?=[\\s\\S]*\\d)(?=[\\s\\S]*[!@#$%^&*()_+\\-=])[\\s\\S]*$",
                     "type": "string"
                   },
                   "clientType": {
@@ -32432,8 +32433,9 @@
                     "type": "string"
                   },
                   "newPassword": {
-                    "minLength": 1,
+                    "minLength": 12,
                     "maxLength": 128,
+                    "pattern": "^(?=[\\s\\S]*[A-Z])(?=[\\s\\S]*[a-z])(?=[\\s\\S]*\\d)(?=[\\s\\S]*[!@#$%^&*()_+\\-=])[\\s\\S]*$",
                     "type": "string"
                   }
                 }
@@ -32922,8 +32924,9 @@
                     "type": "string"
                   },
                   "newPassword": {
-                    "minLength": 1,
+                    "minLength": 12,
                     "maxLength": 128,
+                    "pattern": "^(?=[\\s\\S]*[A-Z])(?=[\\s\\S]*[a-z])(?=[\\s\\S]*\\d)(?=[\\s\\S]*[!@#$%^&*()_+\\-=])[\\s\\S]*$",
                     "type": "string"
                   }
                 }

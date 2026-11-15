@@ -1,4 +1,4 @@
-import { type ZodErrorMap, type ZodIssue, ZodIssueCode } from "zod";
+import { type ZodErrorMap, type ZodIssue, ZodIssueCode, ZodObject, ZodString } from "zod";
 
 type Translate = (key: string, values?: { count?: number }) => string;
 
@@ -15,11 +15,24 @@ export function fieldErrorMap(t: Translate): ZodErrorMap {
       return { message: t("auth:journey.fieldTooLong", { count: Number(issue.maximum) }) };
     if (issue.code === ZodIssueCode.invalid_string && issue.validation === "email")
       return { message: t("auth:journey.fieldEmail") };
+    if (
+      issue.code === ZodIssueCode.invalid_string &&
+      issue.validation === "regex" &&
+      issue.path.at(-1) === "newPassword"
+    )
+      return { message: t("auth:journey.fieldPasswordCharacters") };
     if (issue.code === ZodIssueCode.invalid_string && issue.validation === "url")
       return { message: t("auth:journey.fieldUrl") };
     if (issue.code === ZodIssueCode.custom && issue.message) return { message: issue.message };
     return { message: t("auth:journey.invalidField") };
   };
+}
+
+export function passwordRuleHint(t: Translate, schema: unknown, name: string): string | null {
+  if (name !== "newPassword") return null;
+  const field = schema instanceof ZodObject ? schema.shape[name] : undefined;
+  if (!(field instanceof ZodString) || field.minLength === null) return null;
+  return t("auth:journey.passwordRule", { count: field.minLength });
 }
 
 export function fieldErrors(
