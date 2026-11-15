@@ -35,9 +35,13 @@ function renderPerson({
   permissions = administrator,
   actorIsOwner = false,
   mode = "NORMAL",
+  status = "ACTIVE",
 } = {}) {
   const net = operationNetwork.install();
-  net.on("GET /api/v1/company/users/{publicId}", () => ({ status: 200, body: personBody(target) }));
+  net.on("GET /api/v1/company/users/{publicId}", () => ({
+    status: 200,
+    body: personBody(target, { status }),
+  }));
   net.on("GET /api/v1/company/users/{publicId}/role", () =>
     targetRole
       ? { status: 200, body: assignmentBody(target, targetRole) }
@@ -105,7 +109,7 @@ describe("Company person detail", () => {
   });
 
   it("names the target and consequence before reissuing an invitation", async () => {
-    const net = renderPerson();
+    const net = renderPerson({ status: "ONBOARDING" });
     net.on("POST /api/v1/company/users/{publicId}/invitation", () => ({ status: 204 }));
     fireEvent.click(await screen.findByRole("button", { name: "Resend invitation" }));
     expect(await screen.findByRole("dialog")).toHaveTextContent(
@@ -117,6 +121,15 @@ describe("Company person detail", () => {
       params: { publicId: peopleIds.colleague },
       body: {},
     });
+  });
+
+  it("never reissues an invitation to an employee who already activated", async () => {
+    renderPerson({ status: "ACTIVE" });
+    const resend = await screen.findByRole("button", { name: "Resend invitation" });
+    await waitFor(() => expect(resend).toBeDisabled());
+    expect(
+      screen.getByText("This action is not available in the current state."),
+    ).toBeInTheDocument();
   });
 
   it("projects self-target restrictions onto the actor's own record", async () => {

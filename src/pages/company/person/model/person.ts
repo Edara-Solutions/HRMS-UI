@@ -112,10 +112,12 @@ export type PersonCommand =
 /** Target predicates stay distinct (M06): self, Owner continuity, and the Owner-only transfer. */
 export function targetFacts(
   target: PersonTarget,
+  status: PersonRecord["status"],
   command: PersonCommand,
 ): Pick<AccessFacts, "target" | "requiresOwner"> {
   switch (command) {
     case "invitation":
+      return { target: { self: target.self, lifecycleAllowed: status === "ONBOARDING" } };
     case "password-reset":
     case "revoke-session":
       return { target: { self: target.self } };
