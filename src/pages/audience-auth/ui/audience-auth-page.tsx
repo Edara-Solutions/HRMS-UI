@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ContractViolation, OperationRefusal } from "@/shared/api";
@@ -16,6 +16,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { PasswordInput } from "@/shared/ui/password-input";
+import { CredentialFrame, type CredentialLink } from "@/widgets/credential-frame";
 import { type CredentialMode, loadCredentialService } from "../api/credential-service";
 
 interface AudienceAuthPageProps {
@@ -179,152 +180,137 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
   }
 
   const pending = action.isPending || occupancyAction.isPending;
+  const links: CredentialLink[] = [
+    mode === "login"
+      ? {
+          to: audience === "company" ? "/company/forgot-password" : "/platform/forgot-password",
+          label: t("journey.recoveryTitle"),
+        }
+      : {
+          to: audience === "company" ? "/company/login" : "/platform/login",
+          label: t("journey.loginTitle"),
+        },
+    ...(audience === "company" ? [{ to: "/plans", label: t("journey.publicPlans") }] : []),
+  ];
   return (
-    <section
-      className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10 sm:px-6"
-      aria-labelledby="credential-heading"
+    <CredentialFrame
+      audience={audience}
+      title={t(`journey.${mode}Title`)}
+      description={t(`journey.${mode}Description`)}
+      links={links}
     >
-      <p className="text-sm font-medium text-[var(--color-text-muted)]">
-        {t(`journey.${audience}`)}
-      </p>
-      <h1 id="credential-heading" className="mt-2 text-2xl font-semibold tracking-tight">
-        {t(`journey.${mode}Title`)}
-      </h1>
-      <p className="mt-3 text-sm text-[var(--color-text-muted)]">
-        {t(`journey.${mode}Description`)}
-      </p>
-      {feedback ? (
-        <p
-          role="status"
-          className="mt-5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm"
-        >
-          {feedback}
-        </p>
-      ) : null}
-      {service.isPending ? (
-        <p role="status" className="mt-6 text-sm">
-          {t("journey.loading")}
-        </p>
-      ) : service.isError ? (
-        <Button className="mt-6" onClick={() => void service.refetch()}>
-          {t("journey.retry")}
-        </Button>
-      ) : state.session ? (
-        <div className="mt-6 space-y-4">
-          <p className="text-sm">{t("journey.occupied")}</p>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              intent="cta"
-              disabled={pending}
-              onClick={() => occupancyAction.mutate("continue")}
-            >
-              {t("journey.continue")}
-            </Button>
-            <Button
-              intent="action"
-              disabled={pending}
-              onClick={() => occupancyAction.mutate("sign-out")}
-            >
-              {t("journey.signOutAudience", { audience: t(`journey.${audience}`) })}
-            </Button>
+      <div className="space-y-5">
+        {feedback ? (
+          <p
+            role="status"
+            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-sm"
+          >
+            {feedback}
+          </p>
+        ) : null}
+        {service.isPending ? (
+          <p role="status" className="text-sm">
+            {t("journey.loading")}
+          </p>
+        ) : service.isError ? (
+          <Button onClick={() => void service.refetch()}>{t("journey.retry")}</Button>
+        ) : state.session ? (
+          <div className="space-y-4">
+            <p className="text-sm">{t("journey.occupied")}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                intent="cta"
+                disabled={pending}
+                onClick={() => occupancyAction.mutate("continue")}
+              >
+                {t("journey.continue")}
+              </Button>
+              <Button
+                intent="action"
+                disabled={pending}
+                onClick={() => occupancyAction.mutate("sign-out")}
+              >
+                {t("journey.signOutAudience", { audience: t(`journey.${audience}`) })}
+              </Button>
+            </div>
           </div>
-        </div>
-      ) : linkIncomplete ? (
-        <p
-          role="status"
-          className="mt-5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-sm"
-        >
-          {t("journey.invalidLink")}
-        </p>
-      ) : !completed ? (
-        <form
-          noValidate
-          onSubmit={(event) => void submit(event)}
-          className="mt-7 space-y-5"
-          aria-busy={pending}
-        >
-          {credentialFields(audience, mode).map((field) => {
-            const error = fieldErrors[field.name];
-            const hint = passwordRuleHint(t, service.data?.schemas[mode], field.name);
-            const describedBy = [
-              hint ? `credential-${field.name}-hint` : null,
-              error ? `credential-${field.name}-error` : null,
-            ].filter(Boolean);
-            const validity = {
-              "aria-invalid": Boolean(error),
-              "aria-describedby": describedBy.length > 0 ? describedBy.join(" ") : undefined,
-            };
-            return (
-              <div key={field.name} className="space-y-1.5">
-                <Label htmlFor={`credential-${field.name}`}>{t(`journey.${field.name}`)}</Label>
-                {field.type === "password" ? (
-                  <PasswordInput
-                    id={`credential-${field.name}`}
-                    name={field.name}
-                    required
-                    maxLength={128}
-                    autoComplete={field.autoComplete}
-                    {...validity}
-                    disabled={pending}
-                  />
-                ) : (
-                  <Input
-                    id={`credential-${field.name}`}
-                    name={field.name}
-                    type={field.type}
-                    required
-                    maxLength={
-                      field.name === "companyCode" ? 10 : field.name === "employeeCode" ? 50 : 255
-                    }
-                    autoComplete={field.autoComplete}
-                    {...validity}
-                    disabled={pending}
-                  />
-                )}
-                {hint ? (
-                  <p
-                    id={`credential-${field.name}-hint`}
-                    className="text-xs text-[var(--color-text-muted)]"
-                  >
-                    {hint}
-                  </p>
-                ) : null}
-                {error ? (
-                  <p
-                    id={`credential-${field.name}-error`}
-                    className="text-xs text-[var(--color-danger)]"
-                  >
-                    {error}
-                  </p>
-                ) : null}
-              </div>
-            );
-          })}
-          <Button type="submit" intent="cta" size="block" disabled={pending} isLoading={pending}>
-            {t(`journey.${mode}Action`)}
-          </Button>
-        </form>
-      ) : null}
-      <nav className="mt-6 flex flex-wrap gap-4 text-sm" aria-label={t("journey.authNavigation")}>
-        {mode === "login" ? (
-          <Link
-            to={audience === "company" ? "/company/forgot-password" : "/platform/forgot-password"}
-            className="text-[var(--color-primary)] hover:underline"
+        ) : linkIncomplete ? (
+          <p
+            role="status"
+            className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 text-sm"
           >
-            {t("journey.recoveryTitle")}
-          </Link>
-        ) : (
-          <Link
-            to={audience === "company" ? "/company/login" : "/platform/login"}
-            className="text-[var(--color-primary)] hover:underline"
+            {t("journey.invalidLink")}
+          </p>
+        ) : !completed ? (
+          <form
+            noValidate
+            onSubmit={(event) => void submit(event)}
+            className="space-y-5"
+            aria-busy={pending}
           >
-            {t("journey.loginTitle")}
-          </Link>
-        )}
-        <Link to="/plans" className="text-[var(--color-primary)] hover:underline">
-          {t("journey.publicPlans")}
-        </Link>
-      </nav>
-    </section>
+            {credentialFields(audience, mode).map((field) => {
+              const error = fieldErrors[field.name];
+              const hint = passwordRuleHint(t, service.data?.schemas[mode], field.name);
+              const describedBy = [
+                hint ? `credential-${field.name}-hint` : null,
+                error ? `credential-${field.name}-error` : null,
+              ].filter(Boolean);
+              const validity = {
+                "aria-invalid": Boolean(error),
+                "aria-describedby": describedBy.length > 0 ? describedBy.join(" ") : undefined,
+              };
+              return (
+                <div key={field.name} className="space-y-1.5">
+                  <Label htmlFor={`credential-${field.name}`}>{t(`journey.${field.name}`)}</Label>
+                  {field.type === "password" ? (
+                    <PasswordInput
+                      id={`credential-${field.name}`}
+                      name={field.name}
+                      required
+                      maxLength={128}
+                      autoComplete={field.autoComplete}
+                      {...validity}
+                      disabled={pending}
+                    />
+                  ) : (
+                    <Input
+                      id={`credential-${field.name}`}
+                      name={field.name}
+                      type={field.type}
+                      required
+                      maxLength={
+                        field.name === "companyCode" ? 10 : field.name === "employeeCode" ? 50 : 255
+                      }
+                      autoComplete={field.autoComplete}
+                      {...validity}
+                      disabled={pending}
+                    />
+                  )}
+                  {hint ? (
+                    <p
+                      id={`credential-${field.name}-hint`}
+                      className="text-xs text-[var(--color-text-muted)]"
+                    >
+                      {hint}
+                    </p>
+                  ) : null}
+                  {error ? (
+                    <p
+                      id={`credential-${field.name}-error`}
+                      className="text-xs text-[var(--color-danger)]"
+                    >
+                      {error}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+            <Button type="submit" intent="cta" size="block" disabled={pending} isLoading={pending}>
+              {t(`journey.${mode}Action`)}
+            </Button>
+          </form>
+        ) : null}
+      </div>
+    </CredentialFrame>
   );
 }
