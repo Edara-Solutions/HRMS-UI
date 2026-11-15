@@ -2,11 +2,20 @@ import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 
-export default defineConfig({
+const platformNoIndex = (enabled: boolean): Plugin => ({
+  name: "platform-noindex",
+  transformIndexHtml: () =>
+    enabled
+      ? [{ tag: "meta", attrs: { name: "robots", content: "noindex, nofollow" }, injectTo: "head" }]
+      : [],
+});
+
+export default defineConfig(({ mode }) => ({
   envPrefix: ["VITE_", "ALLOW_"],
   plugins: [
+    platformNoIndex(loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_PLATFORM_PORTAL === "true"),
     tanstackRouter({
       target: "react",
       routesDirectory: "src/app/routes",
@@ -52,4 +61,4 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
   },
-});
+}));

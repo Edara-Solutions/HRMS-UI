@@ -9,3 +9,7 @@ The shell is branded **Edara Platform — Operations Console**. Current routes i
 Presentation preferences use `hrms-preferences:v2`; sidebar and notification style are scoped by audience and user public ID. Only locale and theme migrate globally from old preferences.
 
 This intermediate split-tier migration is nondeployable until the parent epic's final removal/reachability gate. Frozen business source and explicitly deferred E2E fixtures are retained for their owning slices, not advertised as supported workflows.
+
+## Deployment
+
+Production serves two builds: the public Company app with `VITE_ENABLE_PLATFORM_PORTAL=false`, and the staff-only Platform app on its own host with `VITE_ENABLE_PLATFORM_PORTAL=true` (that build adds `noindex, nofollow`). The backend refuses `/api/v1/platform/*` outside the staff networks. Step-by-step setup: `docs/deployment/platform-portal-isolation.md` in HRMS_Back_End.
