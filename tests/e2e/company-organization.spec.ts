@@ -109,6 +109,8 @@ async function open(
         return route.fulfill({ json: profileBody() });
       case "GET /api/v1/company/setup":
         return route.fulfill({ json: setupBody(setupSteps) });
+      case "GET /api/v1/company/overview":
+        return route.fulfill({ json: {} });
       case `POST /api/v1/company/setup/${stepIds.roles}/start`:
         // Another session already moved the step on: the transition is stale.
         setupSteps = [
