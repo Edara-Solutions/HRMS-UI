@@ -90,7 +90,7 @@ function audienceRoutes(audience: AudienceName): RouteDeclaration[] {
       path: `/${audience}/dashboard`,
       audience,
       category: "work",
-      label: { en: "Home", ar: "الرئيسية" },
+      label: { en: "Dashboard", ar: "لوحة التحكم" },
     },
     {
       path: `/${audience}/me/profile`,
@@ -122,14 +122,14 @@ const companyWorkRoutes: RouteDeclaration[] = [
     audience: "company",
     category: "work",
     operation: "GET /api/v1/company/profile",
-    label: { en: "Organization profile", ar: "ملف المؤسسة" },
+    label: { en: "Company profile", ar: "ملف الشركة" },
   },
   {
     path: "/company/setup",
     audience: "company",
     category: "work",
     operation: "GET /api/v1/company/setup",
-    label: { en: "Company setup", ar: "إعداد الشركة" },
+    label: { en: "Setup checklist", ar: "قائمة الإعداد" },
   },
   {
     path: "/company/people",
@@ -162,7 +162,7 @@ const companyWorkRoutes: RouteDeclaration[] = [
     audience: "company",
     category: "work",
     operation: "GET /api/v1/company/email-settings",
-    label: { en: "Email", ar: "البريد الإلكتروني" },
+    label: { en: "Email settings", ar: "إعدادات البريد" },
   },
   {
     path: "/company/email/templates",
@@ -182,7 +182,7 @@ const companyWorkRoutes: RouteDeclaration[] = [
     audience: "company",
     category: "work",
     operation: "GET /api/v1/company/audit-trail",
-    label: { en: "Audit trail", ar: "سجل التدقيق" },
+    label: { en: "Audit Log", ar: "سجل التدقيق" },
   },
 ];
 
@@ -298,7 +298,7 @@ const platformWorkRoutes: RouteDeclaration[] = [
     audience: "platform",
     category: "work",
     operation: "GET /api/v1/platform/audit-trail",
-    label: { en: "Audit trail", ar: "سجل التدقيق" },
+    label: { en: "Audit Log", ar: "سجل التدقيق" },
   },
   {
     path: "/platform/audit/catalog",
@@ -325,7 +325,7 @@ const platformWorkRoutes: RouteDeclaration[] = [
     audience: "platform",
     category: "work",
     operation: "GET /api/v1/platform/emails/sending",
-    label: { en: "Email sending", ar: "إرسال البريد" },
+    label: { en: "Sending controls", ar: "ضوابط الإرسال" },
   },
 ];
 

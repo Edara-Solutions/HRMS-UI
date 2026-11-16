@@ -189,6 +189,11 @@
     "consumers": ["src/features/notification/api/notification-transport.ts"]
   },
   {
+    "key": "GET /api/v1/company/overview",
+    "audience": "company",
+    "consumers": ["src/shared/api/company-operation.ts"]
+  },
+  {
     "key": "GET /api/v1/company/permissions",
     "audience": "company",
     "consumers": [
@@ -545,6 +550,11 @@
     "key": "GET /api/v1/platform/notifications/unread-count",
     "audience": "platform",
     "consumers": ["src/features/notification/api/notification-transport.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/overview",
+    "audience": "platform",
+    "consumers": ["src/shared/api/platform-operation.ts"]
   },
   {
     "key": "GET /api/v1/platform/plan-prices/{publicId}",

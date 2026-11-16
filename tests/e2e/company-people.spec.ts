@@ -115,6 +115,13 @@ async function open(
       return route.fulfill({ json: personBody(id) });
     }
     if (key === "GET /api/v1/company/roles") return route.fulfill({ json: rolesBody() });
+    if (key === "GET /api/v1/company/overview")
+      return route.fulfill({
+        json: {
+          people: { total: 3, byStatus: { ACTIVE: 3 }, createdThisMonth: 0, createdLastMonth: 0 },
+          invitations: { pending: 0 },
+        },
+      });
     if (key === `GET /api/v1/company/roles/${peopleIds.managerRole}`)
       return route.fulfill({
         json: roleDetailBody(peopleIds.managerRole, [peopleIds.permissionRead]),

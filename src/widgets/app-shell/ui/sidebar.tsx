@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ChevronUp, LogOut, PanelLeft, Settings, User } from "lucide-react";
+import { ChevronUp, LockKeyhole, LogOut, Monitor, PanelLeft, UserRound } from "lucide-react";
 import {
   type ReactNode,
   useEffect,
@@ -14,6 +14,7 @@ import { useCurrentAudience, useCurrentSession } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
+import { useEasedNumber } from "../lib/use-eased-number";
 import type { NavGroup, NavIndicator, NavItem } from "../model/nav-items";
 
 interface SidebarProps {
@@ -173,112 +174,125 @@ interface SidebarLinkProps {
   isActive: boolean;
 }
 
-// Expanded badge: color-mixed background gives more saturation than pure -soft while staying readable
-const indicatorClassName: Record<NavIndicator["tone"], string> = {
-  neutral: "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
-  primary:
-    "bg-[color-mix(in_srgb,var(--color-primary)_30%,var(--color-primary-soft))] text-[var(--color-primary)]",
-  info: "bg-[color-mix(in_srgb,var(--color-info)_30%,var(--color-info-soft))] text-[var(--color-info)]",
-  success:
-    "bg-[color-mix(in_srgb,var(--color-success)_30%,var(--color-success-soft))] text-[var(--color-success)]",
-  warning:
-    "bg-[color-mix(in_srgb,var(--color-warning)_30%,var(--color-warning-soft))] text-[var(--color-warning)]",
-  danger:
-    "bg-[color-mix(in_srgb,var(--color-danger)_30%,var(--color-danger-soft))] text-[var(--color-danger)]",
-};
-
-// Collapsed dot: solid semantic colour so the dot is vivid in both light and dark themes.
-// Setting both bg and text to the same token means currentColor (used in the glow shadow) == the dot colour.
-const dotClassName: Record<NavIndicator["tone"], string> = {
-  neutral: "bg-[var(--color-text-faint)] text-[var(--color-text-faint)]",
-  primary: "bg-[var(--color-primary)] text-[var(--color-primary)]",
-  info: "bg-[var(--color-info)] text-[var(--color-info)]",
-  success: "bg-[var(--color-success)] text-[var(--color-success)]",
-  warning: "bg-[var(--color-warning)] text-[var(--color-warning)]",
-  danger: "bg-[var(--color-danger)] text-[var(--color-danger)]",
-};
+const linkClassName =
+  "relative flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium transition-[background-color,color,box-shadow] duration-[var(--motion-fast)]";
 
 function SidebarLink({ item, collapsed, isActive }: SidebarLinkProps) {
-  const locale = usePreferencesStore((state) => state.locale);
+  if (item.upcoming) return <UpcomingEntry item={item} collapsed={collapsed} />;
   const indicator = item.indicator;
-  const label = item.localizedLabels?.[locale] ?? item.label;
 
   return (
     <li>
       <Link
         to={item.href}
         className={cn(
-          "relative flex items-center gap-[9px] rounded-[var(--radius-md)] px-2.5 py-2 text-[13.5px] font-medium transition-[background-color,color,box-shadow] duration-[var(--motion-fast)]",
+          linkClassName,
           isActive
             ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
             : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text)]",
           collapsed && "justify-center px-0",
         )}
         aria-current={isActive ? "page" : undefined}
-        title={collapsed ? label : undefined}
+        title={collapsed ? item.label : undefined}
       >
         <span className={cn("shrink-0 opacity-70", isActive && "opacity-100")}>{item.icon}</span>
         {!collapsed && (
           <>
-            <span className="truncate">{label}</span>
-            {indicator && <SidebarIndicator indicator={indicator} isActive={Boolean(isActive)} />}
+            <span className="truncate">{item.label}</span>
+            {indicator && <CountBadge indicator={indicator} isActive={isActive} />}
           </>
         )}
-        {collapsed && indicator && (
-          <SidebarIndicatorDot indicator={indicator} isActive={Boolean(isActive)} />
-        )}
+        {collapsed && indicator && <CollapsedDot indicator={indicator} />}
       </Link>
     </li>
   );
 }
 
-function SidebarIndicator({ indicator, isActive }: { indicator: NavIndicator; isActive: boolean }) {
+function UpcomingEntry({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
+  const locale = usePreferencesStore((state) => state.locale);
+  const soon = locale === "ar" ? "قريبًا" : "Soon";
+
+  return (
+    <li>
+      <span
+        aria-disabled="true"
+        title={collapsed ? `${item.label} · ${soon}` : undefined}
+        className={cn(
+          linkClassName,
+          "cursor-default select-none text-[var(--color-text-faint)]",
+          collapsed && "justify-center px-0",
+        )}
+      >
+        <span className="shrink-0 opacity-50">{item.icon}</span>
+        {!collapsed && (
+          <>
+            <span className="truncate">{item.label}</span>
+            <span className="ms-auto rounded-[var(--radius-sm)] border border-[var(--color-border)] px-1.5 py-px text-[10px] font-medium leading-4 text-[var(--color-text-faint)]">
+              {soon}
+            </span>
+          </>
+        )}
+      </span>
+    </li>
+  );
+}
+
+function CountBadge({ indicator, isActive }: { indicator: NavIndicator; isActive: boolean }) {
+  const shown = useEasedNumber(indicator.count);
+
   return (
     <span
       className={cn(
-        "ms-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-[var(--radius-sm)]",
-        "px-1.5 text-[10px] font-semibold tabular-nums leading-none",
-        // Always-visible tinted border gives the badge a defined edge in both themes
-        "border border-[color-mix(in_srgb,currentColor_35%,transparent)]",
-        "transition-[transform,box-shadow] duration-[var(--motion-fast)]",
-        indicatorClassName[indicator.tone],
-        // Active: badge swells slightly and gains a soft outer ring
-        isActive &&
-          "scale-[1.04] shadow-[0_0_0_2px_color-mix(in_srgb,currentColor_28%,transparent)]",
-        indicator.effect === "pulse" && "motion-safe:animate-pulse",
+        "ms-auto inline-flex h-5 min-w-[20px] items-center justify-center gap-1.5 rounded-[var(--radius-sm)]",
+        "border px-1.5 text-[10px] font-semibold tabular-nums leading-none",
+        "transition-[background-color,border-color,color] duration-[var(--motion-fast)]",
+        isActive
+          ? "border-[color-mix(in_srgb,var(--color-primary)_25%,transparent)] bg-[var(--color-surface)] text-[var(--color-primary)]"
+          : "border-[var(--color-border)] bg-[var(--color-surface-2)] text-[var(--color-text-muted)]",
       )}
     >
-      {indicator.label}
+      {indicator.attention && (
+        <span
+          aria-hidden="true"
+          className="attention-dot size-1.5 shrink-0 rounded-full bg-[var(--color-primary)]"
+        />
+      )}
+      {shown.toLocaleString()}
     </span>
   );
 }
 
-function SidebarIndicatorDot({
-  indicator,
-  isActive,
-}: {
-  indicator: NavIndicator;
-  isActive: boolean;
-}) {
+function CollapsedDot({ indicator }: { indicator: NavIndicator }) {
   return (
     <span
+      aria-hidden="true"
       className={cn(
-        // Solid semantic colour (not soft) so the dot is vivid against the sidebar in both themes
-        "absolute end-1.5 top-1.5 size-2 rounded-full",
-        "transition-[transform,box-shadow] duration-[var(--motion-fast)]",
-        dotClassName[indicator.tone],
-        // Compound shadow: inner ring separates dot from icon; outer glow uses the dot's own colour
-        // Ring colour adapts: surface when inactive, primary-soft when the link is active
-        isActive
-          ? "scale-125 shadow-[0_0_0_1.5px_var(--color-primary-soft),0_0_6px_1px_color-mix(in_srgb,currentColor_65%,transparent)]"
-          : "shadow-[0_0_0_1.5px_var(--color-surface),0_0_5px_1px_color-mix(in_srgb,currentColor_50%,transparent)]",
-        indicator.effect === "pulse" && "motion-safe:animate-pulse",
+        "absolute end-2 top-1.5 size-1.5 rounded-full shadow-[0_0_0_1.5px_var(--color-surface)]",
+        indicator.attention
+          ? "attention-dot bg-[var(--color-primary)]"
+          : "bg-[var(--color-text-faint)]",
       )}
-      role="img"
-      aria-label={indicator.label}
     />
   );
 }
+
+const selfPages = [
+  {
+    path: "profile",
+    icon: <UserRound size={14} className="shrink-0 opacity-70" />,
+    label: { en: "My profile", ar: "ملفي الشخصي" },
+  },
+  {
+    path: "security",
+    icon: <LockKeyhole size={14} className="shrink-0 opacity-70" />,
+    label: { en: "Security", ar: "الأمان" },
+  },
+  {
+    path: "sessions",
+    icon: <Monitor size={14} className="shrink-0 opacity-70" />,
+    label: { en: "My sessions", ar: "جلساتي" },
+  },
+] as const;
 
 function UserMenu({
   onClose,
@@ -371,24 +385,18 @@ function UserMenu({
       className="z-50 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
       role="menu"
     >
-      <Link
-        to={audience === "platform" ? "/platform/me/profile" : "/company/me/profile"}
-        className={itemClass}
-        onClick={onClose}
-        role="menuitem"
-      >
-        <User size={14} className="shrink-0 opacity-70" />
-        <span>{locale === "ar" ? "الملف الشخصي" : "Profile"}</span>
-      </Link>
-      <Link
-        to={audience === "platform" ? "/platform/me/security" : "/company/me/security"}
-        className={itemClass}
-        onClick={onClose}
-        role="menuitem"
-      >
-        <Settings size={14} className="shrink-0 opacity-70" />
-        <span>{locale === "ar" ? "الإعدادات" : "Settings"}</span>
-      </Link>
+      {selfPages.map(({ path, icon, label }) => (
+        <Link
+          key={path}
+          to={`/${audience === "platform" ? "platform" : "company"}/me/${path}`}
+          className={itemClass}
+          onClick={onClose}
+          role="menuitem"
+        >
+          {icon}
+          <span>{label[locale]}</span>
+        </Link>
+      ))}
       <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />
       <button
         type="button"

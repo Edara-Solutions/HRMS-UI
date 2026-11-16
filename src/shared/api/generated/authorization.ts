@@ -350,6 +350,11 @@ export const operationAuthorization = {
     authorization: "C",
     permission: "company-setup:update",
   },
+  "GET /api/v1/company/overview": {
+    audience: "company",
+    authorization: "AUTH",
+    permission: null,
+  },
   "GET /api/v1/company/subscription": {
     audience: "company",
     authorization: "C",
@@ -971,6 +976,11 @@ export const operationAuthorization = {
     audience: "platform",
     authorization: "P",
     permission: "audit-events:read",
+  },
+  "GET /api/v1/platform/overview": {
+    audience: "platform",
+    authorization: "AUTH",
+    permission: null,
   },
   "GET /api/v1/platform/companies/{publicId}/subscription": {
     audience: "platform",
