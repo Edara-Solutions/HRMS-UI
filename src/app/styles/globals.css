@@ -239,6 +239,26 @@ select {
   }
 }
 
+/* ─── Attention dot ────────────────────────────────────────────────────────
+   A slow navy breath on sidebar items that wait on someone. Opacity and scale
+   only, no bounce; the reduced-motion block below holds it still.
+─────────────────────────────────────────────────────────────────────────── */
+.attention-dot {
+  animation: attention-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes attention-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
 /* Layered so component-level focus-visible utilities (Input, Select, Textarea) can override this default. */
 @layer base {
   :focus-visible {

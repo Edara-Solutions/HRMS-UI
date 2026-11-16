@@ -18,6 +18,7 @@ export { companyCommunicationsOperations } from "./company-communications-operat
 export {
   companyAccessPolicyQuery,
   companyEmailReadinessQuery,
+  companyOverviewQuery,
   companyQueryKey,
   companyReadQuery,
   requestCompanyOperation,
@@ -67,6 +68,7 @@ export { platformCommunicationsOperations } from "./platform-communications-oper
 export { platformCompanyOperations } from "./platform-company-operations";
 export { platformLeadOperations } from "./platform-lead-operations";
 export {
+  platformOverviewQuery,
   platformQueryKey,
   platformReadQuery,
   requestPlatformOperation,

@@ -8,6 +8,7 @@ import {
 } from "./audience-operation";
 import { operation as accessPolicy } from "./generated/company/get-api-v1-company-access-policy";
 import { operation as emailReadiness } from "./generated/company/get-api-v1-company-email-readiness";
+import { operation as overview } from "./generated/company/get-api-v1-company-overview";
 
 /** A Company operation whose declared success (200, 201 or 202) carries a body. */
 export function requestCompanyOperation<Success extends z.ZodTypeAny>(
@@ -54,4 +55,9 @@ export function companyAccessPolicyQuery(userPublicId: string) {
  */
 export function companyEmailReadinessQuery(userPublicId: string) {
   return companyReadQuery(userPublicId, emailReadiness);
+}
+
+/** One permission-aware overview read shared by the sidebar badges and the dashboard. */
+export function companyOverviewQuery(userPublicId: string) {
+  return queryOptions({ ...companyReadQuery(userPublicId, overview), staleTime: 120_000 });
 }

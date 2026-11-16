@@ -6,6 +6,7 @@ import {
   requestAudienceOperation,
   sendAudienceCommand,
 } from "./audience-operation";
+import { operation as overview } from "./generated/platform/get-api-v1-platform-overview";
 
 /** A Platform operation whose declared success (200, 201 or 202) carries a body. */
 export function requestPlatformOperation<Success extends z.ZodTypeAny>(
@@ -39,4 +40,9 @@ export function platformReadQuery<Success extends z.ZodTypeAny>(
     queryKey: platformQueryKey(userPublicId, operation),
     queryFn: ({ signal }) => requestPlatformOperation(operation, {}, signal),
   });
+}
+
+/** One permission-aware overview read shared by the sidebar badges and the dashboard. */
+export function platformOverviewQuery(userPublicId: string) {
+  return queryOptions({ ...platformReadQuery(userPublicId, overview), staleTime: 120_000 });
 }

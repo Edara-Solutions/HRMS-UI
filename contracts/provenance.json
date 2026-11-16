@@ -1,15 +1,15 @@
 {
-  "commit": "e92cb17be19f4377eb325b2cf2fe1e9f6b42c788",
-  "ref": "feat/297-password-policy-contract",
+  "commit": "2b012adb67054fda619836aa2bc2fbf2a9e355fc",
+  "ref": "refactor/split-tier-users",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "67c9a368eaffe8d00db37faad3951787e340b7e4420df27343bc0f782af4ea87"
+      "sha256": "ff0c0178ae5335bd5fcb2d27134c02c53d94d308845f8a82ced8ad7426d2957f"
     },
     "company": {
       "file": "contracts/openapi.company.json",
-      "sha256": "8be0a5e7c2c23f9e69953feae96f06058dc63035046089512a81e4f8a88616e3"
+      "sha256": "1422b971fe82cc640dccfd9e0b7fda5e222d16c0772f396274a7b0d2823af3a7"
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",
@@ -17,7 +17,7 @@
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "27c818c32e35801993a61d3106455dacdcdfd2d477c1d7545fe0603d570bee85"
+      "sha256": "367e47230d3d273bfd54af49c8de72a89437d46940711c968b49ad1ad8ad1282"
     },
     "public": {
       "file": "contracts/openapi.public.json",
@@ -125,6 +125,10 @@
       {
         "file": "get-api-v1-company-notifications-unread-count.ts",
         "key": "GET /api/v1/company/notifications/unread-count"
+      },
+      {
+        "file": "get-api-v1-company-overview.ts",
+        "key": "GET /api/v1/company/overview"
       },
       {
         "file": "get-api-v1-company-permissions.ts",
@@ -589,6 +593,10 @@
       {
         "file": "get-api-v1-platform-notifications-unread-count.ts",
         "key": "GET /api/v1/platform/notifications/unread-count"
+      },
+      {
+        "file": "get-api-v1-platform-overview.ts",
+        "key": "GET /api/v1/platform/overview"
       },
       {
         "file": "get-api-v1-platform-plan-prices-publicid.ts",
