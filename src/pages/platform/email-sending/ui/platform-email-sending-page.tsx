@@ -37,7 +37,7 @@ export function PlatformEmailSendingPage() {
   const pausing = target ? !target.paused : false;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-7">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-7 [overflow-wrap:anywhere]">
       <header className="max-w-2xl border-b border-[var(--color-border)] pb-6">
         <p className="mb-2 flex items-center gap-2 text-xs font-medium text-[var(--color-primary)]">
           <Mail size={14} aria-hidden="true" />

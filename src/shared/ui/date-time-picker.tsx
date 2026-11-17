@@ -186,13 +186,21 @@ export function DateTimePicker({
         size="md"
         disabled={disabled}
         className={
-          label ? "mt-1.5 w-full justify-start font-normal" : "w-full justify-start font-normal"
+          label
+            ? "mt-1.5 w-full min-w-0 justify-start font-normal [&>span]:min-w-0"
+            : "w-full min-w-0 justify-start font-normal [&>span]:min-w-0"
         }
         aria-label={accessibleLabel}
         leadingIcon={<CalendarDays size={15} aria-hidden="true" />}
         onClick={openPicker}
       >
-        <span className={value ? "text-[var(--color-text)]" : "text-[var(--color-text-faint)]"}>
+        <span
+          className={
+            value
+              ? "min-w-0 truncate text-[var(--color-text)]"
+              : "min-w-0 truncate text-[var(--color-text-faint)]"
+          }
+        >
           {value ? formatDateTimeValue(value, locale, pickerPlaceholder) : pickerPlaceholder}
         </span>
       </Button>

@@ -106,14 +106,14 @@ export function DeliveryFiltersCard({ filters, onSearch, onReset }: DeliveryFilt
       <CardContent className="p-4 sm:p-5">
         <form onSubmit={submit} aria-label={t("filters.title")}>
           <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span
                 aria-hidden="true"
                 className="flex size-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
               >
                 <Filter size={15} />
               </span>
-              <div>
+              <div className="min-w-0">
                 <CardTitle>{t("filters.title")}</CardTitle>
                 <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">{t("filters.hint")}</p>
               </div>
@@ -123,17 +123,23 @@ export function DeliveryFiltersCard({ filters, onSearch, onReset }: DeliveryFilt
                 type="button"
                 variant="ghost"
                 size="sm"
+                className="h-auto min-h-8 whitespace-normal py-1.5"
                 onClick={onReset}
                 leadingIcon={<RotateCcw size={13} aria-hidden="true" />}
               >
                 {t("filters.reset")}
               </Button>
-              <Button type="submit" size="sm" leadingIcon={<Search size={14} aria-hidden="true" />}>
+              <Button
+                type="submit"
+                size="sm"
+                className="h-auto min-h-8 whitespace-normal py-1.5"
+                leadingIcon={<Search size={14} aria-hidden="true" />}
+              >
                 {t("filters.search")}
               </Button>
             </div>
           </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[repeat(2,minmax(0,1fr))] xl:grid-cols-[repeat(4,minmax(0,1fr))]">
             <div>
               <Label htmlFor="delivery-context">{t("filters.context.label")}</Label>
               <Select value={context} onValueChange={setContext}>

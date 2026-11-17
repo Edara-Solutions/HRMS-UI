@@ -121,6 +121,7 @@ test("delivery detail minimizes disclosure and rechecks state", async ({ page },
   await expect(dialog).not.toContainText("provider-message-canary");
   await expect(dialog).not.toContainText("failure-canary");
   await expect(dialog).not.toContainText("business-canary");
+  await page.screenshot({ path: info.outputPath("delivery-detail.png") });
   await dialog.getByRole("button", { name: copy["actions.retry"], exact: true }).click();
   const confirm = page.getByRole("dialog").last();
   await confirm.getByLabel(copy["actions.reasonLabel"]).fill("Retry after repair");
