@@ -63,13 +63,29 @@ export function requestListQuery(userPublicId: string, search: RequestSearch) {
     queryFn: ({ signal }) => requestPlatformOperation(operations.requests, { query }, signal),
     select: (value) => ({
       meta: value.meta,
-      items: value.items.map(({ publicId, status, lead, plan, createdAt }) => ({
-        publicId,
-        status,
-        name: lead.companyName,
-        plan: plan.name,
-        createdAt,
-      })),
+      items: value.items.map((item) => {
+        const decider = item.status === "APPROVED" ? item.approvedBy : item.rejectedBy;
+        const decidedAt = item.status === "APPROVED" ? item.approvedAt : item.rejectedAt;
+        return {
+          publicId: item.publicId,
+          status: item.status,
+          name: item.lead.companyName,
+          industry: item.lead.industry,
+          size: item.lead.companySizeRange,
+          plan: item.plan.name,
+          requester: item.requester
+            ? `${item.requester.firstName} ${item.requester.lastName}`
+            : null,
+          decision:
+            item.status !== "PENDING" && decidedAt
+              ? {
+                  by: decider ? `${decider.firstName} ${decider.lastName}` : null,
+                  at: decidedAt,
+                }
+              : null,
+          createdAt: item.createdAt,
+        };
+      }),
     }),
   });
 }

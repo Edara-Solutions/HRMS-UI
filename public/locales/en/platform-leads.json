@@ -318,5 +318,21 @@
   "outcome.access-restricted": "Access is currently restricted. Current records were refreshed.",
   "confirm.typed": "Type {{name}} to confirm",
   "history.createdAt": "Created at",
-  "history.updatedAt": "Updated at"
+  "history.updatedAt": "Updated at",
+  "requests.allStatuses": "All statuses",
+  "requests.reset": "Reset",
+  "requests.industrySize": "Industry / size",
+  "requests.decision": "Decision",
+  "requests.decidedBy": "{{name}} · {{date}}",
+  "requests.created": "Created",
+  "requests.count": "{{count}} requests",
+  "requests.pageOf": "Page {{current}} of {{total}}",
+  "requests.loading": "Loading conversion requests",
+  "requests.empty.title": "No conversion requests",
+  "requests.empty.description": "No requests match these filters.",
+  "requests.error.title": "Couldn't load conversion requests",
+  "requests.error.description": "The list is temporarily unavailable. Try again shortly.",
+  "requests.error.action": "Try again",
+  "requests.contract": "The response could not be verified. This section is unavailable.",
+  "requests.noIndustry": "No industry"
 }
