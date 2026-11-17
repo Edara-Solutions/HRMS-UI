@@ -47,14 +47,12 @@ for (const paused of [false, true])
       await screen.findByRole("button", { name: paused ? "Resume sending" : "Pause sending" }),
     );
     const dialog = screen.getByRole("dialog");
+    const confirm = within(dialog).getByRole("button", { name: paused ? "Resume" : "Pause" });
     if (!paused) {
-      expect(within(dialog).getByRole("button", { name: "Confirm" })).toBeDisabled();
-      await userEvent.type(
-        within(dialog).getByLabelText("Operator reason"),
-        "Investigating incident",
-      );
+      expect(confirm).toBeDisabled();
+      await userEvent.type(within(dialog).getByLabelText("Reason"), "Investigating incident");
     }
-    await userEvent.click(within(dialog).getByRole("button", { name: "Confirm" }));
+    await userEvent.click(confirm);
     await screen.findByText("Action completed.");
     expect(network.calls.find((call) => call.key === operation.key)?.input).toEqual(
       paused
@@ -91,7 +89,8 @@ it("shows context status and a localized update time without exposing actor iden
     }),
   }));
   show();
-  expect(await screen.findByRole("heading", { name: "Company" })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Company sending" })).toBeInTheDocument();
+  expect(screen.getByText("Maintenance")).toBeInTheDocument();
   expect(screen.getByText("Paused")).toBeInTheDocument();
   expect(document.querySelector("time[dateTime='2026-09-26T09:00:00.000Z']")).toBeInTheDocument();
   expect(document.body).not.toHaveTextContent("12345");

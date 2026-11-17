@@ -89,9 +89,9 @@ test("sending pause names the context and submits one command", async ({ page },
   await page.getByRole("button", { name: copy.pause, exact: true }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText(copy["context.EDARA"]);
-  await expect(dialog.getByRole("button", { name: copy.confirm, exact: true })).toBeDisabled();
+  await expect(dialog.getByRole("button", { name: copy.confirmPause, exact: true })).toBeDisabled();
   await dialog.getByLabel(copy.reason).fill("Investigating incident");
-  await dialog.getByRole("button", { name: copy.confirm, exact: true }).click();
+  await dialog.getByRole("button", { name: copy.confirmPause, exact: true }).click();
   await expect(page.getByText(copy["result.success"], { exact: true })).toBeVisible();
   expect(
     calls.filter((call) => call.key === "POST /api/v1/platform/emails/sending/EDARA/pause"),

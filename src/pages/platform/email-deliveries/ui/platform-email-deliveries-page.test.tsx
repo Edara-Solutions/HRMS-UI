@@ -161,3 +161,51 @@ vi.mock("@/shared/api/operation-request", async (original) => {
       operationNetwork.current.execute(client, operation, input, actual.OperationRefusal),
   };
 });
+
+it("names a known failure kind, keeps an unknown one neutral, and shows the timeline", async () => {
+  searchState.deliveryId = platformCommunicationsIds.companyDeliveryId;
+  searchState.deliveryContext = "COMPANY";
+  const { network, show } = communicationsRender(
+    <PlatformEmailDeliveriesPage />,
+    platformCommunicationsPermissions.deliveries,
+  );
+  network.on(operations.deliveries.key, () => ({ status: 200, body: deliveriesBody() }));
+  network.on(operations.delivery.key, () => ({
+    status: 200,
+    body: deliveryBody({
+      status: "FAILED",
+      lastFailureKind: "SMTP_PERMANENT",
+      timeline: [
+        { stage: "ENQUEUED", occurredAt: "2026-09-26T09:00:00.000Z", attemptNumber: 1 },
+        {
+          stage: "FAILED",
+          occurredAt: "2026-09-26T09:01:00.000Z",
+          attemptNumber: 1,
+          failureKind: "kind-canary",
+        },
+      ],
+    }),
+  }));
+  show();
+  const dialog = await screen.findByRole("dialog");
+  expect(await within(dialog).findByText("Permanent SMTP rejection")).toBeInTheDocument();
+  const timeline = within(dialog).getByRole("region", { name: "Attempt timeline" });
+  expect(within(timeline).getByText("2 events")).toBeInTheDocument();
+  expect(within(timeline).getByText("Attempt 1 · Unclassified failure")).toBeInTheDocument();
+  expect(document.body).not.toHaveTextContent("kind-canary");
+});
+
+it("counts the matches in the footer and resets every filter at once", async () => {
+  searchState.status = "FAILED";
+  searchState.recipientEmail = "s@company.test";
+  const { network, show } = communicationsRender(
+    <PlatformEmailDeliveriesPage />,
+    platformCommunicationsPermissions.deliveries,
+  );
+  network.on(operations.deliveries.key, () => ({ status: 200, body: deliveriesBody() }));
+  show();
+  expect(await screen.findByText("1 deliveries")).toBeInTheDocument();
+  expect(screen.getByText("Page 1 of 1")).toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: "Reset" }));
+  expect(navigationCalls.at(-1)).toMatchObject({ href: "/" });
+});
