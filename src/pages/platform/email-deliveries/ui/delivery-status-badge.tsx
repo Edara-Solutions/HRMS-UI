@@ -13,5 +13,9 @@ const tone: Record<DeliveryStatus, "default" | "success" | "warning" | "danger" 
 
 export function DeliveryStatusBadge({ status }: { status: DeliveryStatus }) {
   const { t } = useTranslation("platform-email-deliveries");
-  return <Badge variant={tone[status]}>{t(`status.${status}`)}</Badge>;
+  return (
+    <Badge variant={tone[status]} className="shrink-0 whitespace-nowrap">
+      {t(`status.${status}`)}
+    </Badge>
+  );
 }

@@ -41,7 +41,7 @@ export function PlatformEmailDeliveriesPage() {
   const lastShown = Math.min(firstShown + (data?.items.length ?? 0) - 1, totalItems);
 
   return (
-    <div className="mx-auto min-w-0 max-w-[1480px] space-y-4 [overflow-wrap:anywhere]">
+    <div className="mx-auto min-w-0 max-w-[1480px] space-y-4">
       <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[26px] font-bold tracking-tight text-[var(--color-text)]">

@@ -37,7 +37,7 @@ export function PlatformEmailSendingPage() {
   const pausing = target ? !target.paused : false;
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-7 [overflow-wrap:anywhere]">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-7">
       <header className="max-w-2xl border-b border-[var(--color-border)] pb-6">
         <p className="mb-2 flex items-center gap-2 text-xs font-medium text-[var(--color-primary)]">
           <Mail size={14} aria-hidden="true" />
@@ -198,7 +198,10 @@ function SendingContextCard({ status, disabled, onChange }: SendingContextCardPr
             </p>
           </div>
         </div>
-        <Badge variant={status.paused ? "warning" : "success"}>
+        <Badge
+          variant={status.paused ? "warning" : "success"}
+          className="shrink-0 whitespace-nowrap"
+        >
           {t(status.paused ? "paused" : "active")}
         </Badge>
       </CardHeader>
@@ -212,7 +215,7 @@ function SendingContextCard({ status, disabled, onChange }: SendingContextCardPr
             <dt className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-faint)]">
               {t("reason")}
             </dt>
-            <dd className="mt-0.5 text-xs text-[var(--color-text)]">
+            <dd className="mt-0.5 break-words text-xs text-[var(--color-text)]">
               <bdi dir="auto">{status.reason}</bdi>
             </dd>
           </dl>
