@@ -1,0 +1,23 @@
+{
+  "trigger": "Search",
+  "triggerLabel": "Search pages and records",
+  "title": "Search",
+  "placeholder": "Search pages, people and records…",
+  "hint": "Type at least 2 characters to search records.",
+  "empty": "No matches.",
+  "loading": "Searching…",
+  "group.pages": "Pages",
+  "group.people": "People",
+  "group.staff": "Platform people",
+  "group.companies": "Companies",
+  "group.leads": "Leads",
+  "rateLimited": "Too many searches. Wait a moment, then retry.",
+  "failed": "This group could not be searched.",
+  "retry": "Retry",
+  "help.label": "Help",
+  "help.title": "Keyboard shortcuts",
+  "help.open": "Open search",
+  "help.move": "Move between results",
+  "help.go": "Open the selected result",
+  "help.close": "Close search or menu"
+}

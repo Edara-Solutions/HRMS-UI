@@ -14,7 +14,12 @@ import { useCompanySession } from "@/shared/auth";
 import { companySessionFixture } from "../../test/audience-fixtures";
 import { json, stubNetwork } from "../../test/network-fixtures";
 import { AudienceSessionChanged } from "./audience-operation";
-import { companyQueryKey, companyReadQuery, requestCompanyOperation } from "./company-operation";
+import {
+  companyOverviewQuery,
+  companyQueryKey,
+  companyReadQuery,
+  requestCompanyOperation,
+} from "./company-operation";
 import { companyOrganizationOperations as operations } from "./company-operations";
 import { ContractViolation } from "./generated/runtime";
 
@@ -86,5 +91,23 @@ describe("session-scoped Company operations", () => {
     await expect(requestCompanyOperation(operations.registry, {})).rejects.toBeInstanceOf(
       ContractViolation,
     );
+  });
+
+  it.each([
+    [undefined, ""],
+    ["recentActivity", "?include=recentActivity"],
+  ] as const)("reads the overview with include=%s through the contract", async (include, search) => {
+    const urls: string[] = [];
+    stubNetwork({
+      "GET /api/v1/company/overview": (request) => {
+        urls.push(new URL(request.url).search);
+        return json({});
+      },
+    });
+    const query = companyOverviewQuery("11111111-1111-4111-8111-111111111111", include);
+    await expect(
+      query.queryFn?.({ signal: new AbortController().signal } as never),
+    ).resolves.toEqual({});
+    expect(urls).toEqual([search]);
   });
 });

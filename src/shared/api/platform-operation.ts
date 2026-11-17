@@ -42,7 +42,12 @@ export function platformReadQuery<Success extends z.ZodTypeAny>(
   });
 }
 
-/** One permission-aware overview read shared by the sidebar badges and the dashboard. */
-export function platformOverviewQuery(userPublicId: string) {
-  return queryOptions({ ...platformReadQuery(userPublicId, overview), staleTime: 120_000 });
+/** The permission-aware overview: counts only for the sidebar, with recent activity for the dashboard. */
+export function platformOverviewQuery(userPublicId: string, include?: "recentActivity") {
+  const query = include ? { include } : {};
+  return queryOptions({
+    queryKey: platformQueryKey(userPublicId, overview, include ?? "counts"),
+    queryFn: ({ signal }) => requestPlatformOperation(overview, { query }, signal),
+    staleTime: 120_000,
+  });
 }

@@ -2,7 +2,9 @@
 import { z } from "zod";
 import { defineOperation } from "../runtime";
 
-export const requestSchema = z.object({}).strict();
+export const requestSchema = z
+  .object({ query: z.object({ include: z.literal("recentActivity").optional() }).strict() })
+  .strict();
 export const responseSchemas = {
   "200": z
     .object({
@@ -2062,6 +2064,41 @@ export const responseSchemas = {
         .optional(),
     })
     .strict(),
+  "400": z.object({
+    type: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    title: z.string(),
+    status: z.number().int().min(400).max(599),
+    detail: z.string(),
+    instance: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    traceId: z.string().regex(/^[0-9a-f]{32}$/),
+    invalidParams: z.array(z.string().min(1)).optional(),
+    code: z.literal("COMPANY_ACCESS_DENIED").optional(),
+    mode: z
+      .union([
+        z.literal("NORMAL"),
+        z.literal("READ_ONLY"),
+        z.literal("FROZEN"),
+        z.literal("BLOCKED"),
+        z.literal("MAINTENANCE"),
+      ])
+      .optional(),
+    reason: z.union([z.string().max(255), z.null()]).optional(),
+    effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
+  }),
   "401": z.object({
     type: z.string().refine((value) => {
       try {

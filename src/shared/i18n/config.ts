@@ -17,6 +17,7 @@ void i18next
     defaultNS: "common",
     ns: [
       "common",
+      "command-palette",
       "auth",
       "audit",
       "notification",

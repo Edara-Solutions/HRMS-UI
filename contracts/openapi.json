@@ -52032,6 +52032,16 @@
             "in": "query",
             "name": "pageSize",
             "required": false
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "search",
+            "required": false
           }
         ],
         "x-edara-audience": "PLATFORM",
@@ -60473,6 +60483,16 @@
             },
             "in": "query",
             "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "minLength": 1,
+              "maxLength": 100,
+              "type": "string"
+            },
+            "in": "query",
+            "name": "search",
             "required": false
           }
         ],
@@ -161887,6 +161907,19 @@
         "tags": [
           "Company Overview"
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recentActivity"
+              ]
+            },
+            "in": "query",
+            "name": "include",
+            "required": false
+          }
+        ],
         "x-edara-audience": "COMPANY",
         "x-edara-authorization": "AUTH",
         "responses": {
@@ -172449,6 +172482,118 @@
               }
             }
           },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Default Response",
             "content": {
@@ -172681,6 +172826,19 @@
         "summary": "Read the Platform dashboard overview, limited to what the operator may read",
         "tags": [
           "Platform Overview"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recentActivity"
+              ]
+            },
+            "in": "query",
+            "name": "include",
+            "required": false
+          }
         ],
         "x-edara-audience": "PLATFORM",
         "x-edara-authorization": "AUTH",
@@ -201349,6 +201507,118 @@
                           }
                         ]
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   }
                 }
