@@ -54,9 +54,8 @@ describe("Lead registry", () => {
       audience: "platform",
       input: { query: { page: 1, pageSize: 10, isArchived: false } },
     });
-    fireEvent.change(screen.getByLabelText("Status", { exact: true }), {
-      target: { value: "QUALIFIED" },
-    });
+    fireEvent.click(screen.getByRole("combobox", { name: "Filter by status" }));
+    fireEvent.click(screen.getByRole("option", { name: "Qualified" }));
     expect(navigations.at(-1)).toMatchObject({
       to: "/platform/leads",
       search: { status: "QUALIFIED", page: 1 },
@@ -125,7 +124,7 @@ describe("Lead registry", () => {
   });
   it("renders empty records without inventing conversion actions", async () => {
     open({ items: [], meta: pageMeta() });
-    expect(await screen.findByText("No records found.")).toBeInTheDocument();
+    expect(await screen.findByText("No leads yet")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Convert immediately" })).toBeNull();
   });
   it.each([

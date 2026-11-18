@@ -155,7 +155,8 @@ for (const crossed of [false, true])
     const { calls, company } = await open(page, arabic, {}, leadPermissions, crossed);
     await page.goto("/platform/leads");
     await expect(page.getByRole("link", { name: "Acme Lead" })).toBeVisible();
-    await page.getByLabel(copy["field.status"], { exact: true }).selectOption("QUALIFIED");
+    await page.getByRole("combobox", { name: copy["leads.statusLabel"] }).click();
+    await page.getByRole("option", { name: copy["enum.QUALIFIED"], exact: true }).click();
     await expect(page).toHaveURL(/status=QUALIFIED/);
     await page.getByRole("link", { name: "Acme Lead" }).click();
     await expect(page.getByText("verify-acme", { exact: true })).toBeVisible();
@@ -376,7 +377,7 @@ test("empty and loading registry states remain bounded", async ({ page }, info) 
   await page.goto("/platform/leads");
   await expect(page.getByRole("status")).toBeVisible();
   release();
-  await expect(page.getByText(copy.empty, { exact: true })).toBeVisible();
+  await expect(page.getByText(copy["leads.empty.title"], { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: copy.next, exact: true })).toBeDisabled();
 });
 test("typed delete confirmation supports Escape, focus return and keyboard completion", async ({

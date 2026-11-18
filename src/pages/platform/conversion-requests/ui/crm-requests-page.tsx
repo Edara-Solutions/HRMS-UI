@@ -181,6 +181,7 @@ export function PlatformConversionRequestsPage({ search }: { search: RequestSear
           )}
           {error && (
             <EmptyState
+              role="alert"
               icon={ClipboardCheck}
               title={t("requests.error.title")}
               description={
