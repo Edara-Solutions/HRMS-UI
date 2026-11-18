@@ -57,7 +57,12 @@ export function companyEmailReadinessQuery(userPublicId: string) {
   return companyReadQuery(userPublicId, emailReadiness);
 }
 
-/** One permission-aware overview read shared by the sidebar badges and the dashboard. */
-export function companyOverviewQuery(userPublicId: string) {
-  return queryOptions({ ...companyReadQuery(userPublicId, overview), staleTime: 120_000 });
+/** The permission-aware overview: counts only for the sidebar, with recent activity for the dashboard. */
+export function companyOverviewQuery(userPublicId: string, include?: "recentActivity") {
+  const query = include ? { include } : {};
+  return queryOptions({
+    queryKey: companyQueryKey(userPublicId, overview, include ?? "counts"),
+    queryFn: ({ signal }) => requestCompanyOperation(overview, { query }, signal),
+    staleTime: 120_000,
+  });
 }

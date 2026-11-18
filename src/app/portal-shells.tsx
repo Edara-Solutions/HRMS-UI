@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
+import { CommandPalette, HelpMenu, type PaletteIdentity } from "@/features/command-palette";
 import { NotificationBell, NotificationToaster } from "@/features/notification";
 import { companyOverviewQuery, platformOverviewQuery } from "@/shared/api";
 import { useCompanySession, usePlatformSession } from "@/shared/auth";
@@ -10,14 +11,28 @@ import {
   buildNavGroups,
   Header,
   isUpcomingModulesEnabled,
+  type NavGroup,
   SessionFooter,
 } from "@/widgets/app-shell";
 
-/** Each audience header carries its own bell; a header has no per-render input, so both are built once. */
-const companyHeader = <Header notifications={<NotificationBell />} />;
-const platformHeader = <Header notifications={<NotificationBell />} />;
 const showUpcoming = isUpcomingModulesEnabled();
 const platformBadgeReads = ["companies:read", "leads:read", "lead-conversion-requests:read"];
+const notifications = <NotificationBell />;
+const help = <HelpMenu />;
+
+function palettePages(groups: readonly NavGroup[]) {
+  return groups.flatMap((group) =>
+    group.items.flatMap((item) => (item.upcoming ? [] : [{ label: item.label, href: item.href }])),
+  );
+}
+
+function ShellHeader({ identity, groups }: { identity: PaletteIdentity; groups: NavGroup[] }) {
+  const search = useMemo(
+    () => <CommandPalette identity={identity} pages={palettePages(groups)} />,
+    [identity, groups],
+  );
+  return <Header search={search} help={help} notifications={notifications} />;
+}
 
 export function CompanyShell({ children }: { children: ReactNode }) {
   const session = useCompanySession((state) => state.session);
@@ -28,7 +43,28 @@ export function CompanyShell({ children }: { children: ReactNode }) {
     ...companyOverviewQuery(session?.user.publicId ?? ""),
     enabled: session !== null && readsPeople,
   });
-  if (!session) return null;
+  const identity = useMemo<PaletteIdentity | null>(
+    () =>
+      session && {
+        audience: "company",
+        userPublicId: session.user.publicId,
+        permissions: session.user.permissions,
+        owner: session.user.isOwner,
+      },
+    [session],
+  );
+  const people = overview?.people?.total;
+  const groups = useMemo(
+    () =>
+      identity
+        ? buildNavGroups({ ...identity, authenticated: true }, locale, {
+            showUpcoming,
+            counts: { people },
+          })
+        : [],
+    [identity, locale, people],
+  );
+  if (!session || !identity) return null;
   return (
     <AppShell
       branding={{
@@ -36,18 +72,9 @@ export function CompanyShell({ children }: { children: ReactNode }) {
         subtitle: locale === "ar" ? "إدارة الأفراد" : "People Operations",
         icon: <span>E</span>,
       }}
-      groups={buildNavGroups(
-        {
-          audience: "company",
-          authenticated: true,
-          permissions: session.user.permissions,
-          owner: session.user.isOwner,
-        },
-        locale,
-        { showUpcoming, counts: { people: overview?.people?.total } },
-      )}
+      groups={groups}
       preferenceScope={`company:${session.user.publicId}`}
-      header={companyHeader}
+      header={<ShellHeader identity={identity} groups={groups} />}
       identity={(collapsed) => <SessionFooter collapsed={collapsed} />}
     >
       {children}
@@ -65,7 +92,29 @@ export function PlatformShell({ children }: { children: ReactNode }) {
     ...platformOverviewQuery(session?.user.publicId ?? ""),
     enabled: session !== null && readsBadges,
   });
-  if (!session) return null;
+  const identity = useMemo<PaletteIdentity | null>(
+    () =>
+      session && {
+        audience: "platform",
+        userPublicId: session.user.publicId,
+        permissions: session.user.permissions,
+      },
+    [session],
+  );
+  const companies = overview?.companies?.total;
+  const leads = overview?.leads?.open;
+  const pending = overview?.conversionRequests?.pending;
+  const groups = useMemo(
+    () =>
+      identity
+        ? buildNavGroups({ ...identity, authenticated: true }, locale, {
+            showUpcoming,
+            counts: { companies, leads, "conversion-requests": pending },
+          })
+        : [],
+    [identity, locale, companies, leads, pending],
+  );
+  if (!session || !identity) return null;
   return (
     <AppShell
       branding={{
@@ -73,20 +122,9 @@ export function PlatformShell({ children }: { children: ReactNode }) {
         subtitle: locale === "ar" ? "وحدة العمليات" : "Operations Console",
         icon: <Shield size={14} />,
       }}
-      groups={buildNavGroups(
-        { audience: "platform", authenticated: true, permissions: session.user.permissions },
-        locale,
-        {
-          showUpcoming,
-          counts: {
-            companies: overview?.companies?.total,
-            leads: overview?.leads?.open,
-            "conversion-requests": overview?.conversionRequests?.pending,
-          },
-        },
-      )}
+      groups={groups}
       preferenceScope={`platform:${session.user.publicId}`}
-      header={platformHeader}
+      header={<ShellHeader identity={identity} groups={groups} />}
       identity={(collapsed) => <SessionFooter collapsed={collapsed} />}
     >
       {children}

@@ -8,6 +8,7 @@ export const requestSchema = z
       .object({
         page: z.number().int().min(1).optional(),
         limit: z.number().int().min(1).max(100).optional(),
+        search: z.string().min(1).max(100).optional(),
       })
       .strict(),
   })

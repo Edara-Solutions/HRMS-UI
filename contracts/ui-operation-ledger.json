@@ -259,7 +259,10 @@
   {
     "key": "GET /api/v1/company/users",
     "audience": "company",
-    "consumers": ["src/pages/company/people/api/people.ts"]
+    "consumers": [
+      "src/features/command-palette/model/palette-sources.ts",
+      "src/pages/company/people/api/people.ts"
+    ]
   },
   {
     "key": "GET /api/v1/company/users/{publicId}",
@@ -375,6 +378,7 @@
     "key": "GET /api/v1/platform/companies",
     "audience": "platform",
     "consumers": [
+      "src/features/command-palette/model/palette-sources.ts",
       "src/pages/platform/announcements/api/announcements.ts",
       "src/pages/platform/audit/api/audit-companies.ts",
       "src/pages/platform/companies/api/companies.ts",
@@ -488,7 +492,10 @@
   {
     "key": "GET /api/v1/platform/leads",
     "audience": "platform",
-    "consumers": ["src/pages/platform/leads/api/registry.ts"]
+    "consumers": [
+      "src/features/command-palette/model/palette-sources.ts",
+      "src/pages/platform/leads/api/registry.ts"
+    ]
   },
   {
     "key": "GET /api/v1/platform/leads/{leadPublicId}/sending-domain",
@@ -606,7 +613,10 @@
   {
     "key": "GET /api/v1/platform/users",
     "audience": "platform",
-    "consumers": ["src/pages/platform/people/api/people.ts"]
+    "consumers": [
+      "src/features/command-palette/model/palette-sources.ts",
+      "src/pages/platform/people/api/people.ts"
+    ]
   },
   {
     "key": "GET /api/v1/platform/users/{publicId}",

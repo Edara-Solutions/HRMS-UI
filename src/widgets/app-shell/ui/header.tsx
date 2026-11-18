@@ -4,10 +4,18 @@ import { Avatar } from "@/shared/ui/avatar";
 import { LocaleSwitcher } from "@/shared/ui/locale-switcher";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
-export function Header({ notifications }: { notifications?: ReactNode }) {
+interface HeaderProps {
+  search?: ReactNode;
+  help?: ReactNode;
+  notifications?: ReactNode;
+}
+
+export function Header({ search, help, notifications }: HeaderProps) {
   const user = useCurrentSession()?.user;
   return (
-    <header className="flex min-h-14 shrink-0 items-center justify-end gap-2 border-b border-[var(--color-border)] bg-[var(--color-bg)] px-3 sm:px-6">
+    <header className="flex min-h-14 shrink-0 items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-bg)] px-3 sm:px-6">
+      <div className="me-auto flex min-w-0 items-center">{search}</div>
+      {help}
       {notifications}
       <ThemeToggle />
       <LocaleSwitcher />
