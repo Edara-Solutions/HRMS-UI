@@ -58,6 +58,8 @@ export function companyEmailReadinessQuery(userPublicId: string) {
 }
 
 /** The permission-aware overview: counts only for the sidebar, with recent activity for the dashboard. */
+export type CompanyOverview = z.output<(typeof overview)["responses"]["200"]>;
+
 export function companyOverviewQuery(userPublicId: string, include?: "recentActivity") {
   const query = include ? { include } : {};
   return queryOptions({

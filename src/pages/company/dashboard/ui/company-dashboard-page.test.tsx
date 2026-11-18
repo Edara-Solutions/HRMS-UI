@@ -1,16 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useCompanySession } from "@/shared/auth";
 import { companySessionFixture } from "../../../../test/audience-fixtures";
 import {
   accessPolicyBody,
-  activationBody,
-  organizationCanaries,
   registryBody,
-  setupBody,
-  setupStep,
+  stepIds,
   subscriptionBody,
 } from "../../../../test/company-organization-fixtures";
 import type { createOperationNetwork } from "../../../../test/operation-fakes";
@@ -28,34 +25,43 @@ vi.mock("@tanstack/react-router", async (original) => ({
 
 const everyRead = [
   "companies:read",
-  "company-activation:read",
   "company-subscriptions:read",
   "company-access-policies:read",
-  "company-setup:read",
   "companies:email-readiness:read",
-  "company-profiles:read",
+  "users:read",
+  "users:create",
 ];
 
+const fullOverview = {
+  people: {
+    total: 12,
+    byStatus: { ACTIVE: 9, ONBOARDING: 2, SUSPENDED: 1 },
+    createdThisMonth: 3,
+    createdLastMonth: 4,
+  },
+  invitations: { pending: 2 },
+  roles: { total: 5 },
+  setup: {
+    completed: 1,
+    total: 4,
+    nextSteps: [{ publicId: stepIds.roles, stepType: "SET_ROLES", status: "PENDING" }],
+  },
+  recentActivity: [],
+};
+
 function renderDashboard(
+  overview: unknown = fullOverview,
   permissions: string[] = everyRead,
   override: (net: ReturnType<typeof createOperationNetwork>) => void = () => {},
 ) {
   operationNetwork.install();
   const net = operationNetwork.current;
+  net.on("GET /api/v1/company/overview", () => ({ status: 200, body: overview }));
   net.on("GET /api/v1/company/registry", () => ({ status: 200, body: registryBody() }));
-  net.on("GET /api/v1/company/activation", () => ({ status: 200, body: activationBody() }));
   net.on("GET /api/v1/company/subscription", () => ({ status: 200, body: subscriptionBody() }));
   net.on("GET /api/v1/company/access-policy", () => ({
     status: 200,
-    body: accessPolicyBody("READ_ONLY", "Billing review"),
-  }));
-  net.on("GET /api/v1/company/setup", () => ({
-    status: 200,
-    body: setupBody([
-      setupStep("SET_COMPANY_PROFILE", "COMPLETED"),
-      setupStep("SET_ROLES", "PENDING"),
-      setupStep("SET_BRANCHES", "SKIPPED"),
-    ]),
+    body: accessPolicyBody("NORMAL", null),
   }));
   net.on("GET /api/v1/company/email-readiness", () => ({
     status: 200,
@@ -78,91 +84,72 @@ afterEach(() => {
   useCompanySession.getState().clearSession();
 });
 
-describe("Company operational dashboard", () => {
-  it("separates the labelled demo overview from permitted organization reads", async () => {
-    renderDashboard();
-    expect(await screen.findByRole("heading", { level: 1, name: "Edara Labs" })).toBeVisible();
-    const activation = screen.getByRole("region", { name: "Activation" });
+describe("Company dashboard", () => {
+  it("builds the cards, status chart and next steps from one overview read with activity", async () => {
+    const net = renderDashboard();
+    const people = await screen.findByRole("region", { name: "People" });
+    expect(within(people).getByText("12")).toBeInTheDocument();
+    expect(within(people).getByText("+3 this month")).toBeInTheDocument();
+    expect(within(people).getByText("4 added last month")).toBeInTheDocument();
     expect(
-      await within(activation).findByText("The organization profile is incomplete"),
-    ).toBeVisible();
-    const setup = screen.getByRole("region", { name: "Setup progress" });
-    expect(await within(setup).findByText("2 of 3 steps resolved")).toBeVisible();
-    expect(within(setup).getByText("1 required step remaining")).toBeVisible();
+      within(screen.getByRole("region", { name: "Pending invitations" })).getByText("2"),
+    ).toBeInTheDocument();
     expect(
-      await within(screen.getByRole("region", { name: "Subscription" })).findByText("Growth"),
-    ).toBeVisible();
-    const access = screen.getByRole("region", { name: "Workspace access" });
-    expect(await within(access).findByText("Read-only")).toBeVisible();
-    expect(within(access).getByText("Billing review")).toBeVisible();
+      within(screen.getByRole("region", { name: "Roles" })).getByText("5"),
+    ).toBeInTheDocument();
     expect(
-      await within(screen.getByRole("region", { name: "Email readiness" })).findByText(
-        "The sending domain is not verified yet.",
-      ),
-    ).toBeVisible();
-    const demo = screen.getByRole("region", { name: "Sample overview · May 2026" });
-    expect(within(demo).getByText("Demo data")).toBeVisible();
-    expect(within(demo).getByText(/not current company records/)).toBeVisible();
-    expect(within(demo).getByText("Sample upcoming events")).toBeVisible();
-    expect(within(demo).getByText("Sample department mix")).toBeVisible();
-    expect(within(demo).getByText("Sample module shortcuts")).toBeVisible();
-    expect(within(demo).getByText("Omar Amin")).toBeVisible();
-    expect(within(demo).getByText("Lina Riad")).toBeVisible();
-    for (const canary of organizationCanaries)
-      expect(document.body.textContent).not.toContain(canary);
+      within(screen.getByRole("region", { name: "Setup progress" })).getByText("1/4"),
+    ).toBeInTheDocument();
+    const byStatus = screen.getByRole("region", { name: "People by status" });
+    expect(within(byStatus).getByText("Onboarding")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Next setup steps" })).getByText("Roles"),
+    ).toBeInTheDocument();
+    expect(net.count("GET /api/v1/company/overview")).toBe(1);
+    expect(net.calls.find((call) => call.key === "GET /api/v1/company/overview")?.input).toEqual({
+      query: { include: "recentActivity" },
+    });
   });
 
-  it("offers no Platform lifecycle, activation or policy commands", async () => {
-    renderDashboard();
-    await screen.findByRole("heading", { level: 1, name: "Edara Labs" });
-    expect(screen.queryByRole("button")).toBeNull();
-    expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual([
-      "/company/setup",
-      "/company/profile",
-    ]);
+  it("leaves out every section the overview does not return", async () => {
+    renderDashboard({ roles: { total: 5 } });
+    await screen.findByRole("region", { name: "Roles" });
+    expect(screen.queryByRole("region", { name: "People" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "People by status" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Next setup steps" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Review setup" })).toBeNull();
   });
 
-  it("omits panels and requests the identity may not read", async () => {
-    const net = renderDashboard(["company-setup:read"]);
-    expect(await screen.findByRole("region", { name: "Setup progress" })).toBeVisible();
-    expect(screen.queryByRole("region", { name: "Activation" })).toBeNull();
-    expect(screen.queryByRole("region", { name: "Subscription" })).toBeNull();
-    await waitFor(() =>
-      expect(net.calls.map((call) => call.key)).toEqual(["GET /api/v1/company/setup"]),
+  it("explains an overview with nothing the role may read", async () => {
+    renderDashboard({});
+    expect(await screen.findByText("Nothing to show yet")).toBeInTheDocument();
+  });
+
+  it("keeps only the compact status rail beside the overview", async () => {
+    const net = renderDashboard();
+    const rail = await screen.findByRole("complementary", { name: "Workspace status" });
+    expect(within(rail).getByRole("region", { name: "Subscription" })).toBeInTheDocument();
+    expect(within(rail).getByRole("region", { name: "Workspace access" })).toBeInTheDocument();
+    expect(await within(rail).findByText("Not ready")).toBeInTheDocument();
+    expect(net.count("GET /api/v1/company/activation")).toBe(0);
+    expect(net.count("GET /api/v1/company/setup")).toBe(0);
+  });
+
+  it("offers Add person only to callers who may create people", async () => {
+    renderDashboard(
+      fullOverview,
+      everyRead.filter((permission) => permission !== "users:create"),
     );
-    expect(screen.getByRole("heading", { level: 1, name: "Company overview" })).toBeVisible();
+    await screen.findByRole("region", { name: "People" });
+    expect(screen.queryByRole("link", { name: "Add person" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Review setup" })).toBeInTheDocument();
   });
 
-  it("isolates a malformed read to its own panel without retrying it", async () => {
-    renderDashboard(everyRead, (net) =>
-      net.on("GET /api/v1/company/subscription", () => ({
-        status: 200,
-        body: { subscription: { status: "UNKNOWN_STATUS" }, history: [] },
-      })),
-    );
-    const subscription = await screen.findByRole("region", { name: "Subscription" });
+  it("does not render an overview that fails the contract", async () => {
+    renderDashboard({ people: { total: "twelve" } });
     expect(
-      await within(subscription).findByText(
-        "This information is temporarily unavailable. Actions that depend on it are paused.",
-      ),
-    ).toBeVisible();
-    expect(within(subscription).queryByRole("button", { name: "Try again" })).toBeNull();
-    expect(
-      await within(screen.getByRole("region", { name: "Setup progress" })).findByText(
-        "2 of 3 steps resolved",
-      ),
-    ).toBeVisible();
-    expect(document.body.textContent).not.toContain("UNKNOWN_STATUS");
-  });
-
-  it("keeps an offline read inside its panel with a manual retry", async () => {
-    renderDashboard(everyRead, (net) =>
-      net.on("GET /api/v1/company/email-readiness", () => {
-        throw new TypeError("Failed to fetch");
-      }),
-    );
-    const email = await screen.findByRole("region", { name: "Email readiness" });
-    expect(await within(email).findByRole("button", { name: "Try again" })).toBeVisible();
-    expect(within(email).getByText("This information could not be loaded.")).toBeVisible();
+      await screen.findByText("The response could not be verified. This section is unavailable."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
   });
 });

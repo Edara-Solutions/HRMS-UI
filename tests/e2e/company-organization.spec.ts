@@ -144,22 +144,49 @@ async function expectCalmLayout(page: Page) {
 test("composes the operational dashboard from session-scoped reads", async ({ page }, info) => {
   const arabic = info.project.name === "chromium-rtl";
   const copy = arabic ? ar : en;
-  const requests = await open(page, { arabic });
+  const requests = await open(page, {
+    arabic,
+    reads: {
+      "GET /api/v1/company/overview": (route) =>
+        route.fulfill({
+          json: {
+            people: {
+              total: 12,
+              byStatus: { ACTIVE: 9, ONBOARDING: 2, SUSPENDED: 1 },
+              createdThisMonth: 3,
+              createdLastMonth: 4,
+            },
+            invitations: { pending: 2 },
+            roles: { total: 5 },
+            setup: {
+              completed: 1,
+              total: 2,
+              nextSteps: [{ publicId: stepIds.roles, stepType: "SET_ROLES", status: "PENDING" }],
+            },
+            recentActivity: [],
+          },
+        }),
+    },
+  });
   await page.goto("/company/dashboard");
   await expect(page.getByRole("heading", { level: 1, name: "Edara Labs" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("dir", arabic ? "rtl" : "ltr");
-  const demo = page.getByRole("region", { name: copy["dashboard.demo.title"] });
-  await expect(demo).toContainText(copy["dashboard.demo.badge"]);
-  await expect(demo).toContainText(copy["dashboard.demo.events"]);
-  await expect(demo).toContainText(copy["dashboard.demo.departmentMix"]);
-  await expect(demo).toContainText(copy["dashboard.demo.shortcuts"]);
-  await expect(page.getByText(copy["requirement.COMPANY_PROFILE_INCOMPLETE"])).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: copy["dashboard.kpi.people"], exact: true }),
+  ).toContainText("12");
+  await expect(page.getByRole("region", { name: copy["dashboard.byStatus.title"] })).toBeVisible();
+  await expect(page.getByRole("region", { name: copy["dashboard.nextSteps.title"] })).toContainText(
+    copy["step.SET_ROLES"],
+  );
   await expect(page.getByText(copy["email.ready"])).toBeVisible();
   await expect(page.getByText("Growth")).toBeVisible();
-  await expect(page.getByRole("link", { name: copy["setup.open"] })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: copy["dashboard.nextSteps.open"] })).toHaveAttribute(
     "href",
     "/company/setup",
   );
+  expect(
+    requests.filter((request) => request.key === "GET /api/v1/company/overview"),
+  ).not.toHaveLength(0);
   await expectCalmLayout(page);
   const companyReads = requests.filter((request) => request.key !== "GET /api/v1/company/me");
   expect(companyReads.every((request) => request.authorization === "Bearer access-canary")).toBe(
