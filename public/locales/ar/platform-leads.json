@@ -318,5 +318,21 @@
   "outcome.access-restricted": "الوصول مقيد حالياً. تم تحديث السجلات الحالية.",
   "confirm.typed": "اكتب {{name}} للتأكيد",
   "history.createdAt": "تاريخ الإنشاء",
-  "history.updatedAt": "تاريخ التحديث"
+  "history.updatedAt": "تاريخ التحديث",
+  "requests.allStatuses": "كل الحالات",
+  "requests.reset": "إعادة تعيين",
+  "requests.industrySize": "القطاع / الحجم",
+  "requests.decision": "القرار",
+  "requests.decidedBy": "{{name}} · {{date}}",
+  "requests.created": "تاريخ الإنشاء",
+  "requests.count": "{{count}} طلب",
+  "requests.pageOf": "صفحة {{current}} من {{total}}",
+  "requests.loading": "جارٍ تحميل طلبات التحويل",
+  "requests.empty.title": "لا توجد طلبات تحويل",
+  "requests.empty.description": "لا توجد طلبات تطابق هذه الفلاتر.",
+  "requests.error.title": "تعذّر تحميل طلبات التحويل",
+  "requests.error.description": "القائمة غير متاحة مؤقتًا. حاول مرة أخرى قريبًا.",
+  "requests.error.action": "حاول مرة أخرى",
+  "requests.contract": "تعذر التحقق من الاستجابة. هذا القسم غير متاح.",
+  "requests.noIndustry": "بدون قطاع"
 }

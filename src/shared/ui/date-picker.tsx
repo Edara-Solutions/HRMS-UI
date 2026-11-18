@@ -53,12 +53,6 @@ function weekdayNames(locale: SupportedLocale): string[] {
   return names;
 }
 
-const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
-
 export function toDateKey(value: Date): string {
   return [
     value.getFullYear(),
@@ -81,15 +75,35 @@ export function parseDateValue(value: string | undefined): Date | undefined {
   return date;
 }
 
-function formatDateValue(value: string | undefined): string {
-  const date = parseDateValue(value);
-  if (!date) return "Choose date";
-  return DATE_FORMATTER.format(date);
-}
-
 const DATE_EDGE_LABEL: Record<DateEdgeType, string> = {
   inclusive: "Inclusive",
   exclusive: "Exclusive",
+};
+
+export interface DatePickerText {
+  description: string;
+  placeholder: string;
+  edge: string;
+  inclusive: string;
+  exclusive: string;
+  previousMonth: string;
+  nextMonth: string;
+  clear: string;
+  cancel: string;
+  apply: string;
+}
+
+const defaultDatePickerText: DatePickerText = {
+  description: "Select the date for this field.",
+  placeholder: "Choose date",
+  edge: "Edge",
+  inclusive: DATE_EDGE_LABEL.inclusive,
+  exclusive: DATE_EDGE_LABEL.exclusive,
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  clear: "Clear",
+  cancel: "Cancel",
+  apply: "Apply date",
 };
 
 export interface CalendarGridProps {
@@ -185,17 +199,25 @@ interface EdgeDateTypeFieldProps {
   id: string;
   value: DateEdgeType;
   onValueChange: (value: DateEdgeType) => void;
+  labels?: Record<DateEdgeType, string>;
+  edgeLabel?: string;
 }
 
-export function EdgeDateTypeField({ id, value, onValueChange }: EdgeDateTypeFieldProps) {
+export function EdgeDateTypeField({
+  id,
+  value,
+  onValueChange,
+  labels = DATE_EDGE_LABEL,
+  edgeLabel = "Edge",
+}: EdgeDateTypeFieldProps) {
+  if (!allowEdgeDateChoice()) return null;
   return (
     <div className="mt-5">
       <Label className="block text-xs" htmlFor={id}>
-        Edge
+        {edgeLabel}
       </Label>
       <Select
         value={value}
-        disabled={!allowEdgeDateChoice()}
         onValueChange={(nextValue) => {
           if (nextValue === "inclusive" || nextValue === "exclusive") onValueChange(nextValue);
         }}
@@ -206,7 +228,7 @@ export function EdgeDateTypeField({ id, value, onValueChange }: EdgeDateTypeFiel
         <SelectContent>
           {dateEdgeTypeValues.map((edgeDateType) => (
             <SelectItem key={edgeDateType} value={edgeDateType}>
-              {DATE_EDGE_LABEL[edgeDateType]}
+              {labels[edgeDateType]}
             </SelectItem>
           ))}
         </SelectContent>
@@ -225,6 +247,8 @@ interface DatePickerProps {
   onEdgeValueChange?: (nextValue: DateEdgeValue | undefined) => void;
   description?: string;
   placeholder?: string;
+  locale?: SupportedLocale;
+  text?: Partial<DatePickerText>;
 }
 
 export function DatePicker({
@@ -235,11 +259,16 @@ export function DatePicker({
   edgeDateType = "inclusive",
   onEdgeDateTypeChange,
   onEdgeValueChange,
-  description = "Select the date for this field.",
-  placeholder = "Choose date",
+  description,
+  placeholder,
+  locale = "en",
+  text,
 }: DatePickerProps) {
+  const copy = { ...defaultDatePickerText, ...text };
+  const pickerPlaceholder = placeholder ?? copy.placeholder;
+  const pickerDescription = description ?? copy.description;
   const { titleId, descriptionId } = useDialogIds();
-  const accessibleLabel = label ?? placeholder;
+  const accessibleLabel = label ?? pickerPlaceholder;
   const selectedDate = parseDateValue(value);
   const initialDraft = selectedDate ?? new Date();
   const [open, setOpen] = useState(false);
@@ -270,14 +299,28 @@ export function DatePicker({
         variant="secondary"
         size="md"
         className={
-          label ? "mt-1.5 w-full justify-start font-normal" : "w-full justify-start font-normal"
+          label
+            ? "mt-1.5 w-full min-w-0 justify-start font-normal [&>span]:min-w-0"
+            : "w-full min-w-0 justify-start font-normal [&>span]:min-w-0"
         }
         aria-label={accessibleLabel}
         leadingIcon={<CalendarDays size={15} aria-hidden="true" />}
         onClick={openPicker}
       >
-        <span className={value ? "text-[var(--color-text)]" : "text-[var(--color-text-faint)]"}>
-          {value ? formatDateValue(value) : placeholder}
+        <span
+          className={
+            selectedDate
+              ? "min-w-0 truncate text-[var(--color-text)]"
+              : "min-w-0 truncate text-[var(--color-text-faint)]"
+          }
+        >
+          {selectedDate
+            ? dateFormatterFor(locale, "picked", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }).format(selectedDate)
+            : pickerPlaceholder}
         </span>
       </Button>
       {label ? <span className="mt-1 block min-h-5" aria-hidden="true" /> : null}
@@ -291,27 +334,32 @@ export function DatePicker({
         <DialogTitle id={titleId} className="tracking-[-0.02em]">
           {accessibleLabel}
         </DialogTitle>
-        <DialogDescription id={descriptionId}>{description}</DialogDescription>
+        <DialogDescription id={descriptionId}>{pickerDescription}</DialogDescription>
         <div className="mt-5">
           <CalendarGrid
             month={month}
             selected={draft}
             onMonthChange={setMonth}
             onSelectDay={selectDay}
+            locale={locale}
+            previousMonthLabel={copy.previousMonth}
+            nextMonthLabel={copy.nextMonth}
           />
         </div>
         <EdgeDateTypeField
           id={`${id}-edge`}
           value={draftEdgeDateType}
           onValueChange={setDraftEdgeDateType}
+          edgeLabel={copy.edge}
+          labels={{ inclusive: copy.inclusive, exclusive: copy.exclusive }}
         />
         <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
           <Button variant="ghost" size="sm" onClick={() => setDraft(undefined)}>
-            Clear
+            {copy.clear}
           </Button>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
-              Cancel
+              {copy.cancel}
             </Button>
             <Button
               size="sm"
@@ -326,7 +374,7 @@ export function DatePicker({
                 setOpen(false);
               }}
             >
-              Apply date
+              {copy.apply}
             </Button>
           </div>
         </div>

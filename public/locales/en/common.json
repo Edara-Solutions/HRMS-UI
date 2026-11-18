@@ -5,5 +5,15 @@
   "query.contract": "The response could not be verified. This section is unavailable.",
   "query.refused": "This section is unavailable with your current access.",
   "query.failed": "This section could not be loaded. You can retry the read.",
-  "date.includeBoundary": "Include this date"
+  "date.includeBoundary": "Include this date",
+  "datePicker.description": "Select the date for this filter.",
+  "datePicker.placeholder": "Choose date",
+  "datePicker.edge": "Boundary",
+  "datePicker.inclusive": "Include this date",
+  "datePicker.exclusive": "Exclude this date",
+  "datePicker.previousMonth": "Previous month",
+  "datePicker.nextMonth": "Next month",
+  "datePicker.clear": "Clear",
+  "datePicker.cancel": "Cancel",
+  "datePicker.apply": "Apply date"
 }
