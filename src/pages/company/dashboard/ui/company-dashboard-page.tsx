@@ -14,11 +14,11 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { KpiCard } from "@/shared/ui/kpi-card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { companyDashboardQueries } from "../api/company-dashboard";
 import { type CompanyOverview, monthTrend, trialDaysRemaining } from "../model/company-dashboard";
 import { DashboardPanel } from "./dashboard-panel";
-import { KpiCard } from "./kpi-card";
 import { NextSetupSteps, PeopleByStatus, RecentActivity } from "./overview-sections";
 
 const actionClassName =

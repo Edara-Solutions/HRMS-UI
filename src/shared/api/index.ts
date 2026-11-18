@@ -69,6 +69,7 @@ export { platformCommunicationsOperations } from "./platform-communications-oper
 export { platformCompanyOperations } from "./platform-company-operations";
 export { platformLeadOperations } from "./platform-lead-operations";
 export {
+  type PlatformOverview,
   platformOverviewQuery,
   platformQueryKey,
   platformReadQuery,
