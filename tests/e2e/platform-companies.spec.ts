@@ -114,19 +114,45 @@ async function noOverflow(page: Page) {
     true,
   );
 }
-test("Platform overview separates sample history from permission-gated live routes", async ({
+test("Platform overview shows only live figures and permission-gated actions", async ({
   page,
 }, info) => {
   const arabic = info.project.name === "chromium-rtl";
   const copy = arabic ? arDashboard : enDashboard;
-  const { requests } = await open(page, arabic, false, {}, [...companyPermissions, "plans:read"]);
+  const { requests } = await open(page, arabic, false, {
+    "GET /api/v1/platform/overview": (route) =>
+      route.fulfill({
+        json: {
+          companies: {
+            total: 10,
+            byLifecycle: { ACTIVE: 8, ONBOARDING: 2 },
+            createdThisMonth: 2,
+            createdLastMonth: 3,
+            latest: [
+              {
+                publicId: companyIds.company,
+                name: "Acme Company",
+                companyCode: "ACME",
+                lifecycleStatus: "ACTIVE",
+                createdAt: "2026-11-10T09:00:00.000Z",
+              },
+            ],
+          },
+        },
+      }),
+  });
   await page.goto("/platform/dashboard");
-  const demo = page.getByRole("region", { name: copy.sampleTitle });
-  await expect(demo).toContainText("Swift Systems");
-  await expect(page.getByRole("main").getByRole("link", { name: copy.plans })).toHaveAttribute(
-    "href",
-    "/platform/plans",
+  await expect(
+    page.getByRole("region", { name: copy["kpi.companies"], exact: true }),
+  ).toContainText("10");
+  await expect(page.getByRole("region", { name: copy["recentCompanies.title"] })).toContainText(
+    "Acme Company",
   );
+  await expect(page.getByRole("link", { name: copy.viewCompanies })).toHaveAttribute(
+    "href",
+    "/platform/companies",
+  );
+  await expect(page.getByRole("main")).not.toContainText(/SAR|99\.8%|Swift Systems/);
   expect(requests.some((request) => request.key.includes("/api/v1/company/"))).toBe(false);
   await noOverflow(page);
 });

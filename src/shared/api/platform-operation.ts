@@ -43,6 +43,8 @@ export function platformReadQuery<Success extends z.ZodTypeAny>(
 }
 
 /** The permission-aware overview: counts only for the sidebar, with recent activity for the dashboard. */
+export type PlatformOverview = z.output<(typeof overview)["responses"]["200"]>;
+
 export function platformOverviewQuery(userPublicId: string, include?: "recentActivity") {
   const query = include ? { include } : {};
   return queryOptions({
