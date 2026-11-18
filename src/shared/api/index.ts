@@ -16,6 +16,7 @@ export { loadCompanyIdentity, loginCompany } from "./company-api";
 export { companyApiClient } from "./company-client";
 export { companyCommunicationsOperations } from "./company-communications-operations";
 export {
+  type CompanyOverview,
   companyAccessPolicyQuery,
   companyEmailReadinessQuery,
   companyOverviewQuery,

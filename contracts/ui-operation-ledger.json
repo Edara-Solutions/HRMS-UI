@@ -103,7 +103,6 @@
     "key": "GET /api/v1/company/activation",
     "audience": "company",
     "consumers": [
-      "src/pages/company/dashboard/api/company-dashboard.ts",
       "src/pages/company/profile/api/company-profile.ts",
       "src/pages/company/setup/api/company-setup.ts"
     ]
@@ -246,7 +245,6 @@
     "key": "GET /api/v1/company/setup",
     "audience": "company",
     "consumers": [
-      "src/pages/company/dashboard/api/company-dashboard.ts",
       "src/pages/company/profile/api/company-profile.ts",
       "src/pages/company/setup/api/company-setup.ts"
     ]

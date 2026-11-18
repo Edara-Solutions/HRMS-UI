@@ -1,9 +1,19 @@
 import type { z } from "zod";
-import type { companyOrganizationOperations } from "@/shared/api";
+import type { CompanyOverview, companyOrganizationOperations } from "@/shared/api";
 
 type Operations = typeof companyOrganizationOperations;
 export type CompanySetup = z.output<Operations["setup"]["responses"]["200"]>;
 export type CompanySubscription = z.output<Operations["subscription"]["responses"]["200"]>;
+export type { CompanyOverview };
+
+export interface MonthTrend {
+  added: number;
+  rising: boolean;
+}
+
+export function monthTrend(thisMonth: number): MonthTrend {
+  return { added: thisMonth, rising: thisMonth > 0 };
+}
 
 export interface SetupProgress {
   resolved: number;
