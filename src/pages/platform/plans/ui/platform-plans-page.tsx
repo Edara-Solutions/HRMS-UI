@@ -18,6 +18,7 @@ import { KpiCard } from "@/shared/ui/kpi-card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { type CatalogueFilters, type Plan, plansQuery } from "../api/catalogue";
 import { supportedPlanFeatures } from "../model/catalogue-form";
+import { formatPlanDate } from "../model/plan-date";
 import { CatalogueEditor } from "./catalogue-editor";
 import { CatalogueFilterForm } from "./catalogue-filters";
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const nowrapBadge = "shrink-0 whitespace-nowrap";
+const header = (label: string) => <span className="whitespace-nowrap">{label}</span>;
 
 const planLink = (publicId: string, label: string) => (
   <Link
@@ -60,15 +62,8 @@ export function PlatformPlansPage({ search }: Props) {
   const create = access.availability(operations.create.key);
   const featureLabel = (code: string) =>
     supportedPlanFeatures.has(code) ? t(`feature.${code}`) : code;
-  const updatedDate = (value: string) =>
-    new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(new Date(value));
   const limitsOf = (plan: Plan) =>
     Object.entries(plan.limits ?? {}).map(([key, value]) => `${t(key)}: ${value}`);
-  const header = (label: string) => <span className="whitespace-nowrap">{label}</span>;
 
   return (
     <div className="mx-auto min-w-0 max-w-[1480px] space-y-4">
@@ -230,7 +225,9 @@ export function PlatformPlansPage({ search }: Props) {
                   className:
                     "whitespace-nowrap tabular-nums text-xs text-[var(--color-text-muted)]",
                   cell: (plan) => (
-                    <time dateTime={plan.updatedAt}>{updatedDate(plan.updatedAt)}</time>
+                    <time dateTime={plan.updatedAt}>
+                      {formatPlanDate(plan.updatedAt, i18n.language)}
+                    </time>
                   ),
                 },
                 {
@@ -287,7 +284,9 @@ export function PlatformPlansPage({ search }: Props) {
                   )}
                   <p className="text-xs text-[var(--color-text-faint)]">
                     {t("updated")}:{" "}
-                    <time dateTime={plan.updatedAt}>{updatedDate(plan.updatedAt)}</time>
+                    <time dateTime={plan.updatedAt}>
+                      {formatPlanDate(plan.updatedAt, i18n.language)}
+                    </time>
                   </p>
                   {canEdit && plan.deletedAt === null && (
                     <Button variant="secondary" size="sm" onClick={() => setEditing(plan)}>

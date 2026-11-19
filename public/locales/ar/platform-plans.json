@@ -109,5 +109,19 @@
   "noLimits": "—",
   "shownFooter": "المطابقة للفلاتر الحالية",
   "inactiveFooter": "{{count}} غير نشطة",
-  "privateFooter": "{{count}} خاصة"
+  "privateFooter": "{{count}} خاصة",
+  "definitionHelp": "ما تتضمنه هذه الخطة وكيف تُعرض.",
+  "pricesHelp": "أسعار صريحة لكل سوق. لا يتم تحويل العملات.",
+  "priceColumn": "السعر",
+  "billingColumn": "الفوترة",
+  "countryColumn": "الدولة",
+  "regionColumn": "المنطقة",
+  "billingEvery": "{{interval}} × {{count}}",
+  "noLimitsSet": "لا توجد حدود",
+  "loadingPlan": "جارٍ تحميل الخطة",
+  "planUnavailable": "الخطة غير متاحة",
+  "planUnavailableHelp": "تعذّر تحميل الخطة. حاول مرة أخرى قريبًا.",
+  "retry": "حاول مرة أخرى",
+  "resolvedEmpty": "اختر العملة وفترة الفوترة لعرض السعر الفعلي.",
+  "inspectInvalid": "أدخل رمز عملة من 3 أحرف. رمز الدولة حرفان وعدد الفترات رقم صحيح."
 }

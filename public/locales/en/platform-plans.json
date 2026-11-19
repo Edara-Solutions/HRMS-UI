@@ -105,5 +105,19 @@
   "noLimits": "—",
   "shownFooter": "Matching the current filters",
   "inactiveFooter": "{{count}} inactive",
-  "privateFooter": "{{count}} private"
+  "privateFooter": "{{count}} private",
+  "definitionHelp": "What this plan includes and how it is offered.",
+  "pricesHelp": "Explicit prices by market. No currency conversion is performed.",
+  "priceColumn": "Price",
+  "billingColumn": "Billing",
+  "countryColumn": "Country",
+  "regionColumn": "Region",
+  "billingEvery": "{{interval}} × {{count}}",
+  "noLimitsSet": "No limits set",
+  "loadingPlan": "Loading plan",
+  "planUnavailable": "Plan unavailable",
+  "planUnavailableHelp": "The plan could not be loaded. Try again shortly.",
+  "retry": "Try again",
+  "resolvedEmpty": "Choose a currency and billing interval to see the effective price.",
+  "inspectInvalid": "Enter a 3-letter currency code. Country is 2 letters and interval count is a whole number."
 }
