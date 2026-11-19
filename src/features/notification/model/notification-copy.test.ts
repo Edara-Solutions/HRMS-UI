@@ -14,8 +14,15 @@ const copyInstance = i18next.createInstance();
 const SAMPLE_PARAMS: Record<string, Record<string, unknown>> = {
   "platform.lead-created": {},
   "platform.conversion-requested": {},
-  "platform.company-activated": {},
-  "platform.conversion-decided": { decision: "approved" },
+  "company.activated": {},
+  "company.conversion-decided": { decision: "approved" },
+  "company.announcement": {
+    announcementPublicId: "a-0",
+    message: {
+      en: { title: "Company notice", body: "A message for your company." },
+      ar: { title: "إشعار للشركة", body: "رسالة لشركتك." },
+    },
+  },
   "platform.announcement": {
     announcementPublicId: "a-1",
     message: {
@@ -28,9 +35,16 @@ const SAMPLE_PARAMS: Record<string, Record<string, unknown>> = {
   "company.user-joined": {},
 };
 
-function copyFor(typeKey: string, locale: SupportedLocale, params = SAMPLE_PARAMS[typeKey]) {
+function copyFor(
+  typeKey: string,
+  locale: SupportedLocale,
+  params = SAMPLE_PARAMS[typeKey] ?? {},
+  typeVersion = 1,
+) {
+  const tier = typeKey.startsWith("platform.") ? "platform" : "company";
   return resolveNotificationCopy(
-    { typeKey, params },
+    tier,
+    { typeKey, typeVersion, params },
     copyInstance.getFixedT(locale, "notification"),
     locale,
   );
@@ -71,8 +85,8 @@ describe("resolveNotificationCopy", () => {
   });
 
   it("localizes closed enum params instead of interpolating the raw value", () => {
-    expect(copyFor("platform.conversion-decided", "en")?.title).toContain("approved");
-    expect(copyFor("platform.conversion-decided", "ar")?.title).toContain("مقبول");
+    expect(copyFor("company.conversion-decided", "en")?.title).toContain("approved");
+    expect(copyFor("company.conversion-decided", "ar")?.title).toContain("مقبول");
   });
 
   it("takes the announcement's authored prose from params, falling back to en", () => {
@@ -85,7 +99,22 @@ describe("resolveNotificationCopy", () => {
     expect(copyFor("platform.announcement", "ar", englishOnly)?.title).toBe("Only English");
   });
 
-  it("skips a type key the mirror does not know", () => {
-    expect(copyFor("platform.not-in-catalog", "en", {})).toBeNull();
+  it("gives an unknown type, a newer version, or another audience's type neutral copy", () => {
+    const neutral = { title: "New notification", body: "There is an update in your workspace." };
+    expect(copyFor("company.not-in-catalog", "en", { secret: "raw-param-canary" })).toEqual(
+      neutral,
+    );
+    expect(copyFor("company.role-assigned", "en", { roleName: "Payroll Manager" }, 2)).toEqual(
+      neutral,
+    );
+    expect(
+      resolveNotificationCopy(
+        "company",
+        { typeKey: "platform.lead-created", typeVersion: 1, params: {} },
+        copyInstance.getFixedT("en", "notification"),
+        "en",
+      ),
+    ).toEqual(neutral);
+    expect(copyFor("company.not-in-catalog", "ar", {}).title).toBe("إشعار جديد");
   });
 });

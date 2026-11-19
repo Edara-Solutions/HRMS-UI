@@ -1,227 +1,242 @@
-﻿import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../../test/audience-fixtures";
+import {
+  accessPolicyBody,
+  activationBody,
+  organizationCanaries,
+  profileBody,
+  setupBody,
+  setupStep,
+  stepIds,
+} from "../../../../test/company-organization-fixtures";
+import { problemBody } from "../../../../test/operation-fakes";
+import { operationNetwork } from "../../../../test/operation-request-mock";
 import { CompanySetupPage } from "./company-setup-page";
 
-const mocks = vi.hoisted(() => ({
-  navigate: vi.fn(),
-  useCurrentSession: vi.fn(),
-  useCompanyProfile: vi.fn(),
-  useCompanySetupChecklist: vi.fn(),
-  useCompanyActivation: vi.fn(),
-  useStartSetupStep: vi.fn(),
-  useCompleteSetupStep: vi.fn(),
-  useSkipSetupStep: vi.fn(),
-}));
-
-vi.mock("@tanstack/react-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@tanstack/react-router")>()),
-  Link: ({ children, to, ...props }: { children: ReactNode; to: string }) => (
-    <a href={to} {...props}>
+vi.mock("@tanstack/react-router", async (original) => ({
+  ...(await original<typeof import("@tanstack/react-router")>()),
+  Link: ({ children, to, className }: { children: ReactNode; to: string; className?: string }) => (
+    <a href={to} className={className}>
       {children}
     </a>
   ),
-  useNavigate: () => mocks.navigate,
 }));
 
-vi.mock("@/shared/auth", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/auth")>()),
-  useCurrentSession: mocks.useCurrentSession,
-}));
+const setupRead = "GET /api/v1/company/setup";
+const startKey = "POST /api/v1/company/setup/{stepPublicId}/start";
+const completeKey = "POST /api/v1/company/setup/{stepPublicId}/complete";
+const skipKey = "POST /api/v1/company/setup/{stepPublicId}/skip";
+const allPermissions = [
+  "company-setup:read",
+  "company-setup:update",
+  "company-profiles:read",
+  "company-activation:read",
+  "company-access-policies:read",
+  "companies:read",
+];
 
-vi.mock("../api/company-setup", () => ({
-  useCompanyProfile: mocks.useCompanyProfile,
-  useCompanySetupChecklist: mocks.useCompanySetupChecklist,
-  useCompanyActivation: mocks.useCompanyActivation,
-  useStartSetupStep: mocks.useStartSetupStep,
-  useCompleteSetupStep: mocks.useCompleteSetupStep,
-  useSkipSetupStep: mocks.useSkipSetupStep,
-}));
-
-const SESSION = {
-  accessToken: "token",
-  refreshToken: "refresh",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: {
-    publicId: "owner-1",
-    employeeCode: "OWNER-001",
-    firstName: "Nadia",
-    lastName: "Hassan",
-    email: "owner@example.com",
-    status: "ACTIVE",
-    companyCode: "NW",
-    companyPublicId: "company-1",
-    mustChangePassword: false,
-    permissions: [],
-    isOwner: true,
-    isPlatformAdmin: false,
-  },
-};
-
-const PROFILE = {
-  publicId: "profile-1",
-  companyPublicId: "company-1",
-  name: "Northwind Egypt",
-  logoUrl: null,
-  email: "owner@example.com",
-  phone: null,
-  country: null,
-  city: null,
-  addressLine: null,
-  taxNumber: null,
-  commercialNumber: null,
-  status: "INCOMPLETE",
-  createdAt: "2026-07-27T09:00:00.000Z",
-  updatedAt: "2026-07-27T09:00:00.000Z",
-};
-
-const STEPS = {
-  companyPublicId: "company-1",
-  templateVersion: 2,
-  steps: [
-    {
-      publicId: "22222222-2222-4222-8222-222222222222",
-      stepType: "SET_ROLES",
-      status: "PENDING",
-      isRequired: true,
-      sequence: 2,
-      templateVersion: 2,
-      dependencies: ["SET_COMPANY_PROFILE"],
-      startedAt: null,
-      completedAt: null,
-      createdAt: "2026-07-27T09:10:00.000Z",
-      updatedAt: "2026-07-27T09:10:00.000Z",
-    },
-    {
-      publicId: "11111111-1111-4111-8111-111111111111",
-      stepType: "SET_COMPANY_PROFILE",
-      status: "PENDING",
-      isRequired: true,
-      sequence: 1,
-      templateVersion: 2,
-      dependencies: [],
-      startedAt: null,
-      completedAt: null,
-      createdAt: "2026-07-27T09:00:00.000Z",
-      updatedAt: "2026-07-27T09:00:00.000Z",
-    },
-  ],
-};
-
-const ACTIVATION = {
-  companyPublicId: "company-1",
-  lifecycleStatus: "ONBOARDING",
-  activatedAt: null,
-  canActivate: false,
-  unmetRequirements: [
-    {
-      code: "COMPANY_PROFILE_INCOMPLETE",
-      message: "Fill the profile first.",
-      details: {},
-    },
-  ],
-};
-
-function deferred<T>() {
-  let resolve!: (value: T | PromiseLike<T>) => void;
-  const promise = new Promise<T>((value) => {
-    resolve = value;
-  });
-  return { promise, resolve };
+function renderSetup({
+  permissions = allPermissions,
+  steps = [setupStep("SET_COMPANY_PROFILE", "IN_PROGRESS"), setupStep("SET_ROLES", "PENDING")],
+  mode = "NORMAL",
+  profileStatus = "COMPLETE",
+}: {
+  permissions?: string[];
+  steps?: ReturnType<typeof setupStep>[];
+  mode?: string;
+  profileStatus?: string;
+} = {}) {
+  operationNetwork.install();
+  const current = operationNetwork.current;
+  current.on(setupRead, () => ({ status: 200, body: setupBody(steps) }));
+  current.on("GET /api/v1/company/profile", () => ({
+    status: 200,
+    body: profileBody({ status: profileStatus }),
+  }));
+  current.on("GET /api/v1/company/activation", () => ({ status: 200, body: activationBody() }));
+  current.on("GET /api/v1/company/access-policy", () => ({
+    status: 200,
+    body: accessPolicyBody(mode),
+  }));
+  current.on("GET /api/v1/company/registry", () => ({ status: 200, body: {} }));
+  useCompanySession.getState().setSession(companySessionFixture({ permissions }));
+  const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={queries}>
+      <CompanySetupPage />
+    </QueryClientProvider>,
+  );
+  return current;
 }
 
-function setOwnerSession() {
-  mocks.useCurrentSession.mockReturnValue({
-    accessToken: SESSION.accessToken,
-    refreshToken: SESSION.refreshToken,
-    sessionId: SESSION.sessionId,
-    expiresIn: SESSION.expiresIn,
-    user: SESSION.user,
-  });
-}
+afterEach(() => {
+  cleanup();
+  useCompanySession.getState().clearSession();
+});
 
-function setDefaultQueries() {
-  mocks.useCompanyProfile.mockReturnValue({
-    data: PROFILE,
-    isPending: false,
-    isError: false,
-    refetch: vi.fn(),
-  });
-  mocks.useCompanySetupChecklist.mockReturnValue({
-    data: STEPS,
-    isPending: false,
-    isError: false,
-    refetch: vi.fn(),
-  });
-  mocks.useCompanyActivation.mockReturnValue({
-    data: ACTIVATION,
-    refetch: vi.fn(),
-  });
-}
-
-function renderPage() {
-  render(<CompanySetupPage />);
-}
-
-describe("CompanySetupPage", () => {
-  beforeEach(() => {
-    setOwnerSession();
-    setDefaultQueries();
-    mocks.useStartSetupStep.mockReturnValue({ mutateAsync: vi.fn() });
-    mocks.useCompleteSetupStep.mockReturnValue({ mutateAsync: vi.fn() });
-    mocks.useSkipSetupStep.mockReturnValue({ mutateAsync: vi.fn() });
-  });
-
-  afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
-
-  it("renders steps sorted by sequence and keeps profile completion disabled until the profile is authoritative", () => {
-    renderPage();
-
-    const titles = screen.getAllByRole("heading", { level: 3 }).map((node) => node.textContent);
-    expect(titles).toEqual([
-      "Profile snapshot",
-      "Company profile",
-      "Roles",
-      "Activation",
-      "Checklist snapshot",
-    ]);
-    expect(screen.getByRole("button", { name: "Complete Company profile" })).toBeDisabled();
-    expect(
-      screen.getByText("Step public ID: 11111111-1111-4111-8111-111111111111"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Step public ID: 22222222-2222-4222-8222-222222222222"),
-    ).toBeInTheDocument();
-  });
-
-  it("marks only the active command as loading while a step command is in flight", async () => {
-    const start = deferred<{ publicId: string }>();
-    const startMutation = vi.fn(() => start.promise);
-    mocks.useStartSetupStep.mockReturnValue({ mutateAsync: startMutation });
-    renderPage();
-
-    const startButton = screen.getByRole("button", { name: "Start Roles" });
-    const completeButton = screen.getByRole("button", { name: "Complete Roles" });
-    const skipButton = screen.getByRole("button", { name: "Skip Roles" });
-
-    fireEvent.click(startButton);
-
-    expect(startMutation).toHaveBeenCalledWith({
-      companyPublicId: "company-1",
-      stepPublicId: "22222222-2222-4222-8222-222222222222",
+describe("Company setup checklist", () => {
+  it("offers only the transitions valid for each step's current server state", async () => {
+    renderSetup({
+      steps: [
+        setupStep("SET_COMPANY_PROFILE", "COMPLETED"),
+        setupStep("SET_ROLES", "IN_PROGRESS"),
+        setupStep("SET_BRANCHES", "PENDING"),
+      ],
     });
-    expect(startButton).toBeDisabled();
-    expect(startButton).toHaveAttribute("aria-busy", "true");
-    expect(completeButton).toBeEnabled();
-    expect(skipButton).toBeEnabled();
+    const profile = await screen.findByRole("listitem", { name: "Organization profile" });
+    expect(within(profile).queryByRole("button")).toBeNull();
+    const roles = screen.getByRole("listitem", { name: "Roles" });
+    expect(within(roles).getByRole("button", { name: "Complete Roles" })).toBeEnabled();
+    expect(within(roles).queryByRole("button", { name: "Start Roles" })).toBeNull();
+    const branches = screen.getByRole("listitem", { name: "Branches" });
+    expect(within(branches).getByRole("button", { name: "Start Branches" })).toBeEnabled();
+    expect(within(branches).queryByRole("button", { name: "Complete Branches" })).toBeNull();
+  });
 
-    await act(async () => {
-      start.resolve({ publicId: "22222222-2222-4222-8222-222222222222" });
-      await start.promise;
+  it("starts a step with its public ID only and applies the authoritative result", async () => {
+    const net = renderSetup();
+    net.on(startKey, () => ({ status: 200, body: setupStep("SET_ROLES", "IN_PROGRESS") }));
+    fireEvent.click(await screen.findByRole("button", { name: "Start Roles" }));
+    expect(await screen.findByText("Roles started.")).toBeInTheDocument();
+    expect(net.calls.find((call) => call.key === startKey)).toEqual({
+      audience: "company",
+      key: startKey,
+      input: { params: { stepPublicId: stepIds.roles } },
     });
+    expect(net.count(setupRead)).toBeGreaterThanOrEqual(2);
+  });
+
+  it("reconciles a stale transition instead of claiming it and never retries it", async () => {
+    const net = renderSetup();
+    net.on(startKey, () => ({ status: 400, body: problemBody(400) }));
+    fireEvent.click(await screen.findByRole("button", { name: "Start Roles" }));
+    expect(
+      await screen.findByText(
+        "This step changed since you opened the checklist. It has been refreshed; review it before trying again.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(net.count(setupRead)).toBe(2));
+    expect(net.count(startKey)).toBe(1);
+    expect(screen.queryByText("Roles started.")).toBeNull();
+  });
+
+  it("keeps an ambiguous failure uncertain and re-reads before another attempt", async () => {
+    const net = renderSetup();
+    net.on(completeKey, () => {
+      throw new TypeError("Failed to fetch");
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Complete Organization profile" }));
+    expect(
+      await screen.findByText(
+        "We could not confirm the change. The checklist was refreshed; check the step before trying again.",
+      ),
+    ).toBeInTheDocument();
+    expect(net.count(completeKey)).toBe(1);
+    await waitFor(() => expect(net.count(setupRead)).toBe(2));
+  });
+
+  it("disables completing the profile step until the organization profile is complete", async () => {
+    renderSetup({ profileStatus: "INCOMPLETE" });
+    const complete = await screen.findByRole("button", { name: "Complete Organization profile" });
+    await waitFor(() => expect(complete).toBeDisabled());
+    expect(screen.getAllByText("Complete the organization profile first.").length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getAllByRole("link", { name: "Open organization profile" })[0]).toHaveAttribute(
+      "href",
+      "/company/profile",
+    );
+  });
+
+  it.each([
+    "READ_ONLY",
+    "FROZEN",
+    "MAINTENANCE",
+  ])("keeps reads but disables every transition in %s mode", async (mode) => {
+    renderSetup({ mode });
+    const start = await screen.findByRole("button", { name: "Start Roles" });
+    await waitFor(() => expect(start).toBeDisabled());
+    expect(screen.getByRole("heading", { level: 2, name: /Your company workspace/ })).toBeVisible();
+  });
+
+  it("records a validated access refusal against the policy and disables transitions", async () => {
+    const net = renderSetup();
+    net.on(startKey, () => ({
+      status: 403,
+      body: problemBody(403, { code: "COMPANY_ACCESS_DENIED", mode: "READ_ONLY" }),
+    }));
+    net.on("GET /api/v1/company/access-policy", () => ({
+      status: 200,
+      body: accessPolicyBody("READ_ONLY", "Billing review"),
+    }));
+    fireEvent.click(await screen.findByRole("button", { name: "Start Roles" }));
+    expect(
+      await screen.findByText(
+        "Changes are paused for your company workspace. The checklist was refreshed.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Start Roles" })).toBeDisabled());
+    expect(await screen.findByText("Billing review")).toBeInTheDocument();
+    expect(net.count(startKey)).toBe(1);
+  });
+
+  it("fails closed with an honest reason when the access mode cannot be read", async () => {
+    const net = renderSetup({ permissions: ["company-setup:read", "company-setup:update"] });
+    const start = await screen.findByRole("button", { name: "Start Roles" });
+    expect(start).toBeDisabled();
+    expect(
+      screen.getAllByText(
+        "Changes are unavailable because your workspace access could not be confirmed.",
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(net.count("GET /api/v1/company/access-policy")).toBe(0);
+  });
+
+  it("hides transitions without the update permission and hides unpermitted reads", async () => {
+    const net = renderSetup({ permissions: ["company-setup:read"] });
+    await screen.findByRole("listitem", { name: "Roles" });
+    expect(screen.queryByRole("button", { name: /Start|Complete|Skip/ })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Activation" })).toBeNull();
+    expect(net.count("GET /api/v1/company/profile")).toBe(0);
+    expect(net.count("GET /api/v1/company/activation")).toBe(0);
+  });
+
+  it("confirms a skip, names the consequence, and can be cancelled", async () => {
+    const net = renderSetup();
+    net.on(skipKey, () => ({ status: 200, body: setupStep("SET_ROLES", "SKIPPED") }));
+    fireEvent.click(await screen.findByRole("button", { name: "Skip Roles" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("This step is required.");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(net.count(skipKey)).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: "Skip Roles" }));
+    fireEvent.click(
+      within(await screen.findByRole("dialog")).getByRole("button", { name: "Skip" }),
+    );
+    expect(await screen.findByText("Roles skipped.")).toBeInTheDocument();
+    expect(net.count(skipKey)).toBe(1);
+  });
+
+  it("pauses actions after a malformed transition response", async () => {
+    const net = renderSetup();
+    net.on(startKey, () => ({ status: 200, body: { publicId: "not-a-step" } }));
+    fireEvent.click(await screen.findByRole("button", { name: "Start Roles" }));
+    expect(
+      await screen.findByText(
+        "Setup actions are paused because a response could not be verified. Reload the page later.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Start Roles" })).toBeDisabled());
+  });
+
+  it("never renders identifiers or backend free text", async () => {
+    renderSetup();
+    await screen.findByText("The organization profile is incomplete");
+    for (const canary of [...organizationCanaries, stepIds.profile, stepIds.roles])
+      expect(document.body.textContent).not.toContain(canary);
   });
 });

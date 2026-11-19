@@ -1,4 +1,4 @@
-// The event-metadata table the Admin Portal reads, collected from the vendored contract.
+// The event-metadata table the Platform portal reads, collected from the vendored contract.
 // The backend annotates each response arm with what its catalog definition knows; this
 // reads those annotations back out, so the table cannot drift from the catalog.
 
@@ -97,7 +97,7 @@ export interface AuditEventMetadata {
   /** The only Audit Actor kinds that can ever be attributed to this event (ADR-0005). */
   actors: readonly (
     | "USER"
-    | "PLATFORM_ADMIN"
+    | "PLATFORM_USER"
     | "SYSTEM"
     | "ANONYMOUS"
     | "ATTRIBUTION_FAILED"

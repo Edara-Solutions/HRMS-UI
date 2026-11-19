@@ -2,11 +2,20 @@ import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 
-export default defineConfig({
+const platformNoIndex = (enabled: boolean): Plugin => ({
+  name: "platform-noindex",
+  transformIndexHtml: () =>
+    enabled
+      ? [{ tag: "meta", attrs: { name: "robots", content: "noindex, nofollow" }, injectTo: "head" }]
+      : [],
+});
+
+export default defineConfig(({ mode }) => ({
   envPrefix: ["VITE_", "ALLOW_"],
   plugins: [
+    platformNoIndex(loadEnv(mode, process.cwd(), "VITE_").VITE_ENABLE_PLATFORM_PORTAL === "true"),
     tanstackRouter({
       target: "react",
       routesDirectory: "src/app/routes",
@@ -28,15 +37,22 @@ export default defineConfig({
     },
   },
   build: {
-    // ApexCharts is an intentional core dashboard dependency. Keep it out of
-    // the app shell, then budget the known chart vendor chunk explicitly.
+    // Budget the shared vendor chunk separately from route-specific contracts.
     chunkSizeWarningLimit: 650,
     rollupOptions: {
       output: {
+        onlyExplicitManualChunks: true,
         manualChunks(id) {
-          if (id.includes("apexcharts") || id.includes("react-apexcharts")) {
-            return "charts";
-          }
+          const path = id.replaceAll("\\", "/");
+          if (path.includes("/node_modules/")) return "vendor";
+          if (
+            path.includes("/src/shared/public-api/") ||
+            /\/src\/shared\/api\/(public-api|config)\.ts$/.test(path)
+          )
+            return "public-transport";
+          if (/\/src\/shared\/(ui|lib|config|i18n)\//.test(path)) return "presentation";
+          if (/\/src\/shared\/api\/generated\/(runtime|metadata)\.ts$/.test(path))
+            return "contract-runtime";
         },
       },
     },
@@ -45,4 +61,4 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
   },
-});
+}));

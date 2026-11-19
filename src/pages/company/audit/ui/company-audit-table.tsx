@@ -7,18 +7,11 @@ import {
   type AuditDensity,
   AuditDensityControl,
   AuditEventRow,
-  DegradedAuditEventRow,
   keyAuditRecords,
   UnavailableAuditEventRow,
   useAuditRowExpansion,
 } from "@/widgets/audit-detail";
 import type { CompanyAuditTrailItem } from "../api/audit";
-
-function isUnrecognized(
-  event: CompanyAuditTrailItem,
-): event is Extract<CompanyAuditTrailItem, { eventType: "__unrecognized__" }> {
-  return event.eventType === "__unrecognized__";
-}
 
 function isUnavailable(
   event: CompanyAuditTrailItem,
@@ -68,19 +61,6 @@ export function CompanyAuditTable({ items, onActorSelect }: CompanyAuditTablePro
               const detailId = `company-audit-detail-${rowKey.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
               const toggle = () => expansion.toggle(rowKey);
 
-              if (isUnrecognized(event)) {
-                return (
-                  <DegradedAuditEventRow
-                    key={rowKey}
-                    raw={event.raw}
-                    expanded={expanded}
-                    detailId={detailId}
-                    columnCount={4}
-                    locale={locale}
-                    onToggle={toggle}
-                  />
-                );
-              }
               if (isUnavailable(event)) {
                 return (
                   <UnavailableAuditEventRow

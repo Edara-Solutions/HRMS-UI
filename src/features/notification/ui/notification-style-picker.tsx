@@ -7,6 +7,7 @@ import { cn } from "@/shared/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { focusRovingChoice, nextRovingChoice } from "../lib/roving-choice";
 import { NOTIFICATION_LIST_STYLES } from "../model/notification-list-style";
+import { useNotificationPreference } from "../model/use-notification-preference";
 import { NotificationStylePreview } from "./notification-style-preview";
 
 interface NotificationStylePickerProps {
@@ -17,8 +18,7 @@ interface NotificationStylePickerProps {
 export function NotificationStylePicker({ onBack }: NotificationStylePickerProps) {
   const { t } = useTranslation("notification", { useSuspense: false });
   const locale = usePreferencesStore((preferences) => preferences.locale);
-  const selected = usePreferencesStore((preferences) => preferences.notificationListStyle);
-  const setStyle = usePreferencesStore((preferences) => preferences.setNotificationListStyle);
+  const { selected, setStyle } = useNotificationPreference();
   const optionsRef = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState(selected);
 

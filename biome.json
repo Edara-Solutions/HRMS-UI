@@ -14,11 +14,14 @@
       "!test-results",
       "!.agents",
       "!.claude",
+      "!.worktrees",
       "!contracts/openapi.json",
+      "!contracts/openapi.company.json",
+      "!contracts/openapi.delegated.json",
+      "!contracts/openapi.platform.json",
+      "!contracts/openapi.public.json",
       "!contracts/audit-label-keys.json",
-      "!src/routeTree.gen.ts",
-      "!src/shared/api/schema.d.ts",
-      "!src/shared/api/lead-contract.d.ts"
+      "!src/routeTree.gen.ts"
     ]
   },
   "formatter": {

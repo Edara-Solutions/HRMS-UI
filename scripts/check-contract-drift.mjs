@@ -19,13 +19,25 @@ for (const { generator } of derivedArtifacts) {
   execFileSync(process.execPath, ["run", generator], { cwd: frontendRoot, stdio: "inherit" });
 }
 
-const trackedPaths = derivedArtifacts.flatMap(({ outputs }) =>
-  outputs.map((output) => relative(frontendRoot, output).replaceAll("\\", "/")),
-);
+const generatedContractPaths = execFileSync("git", ["ls-files", "--", "src/shared/api/generated"], {
+  cwd: frontendRoot,
+  encoding: "utf-8",
+})
+  .trim()
+  .split(/\r?\n/)
+  .filter(Boolean);
+const trackedPaths = [
+  ...new Set([
+    ...derivedArtifacts.flatMap(({ outputs }) =>
+      outputs.map((output) => relative(frontendRoot, output).replaceAll("\\", "/")),
+    ),
+    ...generatedContractPaths,
+  ]),
+];
 
 const untracked = execFileSync(
   "git",
-  ["ls-files", "--others", "--exclude-standard", "--", ...trackedPaths],
+  ["ls-files", "--others", "--exclude-standard", "--", "src/shared/api/generated", ...trackedPaths],
   { cwd: frontendRoot, encoding: "utf-8" },
 ).trim();
 if (untracked) {
@@ -43,11 +55,7 @@ try {
 
 console.log(`contract artifacts up to date -> ${trackedPaths.join(", ")}`);
 
-// The key set is generated, but the labels behind it are hand-authored, so the drift
-// gate above cannot see a catalog event nobody has named yet.
-if (!reportAuditLabels()) {
-  process.exit(1);
-}
+if (!reportAuditLabels()) process.exit(1);
 
 function fail(message) {
   console.error(`\n${message}`);

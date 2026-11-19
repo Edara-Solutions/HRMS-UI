@@ -62,7 +62,7 @@ export function AuditFilterPopover({
   return (
     <div
       ref={rootRef}
-      className="relative inline-flex items-center"
+      className="relative inline-flex min-w-0 max-w-full items-center"
       onKeyDown={(event) => {
         if (event.key !== "Escape" || !open) return;
         closeAndRestoreFocus();
@@ -75,6 +75,7 @@ export function AuditFilterPopover({
         size="sm"
         className={cn(
           auditChipClassName,
+          "min-w-0 max-w-full flex-1 [&>span]:min-w-0 [&>span]:max-w-full [&>span>span]:min-w-0",
           active && auditChipActiveClassName,
           clearable && "rounded-e-none border-e-0",
         )}
@@ -91,7 +92,7 @@ export function AuditFilterPopover({
         }
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{label}</span>
+        <span className="truncate">{label}</span>
         {active ? (
           // The chip is the trigger and already focusable, so the clipped summary inside it
           // offers its full value on hover without adding a second tab stop.
@@ -108,7 +109,11 @@ export function AuditFilterPopover({
           variant="secondary"
           size="sm"
           iconOnly
-          className={cn(auditChipClassName, auditChipActiveClassName, "rounded-s-none px-1.5")}
+          className={cn(
+            auditChipClassName,
+            auditChipActiveClassName,
+            "shrink-0 rounded-s-none px-1.5",
+          )}
           aria-label={t("chrome.clearNamedFilter", { filter: label })}
           title={t("chrome.clearNamedFilter", { filter: label })}
           onClick={onClear}

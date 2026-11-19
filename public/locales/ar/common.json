@@ -1,3 +1,19 @@
 {
-  "appName": "HRMS"
+  "appName": "HRMS",
+  "loading": "جار التحميل",
+  "retry": "إعادة القراءة",
+  "query.contract": "تعذر التحقق من الاستجابة. هذا القسم غير متاح.",
+  "query.refused": "هذا القسم غير متاح بصلاحياتك الحالية.",
+  "query.failed": "تعذر تحميل هذا القسم. يمكنك إعادة القراءة.",
+  "date.includeBoundary": "تضمين هذا التاريخ",
+  "datePicker.description": "اختر التاريخ لهذا الفلتر.",
+  "datePicker.placeholder": "اختر التاريخ",
+  "datePicker.edge": "الحد",
+  "datePicker.inclusive": "تضمين هذا التاريخ",
+  "datePicker.exclusive": "استبعاد هذا التاريخ",
+  "datePicker.previousMonth": "الشهر السابق",
+  "datePicker.nextMonth": "الشهر التالي",
+  "datePicker.clear": "مسح",
+  "datePicker.cancel": "إلغاء",
+  "datePicker.apply": "تطبيق التاريخ"
 }

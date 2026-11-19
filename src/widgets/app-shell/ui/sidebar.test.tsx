@@ -1,94 +1,81 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, PermissionAction, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
-import type { NavGroup } from "../model/nav-items";
-import { adminNavGroups, companyNavGroups } from "../model/nav-items";
-import { Sidebar } from "./sidebar";
+import { AudienceSessionProvider, useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
+import { buildNavGroups } from "../model/nav-items";
+import { SessionFooter, Sidebar } from "./sidebar";
 
-// The sidebar only needs a location and a navigate; a full router would add no coverage.
-vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
-  return {
-    ...actual,
-    Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
-    useLocation: () => ({ pathname: "/" }),
-    useNavigate: () => vi.fn(),
-  };
+vi.mock("@tanstack/react-router", () => ({
+  useLocation: () => ({ pathname: "/company/people" }),
+  Link: ({ to, children, ...props }: { to: string; children: React.ReactNode }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+  useNavigate: () => vi.fn(),
+}));
+afterEach(() => {
+  cleanup();
+  useCompanySession.getState().clearSession();
 });
 
-function signIn(overrides: Partial<SessionUser> & { permissions: PermissionAction[] }) {
-  useAuthStore.setState({
-    status: "authenticated",
-    session: {
-      accessToken: "access",
-      refreshToken: "refresh",
-      sessionId: "session",
-      expiresIn: 900,
-      user: {
-        publicId: "11111111-1111-4111-8111-111111111111",
-        employeeCode: "E-1",
-        firstName: "Dana",
-        lastName: "Reed",
-        email: "dana@example.com",
-        status: "ACTIVE",
-        companyCode: "NW",
-        companyPublicId: null,
-        mustChangePassword: false,
-        isOwner: false,
-        isPlatformAdmin: false,
-        ...overrides,
-      },
-    } satisfies AuthSession,
-  });
-}
-
-function renderSidebar(groups: NavGroup[]) {
+function renderSidebar(collapsed: boolean) {
+  useCompanySession.getState().setSession(companySessionFixture());
   render(
-    <Sidebar
-      groups={groups}
-      portalLabel="Edara"
-      portalSubtitle="Portal"
-      portalIcon={<span>E</span>}
-      collapsed={false}
-      onToggleCollapsed={vi.fn()}
-    />,
+    <QueryClientProvider client={new QueryClient()}>
+      <AudienceSessionProvider audience="company">
+        <Sidebar
+          groups={buildNavGroups(
+            { audience: "company", authenticated: true, permissions: ["users:read"] },
+            "en",
+            { showUpcoming: true, counts: { people: 42 } },
+          )}
+          portalLabel="Edara"
+          portalSubtitle="People Operations"
+          portalIcon={<span>E</span>}
+          collapsed={collapsed}
+          onToggleCollapsed={vi.fn()}
+          footer={<SessionFooter collapsed={collapsed} />}
+        />
+      </AudienceSessionProvider>
+    </QueryClientProvider>,
   );
 }
 
-afterEach(() => {
-  cleanup();
-  useAuthStore.setState({ session: null, status: "anonymous" });
-});
-
-describe.each([
-  { portal: "Company", groups: companyNavGroups, label: "Audit log" },
-  { portal: "Admin", groups: adminNavGroups, label: "Audit Log" },
-])("$portal audit nav entry", ({ groups, label }) => {
-  it("is hidden for an identity without audit-events:read", () => {
-    signIn({ permissions: ["users:read"] });
-    renderSidebar(groups);
-
-    expect(screen.queryByRole("link", { name: label })).not.toBeInTheDocument();
-  });
-
-  it("is shown for an identity granted audit-events:read", () => {
-    signIn({ permissions: ["audit-events:read"] });
-    renderSidebar(groups);
-
-    expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
-  });
-
-  // Both portals bypass the permission list for these identities, exactly as the backend
-  // guard does, so neither may be hidden by the new nav field.
+describe("sidebar", () => {
   it.each([
-    { identity: "an owner", grants: { isOwner: true } },
-    { identity: "a platform admin", grants: { isPlatformAdmin: true } },
-  ])("is shown for $identity holding no explicit grant", ({ grants }) => {
-    signIn({ permissions: [], ...grants });
-    renderSidebar(groups);
+    false,
+    true,
+  ])("renders Soon entries as disabled text, never links (collapsed=%s)", (collapsed) => {
+    renderSidebar(collapsed);
+    const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(hrefs).toEqual(["/company/dashboard", "/company/people"]);
+    expect(screen.getByRole("link", { name: /People/ })).toHaveAttribute("aria-current", "page");
+    expect(document.querySelectorAll('[aria-disabled="true"]')).toHaveLength(10);
+  });
 
-    expect(screen.getByRole("link", { name: label })).toBeInTheDocument();
+  it("shows the People count expanded and only a dot collapsed", () => {
+    renderSidebar(false);
+    expect(within(screen.getByRole("link", { name: /People/ })).getByText("42")).toBeVisible();
+    cleanup();
+    renderSidebar(true);
+    expect(screen.queryByText("42")).not.toBeInTheDocument();
+  });
+
+  it("holds the me-pages and Sign out in the user menu", () => {
+    renderSidebar(false);
+    fireEvent.click(screen.getByRole("button", { name: "User menu" }));
+    const menu = screen.getByRole("menu");
+    expect(
+      within(menu)
+        .getAllByRole("menuitem")
+        .map((item) => item.textContent),
+    ).toEqual(["My profile", "Security", "My sessions", "Sign out"]);
+    expect([...menu.querySelectorAll("a")].map((link) => link.getAttribute("href"))).toEqual([
+      "/company/me/profile",
+      "/company/me/security",
+      "/company/me/sessions",
+    ]);
   });
 });

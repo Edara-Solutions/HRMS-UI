@@ -1,11 +1,23 @@
 import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
+import { dirname, resolve } from "node:path";
 
-const serverUrl = "http://127.0.0.1:3000";
+const require = createRequire(import.meta.url);
+const serverUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const serverAddress = new URL(serverUrl);
 const serverTimeoutMs = 60_000;
-const serverCommand = ["bun", "./node_modules/vite/bin/vite.js", "--host", "127.0.0.1"];
+const serverCommand = [
+  "bun",
+  resolve(dirname(require.resolve("vite/package.json")), "bin/vite.js"),
+  "--host",
+  serverAddress.hostname,
+  "--port",
+  serverAddress.port || "3000",
+  "--strictPort",
+];
 const playwrightCommand = [
   "node",
-  "./node_modules/@playwright/test/cli.js",
+  resolve(dirname(require.resolve("@playwright/test/package.json")), "cli.js"),
   "test",
   ...process.argv.slice(2),
 ];

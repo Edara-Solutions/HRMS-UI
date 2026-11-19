@@ -31,7 +31,7 @@ export async function readBackendErrorMessage(response: Response): Promise<strin
 }
 
 /**
- * Maps a login/admin-login failure to the message the user should see.
+ * Maps an audience login failure to the message the user should see.
  * Distinct account-state messages are passed through verbatim — they are
  * already actionable below the throttle line; everything else collapses to
  * one of the three fixed, enumeration-safe messages.

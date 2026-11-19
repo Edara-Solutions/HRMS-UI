@@ -1,18 +1,17 @@
 import { useEffect, useRef } from "react";
-import type { NotificationFeedItem } from "../api/notification-feed";
-import { useNotificationFeed } from "../api/notification-feed";
+import { type NotificationFeedItem, useNotificationFeed } from "../api/notification-feed";
 import {
   SEEN_BATCH_LIMIT,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useMarkNotificationsSeen,
 } from "../api/notification-lifecycle";
-import { NOTIFICATION_CATALOG } from "../model/notification-catalog";
 import {
   type NotificationRowState,
   notificationRowState,
   useBulkReadCursor,
 } from "../model/notification-read-state";
+import { scopeKey, useNotificationScope } from "../model/notification-tier";
 
 export interface NotificationRowModel {
   readonly item: NotificationFeedItem;
@@ -32,7 +31,7 @@ export interface NotificationCenter {
   readonly fetchNextPage: () => void;
   /** Reading a row by opening it: an already-read row owes the server nothing. */
   readonly activate: (row: NotificationRowModel) => void;
-  readonly markRead: (id: number) => void;
+  readonly markRead: (publicId: string) => void;
   readonly markAllRead: (onSuccess: () => void) => void;
 }
 
@@ -44,17 +43,21 @@ export interface NotificationCenter {
 export function useNotificationCenter(open: boolean): NotificationCenter {
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useNotificationFeed(open);
-  const bulkReadCursorAt = useBulkReadCursor((cursor) => cursor.cursorAt);
+  const scope = useNotificationScope();
+  const bulkReadCursorAt = useBulkReadCursor((state) =>
+    scope ? (state.cursors[scopeKey(scope)] ?? null) : null,
+  );
   const markSeen = useMarkNotificationsSeen();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
 
-  // A type the mirror does not know cannot be rendered, and must not leave an empty bucket behind.
-  const rows: NotificationRowModel[] = (data ?? [])
-    .filter((item) => NOTIFICATION_CATALOG.has(item.typeKey))
-    .map((item) => ({ item, state: notificationRowState(item, bulkReadCursorAt) }));
+  // Every row renders: a type the audience mirror does not know takes the neutral presentation.
+  const rows: NotificationRowModel[] = (data ?? []).map((item) => ({
+    item,
+    state: notificationRowState(item, bulkReadCursorAt),
+  }));
 
-  const unseenIds = rows.filter((row) => row.state === "unseen").map((row) => row.item.id);
+  const unseenIds = rows.filter((row) => row.state === "unseen").map((row) => row.item.publicId);
   const unseenKey = unseenIds.join(",");
   const seenSent = useRef(false);
 
@@ -85,9 +88,9 @@ export function useNotificationCenter(open: boolean): NotificationCenter {
     isMarkingAllRead: markAllRead.isPending,
     fetchNextPage: () => void fetchNextPage(),
     activate: (row) => {
-      if (row.state !== "read") markRead.mutate(row.item.id);
+      if (row.state !== "read") markRead.mutate(row.item.publicId);
     },
-    markRead: (id) => markRead.mutate(id),
+    markRead: (publicId) => markRead.mutate(publicId),
     markAllRead: (onSuccess) => markAllRead.mutate(undefined, { onSuccess }),
   };
 }

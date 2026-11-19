@@ -1,20 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { hasPermission } from "@/shared/auth";
-import type { SessionUser } from "./auth-session";
+import { companySessionFixture, platformSessionFixture } from "../../test/audience-fixtures";
 
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
+const baseUser = companySessionFixture().user;
 
 describe("hasPermission", () => {
   it("returns false for a user without the permission, not owner, not platform admin", () => {
@@ -25,12 +13,19 @@ describe("hasPermission", () => {
     expect(hasPermission({ ...baseUser, permissions: ["users:read"] }, "users:read")).toBe(true);
   });
 
-  it("short-circuits to true for a tenant owner regardless of the permissions array", () => {
-    expect(hasPermission({ ...baseUser, isOwner: true }, "users:delete")).toBe(true);
+  it("does not fabricate grants for a Company Owner", () => {
+    expect(hasPermission(companySessionFixture({ isOwner: true }).user, "users:delete")).toBe(
+      false,
+    );
   });
 
-  it("short-circuits to true for a platform admin regardless of the permissions array", () => {
-    expect(hasPermission({ ...baseUser, isPlatformAdmin: true }, "companies:update")).toBe(true);
+  it("does not fabricate grants for a Platform role", () => {
+    expect(
+      hasPermission(
+        platformSessionFixture({ roleNames: ["SUPER_ADMIN"] }).user,
+        "companies:update",
+      ),
+    ).toBe(false);
   });
 
   it("returns false for a null/undefined user", () => {

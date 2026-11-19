@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { useAutoDismiss } from "../lib/use-auto-dismiss";
-import { NOTIFICATION_CATALOG } from "../model/notification-catalog";
+import { knownNotificationEntry } from "../model/notification-catalog";
 import { resolveNotificationCopy } from "../model/notification-copy";
 import {
   type NotificationToast,
@@ -57,12 +57,13 @@ export function NotificationToastCard({ toast, paused }: NotificationToastCardPr
 
   useAutoDismiss(TOAST_DURATION_MS[toast.tone], paused, () => setLeaving(true));
 
-  const entry = NOTIFICATION_CATALOG.get(toast.typeKey);
-  const copy = resolveNotificationCopy(toast, t, locale);
+  const entry = knownNotificationEntry(toast.tier, toast);
 
-  if (!entry || !copy) {
+  if (!entry) {
     return null;
   }
+
+  const copy = resolveNotificationCopy(toast.tier, toast, t, locale);
 
   const Icon = entry.icon;
   const motion = leaving ? "leaving" : entered ? "visible" : "entering";

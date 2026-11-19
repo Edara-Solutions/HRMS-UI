@@ -1,70 +1,25 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AuthSession, SessionUser } from "@/shared/auth";
-import { useAuthStore } from "@/shared/auth";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { AudienceSessionProvider, useCompanySession } from "@/shared/auth";
+import { companySessionFixture } from "../../../test/audience-fixtures";
+import {
+  notificationId,
+  notificationItem,
+  notificationPage,
+} from "../../../test/notification-fixtures";
+import { operationNetwork } from "../../../test/operation-request-mock";
 import { useNotificationFeed } from "./notification-feed";
 
-const feedGetMock = vi.hoisted(() => vi.fn());
-
-// `ky` builds AbortSignals that jsdom's fetch rejects as cross-realm — stub the client boundary
-// instead of the network.
-vi.mock("@/shared/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/api")>()),
-  apiClient: { get: feedGetMock },
-}));
-
-const baseUser: SessionUser = {
-  publicId: "user-1",
-  employeeCode: "EMP-001",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane@example.com",
-  status: "ACTIVE",
-  companyCode: "ACME",
-  mustChangePassword: false,
-  permissions: [],
-  isOwner: false,
-  isPlatformAdmin: false,
-};
-
-const session: AuthSession = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-  sessionId: "session-1",
-  expiresIn: 900,
-  user: baseUser,
-};
-
-function feedItem(id: number, createdAt: string) {
-  return {
-    id,
-    scope: "company",
-    typeKey: "company.user-joined",
-    typeVersion: 1,
-    importance: "normal",
-    params: {},
-    actor: { kind: "system" },
-    subject: null,
-    createdAt,
-    seenAt: null,
-    readAt: null,
-  };
-}
-
-function feedPage(items: unknown[], nextCursor: string | null) {
-  return { json: async () => ({ items, nextCursor, hasMore: nextCursor !== null }) };
-}
-
-function searchParamsOf(call: number) {
-  return feedGetMock.mock.calls[call][1].searchParams as URLSearchParams;
-}
+const feedKey = "GET /api/v1/company/notifications";
 
 function renderFeed(open: boolean) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <AudienceSessionProvider audience="company">
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </AudienceSessionProvider>
   );
 
   return renderHook(({ isOpen }: { isOpen: boolean }) => useNotificationFeed(isOpen), {
@@ -73,51 +28,60 @@ function renderFeed(open: boolean) {
   });
 }
 
-describe("useNotificationFeed", () => {
-  beforeEach(() => {
-    useAuthStore.setState({ session, status: "authenticated" });
-  });
+function queuedPages(...pages: unknown[]) {
+  const net = operationNetwork.install();
+  let call = 0;
+  net.on(feedKey, () => ({ status: 200, body: pages[Math.min(call++, pages.length - 1)] }));
+  return net;
+}
 
-  afterEach(() => {
-    vi.clearAllMocks();
-    useAuthStore.setState({ session: null, status: "anonymous" });
-  });
+describe("useNotificationFeed", () => {
+  beforeEach(() => useCompanySession.getState().setSession(companySessionFixture()));
+  afterEach(() => useCompanySession.getState().clearSession());
 
   it("stays idle while the panel is closed", () => {
+    const net = queuedPages(notificationPage([]));
     renderFeed(false);
 
-    expect(feedGetMock).not.toHaveBeenCalled();
+    expect(net.count(feedKey)).toBe(0);
   });
 
-  it("pages by cursor at the contract limit and keeps one row per id", async () => {
-    feedGetMock
-      .mockReturnValueOnce(feedPage([feedItem(3, "2026-08-25T09:00:00.000Z")], "cursor-2"))
-      .mockReturnValueOnce(
-        feedPage(
-          [feedItem(3, "2026-08-25T09:00:00.000Z"), feedItem(2, "2026-08-24T09:00:00.000Z")],
-          null,
-        ),
-      );
+  it("pages by cursor at the contract limit through the Company client and keeps one row per ID", async () => {
+    const net = queuedPages(
+      notificationPage([notificationItem(3, "2026-08-25T09:00:00.000Z")], "cursor-2"),
+      notificationPage([
+        notificationItem(3, "2026-08-25T09:00:00.000Z"),
+        notificationItem(2, "2026-08-24T09:00:00.000Z"),
+      ]),
+    );
 
     const { result } = renderFeed(true);
 
     await waitFor(() => expect(result.current.data).toHaveLength(1));
-    expect(searchParamsOf(0).get("limit")).toBe("20");
-    expect(searchParamsOf(0).has("cursor")).toBe(false);
+    expect(net.calls[0]).toEqual({
+      audience: "company",
+      key: feedKey,
+      input: { query: { limit: 20 } },
+    });
 
     await act(async () => {
       await result.current.fetchNextPage();
     });
 
     await waitFor(() => expect(result.current.data).toHaveLength(2));
-    expect(searchParamsOf(1).get("cursor")).toBe("cursor-2");
-    expect(result.current.data?.map((item) => item.id)).toEqual([3, 2]);
+    expect(net.calls[1]?.input).toEqual({ query: { limit: 20, cursor: "cursor-2" } });
+    expect(result.current.data?.map((item) => item.publicId)).toEqual([
+      notificationId(3),
+      notificationId(2),
+    ]);
+    expect(result.current.data?.[0]).not.toHaveProperty("actor");
   });
 
   it("catches up on reopen with a since delta merged into the cached rows", async () => {
-    feedGetMock
-      .mockReturnValueOnce(feedPage([feedItem(1, "2026-08-25T09:00:00.000Z")], null))
-      .mockReturnValueOnce(feedPage([feedItem(5, "2026-08-25T10:00:00.000Z")], null));
+    const net = queuedPages(
+      notificationPage([notificationItem(1, "2026-08-25T09:00:00.000Z")]),
+      notificationPage([notificationItem(5, "2026-08-25T10:00:00.000Z")]),
+    );
 
     const { result, rerender } = renderFeed(true);
     await waitFor(() => expect(result.current.data).toHaveLength(1));
@@ -130,7 +94,25 @@ describe("useNotificationFeed", () => {
     });
 
     await waitFor(() => expect(result.current.data).toHaveLength(2));
-    expect(searchParamsOf(1).get("since")).toBe("2026-08-25T09:00:00.000Z");
-    expect(result.current.data?.map((item) => item.id)).toEqual([5, 1]);
+    expect(net.calls[1]?.input).toEqual({
+      query: { limit: 20, since: "2026-08-25T09:00:00.000Z" },
+    });
+    expect(result.current.data?.map((item) => item.publicId)).toEqual([
+      notificationId(5),
+      notificationId(1),
+    ]);
+  });
+
+  it("rejects a malformed feed instead of rendering it", async () => {
+    queuedPages({
+      items: [{ id: 1, typeKey: "company.user-joined" }],
+      nextCursor: null,
+      hasMore: false,
+    });
+
+    const { result } = renderFeed(true);
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.name).toBe("ContractViolation");
   });
 });

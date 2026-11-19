@@ -1,19 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { z } from "zod";
+import type { AuditTrailFilters } from "@/features/audit-filters";
 import {
-  type AuditTrailFilters,
-  appendAuditFilterParams,
-  filterableAuditEventTypes,
-} from "@/features/audit-filters";
-import { apiClient } from "@/shared/api";
-import {
-  CompanyAuditTrailEvent,
-  type CompanyAuditTrailItem,
-  parseCompanyAuditTrailPage,
-  type CompanyAuditTrailPage as RuntimeCompanyAuditTrailPage,
-} from "./audit-runtime-contract";
+  companyQueryKey,
+  companyCommunicationsOperations as operations,
+  requestCompanyOperation,
+  useCompanyAccess,
+} from "@/shared/api";
 
-export type { CompanyAuditTrailItem };
-export type CompanyAuditTrailPage = RuntimeCompanyAuditTrailPage;
+type AuditTrailQuery = z.input<(typeof operations)["auditTrail"]["requestSchema"]>["query"];
+export type CompanyAuditTrailPage = z.output<(typeof operations)["auditTrail"]["responses"]["200"]>;
+export type CompanyAuditTrailItem = CompanyAuditTrailPage["items"][number];
+export type CompanyAuditEventType = NonNullable<AuditTrailQuery["eventType"]>[number];
 
 /**
  * Filter and paging inputs for the Company Audit Trail. The Company route derives its scope
@@ -24,34 +22,53 @@ export interface CompanyAuditTrailParams extends AuditTrailFilters {
   limit?: number;
 }
 
+const eventTypeSchema =
+  operations.auditTrail.requestSchema.shape.query.shape.eventType.unwrap().element;
+
 /**
- * Every event type the Company trail admits — the COMPANY-audience subset of the catalog.
- * A Platform-only type is absent because the contract has no literal for it, which is
- * audience isolation as a type error rather than a filter.
+ * Every event type the Company trail admits, straight from its generated request contract. A
+ * Platform-only type is absent because the Company operation declares no literal for it.
  */
-export const companyAuditEventTypes = filterableAuditEventTypes(CompanyAuditTrailEvent.options);
+export const companyAuditEventTypes: readonly CompanyAuditEventType[] = [
+  ...new Set(eventTypeSchema.options.map((option) => option.value)),
+];
 
-export const companyAuditTrailKeys = {
-  page: (params: CompanyAuditTrailParams) => ["audit-trail", "company", params] as const,
-};
+/** Whether a URL value names an event type the Company operation declares. */
+export function isCompanyEventType(value: string): value is CompanyAuditEventType {
+  return companyAuditEventTypes.some((eventType) => eventType === value);
+}
 
-/** Reads one cursor page and validates it here, so no component ever sees unparsed audit data. */
-export async function fetchCompanyAuditTrail(
-  params: CompanyAuditTrailParams,
-): Promise<CompanyAuditTrailPage> {
-  const searchParams = new URLSearchParams();
-  if (params.cursor) searchParams.set("cursor", params.cursor);
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  appendAuditFilterParams(searchParams, params);
-
-  const response: unknown = await apiClient.get("company/audit-trail", { searchParams }).json();
-
-  return parseCompanyAuditTrailPage(response);
+/** Only declared event types reach the request; anything else would be a request violation. */
+function toQuery(params: CompanyAuditTrailParams): AuditTrailQuery {
+  const eventType = params.eventType?.filter((value) => isCompanyEventType(value));
+  return {
+    cursor: params.cursor,
+    limit: params.limit,
+    occurredFrom: params.occurredFrom,
+    occurredTo: params.occurredTo,
+    actorPublicId: params.actorPublicId,
+    outcome: params.outcome,
+    eventType: eventType && eventType.length > 0 ? eventType : undefined,
+  };
 }
 
 export function useCompanyAuditTrail(params: CompanyAuditTrailParams = {}) {
+  const access = useCompanyAccess();
+  const query = toQuery(params);
   return useQuery({
-    queryKey: companyAuditTrailKeys.page(params),
-    queryFn: () => fetchCompanyAuditTrail(params),
+    queryKey: companyQueryKey(
+      access.user?.publicId ?? "",
+      operations.auditTrail,
+      JSON.stringify(query),
+    ),
+    queryFn: ({ signal }) => requestCompanyOperation(operations.auditTrail, { query }, signal),
+    enabled: access.user !== undefined,
+    placeholderData: keepPreviousData,
   });
+}
+
+/** Names an actor inside the caller's own Company; a Platform identity can never appear here. */
+export async function searchCompanyAuditActors(query: string) {
+  const actors = await requestCompanyOperation(operations.auditActors, { query: { query } });
+  return actors.map(({ publicId, name }) => ({ publicId, name }));
 }

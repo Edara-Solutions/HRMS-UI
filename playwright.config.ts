@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const shouldStartWebServer = process.env.PLAYWRIGHT_USE_WEB_SERVER === "1";
+const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -10,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: baseUrl,
     trace: "on-first-retry",
   },
   projects: [

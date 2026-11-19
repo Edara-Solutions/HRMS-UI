@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useNotificationArrivals } from "../lib/use-notification-arrivals";
 import { useToastStore } from "../model/toast-store";
@@ -17,7 +18,7 @@ export function NotificationToaster() {
 
   useNotificationArrivals();
 
-  return (
+  return createPortal(
     <div
       role="region"
       aria-label={t("toast.region")}
@@ -40,6 +41,7 @@ export function NotificationToaster() {
           <NotificationToastCard key={toast.id} toast={toast} paused={paused} />
         ))}
       </ol>
-    </div>
+    </div>,
+    document.body,
   );
 }

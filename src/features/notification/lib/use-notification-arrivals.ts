@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { fetchNotificationFeed } from "../api/notification-feed";
+import { fetchNotificationFeed } from "../api/notification-transport";
 import {
   planArrivalToast,
   recordPresentedNotifications,
   unpresentedNotifications,
+  usePresentedNotifications,
 } from "../model/notification-arrivals";
-import { useNotificationTier } from "../model/notification-tier";
+import { scopeKey, useNotificationScope } from "../model/notification-tier";
 import { IDLE_POLL_INTERVAL_MS } from "../model/poll-cadence";
 import { useToastStore } from "../model/toast-store";
 
@@ -16,11 +17,16 @@ import { useToastStore } from "../model/toast-store";
  * catch-up on return announces at most one card instead of bursting the backlog.
  */
 export function useNotificationArrivals() {
-  const tier = useNotificationTier();
+  const scope = useNotificationScope();
+  const tier = scope?.tier ?? null;
+  const identity = scope ? scopeKey(scope) : null;
   const showToast = useToastStore((state) => state.showToast);
 
   useEffect(() => {
-    if (!tier) return;
+    if (!tier || !identity) return;
+
+    // A new identity starts with an empty ledger: what another identity saw is not its history.
+    usePresentedNotifications.getState().adopt(identity);
 
     let disposed = false;
     let inFlight = false;
@@ -48,7 +54,7 @@ export function useNotificationArrivals() {
 
         if (page.items[0]) cursor = page.items[0].createdAt;
 
-        const announcement = planArrivalToast(arrivals);
+        const announcement = planArrivalToast(tier, arrivals);
         if (announcement) showToast(announcement);
       } catch {
         // The cursor stands; the next tick retries from where this one stalled.
@@ -73,5 +79,5 @@ export function useNotificationArrivals() {
       window.removeEventListener("focus", catchUp);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [tier, showToast]);
+  }, [tier, identity, showToast]);
 }
