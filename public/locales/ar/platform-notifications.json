@@ -54,5 +54,6 @@
   "reconcile": "التحقق من الحالة",
   "reason": "سبب الإجراء",
   "replacement": "البديل المعتمد",
-  "invalid": "راجع الحقول."
+  "invalid": "راجع الحقول.",
+  "restriction.access-session-read-only": "جلسة الوصول هذه للقراءة فقط."
 }

@@ -50,5 +50,19 @@
   "notifications.company.announcement.title": "إعلان",
   "notifications.company.announcement.body": "تم نشر إعلان جديد.",
   "notifications.unknown.title": "إشعار جديد",
-  "notifications.unknown.body": "يوجد تحديث في مساحة عملك."
+  "notifications.unknown.body": "يوجد تحديث في مساحة عملك.",
+  "notifications.platform.access-requested.title": "طلب وصول للمراجعة",
+  "notifications.platform.access-requested.body": "طلب {{requesterName}} صلاحية {{scope}} للوصول إلى {{companyName}}.",
+  "notifications.platform.access-decided.title": "طلب الوصول: {{decision}}",
+  "notifications.platform.access-decided.body": "قرار {{deciderName}} بشأن طلبك للوصول إلى {{companyName}}: {{decision}}.",
+  "notifications.platform.access-request-lapsed.title": "انتهت صلاحية طلب الوصول",
+  "notifications.platform.access-request-lapsed.body": "لم يُتخذ قرار بشأن طلبك للوصول إلى {{companyName}} خلال 24 ساعة.",
+  "notifications.platform.access-session-ending.title": "الجلسة على وشك الانتهاء",
+  "notifications.platform.access-session-ending.body": "تنتهي جلستك في {{companyName}} خلال أقل من 10 دقائق.",
+  "notifications.platform.access-session-ended.title": "انتهت الجلسة",
+  "notifications.platform.access-session-ended.body": "جلستك في {{companyName}}: {{cause}}.",
+  "values.scope.READ": "القراءة فقط",
+  "values.scope.CHANGE": "القراءة والتعديل",
+  "values.cause.EXPIRED": "انتهى وقتها",
+  "values.cause.ENDED_BY_APPROVER": "أنهاها معتمِد"
 }

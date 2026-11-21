@@ -326,9 +326,14 @@ describe("Access Session workspace", () => {
     });
   });
 
-  it("names the Company from the delegated profile without a registry grant", async () => {
-    open({ permissions: ["delegation:open", "delegation:profile:read"] });
-    expect(await screen.findByText("Support session · Acme Labs")).toBeInTheDocument();
+  it("names the Company from the session itself, without a registry or profile grant", async () => {
+    open({ permissions: ["delegation:open"] });
+    expect(await screen.findByText("Support session · Acme Company")).toBeInTheDocument();
+  });
+
+  it("disables changes in a Read only session while reads stay available", async () => {
+    open({ session: { scope: "READ" } });
+    expect(await screen.findByText(/Read only session/)).toBeInTheDocument();
   });
 
   it("does not retry an inactive-session refusal before clearing content", async () => {

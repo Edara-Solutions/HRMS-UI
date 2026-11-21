@@ -1,11 +1,11 @@
 {
-  "commit": "d6404efc7237de705bf406bef48321d9bf735812",
-  "ref": "refactor/split-tier-users",
+  "commit": "8d62cabad26ac6ba6da0485dfca01d38d3d309d6",
+  "ref": "feature/delegated-access-approval",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "d4bfbc193dd86336ea09595763d800b37978662639a801ae7bce3fa2599f385a"
+      "sha256": "8ebdfe3fd7eb3113188d432fdd94130c1522a4174719ff250d5fdb04c23ddcd1"
     },
     "company": {
       "file": "contracts/openapi.company.json",
@@ -13,11 +13,11 @@
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",
-      "sha256": "7ba7d972d33156c10e062a543fcbd5e57fd36be61f35695f403e4b9bd5197afb"
+      "sha256": "28fd1e39210eeff07d8e579baa68291e5bd12550e2197600fced9a6b16f21af5"
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "dd34cc71357a5e83f8b4581838d8a9607bb645ffecfc2ee017d6255b29799615"
+      "sha256": "a8a9dc41377a9758e0366a210c6d8726a4e2f450db29eeff03d1e911779d3541"
     },
     "public": {
       "file": "contracts/openapi.public.json",
@@ -459,8 +459,20 @@
         "key": "DELETE /api/v1/platform/users/{publicId}/sessions/{sessionPublicId}"
       },
       {
+        "file": "get-api-v1-platform-access-requests.ts",
+        "key": "GET /api/v1/platform/access-requests"
+      },
+      {
+        "file": "get-api-v1-platform-access-requests-mine.ts",
+        "key": "GET /api/v1/platform/access-requests/mine"
+      },
+      {
         "file": "get-api-v1-platform-access-sessions-sessionpublicid.ts",
         "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-live.ts",
+        "key": "GET /api/v1/platform/access-sessions/live"
       },
       {
         "file": "get-api-v1-platform-announcements.ts",
@@ -683,12 +695,32 @@
         "key": "PATCH /api/v1/platform/users/{publicId}"
       },
       {
+        "file": "post-api-v1-platform-access-requests.ts",
+        "key": "POST /api/v1/platform/access-requests"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-approve.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/approve"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-cancel.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/cancel"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-reject.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/reject"
+      },
+      {
         "file": "post-api-v1-platform-access-sessions.ts",
         "key": "POST /api/v1/platform/access-sessions"
       },
       {
         "file": "post-api-v1-platform-access-sessions-sessionpublicid-close.ts",
         "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-end.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/end"
       },
       {
         "file": "post-api-v1-platform-announcements.ts",

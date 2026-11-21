@@ -182,5 +182,6 @@
   "role.deleteHint": "يفقد أصحاب هذا الدور صلاحياته.",
   "role.delete": "حذف الدور",
   "role.deleteConfirm.title": "حذف {{role}}؟",
-  "role.deleteConfirm.description": "كل من لديه {{role}} يفقد صلاحياته. لا يمكن التراجع عن ذلك."
+  "role.deleteConfirm.description": "كل من لديه {{role}} يفقد صلاحياته. لا يمكن التراجع عن ذلك.",
+  "restriction.access-session-read-only": "جلسة الوصول هذه للقراءة فقط."
 }

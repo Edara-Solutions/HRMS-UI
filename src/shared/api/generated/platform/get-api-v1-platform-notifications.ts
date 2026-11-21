@@ -38,6 +38,33 @@ export const responseSchemas = {
                     .strict(),
                 })
                 .strict(),
+              z
+                .object({
+                  requesterName: z.string(),
+                  companyName: z.string(),
+                  scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+                  minutes: z.number().int(),
+                })
+                .strict(),
+              z
+                .object({
+                  decision: z.union([z.literal("approved"), z.literal("rejected")]),
+                  companyName: z.string(),
+                  deciderName: z.string(),
+                  scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+                  minutes: z.number().int(),
+                })
+                .strict(),
+              z.object({ companyName: z.string() }).strict(),
+              z.object({ companyName: z.string(), endsAt: z.string() }).strict(),
+              z
+                .object({
+                  cause: z.union([z.literal("EXPIRED"), z.literal("ENDED_BY_APPROVER")]),
+                  companyName: z.string(),
+                  endedByName: z.string(),
+                  note: z.string(),
+                })
+                .strict(),
             ]),
             subject: z.union([
               z.object({ type: z.string(), publicId: z.string().uuid() }).strict(),

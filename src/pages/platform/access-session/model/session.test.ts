@@ -10,13 +10,13 @@ import { availableCommands } from "./setup";
 function session(overrides: Record<string, unknown> = {}): AccessSession {
   const body = accessSessionBody(overrides);
   return {
-    publicId: body.publicId,
-    companyPublicId: body.companyPublicId,
+    ...body,
     reason: "SUPPORT_REQUEST",
+    scope: "CHANGE",
     status: body.status === "CLOSED" ? "CLOSED" : body.status === "EXPIRED" ? "EXPIRED" : "OPEN",
-    openedAt: body.openedAt,
-    expiresAt: body.expiresAt,
     closedAt: typeof body.closedAt === "string" ? body.closedAt : null,
+    endedBy: null,
+    endNote: null,
   };
 }
 

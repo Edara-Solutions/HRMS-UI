@@ -36,6 +36,7 @@ export type ActionRestriction =
   | "restricted-mode"
   | "access-unverified"
   | "access-session-inactive"
+  | "access-session-read-only"
   | "company-blocked";
 export type ActionAvailability =
   | { state: "hidden" }
@@ -53,6 +54,7 @@ export interface AccessFacts {
   accessSession?: "live" | "inactive" | "foreign" | "missing";
   delegatedScopeMatches?: boolean;
   delegatedGrant?: boolean;
+  delegatedReadOnly?: boolean;
   restriction?: ActionRestriction;
   target?: {
     self?: boolean;
@@ -227,6 +229,14 @@ const platformWorkRoutes: RouteDeclaration[] = [
     operation: "GET /api/v1/platform/lead-conversion-requests/{publicId}",
   },
   {
+    path: "/platform/access-requests",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/access-requests/mine",
+    alternativeOperations: ["GET /api/v1/platform/access-requests"],
+    label: { en: "Access requests", ar: "طلبات الوصول" },
+  },
+  {
     path: "/platform/companies",
     audience: "platform",
     category: "work",
@@ -388,6 +398,8 @@ export function projectActionAvailability(
       return { state: "disabled", reason: "access-session-inactive" };
     if (facts.accessSession !== "live" || !facts.delegatedScopeMatches || !facts.delegatedGrant)
       return { state: "hidden" };
+    if (facts.delegatedReadOnly && !operation.startsWith("GET "))
+      return { state: "disabled", reason: "access-session-read-only" };
   }
   if (policy.authorization !== "SELF" && facts.audience === "company") {
     if (facts.companyMode === "BLOCKED") return { state: "disabled", reason: "company-blocked" };

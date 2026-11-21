@@ -283,6 +283,16 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
+    "key": "GET /api/v1/platform/access-requests",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-requests/mine",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
     "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}",
     "audience": "platform",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
@@ -356,6 +366,11 @@
     "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}",
     "audience": "delegated",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-sessions/live",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
     "key": "GET /api/v1/platform/announcements",
@@ -856,9 +871,29 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
+    "key": "POST /api/v1/platform/access-requests",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/approve",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/cancel",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/reject",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
     "key": "POST /api/v1/platform/access-sessions",
     "audience": "platform",
-    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close",
@@ -874,6 +909,11 @@
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",
     "audience": "delegated",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/end",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete",

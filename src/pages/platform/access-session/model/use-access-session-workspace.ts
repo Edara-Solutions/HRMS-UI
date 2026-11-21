@@ -156,7 +156,7 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
     diagnostics,
     closable: session !== undefined && canClose(session),
     availability: (operation: { key: string }) =>
-      access.delegatedAvailability(operation.key, liveness),
+      access.delegatedAvailability(operation.key, liveness, session?.scope),
   };
 }
 

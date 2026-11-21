@@ -697,10 +697,50 @@ export const operationAuthorization = {
     authorization: "P",
     permission: "companies:restore",
   },
+  "POST /api/v1/platform/access-requests": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "GET /api/v1/platform/access-requests": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "GET /api/v1/platform/access-requests/mine": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/cancel": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/approve": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/reject": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
   "POST /api/v1/platform/access-sessions": {
     audience: "platform",
     authorization: "P",
     permission: "delegation:open",
+  },
+  "GET /api/v1/platform/access-sessions/live": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "POST /api/v1/platform/access-sessions/{sessionPublicId}/end": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
   },
   "GET /api/v1/platform/access-sessions/{sessionPublicId}": {
     audience: "platform",
@@ -1085,6 +1125,7 @@ export type OperationPermission = Exclude<
 >;
 export const generatedRefusalCodes = [
   "ACCESS_SESSION_INACTIVE",
+  "ACCESS_SESSION_READ_ONLY",
   "COMPANY_ACCESS_DENIED",
   "DIAGNOSTIC_RATE_LIMITED",
   "DIAGNOSTIC_REQUEST_CONFLICT",

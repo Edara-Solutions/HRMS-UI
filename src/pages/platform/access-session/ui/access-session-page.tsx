@@ -1,12 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import {
-  ContractViolation,
-  delegatedCompanyOperations,
-  OperationRefusal,
-  platformCompanyOperations,
-} from "@/shared/api";
+import { ContractViolation, delegatedCompanyOperations, OperationRefusal } from "@/shared/api";
 import { usePlatformSession } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
@@ -61,20 +55,6 @@ function ScopedAccessSessionPage({ sessionPublicId, search }: AccessSessionPageP
   const { t } = useTranslation("platform-access-session");
   const workspace = useAccessSessionWorkspace(sessionPublicId);
   const { session, sessionError: error } = workspace;
-  const companyReadable =
-    workspace.access.availability(platformCompanyOperations.company.key).state === "enabled";
-  const { data: company } = useQuery({
-    ...workspace.queries.company(session?.companyPublicId ?? ""),
-    enabled: session !== undefined && companyReadable,
-  });
-  const { data: profile } = useQuery({
-    ...workspace.delegated.profile,
-    enabled:
-      !companyReadable &&
-      workspace.state === "open" &&
-      workspace.availability(delegatedCompanyOperations.profile).state === "enabled",
-  });
-
   if (error instanceof OperationRefusal && [403, 404].includes(error.status)) throw error;
   if (!workspace.access.user) return null;
 
@@ -101,16 +81,13 @@ function ScopedAccessSessionPage({ sessionPublicId, search }: AccessSessionPageP
       </div>
     );
 
-  const companyName =
-    workspace.state === "open"
-      ? (company?.name ?? profile?.name ?? t("companyFallback"))
-      : t("companyFallback");
+  const companyName = session.company.name;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <Link
         to="/platform/companies/$publicId"
-        params={{ publicId: session.companyPublicId }}
+        params={{ publicId: session.company.publicId }}
         className="text-sm underline"
       >
         {t("back")}

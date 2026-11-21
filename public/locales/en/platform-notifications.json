@@ -54,5 +54,6 @@
   "reconcile": "Reconcile",
   "reason": "Operator reason",
   "replacement": "Approved replacement",
-  "invalid": "Check the fields."
+  "invalid": "Check the fields.",
+  "restriction.access-session-read-only": "This access session is read only."
 }

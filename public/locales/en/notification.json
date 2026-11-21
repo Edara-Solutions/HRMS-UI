@@ -50,5 +50,19 @@
   "notifications.company.announcement.title": "Announcement",
   "notifications.company.announcement.body": "A new announcement was published.",
   "notifications.unknown.title": "New notification",
-  "notifications.unknown.body": "There is an update in your workspace."
+  "notifications.unknown.body": "There is an update in your workspace.",
+  "notifications.platform.access-requested.title": "Access request to review",
+  "notifications.platform.access-requested.body": "{{requesterName}} asked for {{scope}} access to {{companyName}}.",
+  "notifications.platform.access-decided.title": "Access request {{decision}}",
+  "notifications.platform.access-decided.body": "{{deciderName}} {{decision}} your request for {{companyName}}.",
+  "notifications.platform.access-request-lapsed.title": "Access request expired",
+  "notifications.platform.access-request-lapsed.body": "Nobody decided on your request for {{companyName}} within 24 hours.",
+  "notifications.platform.access-session-ending.title": "Session ending soon",
+  "notifications.platform.access-session-ending.body": "Your session in {{companyName}} ends in less than 10 minutes.",
+  "notifications.platform.access-session-ended.title": "Session ended",
+  "notifications.platform.access-session-ended.body": "Your session in {{companyName}} {{cause}}.",
+  "values.scope.READ": "read only",
+  "values.scope.CHANGE": "read and change",
+  "values.cause.EXPIRED": "reached its end time",
+  "values.cause.ENDED_BY_APPROVER": "was ended by an approver"
 }

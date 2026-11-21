@@ -1,4 +1,5 @@
 export {
+  accessRequestOperations,
   accessSessionOperations,
   delegatedCompanyOperations,
 } from "./access-session-operations";

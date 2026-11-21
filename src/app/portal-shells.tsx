@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
+import { accessRequestQueries } from "@/features/access-request";
 import { CommandPalette, HelpMenu, type PaletteIdentity } from "@/features/command-palette";
 import { NotificationBell, NotificationToaster } from "@/features/notification";
 import { companyOverviewQuery, platformOverviewQuery } from "@/shared/api";
@@ -92,6 +93,10 @@ export function PlatformShell({ children }: { children: ReactNode }) {
     ...platformOverviewQuery(session?.user.publicId ?? ""),
     enabled: session !== null && readsBadges,
   });
+  const { data: accessReview } = useQuery({
+    ...accessRequestQueries(session?.user.publicId ?? "").review("review"),
+    enabled: session?.user.permissions.includes("delegation:approve") === true,
+  });
   const identity = useMemo<PaletteIdentity | null>(
     () =>
       session && {
@@ -104,15 +109,23 @@ export function PlatformShell({ children }: { children: ReactNode }) {
   const companies = overview?.companies?.total;
   const leads = overview?.leads?.open;
   const pending = overview?.conversionRequests?.pending;
+  const awaitingDecision = accessReview?.items.filter(
+    (request) => request.requester.publicId !== session?.user.publicId,
+  ).length;
   const groups = useMemo(
     () =>
       identity
         ? buildNavGroups({ ...identity, authenticated: true }, locale, {
             showUpcoming,
-            counts: { companies, leads, "conversion-requests": pending },
+            counts: {
+              companies,
+              leads,
+              "conversion-requests": pending,
+              "access-requests": awaitingDecision,
+            },
           })
         : [],
-    [identity, locale, companies, leads, pending],
+    [identity, locale, companies, leads, pending, awaitingDecision],
   );
   if (!session || !identity) return null;
   return (

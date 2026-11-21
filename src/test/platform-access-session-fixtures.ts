@@ -7,6 +7,8 @@ export const accessSessionIds = {
   role: "5c3e8d2f-0b9a-4f4e-9d3c-2b1a0f9e8d7c",
   step: "6d4f9e3a-1c0b-4a5f-8e4d-3c2b1a0f9e8d",
   permission: "7e5a0f4b-2d1c-4b6a-9f5e-4d3c2b1a0f9e",
+  operator: "8f6b1a5c-3e2d-4c7b-8a6f-5e4d3c2b1a0f",
+  approver: "9a7c2b6d-4f3e-4d8c-9b7a-6f5e4d3c2b1a",
 } as const;
 
 export const everyDelegatedPermission = [
@@ -32,12 +34,17 @@ export const everyDelegatedPermission = [
 export function accessSessionBody(overrides: Record<string, unknown> = {}) {
   return {
     publicId: accessSessionIds.session,
-    companyPublicId: accessSessionIds.company,
+    company: { publicId: accessSessionIds.company, name: "Acme Company" },
+    operator: { publicId: accessSessionIds.operator, name: "Sara Haddad" },
+    approver: { publicId: accessSessionIds.approver, name: "Omar Nasser" },
     reason: "SUPPORT_REQUEST",
+    scope: "CHANGE",
     status: "OPEN",
     openedAt: at,
     expiresAt: new Date(Date.now() + 60 * 60_000).toISOString(),
     closedAt: null,
+    endedBy: null,
+    endNote: null,
     ...overrides,
   };
 }
@@ -142,5 +149,33 @@ export function delegatedSendingDomainBody() {
     health: "HEALTHY",
     verifiedAt: at,
     lastFailure: "provider-failure-canary",
+  };
+}
+
+export const accessRequestIds = {
+  request: "1b8d3c7e-5a4f-4e9d-8c8b-7a6f5e4d3c2b",
+  approver: accessSessionIds.approver,
+} as const;
+
+export function accessRequestBody(overrides: Record<string, unknown> = {}) {
+  return {
+    publicId: accessRequestIds.request,
+    company: { publicId: accessSessionIds.company, name: "Acme Company" },
+    requester: { publicId: accessSessionIds.operator, name: "Sara Haddad" },
+    reason: "INCIDENT_RESPONSE",
+    scope: "CHANGE",
+    requestedMinutes: 120,
+    note: "Reproduce the failed payroll export. Ticket SUP-1234.",
+    state: "PENDING",
+    requestedAt: "2026-09-27T09:00:00.000Z",
+    lapsesAt: "2026-09-28T09:00:00.000Z",
+    decider: null,
+    decidedAt: null,
+    decisionNote: null,
+    grantedScope: null,
+    grantedMinutes: null,
+    windowEndsAt: null,
+    session: null,
+    ...overrides,
   };
 }

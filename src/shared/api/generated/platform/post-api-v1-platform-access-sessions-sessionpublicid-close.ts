@@ -9,17 +9,33 @@ export const responseSchemas = {
   "200": z
     .object({
       publicId: z.string().uuid(),
-      companyPublicId: z.string().uuid(),
+      company: z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+      operator: z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+      approver: z.union([
+        z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+        z.null(),
+      ]),
       reason: z.union([
         z.literal("SUPPORT_REQUEST"),
         z.literal("INCIDENT_RESPONSE"),
         z.literal("PROVISIONING"),
         z.literal("CUSTOMER_REQUEST"),
       ]),
-      status: z.union([z.literal("OPEN"), z.literal("EXPIRED"), z.literal("CLOSED")]),
+      scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+      status: z.union([
+        z.literal("OPEN"),
+        z.literal("EXPIRED"),
+        z.literal("CLOSED"),
+        z.literal("ENDED"),
+      ]),
       openedAt: z.string().datetime({ offset: true }),
       expiresAt: z.string().datetime({ offset: true }),
       closedAt: z.union([z.string().datetime({ offset: true }), z.null()]),
+      endedBy: z.union([
+        z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+        z.null(),
+      ]),
+      endNote: z.union([z.string(), z.null()]),
     })
     .strict(),
   "400": z.object({

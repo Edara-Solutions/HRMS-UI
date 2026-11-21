@@ -51,7 +51,12 @@
     "lead.lifecycle.deleted",
     "lead.lifecycle.unarchived",
     "lead.lifecycle.updated",
+    "platform.access_request.approved",
+    "platform.access_request.cancelled",
+    "platform.access_request.rejected",
+    "platform.access_request.submitted",
     "platform.access_session.closed",
+    "platform.access_session.ended",
     "platform.access_session.opened",
     "platform.company_email_diagnostic.accepted",
     "platform.credential.password-changed",
@@ -82,6 +87,7 @@
   ],
   "fields": [
     "field.accessMode",
+    "field.accessRequestPublicId",
     "field.accessSessionPublicId",
     "field.actions",
     "field.activatedAt",
@@ -109,6 +115,8 @@
     "field.familyId",
     "field.fields",
     "field.fromRevisionKey",
+    "field.grantedMinutes",
+    "field.grantedScope",
     "field.hasEmail",
     "field.hasPhone",
     "field.hasPrimaryContact",
@@ -135,6 +143,7 @@
     "field.removedActions",
     "field.replacementContactPublicId",
     "field.requestId",
+    "field.requestedMinutes",
     "field.revoked",
     "field.roleName",
     "field.rolePublicIds",
@@ -170,6 +179,10 @@
       "NORMAL",
       "READ_ONLY"
     ],
+    "grantedScope": [
+      "CHANGE",
+      "READ"
+    ],
     "locale": [
       "ar",
       "en"
@@ -200,8 +213,10 @@
       "SUPPORT_REQUEST"
     ],
     "scope": [
+      "CHANGE",
       "COMPANY",
-      "PLATFORM"
+      "PLATFORM",
+      "READ"
     ],
     "status": [
       "COMPLETED",

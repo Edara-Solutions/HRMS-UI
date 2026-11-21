@@ -322,5 +322,14 @@
   "field.roleName": "اسم الدور",
   "field.rolePublicIds": "الأدوار",
   "field.sessionPublicId": "الجلسة",
-  "field.wasRoot": "كان يتمتع بصلاحية المسؤول الأعلى"
+  "field.wasRoot": "كان يتمتع بصلاحية المسؤول الأعلى",
+  "platform.access_request.submitted": "قُدّم طلب وصول",
+  "platform.access_request.approved": "اعتُمد طلب وصول",
+  "platform.access_request.rejected": "رُفض طلب وصول",
+  "platform.access_request.cancelled": "أُلغي طلب وصول",
+  "platform.access_session.ended": "أنهى المعتمِد جلسة الوصول",
+  "field.accessRequestPublicId": "طلب الوصول",
+  "field.requestedMinutes": "الدقائق المطلوبة",
+  "field.grantedMinutes": "الدقائق الممنوحة",
+  "field.grantedScope": "الصلاحية الممنوحة"
 }

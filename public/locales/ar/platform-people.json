@@ -152,5 +152,6 @@
   "role.deleteConfirm.description": "يُزال {{role}} نهائيًا.",
   "role.grantsConfirm.title": "تغيير إجراءات {{role}}؟",
   "role.grantsConfirm.description": "تُضاف {{added}} وتُزال {{removed}} من الإجراءات لكل من يحمل {{role}}، في طلبه التالي.",
-  "role.deleted": "تم حذف {{role}}."
+  "role.deleted": "تم حذف {{role}}.",
+  "restriction.access-session-read-only": "جلسة الوصول هذه للقراءة فقط."
 }

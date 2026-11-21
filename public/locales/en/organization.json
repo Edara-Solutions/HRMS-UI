@@ -181,5 +181,6 @@
   "dashboard.error.action": "Try again",
   "dashboard.contract": "The response could not be verified. This section is unavailable.",
   "dashboard.empty.title": "Nothing to show yet",
-  "dashboard.empty.description": "Your role doesn't include any overview sections. Ask a company admin for access."
+  "dashboard.empty.description": "Your role doesn't include any overview sections. Ask a company admin for access.",
+  "restriction.access-session-read-only": "This access session is read only."
 }
