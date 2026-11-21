@@ -47,6 +47,8 @@
   "notifications.company.activated.body": "Your company is now active on Edara.",
   "notifications.company.conversion-decided.title": "Conversion request {{decision}}",
   "notifications.company.conversion-decided.body": "Edara has reviewed your conversion request.",
+  "notifications.company.support-access-opened.title": "Edara support opened access",
+  "notifications.company.support-access-opened.body": "An Edara support operator can now work in your Company with {{scope}} access for a limited time. Their actions appear in your audit trail.",
   "notifications.company.announcement.title": "Announcement",
   "notifications.company.announcement.body": "A new announcement was published.",
   "notifications.unknown.title": "New notification",

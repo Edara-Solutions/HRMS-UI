@@ -10723,6 +10723,36 @@
                 "additionalProperties": false,
                 "type": "object",
                 "required": [
+                  "scope",
+                  "expiresAt"
+                ],
+                "properties": {
+                  "scope": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "READ"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "CHANGE"
+                        ]
+                      }
+                    ]
+                  },
+                  "expiresAt": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
                   "announcementPublicId",
                   "message"
                 ],
@@ -14719,6 +14749,49 @@
                     },
                     "timezone": {
                       "type": "string"
+                    },
+                    "delegation": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "accessSessionPublicId",
+                        "companyName",
+                        "reason",
+                        "scope",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "accessSessionPublicId": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "companyName": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "scope": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "READ"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "CHANGE"
+                              ]
+                            }
+                          ]
+                        },
+                        "expiresAt": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 }

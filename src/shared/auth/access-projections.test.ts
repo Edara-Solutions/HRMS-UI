@@ -28,12 +28,15 @@ describe("shared access projections", () => {
       }),
     ).toEqual({ state: "disabled", reason: "access-unverified" });
     expect(
-      projectActionAvailability("GET /api/v1/platform/access-sessions/{sessionPublicId}/users", {
-        audience: "platform",
-        authenticated: true,
-        permissions: ["delegation:users:read"],
-        accessSession: "inactive",
-      }),
+      projectActionAvailability(
+        "GET /api/v1/platform/access-sessions/{sessionPublicId}/audit-trail",
+        {
+          audience: "platform",
+          authenticated: true,
+          permissions: ["delegation:audit:read"],
+          accessSession: "inactive",
+        },
+      ),
     ).toEqual({ state: "hidden" });
   });
   it.each([
@@ -139,12 +142,12 @@ describe("shared access projections", () => {
     expect(projectRouteAccess("/company/me/profile", { ...company, companyMode: "BLOCKED" })).toBe(
       "allow",
     );
-    const delegated = "GET /api/v1/platform/access-sessions/{sessionPublicId}/users";
+    const delegated = "GET /api/v1/platform/access-sessions/{sessionPublicId}/audit-trail";
     expect(
       projectActionAvailability(delegated, {
         audience: "platform",
         authenticated: true,
-        permissions: ["delegation:users:read"],
+        permissions: ["delegation:audit:read"],
         accessSession: "inactive",
         delegatedScopeMatches: true,
         delegatedGrant: true,
@@ -154,7 +157,7 @@ describe("shared access projections", () => {
       projectActionAvailability(delegated, {
         audience: "platform",
         authenticated: true,
-        permissions: ["delegation:users:read"],
+        permissions: ["delegation:audit:read"],
         accessSession: "foreign",
       }),
     ).toEqual({ state: "hidden" });

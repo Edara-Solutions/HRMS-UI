@@ -35,7 +35,7 @@ function open(permissions: readonly string[] = diagnosticsPermissions) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const view = render(
     <QueryClientProvider client={client}>
-      <AccessSessionPage sessionPublicId={ids.session} search={{ area: "email" }} />
+      <AccessSessionPage sessionPublicId={ids.session} search={{ area: "diagnostics" }} />
     </QueryClientProvider>,
   );
   return { net, client, platform, view };

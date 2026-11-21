@@ -3,22 +3,14 @@ import { z } from "zod";
 import { defineOperation } from "../runtime";
 
 export const requestSchema = z
-  .object({
-    params: z
-      .object({ sessionPublicId: z.string().uuid(), stepPublicId: z.string().uuid() })
-      .strict(),
-  })
+  .object({ params: z.object({ sessionPublicId: z.string().uuid() }).strict() })
   .strict();
 export const responseSchemas = {
   "200": z
     .object({
-      publicId: z.string().uuid(),
-      stepType: z.string(),
-      status: z.string(),
-      isRequired: z.boolean(),
-      sequence: z.number().int(),
-      startedAt: z.union([z.string().datetime({ offset: true }), z.null()]),
-      completedAt: z.union([z.string().datetime({ offset: true }), z.null()]),
+      accessToken: z.string(),
+      expiresIn: z.number().int().min(1),
+      companyPublicId: z.string().uuid(),
     })
     .strict(),
   "400": z.object({
@@ -161,83 +153,13 @@ export const responseSchemas = {
     reason: z.union([z.string().max(255), z.null()]).optional(),
     effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
   }),
-  "409": z.object({
-    type: z.string().refine((value) => {
-      try {
-        new URL(value, "https://contract.invalid");
-        return true;
-      } catch {
-        return false;
-      }
-    }),
-    title: z.string(),
-    status: z.number().int().min(400).max(599),
-    detail: z.string(),
-    instance: z.string().refine((value) => {
-      try {
-        new URL(value, "https://contract.invalid");
-        return true;
-      } catch {
-        return false;
-      }
-    }),
-    traceId: z.string().regex(/^[0-9a-f]{32}$/),
-    invalidParams: z.array(z.string().min(1)).optional(),
-    code: z.literal("COMPANY_ACCESS_DENIED").optional(),
-    mode: z
-      .union([
-        z.literal("NORMAL"),
-        z.literal("READ_ONLY"),
-        z.literal("FROZEN"),
-        z.literal("BLOCKED"),
-        z.literal("MAINTENANCE"),
-      ])
-      .optional(),
-    reason: z.union([z.string().max(255), z.null()]).optional(),
-    effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
-  }),
-  "422": z.object({
-    type: z.string().refine((value) => {
-      try {
-        new URL(value, "https://contract.invalid");
-        return true;
-      } catch {
-        return false;
-      }
-    }),
-    title: z.string(),
-    status: z.number().int().min(400).max(599),
-    detail: z.string(),
-    instance: z.string().refine((value) => {
-      try {
-        new URL(value, "https://contract.invalid");
-        return true;
-      } catch {
-        return false;
-      }
-    }),
-    traceId: z.string().regex(/^[0-9a-f]{32}$/),
-    invalidParams: z.array(z.string().min(1)).optional(),
-    code: z.literal("COMPANY_ACCESS_DENIED").optional(),
-    mode: z
-      .union([
-        z.literal("NORMAL"),
-        z.literal("READ_ONLY"),
-        z.literal("FROZEN"),
-        z.literal("BLOCKED"),
-        z.literal("MAINTENANCE"),
-      ])
-      .optional(),
-    reason: z.union([z.string().max(255), z.null()]).optional(),
-    effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
-  }),
 } as const;
 
 export const operation = defineOperation({
-  audience: "delegated",
-  key: "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete",
+  audience: "platform",
+  key: "POST /api/v1/platform/access-sessions/{sessionPublicId}/enter",
   method: "POST",
-  path: "/api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete",
+  path: "/api/v1/platform/access-sessions/{sessionPublicId}/enter",
   requestSchema,
   responses: responseSchemas,
 });

@@ -204,6 +204,14 @@ export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = 
     enumParams: ["decision"],
     route: null,
   }),
+  catalogEntry("company.support-access-opened", {
+    importance: "high",
+    tone: "warning",
+    icon: KeyRound,
+    paramsSchema: z.object({ scope: z.enum(["READ", "CHANGE"]), expiresAt: z.string() }),
+    enumParams: ["scope"],
+    route: null,
+  }),
   catalogEntry("company.announcement", {
     importance: "normal",
     tone: "info",

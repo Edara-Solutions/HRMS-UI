@@ -1,4 +1,4 @@
-import { useCompanySession } from "../auth/company-session";
+import { endSupportAccess, isSupportDelegate, useCompanySession } from "../auth/company-session";
 import { refreshCompanyTokens } from "../auth/company-session-api";
 import { createAudienceClient } from "./audience-client";
 
@@ -14,7 +14,8 @@ export const companyApiClient = createAudienceClient({
   getSessionGeneration: () => useCompanySession.getState().generation,
   refresh: refreshCompanyTokens,
   updateTokens: (tokens) => useCompanySession.getState().updateTokens(tokens),
-  clearSession: () => useCompanySession.getState().clearSession(),
+  clearSession: () => endSupportAccess(),
+  endsOnUnauthorized: () => isSupportDelegate(currentSession()?.user),
   markUnavailable: () => useCompanySession.getState().setStatus("unavailable"),
   canReplayProtectedRead: () => useCompanySession.getState().status === "authenticated",
   validateRefreshedIdentity: async () => {

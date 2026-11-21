@@ -55,6 +55,7 @@ export interface AccessFacts {
   delegatedScopeMatches?: boolean;
   delegatedGrant?: boolean;
   delegatedReadOnly?: boolean;
+  supportDelegate?: boolean;
   restriction?: ActionRestriction;
   target?: {
     self?: boolean;
@@ -402,7 +403,8 @@ export function projectActionAvailability(
       return { state: "disabled", reason: "access-session-read-only" };
   }
   if (policy.authorization !== "SELF" && facts.audience === "company") {
-    if (facts.companyMode === "BLOCKED") return { state: "disabled", reason: "company-blocked" };
+    if (facts.companyMode === "BLOCKED" && !facts.supportDelegate)
+      return { state: "disabled", reason: "company-blocked" };
     const write = !operation.startsWith("GET ") && !operation.startsWith("HEAD ");
     // An unknown mode fails closed, but says so instead of claiming the workspace is restricted.
     if (write && facts.companyMode === undefined)
@@ -436,7 +438,8 @@ export function projectRouteAccess(pathname: string, facts: AccessFacts): Access
   if (!facts.authenticated) return "authenticate";
   if (facts.mustChangePassword && route.category !== "credential") return "credential-completion";
   if (route.category === "self" || route.category === "credential") return "allow";
-  if (route.audience === "company" && facts.companyMode === "BLOCKED") return "company-blocked";
+  if (route.audience === "company" && facts.companyMode === "BLOCKED" && !facts.supportDelegate)
+    return "company-blocked";
   if (route.operation) {
     const available = projectActionAvailability(route.operation, facts);
     if (

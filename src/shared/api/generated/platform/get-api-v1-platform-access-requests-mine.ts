@@ -53,6 +53,7 @@ export const responseSchemas = {
                   ]),
                   expiresAt: z.string().datetime({ offset: true }),
                   endNote: z.union([z.string(), z.null()]),
+                  fromThisSignIn: z.boolean(),
                 })
                 .strict(),
               z.null(),

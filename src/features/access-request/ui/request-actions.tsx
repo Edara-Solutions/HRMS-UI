@@ -48,10 +48,25 @@ export function RequestActions({ request, blocked = false }: RequestActionsProps
           {t("access.card.open")}
         </Button>
       )}
-      {display === "SESSION_OPEN" && request.session && (
+      {display === "SESSION_OPEN" && request.session?.fromThisSignIn && (
         <Button intent="cta" size="sm" onClick={() => goToSession(request.session?.publicId ?? "")}>
           {t("access.card.goToSession")}
         </Button>
+      )}
+      {display === "SESSION_OPEN" && request.session && !request.session.fromThisSignIn && (
+        <>
+          <p className="text-xs text-[var(--color-text-muted)]">{t("access.card.otherSignIn")}</p>
+          <Button
+            intent="destructive-trigger"
+            size="sm"
+            disabled={command.pending}
+            onClick={() =>
+              command.run({ kind: "close", sessionPublicId: request.session?.publicId ?? "" })
+            }
+          >
+            {t("access.card.closeSession")}
+          </Button>
+        </>
       )}
       <CommandFailure failure={command.failure} />
     </div>

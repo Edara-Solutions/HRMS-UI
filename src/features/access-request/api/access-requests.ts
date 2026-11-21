@@ -52,7 +52,8 @@ export type AccessCommand =
     }
   | { kind: "reject"; requestPublicId: string; note: string }
   | { kind: "open"; requestPublicId: string }
-  | { kind: "end"; sessionPublicId: string; note: string };
+  | { kind: "end"; sessionPublicId: string; note: string }
+  | { kind: "close"; sessionPublicId: string };
 
 export function sendAccessCommand(command: AccessCommand): Promise<{ readonly publicId: string }> {
   switch (command.kind) {
@@ -88,6 +89,10 @@ export function sendAccessCommand(command: AccessCommand): Promise<{ readonly pu
       return requestPlatformOperation(sessions.end, {
         params: { sessionPublicId: command.sessionPublicId },
         body: { note: command.note.trim() },
+      });
+    case "close":
+      return requestPlatformOperation(sessions.close, {
+        params: { sessionPublicId: command.sessionPublicId },
       });
   }
 }

@@ -9,8 +9,7 @@ import { PageTabs } from "@/shared/ui/page-tabs";
 import { Skeleton } from "@/shared/ui/skeleton";
 import {
   type AccessSession,
-  areaAlternativeReads,
-  areaReadOperation,
+  areaReads,
   type WorkspaceArea,
   type WorkspaceSearch,
   workspaceAreas,
@@ -19,10 +18,8 @@ import {
   type AccessSessionWorkspace,
   useAccessSessionWorkspace,
 } from "../model/use-access-session-workspace";
-import { EmailPanel } from "./email-panel";
-import { EmployeesPanel } from "./employees-panel";
-import { ProfileSetupPanel } from "./profile-setup-panel";
-import { RolesPanel } from "./roles-panel";
+import { CompanyPortalCard } from "./company-portal-card";
+import { EmailDiagnosticsPanel } from "./email-diagnostics-panel";
 import { ScopedAuditPanel } from "./scoped-audit-panel";
 import { SessionRail } from "./session-rail";
 
@@ -126,39 +123,33 @@ function WorkspaceContent({ workspace, session, area }: WorkspaceContentProps) {
     );
 
   const visible = workspaceAreas.filter((candidate) =>
-    [areaReadOperation[candidate], ...(areaAlternativeReads[candidate] ?? [])].some(
+    areaReads[candidate].some(
       (name) => workspace.availability(delegatedCompanyOperations[name]).state === "enabled",
     ),
   );
-  if (visible.length === 0)
-    return (
-      <Card>
-        <CardContent className="p-6 text-sm" role="status">
-          {t("area.none")}
-        </CardContent>
-      </Card>
-    );
   const active = area && visible.includes(area) ? area : visible[0];
 
   return (
-    <div>
-      <PageTabs
-        ariaLabel={t("areasLabel")}
-        value={active}
-        items={visible.map((value) => ({ value, label: t(`area.${value}`) }))}
-        onValueChange={(value) =>
-          void navigate({
-            to: "/platform/access-sessions/$sessionPublicId",
-            params: { sessionPublicId: session.publicId },
-            search: { area: value },
-          })
-        }
-      />
-      {active === "employees" && <EmployeesPanel workspace={workspace} />}
-      {active === "roles" && <RolesPanel workspace={workspace} />}
-      {active === "profile" && <ProfileSetupPanel workspace={workspace} />}
-      {active === "email" && <EmailPanel workspace={workspace} />}
-      {active === "audit" && <ScopedAuditPanel workspace={workspace} />}
+    <div className="space-y-6">
+      <CompanyPortalCard workspace={workspace} />
+      {active && (
+        <div>
+          <PageTabs
+            ariaLabel={t("areasLabel")}
+            value={active}
+            items={visible.map((value) => ({ value, label: t(`area.${value}`) }))}
+            onValueChange={(value) =>
+              void navigate({
+                to: "/platform/access-sessions/$sessionPublicId",
+                params: { sessionPublicId: session.publicId },
+                search: { area: value },
+              })
+            }
+          />
+          {active === "diagnostics" && <EmailDiagnosticsPanel workspace={workspace} />}
+          {active === "audit" && <ScopedAuditPanel workspace={workspace} />}
+        </div>
+      )}
     </div>
   );
 }

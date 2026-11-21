@@ -21,8 +21,14 @@ export {
   createAudienceSessionStore,
 } from "./audience-session";
 export {
+  type CompanyDelegation,
   type CompanySession,
   type CompanyUser,
+  dropSupportAccess,
+  endSupportAccess,
+  isSupportDelegate,
+  supportSessionPath,
+  useCompanyDelegation,
   useCompanySession,
 } from "./company-session";
 export {

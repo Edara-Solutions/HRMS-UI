@@ -34,6 +34,12 @@ export const responseSchemas = {
                 .strict(),
               z
                 .object({
+                  scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+                  expiresAt: z.string().datetime({ offset: true }),
+                })
+                .strict(),
+              z
+                .object({
                   announcementPublicId: z.string(),
                   message: z
                     .object({

@@ -16,6 +16,7 @@ export interface AudienceClientOptions {
   markUnavailable?: () => void;
   validateRefreshedIdentity?: () => Promise<void>;
   canReplayProtectedRead?: () => boolean;
+  endsOnUnauthorized?: () => boolean;
 }
 
 export interface AudienceClient extends KyInstance {
@@ -72,6 +73,14 @@ export function createAudienceClient(options: AudienceClientOptions): AudienceCl
           const contract = responseContract(requestOptions.context.operation);
           if (response.status === 401 && contract) {
             await readOperationResponse(contract, response.clone());
+          }
+          if (
+            response.status === 401 &&
+            !isAuthPath(request.url) &&
+            options.endsOnUnauthorized?.() === true
+          ) {
+            options.clearSession();
+            return response;
           }
           if (
             response.status === 401 &&

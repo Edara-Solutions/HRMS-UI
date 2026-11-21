@@ -10,7 +10,12 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useCurrentAudience, useCurrentSession } from "@/shared/auth";
+import {
+  endSupportAccess,
+  useCompanyDelegation,
+  useCurrentAudience,
+  useCurrentSession,
+} from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { cn } from "@/shared/lib/cn";
 import { Avatar } from "@/shared/ui/avatar";
@@ -294,6 +299,11 @@ const selfPages = [
   },
 ] as const;
 
+const signOutLabel = {
+  signOut: { en: "Sign out", ar: "تسجيل الخروج" },
+  leave: { en: "Leave support access", ar: "مغادرة وصول الدعم" },
+} as const;
+
 function UserMenu({
   onClose,
   triggerRef,
@@ -302,6 +312,7 @@ function UserMenu({
   triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const audience = useCurrentAudience();
+  const delegated = useCompanyDelegation() !== null && audience === "company";
   const locale = usePreferencesStore((state) => state.locale);
   const navigate = useNavigate();
   const logout = useMutation({
@@ -372,7 +383,8 @@ function UserMenu({
   }, [triggerRef]);
 
   function handleLogout() {
-    if (!logout.isPending) logout.mutate();
+    if (delegated) endSupportAccess();
+    else if (!logout.isPending) logout.mutate();
   }
 
   const itemClass =
@@ -385,7 +397,7 @@ function UserMenu({
       className="z-50 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]"
       role="menu"
     >
-      {selfPages.map(({ path, icon, label }) => (
+      {(delegated ? [] : selfPages).map(({ path, icon, label }) => (
         <Link
           key={path}
           to={`/${audience === "platform" ? "platform" : "company"}/me/${path}`}
@@ -397,7 +409,7 @@ function UserMenu({
           <span>{label[locale]}</span>
         </Link>
       ))}
-      <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />
+      {!delegated && <hr className="my-1 h-px border-0 bg-[var(--color-border)]" />}
       <button
         type="button"
         className={cn(
@@ -409,7 +421,7 @@ function UserMenu({
         role="menuitem"
       >
         <LogOut size={14} className="shrink-0" />
-        <span>{locale === "ar" ? "تسجيل الخروج" : "Sign out"}</span>
+        <span>{signOutLabel[delegated ? "leave" : "signOut"][locale]}</span>
       </button>
     </div>,
     document.body,

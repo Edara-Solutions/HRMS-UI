@@ -83,30 +83,6 @@ export function SessionRail({ session, companyName, workspace }: SessionRailProp
           </p>
         </CardContent>
       </Card>
-      <Card as="section" aria-labelledby="session-activity-title">
-        <CardHeader>
-          <CardTitle id="session-activity-title">{t("activity.title")}</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 text-sm">
-          {workspace.activity.length === 0 ? (
-            <p className="text-[var(--color-text-muted)]">{t("activity.empty")}</p>
-          ) : (
-            <ol className="space-y-2">
-              {workspace.activity.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap justify-between gap-x-3">
-                  <span>{t(`activity.${entry.kind}`)}</span>
-                  <time
-                    dateTime={new Date(entry.at).toISOString()}
-                    className="text-xs text-[var(--color-text-muted)]"
-                  >
-                    {formatInstant(new Date(entry.at).toISOString(), locale)}
-                  </time>
-                </li>
-              ))}
-            </ol>
-          )}
-        </CardContent>
-      </Card>
       <ConfirmDialog
         open={confirming}
         title={t("close.title")}

@@ -1,6 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "@tanstack/react-router";
-import { type AudienceName, useAudienceSession } from "@/shared/auth";
+import {
+  type AudienceName,
+  endSupportAccess,
+  useAudienceSession,
+  useCompanyDelegation,
+} from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { type RefusalKind, RefusalSurface } from "@/shared/ui/refusal-surface";
 
@@ -37,6 +42,7 @@ function AnonymousRefusal({ kind }: { kind: RefusalKind }) {
 function AudienceRefusal({ kind, audience }: { kind: RefusalKind; audience: AudienceName }) {
   const locale = usePreferencesStore((state) => state.locale);
   const state = useAudienceSession(audience);
+  const delegated = useCompanyDelegation() !== null && audience === "company";
   const signOut = useMutation({
     retry: false,
     mutationFn: async () =>
@@ -47,9 +53,8 @@ function AudienceRefusal({ kind, audience }: { kind: RefusalKind; audience: Audi
       window.location.assign(`/${audience}/login?localSignOutOnly=${!result.remoteConfirmed}`),
   });
   const established = state.status === "authenticated" && !!state.session;
-  const destination = established
-    ? `/${audience}/${kind === "no-work-access" || kind === "company-blocked" ? "me/profile" : "dashboard"}`
-    : "/";
+  const personal = !delegated && (kind === "no-work-access" || kind === "company-blocked");
+  const destination = established ? `/${audience}/${personal ? "me/profile" : "dashboard"}` : "/";
   return (
     <RefusalSurface
       kind={kind}
@@ -65,7 +70,12 @@ function AudienceRefusal({ kind, audience }: { kind: RefusalKind; audience: Audi
             : "Back to home"
       }
     >
-      {established && (kind === "no-work-access" || kind === "company-blocked") && (
+      {established && delegated && (
+        <button type="button" className="mt-6 text-sm" onClick={endSupportAccess}>
+          {locale === "ar" ? "مغادرة وصول الدعم" : "Leave support access"}
+        </button>
+      )}
+      {established && personal && (
         <nav
           className="mt-6 flex flex-wrap justify-center gap-4 text-sm"
           aria-label={locale === "ar" ? "حسابي" : "My account"}

@@ -7,6 +7,31 @@ import { clearCredentialContext } from "./credential-context";
 
 export type CompanyUser = CompanyMeUser;
 export type CompanySession = AudienceSession<CompanyUser>;
+export type CompanyDelegation = NonNullable<CompanyUser["delegation"]>;
+
+export function supportSessionPath(accessSessionPublicId: string) {
+  return `/platform/access-sessions/${accessSessionPublicId}`;
+}
+
+export function isSupportDelegate(user: CompanyUser | undefined): boolean {
+  return user?.delegation !== undefined;
+}
+
+export function dropSupportAccess(accessSessionPublicId: string) {
+  const delegation = useCompanySession.getState().session?.user.delegation;
+  if (delegation?.accessSessionPublicId === accessSessionPublicId)
+    useCompanySession.getState().clearSession();
+}
+
+export function endSupportAccess() {
+  const delegation = useCompanySession.getState().session?.user.delegation;
+  useCompanySession.getState().clearSession();
+  if (delegation) window.location.assign(supportSessionPath(delegation.accessSessionPublicId));
+}
+
+export function useCompanyDelegation(): CompanyDelegation | null {
+  return useCompanySession((state) => state.session?.user.delegation ?? null);
+}
 
 export const useCompanySession = createAudienceSessionStore<CompanyUser>(
   "company",

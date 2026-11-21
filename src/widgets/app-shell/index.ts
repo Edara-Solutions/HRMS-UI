@@ -2,3 +2,4 @@ export { buildNavGroups, isUpcomingModulesEnabled, type NavGroup } from "./model
 export { AppShell } from "./ui/app-shell";
 export { Header } from "./ui/header";
 export { SessionFooter } from "./ui/sidebar";
+export { SupportAccessBanner } from "./ui/support-access-banner";

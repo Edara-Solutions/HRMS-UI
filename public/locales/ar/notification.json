@@ -47,6 +47,8 @@
   "notifications.company.activated.body": "شركتك الآن مفعّلة على إدارة.",
   "notifications.company.conversion-decided.title": "طلب التحويل {{decision}}",
   "notifications.company.conversion-decided.body": "قامت إدارة بمراجعة طلب التحويل الخاص بك.",
+  "notifications.company.support-access-opened.title": "فتح دعم إدارة وصولًا",
+  "notifications.company.support-access-opened.body": "يمكن لموظف دعم من إدارة الآن العمل في شركتك بصلاحية {{scope}} لفترة محدودة. تظهر إجراءاته في سجل التدقيق.",
   "notifications.company.announcement.title": "إعلان",
   "notifications.company.announcement.body": "تم نشر إعلان جديد.",
   "notifications.unknown.title": "إشعار جديد",
