@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { OperationRefusal } from "@/shared/api";
 import { useAudienceSession } from "@/shared/auth";
 import { formatFullInstant } from "@/shared/lib/format-instant";
 import { Button } from "@/shared/ui/button";
@@ -31,31 +32,34 @@ export function SessionList({ identity, service }: SessionListProps) {
   const revoke = useMutation({
     retry: false,
     mutationFn: async () => {
-      if (
-        identity.audience !== "company" ||
-        !service.revokeSession ||
-        !selectedId ||
-        !sessions.data?.items.some((item) => item.id === selectedId)
-      )
+      if (!selectedId || !sessions.data?.items.some((item) => item.id === selectedId))
         throw new Error("Session unavailable");
       await service.revokeSession(selectedId);
     },
     onSuccess: async () => {
-      setSelectedId(null);
       if (state.session?.sessionId === selectedId) {
+        setSelectedId(null);
         await navigate({
           to: identity.audience === "company" ? "/company/login" : "/platform/login",
         });
         return;
       }
-      await queries.invalidateQueries({ queryKey: queryRoot });
-      setFeedback(t("account.sessionRevoked"));
+      await reconcile("account.sessionRevoked");
     },
-    onError: async () => {
-      await queries.invalidateQueries({ queryKey: queryRoot });
-      setFeedback(t("account.uncertainChange"));
-    },
+    onError: (error) =>
+      reconcile(
+        error instanceof OperationRefusal && error.status === 404
+          ? "account.sessionAlreadyEnded"
+          : "account.uncertainChange",
+      ),
   });
+
+  async function reconcile(message: string) {
+    setSelectedId(null);
+    revoke.reset();
+    await queries.invalidateQueries({ queryKey: queryRoot });
+    setFeedback(t(message));
+  }
 
   if (sessions.isPending) return <p role="status">{t("account.loading")}</p>;
   if (sessions.isError)
@@ -105,7 +109,7 @@ export function SessionList({ identity, service }: SessionListProps) {
                   </bdi>
                 </p>
               </div>
-              {identity.audience === "company" && service.revokeSession ? (
+              {service.canRevokeCurrent || !session.isCurrent ? (
                 <Button
                   intent="destructive-trigger"
                   disabled={revoke.isPending}
@@ -154,12 +158,13 @@ export function SessionList({ identity, service }: SessionListProps) {
         descriptionId={descriptionId}
       >
         <DialogTitle id={titleId}>{t("account.revokeTitle")}</DialogTitle>
-        <DialogDescription id={descriptionId}>{t("account.revokeDescription")}</DialogDescription>
-        {revoke.isError ? (
-          <p role="status" className="mt-3 text-sm">
-            {t("account.uncertainChange")}
-          </p>
-        ) : null}
+        <DialogDescription id={descriptionId}>
+          {t(
+            service.canRevokeCurrent
+              ? "account.revokeDescription"
+              : "account.revokeOtherDescription",
+          )}
+        </DialogDescription>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button
             intent="destructive"
