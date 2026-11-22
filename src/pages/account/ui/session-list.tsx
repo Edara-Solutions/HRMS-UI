@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { OperationRefusal } from "@/shared/api";
 import { useAudienceSession } from "@/shared/auth";
 import { formatFullInstant } from "@/shared/lib/format-instant";
 import { Button } from "@/shared/ui/button";
@@ -32,7 +33,6 @@ export function SessionList({ identity, service }: SessionListProps) {
     retry: false,
     mutationFn: async () => {
       if (
-        identity.audience !== "company" ||
         !service.revokeSession ||
         !selectedId ||
         !sessions.data?.items.some((item) => item.id === selectedId)
@@ -51,7 +51,14 @@ export function SessionList({ identity, service }: SessionListProps) {
       await queries.invalidateQueries({ queryKey: queryRoot });
       setFeedback(t("account.sessionRevoked"));
     },
-    onError: async () => {
+    onError: async (error) => {
+      if (error instanceof OperationRefusal && error.status === 404) {
+        setSelectedId(null);
+        revoke.reset();
+        await queries.invalidateQueries({ queryKey: queryRoot });
+        setFeedback(t("account.sessionAlreadyEnded"));
+        return;
+      }
       await queries.invalidateQueries({ queryKey: queryRoot });
       setFeedback(t("account.uncertainChange"));
     },
@@ -105,7 +112,7 @@ export function SessionList({ identity, service }: SessionListProps) {
                   </bdi>
                 </p>
               </div>
-              {identity.audience === "company" && service.revokeSession ? (
+              {service.revokeSession && !(identity.audience === "platform" && session.isCurrent) ? (
                 <Button
                   intent="destructive-trigger"
                   disabled={revoke.isPending}

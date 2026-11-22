@@ -22,7 +22,7 @@ export async function loadSelfService(audience: AudienceName) {
     updateProfile: platform.updatePlatformProfile,
     changeEmail: platform.changePlatformEmail,
     readSessions: platform.readPlatformSessions,
-    revokeSession: undefined,
+    revokeSession: platform.revokePlatformSession,
     signOut: auth.signOutPlatform,
   };
 }
