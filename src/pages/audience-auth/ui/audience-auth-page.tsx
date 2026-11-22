@@ -55,6 +55,15 @@ function credentialFields(audience: AudienceName, mode: CredentialMode): Credent
   ];
 }
 
+function isFailedResponse(violation: ContractViolation) {
+  if (violation.phase === "status") return true;
+  return (
+    violation.phase === "response" &&
+    violation.status !== undefined &&
+    (violation.status < 200 || violation.status >= 300)
+  );
+}
+
 export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPageProps) {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
@@ -169,7 +178,7 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
         t(
           error instanceof OperationRefusal && error.status === 429
             ? "journey.rateLimited"
-            : error instanceof ContractViolation
+            : error instanceof ContractViolation && !(mode === "login" && isFailedResponse(error))
               ? "journey.unavailable"
               : mode === "login"
                 ? "journey.signInFailed"
