@@ -1,9 +1,10 @@
 import type { UseQueryResult } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ActionAvailability } from "@/shared/auth";
 import { usePreferencesStore } from "@/shared/config";
 import { formatInstant } from "@/shared/lib/format-instant";
+import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { EnumSelect } from "@/shared/ui/enum-select";
@@ -12,8 +13,11 @@ import { Label } from "@/shared/ui/label";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { assignRole, revokeAssignment } from "../api/person";
 import {
+  activeAssignments,
   assignableRoles,
   assignmentExpiry,
+  expiredAssignments,
+  type ListedAssignment,
   type PersonRecord,
   type PlatformRole,
   type RoleAssignment,
@@ -42,7 +46,9 @@ export function PersonRolesCard({
   commands,
 }: PersonRolesCardProps) {
   const { t } = useTranslation("platform-people");
-  const held = assignments.data?.items ?? [];
+  const listed = assignments.data?.items ?? [];
+  const held = activeAssignments(listed);
+  const expired = expiredAssignments(listed);
 
   return (
     <Card as="section" aria-labelledby="platform-person-roles">
@@ -55,13 +61,16 @@ export function PersonRolesCard({
         ) : assignments.isError ? (
           <p>{t("state.loadFailed")}</p>
         ) : (
-          <AssignmentList
-            person={person}
-            held={held}
-            roles={roles}
-            revoke={revoke}
-            commands={commands}
-          />
+          <>
+            <AssignmentList
+              person={person}
+              held={held}
+              roles={roles}
+              revoke={revoke}
+              commands={commands}
+            />
+            <ExpiredList expired={expired} roles={roles} />
+          </>
         )}
         <RestrictionNote availability={revoke} />
         {assign.state !== "hidden" && roles !== undefined && (
@@ -77,9 +86,14 @@ export function PersonRolesCard({
   );
 }
 
+const stateVariant = {
+  ACTIVE: "success",
+  EXPIRED: "default",
+} as const satisfies Record<ListedAssignment["state"], string>;
+
 interface AssignmentListProps {
   person: PersonRecord;
-  held: readonly RoleAssignment[];
+  held: readonly ListedAssignment[];
   roles: readonly PlatformRole[] | undefined;
   revoke: ActionAvailability;
   commands: Commands;
@@ -94,19 +108,18 @@ function AssignmentList({ person, held, roles, revoke, commands }: AssignmentLis
   return (
     <ul className="divide-y divide-[var(--color-border)]">
       {held.map((assignment) => {
-        const role =
-          roles?.find((candidate) => candidate.publicId === assignment.rolePublicId)?.name ??
-          t("roles.unknown");
+        const role = roleName(roles, assignment) ?? t("roles.unknown");
         return (
-          <li key={assignment.publicId} className="flex flex-wrap items-center gap-2 py-2">
-            <div className="me-auto min-w-0">
-              <p className="break-words font-medium">{role}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">
-                {assignment.expiresAt
-                  ? t("roles.expires", { date: formatInstant(assignment.expiresAt, locale) })
-                  : t("roles.noExpiry")}
-              </p>
-            </div>
+          <AssignmentRow
+            key={assignment.publicId}
+            role={role}
+            state={assignment.state}
+            detail={
+              assignment.expiresAt
+                ? t("roles.expires", { date: formatInstant(assignment.expiresAt, locale) })
+                : t("roles.noExpiry")
+            }
+          >
             {revoke.state !== "hidden" && (
               <Button
                 intent="destructive-trigger"
@@ -127,11 +140,81 @@ function AssignmentList({ person, held, roles, revoke, commands }: AssignmentLis
                 {t("roles.revokeConfirm.action")}
               </Button>
             )}
-          </li>
+          </AssignmentRow>
         );
       })}
     </ul>
   );
+}
+
+interface ExpiredListProps {
+  expired: readonly ListedAssignment[];
+  roles: readonly PlatformRole[] | undefined;
+}
+
+function ExpiredList({ expired, roles }: ExpiredListProps) {
+  const { t } = useTranslation("platform-people");
+  const locale = usePreferencesStore((state) => state.locale);
+  if (expired.length === 0) return null;
+
+  return (
+    <section
+      aria-labelledby="platform-person-expired-roles"
+      className="space-y-1 border-t border-[var(--color-border)] pt-4"
+    >
+      <h4
+        id="platform-person-expired-roles"
+        className="text-xs font-medium text-[var(--color-text-muted)]"
+      >
+        {t("roles.expiredTitle")}
+      </h4>
+      <ul className="divide-y divide-[var(--color-border)]">
+        {expired.map((assignment) => (
+          <AssignmentRow
+            key={assignment.publicId}
+            role={roleName(roles, assignment) ?? t("roles.unknown")}
+            state={assignment.state}
+            detail={
+              assignment.expiresAt
+                ? t("roles.expiredOn", { date: formatInstant(assignment.expiresAt, locale) })
+                : null
+            }
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+interface AssignmentRowProps {
+  role: string;
+  state: ListedAssignment["state"];
+  detail: string | null;
+  children?: ReactNode;
+}
+
+function AssignmentRow({ role, state, detail, children }: AssignmentRowProps) {
+  const { t } = useTranslation("platform-people");
+
+  return (
+    <li className="flex flex-wrap items-center gap-2 py-2">
+      <div className="me-auto min-w-0">
+        <p className="flex flex-wrap items-center gap-2 break-words font-medium">
+          <span>{role}</span>
+          <Badge variant={stateVariant[state]}>{t(`roles.state.${state}`)}</Badge>
+        </p>
+        {detail && <p className="text-xs text-[var(--color-text-muted)]">{detail}</p>}
+      </div>
+      {children}
+    </li>
+  );
+}
+
+function roleName(
+  roles: readonly PlatformRole[] | undefined,
+  assignment: RoleAssignment,
+): string | undefined {
+  return roles?.find((candidate) => candidate.publicId === assignment.rolePublicId)?.name;
 }
 
 interface AssignRoleFormProps {

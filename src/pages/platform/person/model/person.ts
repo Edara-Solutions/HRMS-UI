@@ -86,7 +86,9 @@ export function personTarget(
   const rootRoles = new Set(roles.filter((role) => role.isSystem).map((role) => role.publicId));
   return {
     self,
-    root: assignments.some((assignment) => rootRoles.has(assignment.rolePublicId)),
+    root: activeAssignments(assignments).some((assignment) =>
+      rootRoles.has(assignment.rolePublicId),
+    ),
   };
 }
 
@@ -138,6 +140,20 @@ export function targetFacts(
     },
     restriction: target.root === undefined && !actorRoot ? "access-unverified" : undefined,
   };
+}
+
+export type ListedAssignment = RoleAssignment & { state: "ACTIVE" | "EXPIRED" };
+
+export function activeAssignments(assignments: readonly RoleAssignment[]): ListedAssignment[] {
+  return assignments.filter(
+    (assignment): assignment is ListedAssignment => assignment.state === "ACTIVE",
+  );
+}
+
+export function expiredAssignments(assignments: readonly RoleAssignment[]): ListedAssignment[] {
+  return assignments.filter(
+    (assignment): assignment is ListedAssignment => assignment.state === "EXPIRED",
+  );
 }
 
 /** Roles the target does not already hold, in catalogue order. */

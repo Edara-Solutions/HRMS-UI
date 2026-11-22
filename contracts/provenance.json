@@ -1,11 +1,11 @@
 {
-  "commit": "4dc814e4b621d139b07043da37067a3e3561cfa2",
+  "commit": "d45b447d080aa6ec15a8184b77bdb46e0f552641",
   "ref": "dev",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "d6432b499b535a98ac7098c44c25f923a257cd32da0d627cb405e60c3c5d0374"
+      "sha256": "b1e0f99efc3c350135f86acf1641f96ae83deae84e269c93161eb94aa3093a26"
     },
     "company": {
       "file": "contracts/openapi.company.json",
@@ -17,7 +17,7 @@
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "85ee0388f848741856b5b0cbd44ed5792a0f4c31f4b38238a3951eb370e7b572"
+      "sha256": "789a53873a8451c9037cd2ad4bb1cc415fb1079a3cd5b3979e8ba3bf94d8d0da"
     },
     "public": {
       "file": "contracts/openapi.public.json",

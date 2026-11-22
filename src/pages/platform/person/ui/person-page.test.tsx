@@ -6,6 +6,7 @@ import { platformSessionFixture } from "../../../../test/audience-fixtures";
 import { type OperationReply, problemBody } from "../../../../test/operation-fakes";
 import { operationNetwork } from "../../../../test/operation-request-mock";
 import {
+  type AssignmentFixture,
   platformAdministrator,
   platformAssignmentsBody,
   platformCanaries,
@@ -28,22 +29,17 @@ function actorUser(root: boolean, permissions: readonly string[]) {
   }).user;
 }
 
-interface Held {
-  publicId: string;
-  rolePublicId: string;
-}
-
 interface RenderOptions {
   target?: string;
   status?: string;
-  held?: Held[];
+  held?: AssignmentFixture[];
   root?: boolean;
   permissions?: readonly string[];
   person?: Record<string, unknown>;
   personReply?: () => Promise<OperationReply>;
 }
 
-const colleagueHeld: Held[] = [
+const colleagueHeld: AssignmentFixture[] = [
   { publicId: platformIds.colleagueAssignment, rolePublicId: platformIds.supportRole },
 ];
 
@@ -159,6 +155,7 @@ describe("Platform person detail", () => {
         platformUserPublicId: platformIds.colleague,
         rolePublicId: platformIds.rootRole,
         expiresAt: null,
+        state: "ACTIVE",
       },
     }));
     const select = await screen.findByRole("combobox", { name: "Assign a role" });
@@ -181,6 +178,109 @@ describe("Platform person detail", () => {
         expiresAt: null,
       },
     });
+  });
+
+  it("lists an Expired role apart from held roles with its date and no removal", async () => {
+    renderPerson({
+      root: true,
+      permissions: rootPermissions,
+      held: [
+        ...colleagueHeld,
+        {
+          publicId: platformIds.expiredAssignment,
+          rolePublicId: platformIds.auditorRole,
+          state: "EXPIRED",
+          expiresAt: "2025-03-01T09:00:00.000Z",
+        },
+      ],
+    });
+    const expired = await screen.findByRole("region", { name: "Expired roles" });
+    expect(within(expired).getByText("Auditor")).toBeInTheDocument();
+    expect(within(expired).getByText(/^Expired 1 Mar 2025/)).toBeInTheDocument();
+    expect(within(expired).queryByRole("button")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Remove Auditor" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Remove Support" })).toBeInTheDocument();
+    const roles = screen.getByRole("region", { name: "Roles" });
+    expect(within(roles).getAllByText("Active")).toHaveLength(1);
+    expect(within(expired).getByText("Expired")).toBeInTheDocument();
+  });
+
+  it("offers an Expired role in the picker so it can be renewed", async () => {
+    const net = renderPerson({
+      root: true,
+      permissions: rootPermissions,
+      held: [
+        ...colleagueHeld,
+        {
+          publicId: platformIds.expiredAssignment,
+          rolePublicId: platformIds.auditorRole,
+          state: "EXPIRED",
+          expiresAt: "2025-03-01T09:00:00.000Z",
+        },
+      ],
+    });
+    net.on("POST /api/v1/platform/role-assignments", () => ({
+      status: 201,
+      body: {
+        publicId: platformIds.rootAssignment,
+        platformUserPublicId: platformIds.colleague,
+        rolePublicId: platformIds.auditorRole,
+        expiresAt: null,
+        state: "ACTIVE",
+      },
+    }));
+    const select = await screen.findByRole("combobox", { name: "Assign a role" });
+    await waitFor(() => expect(select).toBeEnabled());
+    fireEvent.click(select);
+    const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
+    expect(options).toEqual(["SUPER_ADMIN", "Auditor"]);
+    fireEvent.click(screen.getByRole("option", { name: "Auditor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Assign role" }));
+    await confirmIn("Assign role");
+    expect(await screen.findByText("Omar Nabil now holds Auditor.")).toBeInTheDocument();
+  });
+
+  it("shows a renewed role once as held and once as Expired, and no longer offers it", async () => {
+    renderPerson({
+      root: true,
+      permissions: rootPermissions,
+      held: [
+        ...colleagueHeld,
+        { publicId: platformIds.renewedAssignment, rolePublicId: platformIds.auditorRole },
+        {
+          publicId: platformIds.expiredAssignment,
+          rolePublicId: platformIds.auditorRole,
+          state: "EXPIRED",
+          expiresAt: "2025-03-01T09:00:00.000Z",
+        },
+      ],
+    });
+    const expired = await screen.findByRole("region", { name: "Expired roles" });
+    expect(within(expired).getAllByText("Auditor")).toHaveLength(1);
+    expect(screen.getAllByText("Auditor")).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Remove Auditor" })).toBeInTheDocument();
+    const select = screen.getByRole("combobox", { name: "Assign a role" });
+    await waitFor(() => expect(select).toBeEnabled());
+    fireEvent.click(select);
+    const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
+    expect(options).toEqual(["SUPER_ADMIN"]);
+  });
+
+  it("does not treat an Expired root assignment as root standing", async () => {
+    renderPerson({
+      target: platformIds.root,
+      held: [
+        {
+          publicId: platformIds.rootAssignment,
+          rolePublicId: platformIds.rootRole,
+          state: "EXPIRED",
+          expiresAt: "2025-03-01T09:00:00.000Z",
+        },
+      ],
+    });
+    const suspend = await screen.findByRole("button", { name: "Suspend" });
+    await waitFor(() => expect(suspend).toBeEnabled());
+    expect(screen.queryByText("Root", { selector: "span" })).toBeNull();
   });
 
   it("refuses a past expiry before any request", async () => {

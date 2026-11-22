@@ -49677,7 +49677,7 @@
     },
     "/api/v1/platform/role-assignments": {
       "get": {
-        "summary": "List one operator's current role assignments",
+        "summary": "List one operator's Active and Expired role assignments",
         "tags": [
           "Platform Roles"
         ],
@@ -49716,7 +49716,8 @@
                           "publicId",
                           "platformUserPublicId",
                           "rolePublicId",
-                          "expiresAt"
+                          "expiresAt",
+                          "state"
                         ],
                         "properties": {
                           "publicId": {
@@ -49738,6 +49739,28 @@
                               },
                               {
                                 "type": "null"
+                              }
+                            ]
+                          },
+                          "state": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "ACTIVE"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "EXPIRED"
+                                ]
+                              },
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "REVOKED"
+                                ]
                               }
                             ]
                           }
@@ -50144,7 +50167,8 @@
                     "publicId",
                     "platformUserPublicId",
                     "rolePublicId",
-                    "expiresAt"
+                    "expiresAt",
+                    "state"
                   ],
                   "properties": {
                     "publicId": {
@@ -50166,6 +50190,28 @@
                         },
                         {
                           "type": "null"
+                        }
+                      ]
+                    },
+                    "state": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ACTIVE"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "EXPIRED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "REVOKED"
+                          ]
                         }
                       ]
                     }
