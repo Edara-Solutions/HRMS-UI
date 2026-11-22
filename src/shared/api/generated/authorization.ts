@@ -547,6 +547,11 @@ export const operationAuthorization = {
     authorization: "SELF",
     permission: null,
   },
+  "DELETE /api/v1/platform/me/sessions/{sessionId}": {
+    audience: "platform",
+    authorization: "SELF",
+    permission: null,
+  },
   "GET /api/v1/platform/roles": {
     audience: "platform",
     authorization: "P",
