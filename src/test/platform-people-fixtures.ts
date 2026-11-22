@@ -11,6 +11,7 @@ export const platformIds = {
   auditorRole: "7c6d5e4f-3a2b-4c1d-8e9f-0a1b2c3d4e5f",
   colleagueAssignment: "d2c1b0a9-f8e7-4d6c-9b5a-4f3e2d1c0b9a",
   rootAssignment: "e3d2c1b0-a9f8-4e7d-8c6b-5a4f3e2d1c0b",
+  expiredAssignment: "f4e3d2c1-b0a9-4f8e-9d7c-6b5a4f3e2d1c",
   session: "8d7e6f5a-4b3c-4d2e-9f1a-0b1c2d3e4f5a",
 } as const;
 
@@ -96,13 +97,19 @@ export function platformRolesBody() {
 
 export function platformAssignmentsBody(
   platformUserPublicId: string,
-  held: readonly { publicId: string; rolePublicId: string }[],
+  held: readonly {
+    publicId: string;
+    rolePublicId: string;
+    state?: "ACTIVE" | "EXPIRED";
+    expiresAt?: string | null;
+  }[],
 ) {
   return {
     items: held.map((assignment) => ({
-      ...assignment,
       platformUserPublicId,
       expiresAt: null,
+      state: "ACTIVE",
+      ...assignment,
     })),
   };
 }

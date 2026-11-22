@@ -86,7 +86,9 @@ export function personTarget(
   const rootRoles = new Set(roles.filter((role) => role.isSystem).map((role) => role.publicId));
   return {
     self,
-    root: assignments.some((assignment) => rootRoles.has(assignment.rolePublicId)),
+    root: activeAssignments(assignments).some((assignment) =>
+      rootRoles.has(assignment.rolePublicId),
+    ),
   };
 }
 
@@ -140,12 +142,20 @@ export function targetFacts(
   };
 }
 
+export function activeAssignments(assignments: readonly RoleAssignment[]): RoleAssignment[] {
+  return assignments.filter((assignment) => assignment.state === "ACTIVE");
+}
+
+export function expiredAssignments(assignments: readonly RoleAssignment[]): RoleAssignment[] {
+  return assignments.filter((assignment) => assignment.state === "EXPIRED");
+}
+
 /** Roles the target does not already hold, in catalogue order. */
 export function assignableRoles(
   roles: readonly PlatformRole[],
   assignments: readonly RoleAssignment[],
 ): PlatformRole[] {
-  const held = new Set(assignments.map((assignment) => assignment.rolePublicId));
+  const held = new Set(activeAssignments(assignments).map((assignment) => assignment.rolePublicId));
   return roles.filter((role) => !held.has(role.publicId));
 }
 
