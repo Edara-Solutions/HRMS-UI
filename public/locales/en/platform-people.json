@@ -114,7 +114,6 @@
   "roles.noExpiry": "No expiry",
   "roles.state.ACTIVE": "Active",
   "roles.state.EXPIRED": "Expired",
-  "roles.state.REVOKED": "Revoked",
   "roles.expiredTitle": "Expired roles",
   "roles.expiredOn": "Expired {{date}}",
   "roles.assign": "Assign a role",

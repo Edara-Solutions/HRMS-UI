@@ -114,7 +114,6 @@
   "roles.noExpiry": "دون انتهاء",
   "roles.state.ACTIVE": "نشط",
   "roles.state.EXPIRED": "منتهي",
-  "roles.state.REVOKED": "ملغى",
   "roles.expiredTitle": "الأدوار المنتهية",
   "roles.expiredOn": "انتهى {{date}}",
   "roles.assign": "تعيين دور",
