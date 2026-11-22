@@ -172,7 +172,7 @@ export function AudienceAuthPage({ audience, mode, search = {} }: AudienceAuthPa
             : error instanceof ContractViolation
               ? "journey.unavailable"
               : mode === "login"
-                ? "journey.invalidCredentials"
+                ? "journey.signInFailed"
                 : "journey.notCompleted",
         ),
       );

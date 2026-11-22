@@ -13,6 +13,7 @@ import { AudienceAuthPage } from "./audience-auth-page";
 
 const actions = vi.hoisted(() => ({
   signIn: vi.fn(),
+  platformSignIn: vi.fn(),
   invitation: vi.fn(),
   recovery: vi.fn(),
   reset: vi.fn(),
@@ -36,6 +37,11 @@ vi.mock("@/shared/company-auth", async (original) => ({
   confirmCompanyRecovery: actions.reset,
   signOutCompany: actions.signOut,
   revalidateCompanySession: actions.revalidate,
+}));
+
+vi.mock("@/shared/platform-auth", async (original) => ({
+  ...(await original<typeof import("@/shared/platform-auth")>()),
+  signInPlatform: actions.platformSignIn,
 }));
 
 const session: CompanySession = {
@@ -62,7 +68,10 @@ const session: CompanySession = {
   },
 };
 
-function renderPage(mode: "login" | "invitation" | "recovery" | "reset" = "login") {
+function renderPage(
+  mode: "login" | "invitation" | "recovery" | "reset" = "login",
+  audience: "company" | "platform" = "company",
+) {
   return render(
     <QueryClientProvider
       client={
@@ -72,7 +81,7 @@ function renderPage(mode: "login" | "invitation" | "recovery" | "reset" = "login
       }
     >
       <AudienceAuthPage
-        audience="company"
+        audience={audience}
         mode={mode}
         search={credentialSearchSchema.parse(
           Object.fromEntries(new URLSearchParams(window.location.search)),
@@ -145,17 +154,86 @@ describe("audience credential page", () => {
     expect(actions.signIn).not.toHaveBeenCalled();
   });
 
-  it("does not expose an arbitrary failure detail in the credential page", async () => {
-    actions.signIn.mockRejectedValueOnce(new Error("internal-server-canary"));
-    renderPage();
+  const neutralSignInFailure =
+    "We couldn't sign you in. Please try again, or contact your administrator if this keeps happening.";
+  const loginOperation = (audience: "company" | "platform") => ({
+    audience,
+    key: `POST /api/v1/${audience}/auth/login`,
+    parseResponse: () => undefined,
+  });
+  const meOperation = (audience: "company" | "platform") => ({
+    audience,
+    key: `GET /api/v1/${audience}/me`,
+    parseResponse: () => undefined,
+  });
+  const signInFailures = [
+    {
+      cause: "rejected credentials",
+      error: (audience: "company" | "platform") =>
+        new OperationRefusal(loginOperation(audience), 401, { detail: "internal-server-canary" }),
+    },
+    { cause: "a network failure", error: () => new TypeError("internal-server-canary") },
+    {
+      cause: "a server error",
+      error: (audience: "company" | "platform") =>
+        new OperationRefusal(loginOperation(audience), 500, { detail: "internal-server-canary" }),
+    },
+    {
+      cause: "an identity lookup failure",
+      error: (audience: "company" | "platform") =>
+        new OperationRefusal(meOperation(audience), 401, { detail: "internal-server-canary" }),
+    },
+    { cause: "an unexpected failure", error: () => new Error("internal-server-canary") },
+  ];
+
+  async function fillCompanySignIn() {
     fireEvent.change(await screen.findByLabelText("Company code"), { target: { value: "EDARA" } });
     fireEvent.change(screen.getByLabelText("Employee code"), { target: { value: "EMP-1" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password" } });
+  }
+
+  async function fillPlatformSignIn() {
+    fireEvent.change(await screen.findByLabelText("Email address"), {
+      target: { value: "operator@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password" } });
+  }
+
+  it.each(signInFailures)("shows the neutral Company sign-in message after $cause", async ({
+    error,
+  }) => {
+    actions.signIn.mockRejectedValueOnce(error("company"));
+    renderPage();
+    await fillCompanySignIn();
+    submitForm("Sign in");
+    expect(await screen.findByText(neutralSignInFailure)).toBeInTheDocument();
+    expect(screen.queryByText(/internal-server-canary/)).not.toBeInTheDocument();
+  });
+
+  it.each(signInFailures)("shows the neutral Platform sign-in message after $cause", async ({
+    error,
+  }) => {
+    window.history.replaceState(null, "", "/platform/login");
+    actions.platformSignIn.mockRejectedValueOnce(error("platform"));
+    renderPage("login", "platform");
+    await fillPlatformSignIn();
+    submitForm("Sign in");
+    expect(await screen.findByText(neutralSignInFailure)).toBeInTheDocument();
+    expect(screen.queryByText(/internal-server-canary/)).not.toBeInTheDocument();
+  });
+
+  it("keeps Platform rate-limit feedback distinct from the neutral message", async () => {
+    window.history.replaceState(null, "", "/platform/login");
+    actions.platformSignIn.mockRejectedValueOnce(
+      new OperationRefusal(loginOperation("platform"), 429, { detail: "internal canary" }),
+    );
+    renderPage("login", "platform");
+    await fillPlatformSignIn();
     submitForm("Sign in");
     expect(
-      await screen.findByText("We could not sign you in. Check your credentials and try again."),
+      await screen.findByText("Too many attempts. Please wait a moment and try again."),
     ).toBeInTheDocument();
-    expect(screen.queryByText("internal-server-canary")).not.toBeInTheDocument();
+    expect(screen.queryByText(neutralSignInFailure)).not.toBeInTheDocument();
   });
 
   it("offers Continue or Company-only sign-out instead of replacing an occupied slot", async () => {
