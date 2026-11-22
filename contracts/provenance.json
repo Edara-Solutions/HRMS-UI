@@ -1,11 +1,11 @@
 {
-  "commit": "d6404efc7237de705bf406bef48321d9bf735812",
-  "ref": "refactor/split-tier-users",
+  "commit": "c01277764f80e392d12e1167ef6b6f214f60532d",
+  "ref": "feat/platform-revoke-own-session",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "d4bfbc193dd86336ea09595763d800b37978662639a801ae7bce3fa2599f385a"
+      "sha256": "dea6289e463b0c093c4b18466e1d3f9a392a1029b222a5f236117b398a6a8978"
     },
     "company": {
       "file": "contracts/openapi.company.json",
@@ -17,7 +17,7 @@
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "dd34cc71357a5e83f8b4581838d8a9607bb645ffecfc2ee017d6255b29799615"
+      "sha256": "85ee0388f848741856b5b0cbd44ed5792a0f4c31f4b38238a3951eb370e7b572"
     },
     "public": {
       "file": "contracts/openapi.public.json",
@@ -429,6 +429,10 @@
       {
         "file": "delete-api-v1-platform-leads-publicid-contacts-contactpublicid.ts",
         "key": "DELETE /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-me-sessions-sessionid.ts",
+        "key": "DELETE /api/v1/platform/me/sessions/{sessionId}"
       },
       {
         "file": "delete-api-v1-platform-plan-prices-publicid.ts",
