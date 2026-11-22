@@ -43,6 +43,7 @@ describe("shared access projections", () => {
     [{ systemRole: true }, "system-role"],
     [{ selfHeldRole: true }, "self-held-role"],
     [{ preservesOwner: false }, "owner-continuity"],
+    [{ keepsUsableOwner: false }, "last-usable-owner"],
     [{ lifecycleAllowed: false }, "lifecycle"],
   ] as const)("projects validated target restrictions independently of permission", (target, reason) => {
     expect(

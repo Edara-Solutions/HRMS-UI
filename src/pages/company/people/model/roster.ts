@@ -16,6 +16,17 @@ export const personStatuses = [
   "RESIGNED",
 ] as const satisfies readonly PersonStatus[];
 
+const usableStatuses: readonly PersonStatus[] = ["ACTIVE", "ONBOARDING", "PROBATION"];
+
+export type BulkAction = { kind: "status"; status: PersonStatus } | { kind: "delete" };
+
+export function removesLastUsableOwner(action: BulkAction, person: Person): boolean {
+  return (
+    person.ownerContinuity.isLastUsableOwner &&
+    (action.kind === "delete" || !usableStatuses.includes(action.status))
+  );
+}
+
 export const rosterPageSize = 20;
 
 /** Roster search is URL state: validated, bounded, and falling back instead of failing. */

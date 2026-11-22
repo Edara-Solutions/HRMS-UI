@@ -51,9 +51,14 @@ export function personBody(publicId: string, overrides: Record<string, unknown> 
     lastLoginAt: null,
     createdAt: at,
     updatedAt: at,
+    ownerContinuity: { holdsOwnerRole: false, isLastUsableOwner: false },
     ...overrides,
   };
 }
+
+export const lastUsableOwner = {
+  ownerContinuity: { holdsOwnerRole: true, isLastUsableOwner: true },
+} as const;
 
 export function rosterBody(publicIds: readonly string[], totalPages = 1) {
   return {

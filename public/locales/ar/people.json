@@ -15,6 +15,7 @@
   "restriction.final-root": "هذا الهدف محمي.",
   "restriction.system-role": "لا يمكن تعديل أدوار النظام بهذه الطريقة.",
   "restriction.owner-continuity": "يتغير مالك الشركة فقط عبر نقل الملكية.",
+  "restriction.last-usable-owner": "هذا الشخص هو آخر مالك فعّال للشركة. انقل الملكية أولاً.",
   "restriction.lifecycle": "هذا الإجراء غير متاح في الحالة الحالية.",
   "restriction.prerequisite": "المالك الحالي وحده يمكنه نقل الملكية.",
   "restriction.restricted-mode": "التعديلات متوقفة لمساحة عمل شركتك.",

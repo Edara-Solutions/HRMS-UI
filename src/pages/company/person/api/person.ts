@@ -43,7 +43,7 @@ export function personQueries(userPublicId: string, publicId: string) {
             signal,
           ),
       }),
-    /** Assignable roles and Owner detection both come from the Company role catalogue. */
+    /** Assignable roles come from the Company role catalogue; Owner standing never does. */
     roles: queryOptions({
       queryKey: companyQueryKey(userPublicId, operations.roles, "assignable"),
       queryFn: ({ signal }) =>

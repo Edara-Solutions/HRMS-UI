@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { companyPeopleOperations as operations } from "@/shared/api";
 import { companySessionFixture } from "../../../../test/audience-fixtures";
+import { lastUsableOwner, peopleIds, personBody } from "../../../../test/company-people-fixtures";
 import {
-  assignmentBody,
-  peopleIds,
-  personBody,
-  rolesBody,
-} from "../../../../test/company-people-fixtures";
-import { buildPersonUpdate, personTarget, targetFacts, toPersonForm } from "./person";
+  buildPersonUpdate,
+  personTarget,
+  statusOptionsFor,
+  targetFacts,
+  toPersonForm,
+} from "./person";
 
 const person = operations.user.responses["200"].parse(personBody(peopleIds.colleague));
-const roles = operations.roles.responses["200"].parse(rolesBody()).items;
 const actor = companySessionFixture({ publicId: peopleIds.actor }).user;
 
 describe("person update", () => {
@@ -59,31 +59,60 @@ describe("person update", () => {
 });
 
 describe("target predicates", () => {
-  it("recognises the Owner from the role catalogue and self from the session", () => {
-    const owned = operations.userRole.responses["200"].parse(
-      assignmentBody(person.publicId, peopleIds.ownerRole),
+  it("reads Owner standing from the person's backend eligibility and self from the session", () => {
+    const owner = operations.user.responses["200"].parse(
+      personBody(peopleIds.owner, lastUsableOwner),
     );
-    expect(personTarget(actor, person, owned, roles)).toEqual({ self: false, owner: true });
-    expect(personTarget(actor, person, null, roles)).toEqual({ self: false, owner: false });
+    expect(personTarget(actor, owner)).toEqual({
+      self: false,
+      holdsOwnerRole: true,
+      isLastUsableOwner: true,
+    });
+    expect(personTarget(actor, person)).toEqual({
+      self: false,
+      holdsOwnerRole: false,
+      isLastUsableOwner: false,
+    });
     const self = operations.user.responses["200"].parse(personBody(peopleIds.actor));
-    expect(personTarget(actor, self, null, roles).self).toBe(true);
+    expect(personTarget(actor, self).self).toBe(true);
   });
 
-  it("keeps self, Owner continuity and Owner-only transfer as distinct facts", () => {
-    expect(targetFacts({ self: true, owner: false }, "ACTIVE", "password-reset")).toEqual({
+  it("keeps self, Owner role, last usable Owner and Owner-only transfer as distinct facts", () => {
+    const colleague = { self: false, holdsOwnerRole: false, isLastUsableOwner: false };
+    const lastOwner = { self: false, holdsOwnerRole: true, isLastUsableOwner: true };
+    const otherOwner = { self: false, holdsOwnerRole: true, isLastUsableOwner: false };
+    expect(targetFacts({ ...colleague, self: true }, "ACTIVE", "password-reset")).toEqual({
       target: { self: true },
     });
-    expect(targetFacts({ self: false, owner: true }, "ACTIVE", "delete")).toEqual({
+    expect(targetFacts(lastOwner, "ACTIVE", "delete")).toEqual({
+      target: { self: false, keepsUsableOwner: false },
+    });
+    expect(targetFacts(otherOwner, "SUSPENDED", "delete")).toEqual({
+      target: { self: false, keepsUsableOwner: true },
+    });
+    expect(targetFacts(otherOwner, "SUSPENDED", "revoke-role")).toEqual({
       target: { self: false, preservesOwner: false },
     });
-    expect(targetFacts({ self: false, owner: false }, "ACTIVE", "transfer")).toEqual({
+    expect(targetFacts(colleague, "ACTIVE", "transfer")).toEqual({
       requiresOwner: true,
-      target: { self: false },
+      target: { self: false, lifecycleAllowed: true },
     });
+    expect(targetFacts(colleague, "SUSPENDED", "transfer")).toEqual({
+      requiresOwner: true,
+      target: { self: false, lifecycleAllowed: false },
+    });
+  });
+
+  it("offers the last usable Owner only working statuses", () => {
+    const owner = operations.user.responses["200"].parse(
+      personBody(peopleIds.owner, lastUsableOwner),
+    );
+    expect(statusOptionsFor(owner)).toEqual(["ACTIVE", "ONBOARDING", "PROBATION"]);
+    expect(statusOptionsFor(person)).toHaveLength(6);
   });
 
   it("offers a reissued invitation only to an employee who has not activated", () => {
-    const colleague = { self: false, owner: false };
+    const colleague = { self: false, holdsOwnerRole: false, isLastUsableOwner: false };
     expect(targetFacts(colleague, "ONBOARDING", "invitation")).toEqual({
       target: { self: false, lifecycleAllowed: true },
     });

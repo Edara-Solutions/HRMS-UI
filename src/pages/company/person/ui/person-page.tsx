@@ -102,7 +102,7 @@ function PersonWorkspace({
   const { data: roles } = useQuery({ ...queries.roles, enabled: canReadRoles });
   const commands = useConfirmedCommand(personRoots(userPublicId));
   if (!actor) return null;
-  const target = personTarget(actor, person, assignment, roles?.items ?? []);
+  const target = personTarget(actor, person);
   const name = `${person.firstName} ${person.lastName}`;
   const availability = (operation: OperationKey, command: PersonCommand) =>
     access.availability(operation, targetFacts(target, person.status, command));
@@ -114,7 +114,7 @@ function PersonWorkspace({
         <Badge variant={person.status === "ACTIVE" ? "success" : "default"}>
           {t(`status.${person.status}`)}
         </Badge>
-        {target.owner && <Badge variant="primary">{t("person.owner")}</Badge>}
+        {target.holdsOwnerRole && <Badge variant="primary">{t("person.owner")}</Badge>}
         {target.self && <Badge variant="default">{t("roster.you")}</Badge>}
       </header>
 

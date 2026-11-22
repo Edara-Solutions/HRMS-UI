@@ -18,7 +18,7 @@ import {
   type PersonFormValues,
   type PersonRecord,
   personFormSchema,
-  personStatuses,
+  statusOptionsFor,
   toPersonForm,
   workLocations,
 } from "../model/person";
@@ -80,7 +80,11 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
       if (outcome.kind === "invalid")
         for (const field of outcome.fields)
           if (isPersonField(field)) form.setError(field, { message: "rejected" });
-      setFeedback({ tone: "alert", message: t(`outcome.${outcome.kind}`) });
+      const message =
+        outcome.kind === "refused" && person.ownerContinuity.holdsOwnerRole
+          ? t("restriction.last-usable-owner")
+          : t(`outcome.${outcome.kind}`);
+      setFeedback({ tone: "alert", message });
     }
   }
 
@@ -149,11 +153,22 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
                   id="person-status"
                   value={field.value}
                   disabled={!editable}
-                  options={personStatuses.map((value) => ({ value, label: t(`status.${value}`) }))}
+                  aria-describedby={
+                    person.ownerContinuity.isLastUsableOwner ? "person-status-note" : undefined
+                  }
+                  options={statusOptionsFor(person).map((value) => ({
+                    value,
+                    label: t(`status.${value}`),
+                  }))}
                   onValueChange={field.onChange}
                 />
               )}
             />
+            {person.ownerContinuity.isLastUsableOwner && (
+              <p id="person-status-note" className="text-xs text-[var(--color-text-muted)]">
+                {t("restriction.last-usable-owner")}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="person-employmentType">{t("field.employmentType")}</Label>

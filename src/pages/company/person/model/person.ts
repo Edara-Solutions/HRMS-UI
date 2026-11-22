@@ -80,24 +80,24 @@ export function buildPersonUpdate(
   return update;
 }
 
+const usableStatuses: readonly PersonRecord["status"][] = ["ACTIVE", "ONBOARDING", "PROBATION"];
+
 export interface PersonTarget {
   self: boolean;
-  owner: boolean;
+  holdsOwnerRole: boolean;
+  isLastUsableOwner: boolean;
 }
 
-export function personTarget(
-  actor: CompanyUser,
-  person: PersonRecord,
-  assignment: RoleAssignment | null | undefined,
-  roles: readonly RoleSummary[],
-): PersonTarget {
+export function personTarget(actor: CompanyUser, person: PersonRecord): PersonTarget {
   return {
     self: actor.publicId === person.publicId,
-    owner:
-      assignment !== null &&
-      assignment !== undefined &&
-      roles.some((role) => role.isOwner && role.publicId === assignment.rolePublicId),
+    holdsOwnerRole: person.ownerContinuity.holdsOwnerRole,
+    isLastUsableOwner: person.ownerContinuity.isLastUsableOwner,
   };
+}
+
+export function statusOptionsFor(person: PersonRecord): readonly PersonRecord["status"][] {
+  return person.ownerContinuity.isLastUsableOwner ? usableStatuses : personStatuses;
 }
 
 export type PersonCommand =
@@ -122,10 +122,17 @@ export function targetFacts(
     case "revoke-session":
       return { target: { self: target.self } };
     case "delete":
+      return { target: { self: target.self, keepsUsableOwner: !target.isLastUsableOwner } };
     case "assign-role":
     case "revoke-role":
-      return { target: { self: target.self, preservesOwner: !target.owner } };
+      return { target: { self: target.self, preservesOwner: !target.holdsOwnerRole } };
     case "transfer":
-      return { requiresOwner: true, target: { self: target.self } };
+      return {
+        requiresOwner: true,
+        target: {
+          self: target.self,
+          lifecycleAllowed: usableStatuses.includes(status),
+        },
+      };
   }
 }

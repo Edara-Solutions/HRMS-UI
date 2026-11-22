@@ -10,6 +10,7 @@ export interface ConfirmedCommand {
   tone: "consequential" | "destructive";
   typedTarget?: { label: string; target: string };
   success: string;
+  refusal?: string;
   run: () => Promise<unknown>;
   onSuccess?: () => void | Promise<void>;
 }
@@ -36,9 +37,13 @@ export function useConfirmedCommand(affected: readonly QueryKey[]) {
       setFeedback({ tone: "status", message: command.success });
       await command.onSuccess?.();
     },
-    onError: async (error) => {
+    onError: async (error, command) => {
       const outcome = await recover(error);
-      setFeedback({ tone: "alert", message: t(`outcome.${outcome.kind}`) });
+      const message =
+        outcome.kind === "refused" && command.refusal
+          ? command.refusal
+          : t(`outcome.${outcome.kind}`);
+      setFeedback({ tone: "alert", message });
     },
     onSettled: () =>
       Promise.all(affected.map((queryKey) => queryClient.invalidateQueries({ queryKey }))),

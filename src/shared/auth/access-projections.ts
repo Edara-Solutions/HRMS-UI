@@ -31,6 +31,7 @@ export type ActionRestriction =
   | "system-role"
   | "self-held-role"
   | "owner-continuity"
+  | "last-usable-owner"
   | "lifecycle"
   | "prerequisite"
   | "restricted-mode"
@@ -61,6 +62,7 @@ export interface AccessFacts {
     systemRole?: boolean;
     selfHeldRole?: boolean;
     preservesOwner?: boolean;
+    keepsUsableOwner?: boolean;
     lifecycleAllowed?: boolean;
   };
   requiresRoot?: boolean;
@@ -409,6 +411,8 @@ export function projectActionAvailability(
   if (facts.target?.selfHeldRole) return { state: "disabled", reason: "self-held-role" };
   if (facts.target?.preservesOwner === false)
     return { state: "disabled", reason: "owner-continuity" };
+  if (facts.target?.keepsUsableOwner === false)
+    return { state: "disabled", reason: "last-usable-owner" };
   if (facts.target?.lifecycleAllowed === false) return { state: "disabled", reason: "lifecycle" };
   if (facts.restriction) return { state: "disabled", reason: facts.restriction };
   return { state: "enabled" };

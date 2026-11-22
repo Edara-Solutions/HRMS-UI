@@ -95,6 +95,9 @@ export function PersonAccountCard({
                     target: person.employeeCode,
                   },
                   success: t("account.delete.done", { name }),
+                  refusal: person.ownerContinuity.holdsOwnerRole
+                    ? t("restriction.last-usable-owner")
+                    : undefined,
                   run: () => deletePerson(person.publicId),
                   onSuccess: onDeleted,
                 })
