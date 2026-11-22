@@ -11,6 +11,7 @@ export async function loadSelfService(audience: AudienceName) {
       changeEmail: company.changeCompanyEmail,
       readSessions: company.readCompanySessions,
       revokeSession: company.revokeCompanySession,
+      canRevokeCurrent: true,
       signOut: auth.signOutCompany,
     };
   }
@@ -22,7 +23,8 @@ export async function loadSelfService(audience: AudienceName) {
     updateProfile: platform.updatePlatformProfile,
     changeEmail: platform.changePlatformEmail,
     readSessions: platform.readPlatformSessions,
-    revokeSession: undefined,
+    revokeSession: platform.revokePlatformSession,
+    canRevokeCurrent: false,
     signOut: auth.signOutPlatform,
   };
 }

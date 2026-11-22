@@ -132,7 +132,7 @@ export function PersonAccessCard({
           </div>
         )}
 
-        {!target.owner && transfer.state !== "hidden" && (
+        {!target.holdsOwnerRole && transfer.state !== "hidden" && (
           <div className="space-y-2 border-t border-[var(--color-border)] pt-4">
             <p className="text-[var(--color-text-muted)]">{t("access.transferHint")}</p>
             <Button

@@ -1,15 +1,15 @@
 {
-  "commit": "3710287451fd015861d6e2b67e5a83a8b850d964",
-  "ref": "fix/platform-role-expiry-state",
+  "commit": "d45b447d080aa6ec15a8184b77bdb46e0f552641",
+  "ref": "dev",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "847f3bde42cad878079e4c960a466526636dcf2e578ad32cb968a2e402ecdba7"
+      "sha256": "b1e0f99efc3c350135f86acf1641f96ae83deae84e269c93161eb94aa3093a26"
     },
     "company": {
       "file": "contracts/openapi.company.json",
-      "sha256": "d8a40676a6de547b24d310b2f126702b19718bb51f78b12baa02370d2e89061b"
+      "sha256": "5999164ae8c9f34148c2670344b5ea1d013a12ccbc2da74e2b8587fadd94e1de"
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",
@@ -17,7 +17,7 @@
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "4bd9dc696995972f9df61f899c01a9e42c783a801c1c7c20aaf46d39b0a59502"
+      "sha256": "789a53873a8451c9037cd2ad4bb1cc415fb1079a3cd5b3979e8ba3bf94d8d0da"
     },
     "public": {
       "file": "contracts/openapi.public.json",
@@ -429,6 +429,10 @@
       {
         "file": "delete-api-v1-platform-leads-publicid-contacts-contactpublicid.ts",
         "key": "DELETE /api/v1/platform/leads/{publicId}/contacts/{contactPublicId}"
+      },
+      {
+        "file": "delete-api-v1-platform-me-sessions-sessionid.ts",
+        "key": "DELETE /api/v1/platform/me/sessions/{sessionId}"
       },
       {
         "file": "delete-api-v1-platform-plan-prices-publicid.ts",

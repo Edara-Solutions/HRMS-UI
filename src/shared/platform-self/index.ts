@@ -1,3 +1,4 @@
+import { operation as revoke } from "../api/generated/platform/delete-api-v1-platform-me-sessions-sessionid";
 import { operation as profile } from "../api/generated/platform/get-api-v1-platform-me-profile";
 import { operation as sessions } from "../api/generated/platform/get-api-v1-platform-me-sessions";
 import { operation as updateProfile } from "../api/generated/platform/patch-api-v1-platform-me-profile";
@@ -49,4 +50,8 @@ export async function readPlatformSessions(page: number, signal?: AbortSignal) {
   return sessions.responses["200"].parse(
     await request(sessions, { query: { page, pageSize: 20 } }, signal),
   );
+}
+
+export async function revokePlatformSession(sessionId: string) {
+  await request(revoke, { params: { sessionId } });
 }

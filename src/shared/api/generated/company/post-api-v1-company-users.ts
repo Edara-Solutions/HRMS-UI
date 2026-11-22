@@ -89,6 +89,9 @@ export const responseSchemas = {
       lastLoginAt: z.union([z.string().datetime({ offset: true }), z.null()]),
       createdAt: z.string().datetime({ offset: true }),
       updatedAt: z.string().datetime({ offset: true }),
+      ownerContinuity: z
+        .object({ holdsOwnerRole: z.boolean(), isLastUsableOwner: z.boolean() })
+        .strict(),
     })
     .strict(),
   "400": z.object({

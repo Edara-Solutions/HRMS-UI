@@ -46658,6 +46658,480 @@
         }
       }
     },
+    "/api/v1/platform/me/sessions/{sessionId}": {
+      "delete": {
+        "summary": "Revoke one of the signed-in operator's other sign-ins",
+        "tags": [
+          "Platform Auth"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "x-edara-audience": "PLATFORM",
+        "x-edara-authorization": "SELF",
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "traceId"
+                  ],
+                  "properties": {
+                    "type": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "minimum": 400,
+                      "maximum": 599,
+                      "type": "integer"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "format": "uri-reference",
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "pattern": "^[0-9a-f]{32}$",
+                      "type": "string"
+                    },
+                    "invalidParams": {
+                      "type": "array",
+                      "items": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "COMPANY_ACCESS_DENIED"
+                      ]
+                    },
+                    "mode": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "NORMAL"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "READ_ONLY"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "FROZEN"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "BLOCKED"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "MAINTENANCE"
+                          ]
+                        }
+                      ]
+                    },
+                    "reason": {
+                      "anyOf": [
+                        {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "effectiveUntil": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/platform/roles": {
       "get": {
         "summary": "List Platform roles and their grants",
@@ -137813,7 +138287,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -138057,6 +138532,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -139080,7 +139571,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -139324,6 +139816,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -141004,7 +141512,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -141248,6 +141757,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }
@@ -142144,7 +142669,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -142388,6 +142914,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -143153,7 +143695,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -143397,6 +143940,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }
@@ -144384,7 +144943,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -144628,6 +145188,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }

@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { parseBulkRows, rosterSearchSchema, summarizeBulk } from "./roster";
+import { companyPeopleOperations as operations } from "@/shared/api";
+import { otherOwner, peopleIds, personBody } from "../../../../test/company-people-fixtures";
+import {
+  mayBreakOwnerContinuity,
+  parseBulkRows,
+  rosterSearchSchema,
+  summarizeBulk,
+} from "./roster";
+
+describe("bulk Owner continuity", () => {
+  const owner = operations.user.responses["200"].parse(personBody(peopleIds.owner, otherOwner));
+  const colleague = operations.user.responses["200"].parse(personBody(peopleIds.colleague));
+
+  it("flags only removals or non-working statuses of an Owner", () => {
+    expect(mayBreakOwnerContinuity({ kind: "delete" }, owner)).toBe(true);
+    expect(mayBreakOwnerContinuity({ kind: "status", status: "RESIGNED" }, owner)).toBe(true);
+    expect(mayBreakOwnerContinuity({ kind: "status", status: "PROBATION" }, owner)).toBe(false);
+    expect(mayBreakOwnerContinuity({ kind: "delete" }, colleague)).toBe(false);
+  });
+});
 
 describe("bulk outcome summary", () => {
   it("separates successes, declared failures and unaccounted items without all-or-nothing", () => {

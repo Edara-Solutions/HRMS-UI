@@ -3,16 +3,20 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OperationRefusal } from "@/shared/api";
 import {
+  type AudienceName,
   type CompanySession,
   credentialSearchSchema,
   useCompanySession,
   usePlatformSession,
 } from "@/shared/auth";
 import { i18next } from "@/shared/i18n";
+import { companySessionFixture, platformSessionFixture } from "../../../test/audience-fixtures";
+import { json, problem } from "../../../test/network-fixtures";
 import { AudienceAuthPage } from "./audience-auth-page";
 
 const actions = vi.hoisted(() => ({
   signIn: vi.fn(),
+  platformSignIn: vi.fn(),
   invitation: vi.fn(),
   recovery: vi.fn(),
   reset: vi.fn(),
@@ -20,6 +24,24 @@ const actions = vi.hoisted(() => ({
   revalidate: vi.fn(),
   navigate: vi.fn(),
 }));
+
+const network = vi.hoisted(() => ({ respond: vi.fn() }));
+
+vi.mock("@/shared/api/company-client", () => ({
+  companyApiClient: Object.assign(
+    async (path: string, options: { method: string }) =>
+      network.respond(`${options.method} /${path}`),
+    { audience: "company" },
+  ),
+}));
+vi.mock("@/shared/api/platform-client", () => {
+  const client = async (path: string, options: { method: string }) =>
+    network.respond(`${options.method} /${path}`);
+  return {
+    platformApiClient: Object.assign(client, { audience: "platform" }),
+    delegatedApiClient: Object.assign(async () => client, { audience: "delegated" }),
+  };
+});
 
 vi.mock("@tanstack/react-router", async (original) => ({
   ...(await original<typeof import("@tanstack/react-router")>()),
@@ -36,6 +58,11 @@ vi.mock("@/shared/company-auth", async (original) => ({
   confirmCompanyRecovery: actions.reset,
   signOutCompany: actions.signOut,
   revalidateCompanySession: actions.revalidate,
+}));
+
+vi.mock("@/shared/platform-auth", async (original) => ({
+  ...(await original<typeof import("@/shared/platform-auth")>()),
+  signInPlatform: actions.platformSignIn,
 }));
 
 const session: CompanySession = {
@@ -62,7 +89,118 @@ const session: CompanySession = {
   },
 };
 
-function renderPage(mode: "login" | "invitation" | "recovery" | "reset" = "login") {
+const neutralSignInFailure =
+  "We couldn't sign you in. Please try again, or contact your administrator if this keeps happening.";
+
+function operation(audience: AudienceName, key: string) {
+  return { audience, key, parseResponse: () => undefined };
+}
+
+const signInFailures = [
+  {
+    cause: "rejected credentials",
+    error: (audience: AudienceName) =>
+      new OperationRefusal(operation(audience, `POST /api/v1/${audience}/auth/login`), 401, {
+        detail: "internal-server-canary",
+      }),
+  },
+  { cause: "a network failure", error: () => new TypeError("internal-server-canary") },
+  {
+    cause: "a rejected identity lookup",
+    error: (audience: AudienceName) =>
+      new OperationRefusal(operation(audience, `GET /api/v1/${audience}/me`), 401, {
+        detail: "internal-server-canary",
+      }),
+  },
+  { cause: "an unexpected failure", error: () => new Error("internal-server-canary") },
+];
+
+function html502() {
+  return new Response("<html><body>Bad gateway canary</body></html>", {
+    status: 502,
+    headers: { "Content-Type": "text/html" },
+  });
+}
+
+const responseFailures = [
+  {
+    cause: "a 500 from login",
+    routes: (audience: AudienceName): Record<string, () => Response> => ({
+      [`POST /api/v1/${audience}/auth/login`]: () => problem(500),
+    }),
+  },
+  {
+    cause: "an HTML 502 from login",
+    routes: (audience: AudienceName): Record<string, () => Response> => ({
+      [`POST /api/v1/${audience}/auth/login`]: html502,
+    }),
+  },
+  {
+    cause: "a 503 from the identity lookup",
+    routes: (audience: AudienceName, tokens: unknown): Record<string, () => Response> => ({
+      [`POST /api/v1/${audience}/auth/login`]: () => json(tokens),
+      [`GET /api/v1/${audience}/me`]: () => problem(503),
+    }),
+  },
+  {
+    cause: "an HTML 502 from the identity lookup",
+    routes: (audience: AudienceName, tokens: unknown): Record<string, () => Response> => ({
+      [`POST /api/v1/${audience}/auth/login`]: () => json(tokens),
+      [`GET /api/v1/${audience}/me`]: html502,
+    }),
+  },
+];
+
+async function fillCompanySignIn() {
+  fireEvent.change(await screen.findByLabelText("Company code", {}, { timeout: 10000 }), {
+    target: { value: "EDARA" },
+  });
+  fireEvent.change(screen.getByLabelText("Employee code"), { target: { value: "EMP-1" } });
+  fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password" } });
+}
+
+async function fillPlatformSignIn() {
+  fireEvent.change(await screen.findByLabelText("Email address", {}, { timeout: 10000 }), {
+    target: { value: "operator@example.test" },
+  });
+  fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password" } });
+}
+
+const portals = [
+  {
+    audience: "company" as const,
+    session: companySessionFixture(),
+    fill: fillCompanySignIn,
+    useRealSignIn: async () => {
+      const real =
+        await vi.importActual<typeof import("@/shared/company-auth")>("@/shared/company-auth");
+      actions.signIn.mockImplementation(real.signInCompany);
+    },
+  },
+  {
+    audience: "platform" as const,
+    session: platformSessionFixture(),
+    fill: fillPlatformSignIn,
+    useRealSignIn: async () => {
+      const real =
+        await vi.importActual<typeof import("@/shared/platform-auth")>("@/shared/platform-auth");
+      actions.platformSignIn.mockImplementation(real.signInPlatform);
+    },
+  },
+];
+
+function routeNetwork(routes: Record<string, () => Response>) {
+  network.respond.mockImplementation((key: string) => {
+    const handler = routes[key];
+    if (!handler) throw new Error(`Unexpected operation ${key}`);
+    return handler();
+  });
+}
+
+function renderPage(
+  mode: "login" | "invitation" | "recovery" | "reset" = "login",
+  audience: AudienceName = "company",
+) {
   return render(
     <QueryClientProvider
       client={
@@ -72,7 +210,7 @@ function renderPage(mode: "login" | "invitation" | "recovery" | "reset" = "login
       }
     >
       <AudienceAuthPage
-        audience="company"
+        audience={audience}
         mode={mode}
         search={credentialSearchSchema.parse(
           Object.fromEntries(new URLSearchParams(window.location.search)),
@@ -145,17 +283,70 @@ describe("audience credential page", () => {
     expect(actions.signIn).not.toHaveBeenCalled();
   });
 
-  it("does not expose an arbitrary failure detail in the credential page", async () => {
-    actions.signIn.mockRejectedValueOnce(new Error("internal-server-canary"));
+  it.each(signInFailures)("shows the neutral Company sign-in message after $cause", async ({
+    error,
+  }) => {
+    actions.signIn.mockRejectedValueOnce(error("company"));
     renderPage();
-    fireEvent.change(await screen.findByLabelText("Company code"), { target: { value: "EDARA" } });
-    fireEvent.change(screen.getByLabelText("Employee code"), { target: { value: "EMP-1" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "password" } });
+    await fillCompanySignIn();
+    submitForm("Sign in");
+    expect(await screen.findByText(neutralSignInFailure)).toBeInTheDocument();
+    expect(screen.queryByText(/internal-server-canary/)).not.toBeInTheDocument();
+  });
+
+  it.each(signInFailures)("shows the neutral Platform sign-in message after $cause", async ({
+    error,
+  }) => {
+    window.history.replaceState(null, "", "/platform/login");
+    actions.platformSignIn.mockRejectedValueOnce(error("platform"));
+    renderPage("login", "platform");
+    await fillPlatformSignIn();
+    submitForm("Sign in");
+    expect(await screen.findByText(neutralSignInFailure)).toBeInTheDocument();
+    expect(screen.queryByText(/internal-server-canary/)).not.toBeInTheDocument();
+  });
+
+  describe.each(portals)("$audience sign-in over the network", (portal) => {
+    it.each(responseFailures)("shows the neutral message after $cause", async ({ routes }) => {
+      const { user: _user, ...tokens } = portal.session;
+      routeNetwork(routes(portal.audience, tokens));
+      await portal.useRealSignIn();
+      window.history.replaceState(null, "", `/${portal.audience}/login`);
+      renderPage("login", portal.audience);
+      await portal.fill();
+      submitForm("Sign in");
+      expect(await screen.findByText(neutralSignInFailure)).toBeInTheDocument();
+      expect(screen.queryByText(/canary/)).not.toBeInTheDocument();
+    });
+
+    it("keeps a malformed successful login on the access-unavailable message", async () => {
+      routeNetwork({ [`POST /api/v1/${portal.audience}/auth/login`]: () => json({}) });
+      await portal.useRealSignIn();
+      window.history.replaceState(null, "", `/${portal.audience}/login`);
+      renderPage("login", portal.audience);
+      await portal.fill();
+      submitForm("Sign in");
+      expect(
+        await screen.findByText("We could not confirm access right now. Please try again."),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(neutralSignInFailure)).not.toBeInTheDocument();
+    });
+  });
+
+  it("keeps Platform rate-limit feedback distinct from the neutral message", async () => {
+    window.history.replaceState(null, "", "/platform/login");
+    actions.platformSignIn.mockRejectedValueOnce(
+      new OperationRefusal(operation("platform", "POST /api/v1/platform/auth/login"), 429, {
+        detail: "internal canary",
+      }),
+    );
+    renderPage("login", "platform");
+    await fillPlatformSignIn();
     submitForm("Sign in");
     expect(
-      await screen.findByText("We could not sign you in. Check your credentials and try again."),
+      await screen.findByText("Too many attempts. Please wait a moment and try again."),
     ).toBeInTheDocument();
-    expect(screen.queryByText("internal-server-canary")).not.toBeInTheDocument();
+    expect(screen.queryByText(neutralSignInFailure)).not.toBeInTheDocument();
   });
 
   it("offers Continue or Company-only sign-out instead of replacing an occupied slot", async () => {

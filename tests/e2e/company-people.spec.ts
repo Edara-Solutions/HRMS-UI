@@ -5,6 +5,7 @@ import { companySessionFixture } from "../../src/test/audience-fixtures";
 import {
   assignmentBody,
   catalogueBody,
+  lastUsableOwner,
   peopleCanaries,
   peopleIds,
   personBody,
@@ -112,7 +113,9 @@ async function open(
           ),
         });
       if (personMatch[2] === "/sessions") return route.fulfill({ json: sessionsBody() });
-      return route.fulfill({ json: personBody(id) });
+      return route.fulfill({
+        json: personBody(id, id === peopleIds.owner ? lastUsableOwner : {}),
+      });
     }
     if (key === "GET /api/v1/company/roles") return route.fulfill({ json: rolesBody() });
     if (key === "GET /api/v1/company/overview")

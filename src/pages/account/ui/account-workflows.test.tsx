@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { OperationRefusal } from "@/shared/api";
 import { useCompanySession } from "@/shared/auth";
 import { companySelfSchemas } from "@/shared/company-self";
 import { platformSelfSchemas } from "@/shared/platform-self";
@@ -47,9 +48,57 @@ function companyService() {
       meta: { mode: "page", page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
     }),
     revokeSession: vi.fn().mockResolvedValue(undefined),
+    canRevokeCurrent: true,
     signOut: vi.fn().mockResolvedValue({ remoteConfirmed: true }),
   } satisfies SelfService;
 }
+
+const otherRow = {
+  ...row,
+  id: "6f1d1c1e-2b8f-4e0a-9d43-6f2a3c9b7e10",
+  deviceName: "Office laptop",
+  isCurrent: false,
+};
+
+function sessionPage(items: Array<typeof row>) {
+  return {
+    items,
+    meta: { mode: "page" as const, page: 1, pageSize: 20, totalItems: items.length, totalPages: 1 },
+  };
+}
+
+function platformService() {
+  return { ...companyService(), schemas: platformSelfSchemas, canRevokeCurrent: false };
+}
+
+function listOtherSessionThenItsRemoval(
+  readSessions: ReturnType<typeof companyService>["readSessions"],
+) {
+  readSessions
+    .mockResolvedValueOnce(sessionPage([row, otherRow]))
+    .mockResolvedValue(sessionPage([row]));
+}
+
+function refusal(audience: "company" | "platform", status: number) {
+  return new OperationRefusal(
+    {
+      audience,
+      key: `DELETE /api/v1/${audience}/me/sessions/{sessionId}`,
+      parseResponse: () => undefined,
+    },
+    status,
+    { detail: "internal canary" },
+  );
+}
+
+async function confirmRevocation(trigger: HTMLElement) {
+  fireEvent.click(trigger);
+  fireEvent.click(
+    within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke session" }),
+  );
+}
+
+const platformIdentity = { audience: "platform" as const, publicId: "platform-user" };
 
 function renderWorkflow(children: ReactNode) {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -102,16 +151,60 @@ describe("SELF sessions workflow", () => {
     await waitFor(() => expect(service.revokeSession).toHaveBeenCalledWith(row.id));
   });
 
-  it("never offers individual Platform SELF revocation", async () => {
-    const service = { ...companyService(), schemas: platformSelfSchemas, revokeSession: undefined };
-    renderWorkflow(
-      <SessionList
-        identity={{ audience: "platform", publicId: "platform-user" }}
-        service={service}
-      />,
+  it("revokes another Platform session after confirmation and never offers the current one", async () => {
+    const service = platformService();
+    listOtherSessionThenItsRemoval(service.readSessions);
+    renderWorkflow(<SessionList identity={platformIdentity} service={service} />);
+    const revokeButtons = await screen.findAllByRole("button", { name: "Revoke session" });
+    expect(revokeButtons).toHaveLength(1);
+    fireEvent.click(revokeButtons[0]);
+    expect(
+      within(screen.getByRole("dialog")).getByText(
+        "Access from this session will end. Your current session stays signed in.",
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke session" }),
     );
-    expect(await screen.findByText("My browser")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Revoke session" })).not.toBeInTheDocument();
+    await waitFor(() => expect(service.revokeSession).toHaveBeenCalledWith(otherRow.id));
+    expect(await screen.findByText("The session has been revoked.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText("Office laptop")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Revoke session" })).not.toBeInTheDocument(),
+    );
+  });
+
+  it.each([
+    ["Platform", platformService, platformIdentity],
+    ["Company", companyService, identity],
+  ] as const)("refreshes the %s list when the session has already ended", async (_, makeService, who) => {
+    const service = makeService();
+    listOtherSessionThenItsRemoval(service.readSessions);
+    service.revokeSession.mockRejectedValueOnce(refusal(who.audience, 404));
+    renderWorkflow(<SessionList identity={who} service={service} />);
+    const triggers = await screen.findAllByRole("button", { name: "Revoke session" });
+    await confirmRevocation(triggers[triggers.length - 1]);
+    await waitFor(() => expect(service.revokeSession).toHaveBeenCalledWith(otherRow.id));
+    expect(await screen.findByText("That session has already ended.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText("Office laptop")).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText("internal canary")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the uncertain-change message when Platform refuses with a conflict", async () => {
+    const service = platformService();
+    service.readSessions.mockResolvedValue(sessionPage([row, otherRow]));
+    service.revokeSession.mockRejectedValueOnce(refusal("platform", 409));
+    renderWorkflow(<SessionList identity={platformIdentity} service={service} />);
+    await confirmRevocation(await screen.findByRole("button", { name: "Revoke session" }));
+    expect(
+      await screen.findByText(
+        "We could not confirm the change. Review the refreshed account details before trying again.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(service.readSessions).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText("That session has already ended.")).not.toBeInTheDocument();
   });
 
   it("shows an empty list without a fabricated page count", async () => {
