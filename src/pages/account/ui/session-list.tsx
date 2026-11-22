@@ -32,11 +32,7 @@ export function SessionList({ identity, service }: SessionListProps) {
   const revoke = useMutation({
     retry: false,
     mutationFn: async () => {
-      if (
-        !service.revokeSession ||
-        !selectedId ||
-        !sessions.data?.items.some((item) => item.id === selectedId)
-      )
+      if (!selectedId || !sessions.data?.items.some((item) => item.id === selectedId))
         throw new Error("Session unavailable");
       await service.revokeSession(selectedId);
     },
@@ -112,7 +108,7 @@ export function SessionList({ identity, service }: SessionListProps) {
                   </bdi>
                 </p>
               </div>
-              {service.revokeSession && !(identity.audience === "platform" && session.isCurrent) ? (
+              {identity.audience === "company" || !session.isCurrent ? (
                 <Button
                   intent="destructive-trigger"
                   disabled={revoke.isPending}
