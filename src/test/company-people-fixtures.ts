@@ -60,6 +60,10 @@ export const lastUsableOwner = {
   ownerContinuity: { holdsOwnerRole: true, isLastUsableOwner: true },
 } as const;
 
+export const otherOwner = {
+  ownerContinuity: { holdsOwnerRole: true, isLastUsableOwner: false },
+} as const;
+
 export function rosterBody(publicIds: readonly string[], totalPages = 1) {
   return {
     items: publicIds.map((publicId) => personBody(publicId)),

@@ -61,8 +61,8 @@ export interface AccessFacts {
     finalRoot?: boolean;
     systemRole?: boolean;
     selfHeldRole?: boolean;
-    preservesOwner?: boolean;
-    keepsUsableOwner?: boolean;
+    ownerRoleUntouched?: boolean;
+    usableOwnerRemains?: boolean;
     lifecycleAllowed?: boolean;
   };
   requiresRoot?: boolean;
@@ -409,9 +409,9 @@ export function projectActionAvailability(
   if (facts.target?.finalRoot) return { state: "disabled", reason: "final-root" };
   if (facts.target?.systemRole) return { state: "disabled", reason: "system-role" };
   if (facts.target?.selfHeldRole) return { state: "disabled", reason: "self-held-role" };
-  if (facts.target?.preservesOwner === false)
+  if (facts.target?.ownerRoleUntouched === false)
     return { state: "disabled", reason: "owner-continuity" };
-  if (facts.target?.keepsUsableOwner === false)
+  if (facts.target?.usableOwnerRemains === false)
     return { state: "disabled", reason: "last-usable-owner" };
   if (facts.target?.lifecycleAllowed === false) return { state: "disabled", reason: "lifecycle" };
   if (facts.restriction) return { state: "disabled", reason: facts.restriction };

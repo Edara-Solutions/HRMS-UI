@@ -20,9 +20,9 @@ const usableStatuses: readonly PersonStatus[] = ["ACTIVE", "ONBOARDING", "PROBAT
 
 export type BulkAction = { kind: "status"; status: PersonStatus } | { kind: "delete" };
 
-export function removesLastUsableOwner(action: BulkAction, person: Person): boolean {
+export function mayBreakOwnerContinuity(action: BulkAction, person: Person): boolean {
   return (
-    person.ownerContinuity.isLastUsableOwner &&
+    person.ownerContinuity.holdsOwnerRole &&
     (action.kind === "delete" || !usableStatuses.includes(action.status))
   );
 }

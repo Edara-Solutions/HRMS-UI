@@ -15,8 +15,10 @@ import {
   buildPersonUpdate,
   employmentTypes,
   isPersonField,
+  mayBreakOwnerContinuity,
   type PersonFormValues,
   type PersonRecord,
+  type PersonTarget,
   personFormSchema,
   statusOptionsFor,
   toPersonForm,
@@ -39,7 +41,13 @@ interface Feedback {
   message: string;
 }
 
-export function PersonProfileForm({ person }: { person: PersonRecord }) {
+export function PersonProfileForm({
+  person,
+  target,
+}: {
+  person: PersonRecord;
+  target: PersonTarget;
+}) {
   const { t } = useTranslation("people");
   const access = useCompanyAccess();
   const recover = useCompanyMutationRecovery();
@@ -81,8 +89,9 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
         for (const field of outcome.fields)
           if (isPersonField(field)) form.setError(field, { message: "rejected" });
       const message =
-        outcome.kind === "refused" && person.ownerContinuity.holdsOwnerRole
-          ? t("restriction.last-usable-owner")
+        outcome.kind === "refused" &&
+        mayBreakOwnerContinuity(target, { kind: "update", status: update.status })
+          ? t("refusal.owner-continuity")
           : t(`outcome.${outcome.kind}`);
       setFeedback({ tone: "alert", message });
     }
@@ -153,10 +162,8 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
                   id="person-status"
                   value={field.value}
                   disabled={!editable}
-                  aria-describedby={
-                    person.ownerContinuity.isLastUsableOwner ? "person-status-note" : undefined
-                  }
-                  options={statusOptionsFor(person).map((value) => ({
+                  aria-describedby={target.isLastUsableOwner ? "person-status-note" : undefined}
+                  options={statusOptionsFor(target).map((value) => ({
                     value,
                     label: t(`status.${value}`),
                   }))}
@@ -164,7 +171,7 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
                 />
               )}
             />
-            {person.ownerContinuity.isLastUsableOwner && (
+            {target.isLastUsableOwner && (
               <p id="person-status-note" className="text-xs text-[var(--color-text-muted)]">
                 {t("restriction.last-usable-owner")}
               </p>

@@ -136,7 +136,7 @@ describe("Company roster", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Delete selected" }));
     const summary = await screen.findByRole("alert");
     expect(summary).toHaveTextContent(
-      "Laila Hassan: This person is the Company's last usable Owner. Transfer ownership first.",
+      "Laila Hassan: This change would leave the Company without a usable Owner. Transfer ownership first.",
     );
     expect(summary).not.toHaveTextContent("Omar Nabil");
   });

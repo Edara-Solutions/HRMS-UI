@@ -3,12 +3,13 @@ import type { ActionAvailability } from "@/shared/auth";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { deletePerson, reissueInvitation, resetPersonPassword } from "../api/person";
-import type { PersonRecord } from "../model/person";
+import { mayBreakOwnerContinuity, type PersonRecord, type PersonTarget } from "../model/person";
 import type { useConfirmedCommand } from "../model/use-confirmed-command";
 import { RestrictionNote } from "./restriction-note";
 
 interface PersonAccountCardProps {
   person: PersonRecord;
+  target: PersonTarget;
   invitation: ActionAvailability;
   passwordReset: ActionAvailability;
   remove: ActionAvailability;
@@ -18,6 +19,7 @@ interface PersonAccountCardProps {
 
 export function PersonAccountCard({
   person,
+  target,
   invitation,
   passwordReset,
   remove,
@@ -95,8 +97,8 @@ export function PersonAccountCard({
                     target: person.employeeCode,
                   },
                   success: t("account.delete.done", { name }),
-                  refusal: person.ownerContinuity.holdsOwnerRole
-                    ? t("restriction.last-usable-owner")
+                  refusal: mayBreakOwnerContinuity(target, { kind: "delete" })
+                    ? t("refusal.owner-continuity")
                     : undefined,
                   run: () => deletePerson(person.publicId),
                   onSuccess: onDeleted,

@@ -96,8 +96,18 @@ export function personTarget(actor: CompanyUser, person: PersonRecord): PersonTa
   };
 }
 
-export function statusOptionsFor(person: PersonRecord): readonly PersonRecord["status"][] {
-  return person.ownerContinuity.isLastUsableOwner ? usableStatuses : personStatuses;
+export function statusOptionsFor(target: PersonTarget): readonly PersonRecord["status"][] {
+  return target.isLastUsableOwner ? usableStatuses : personStatuses;
+}
+
+export type PersonWrite = { kind: "delete" } | { kind: "update"; status?: PersonRecord["status"] };
+
+export function mayBreakOwnerContinuity(target: PersonTarget, write: PersonWrite): boolean {
+  if (!target.holdsOwnerRole) return false;
+  return (
+    write.kind === "delete" ||
+    (write.status !== undefined && !usableStatuses.includes(write.status))
+  );
 }
 
 export type PersonCommand =
@@ -122,10 +132,10 @@ export function targetFacts(
     case "revoke-session":
       return { target: { self: target.self } };
     case "delete":
-      return { target: { self: target.self, keepsUsableOwner: !target.isLastUsableOwner } };
+      return { target: { self: target.self, usableOwnerRemains: !target.isLastUsableOwner } };
     case "assign-role":
     case "revoke-role":
-      return { target: { self: target.self, preservesOwner: !target.holdsOwnerRole } };
+      return { target: { self: target.self, ownerRoleUntouched: !target.holdsOwnerRole } };
     case "transfer":
       return {
         requiresOwner: true,

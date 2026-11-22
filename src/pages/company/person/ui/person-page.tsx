@@ -120,7 +120,7 @@ function PersonWorkspace({
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-6">
-          <PersonProfileForm person={person} />
+          <PersonProfileForm person={person} target={target} />
           {canReadSessions.state !== "hidden" && (
             <PersonSessionsCard
               person={person}
@@ -150,6 +150,7 @@ function PersonWorkspace({
           />
           <PersonAccountCard
             person={person}
+            target={target}
             invitation={availability(
               "POST /api/v1/company/users/{publicId}/invitation",
               "invitation",

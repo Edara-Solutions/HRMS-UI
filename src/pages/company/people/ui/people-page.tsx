@@ -27,11 +27,11 @@ import { changePeopleStatus, deletePeople, rosterQuery, rosterRoot } from "../ap
 import {
   type BulkAction,
   type BulkSummary,
+  mayBreakOwnerContinuity,
   type Person,
   type PersonStatus,
   personStatuses,
   type RosterSearch,
-  removesLastUsableOwner,
   summarizeBulk,
 } from "../model/roster";
 import { BulkAddDialog } from "./bulk-add-dialog";
@@ -83,8 +83,8 @@ export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
         action: action.kind,
         result: summarizeBulk(result, targets.length),
         labels: targets.map((person) =>
-          removesLastUsableOwner(action, person)
-            ? `${person.firstName} ${person.lastName}: ${t("restriction.last-usable-owner")}`
+          mayBreakOwnerContinuity(action, person)
+            ? `${person.firstName} ${person.lastName}: ${t("refusal.owner-continuity")}`
             : `${person.firstName} ${person.lastName}`,
         ),
       });

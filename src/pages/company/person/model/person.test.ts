@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { companyPeopleOperations as operations } from "@/shared/api";
 import { companySessionFixture } from "../../../../test/audience-fixtures";
-import { lastUsableOwner, peopleIds, personBody } from "../../../../test/company-people-fixtures";
+import {
+  lastUsableOwner,
+  otherOwner,
+  peopleIds,
+  personBody,
+} from "../../../../test/company-people-fixtures";
 import {
   buildPersonUpdate,
+  mayBreakOwnerContinuity,
   personTarget,
   statusOptionsFor,
   targetFacts,
@@ -79,19 +85,19 @@ describe("target predicates", () => {
 
   it("keeps self, Owner role, last usable Owner and Owner-only transfer as distinct facts", () => {
     const colleague = { self: false, holdsOwnerRole: false, isLastUsableOwner: false };
-    const lastOwner = { self: false, holdsOwnerRole: true, isLastUsableOwner: true };
-    const otherOwner = { self: false, holdsOwnerRole: true, isLastUsableOwner: false };
+    const lastOwner = { self: false, ...lastUsableOwner.ownerContinuity };
+    const secondOwner = { self: false, ...otherOwner.ownerContinuity };
     expect(targetFacts({ ...colleague, self: true }, "ACTIVE", "password-reset")).toEqual({
       target: { self: true },
     });
     expect(targetFacts(lastOwner, "ACTIVE", "delete")).toEqual({
-      target: { self: false, keepsUsableOwner: false },
+      target: { self: false, usableOwnerRemains: false },
     });
-    expect(targetFacts(otherOwner, "SUSPENDED", "delete")).toEqual({
-      target: { self: false, keepsUsableOwner: true },
+    expect(targetFacts(secondOwner, "SUSPENDED", "delete")).toEqual({
+      target: { self: false, usableOwnerRemains: true },
     });
-    expect(targetFacts(otherOwner, "SUSPENDED", "revoke-role")).toEqual({
-      target: { self: false, preservesOwner: false },
+    expect(targetFacts(secondOwner, "SUSPENDED", "revoke-role")).toEqual({
+      target: { self: false, ownerRoleUntouched: false },
     });
     expect(targetFacts(colleague, "ACTIVE", "transfer")).toEqual({
       requiresOwner: true,
@@ -107,8 +113,25 @@ describe("target predicates", () => {
     const owner = operations.user.responses["200"].parse(
       personBody(peopleIds.owner, lastUsableOwner),
     );
-    expect(statusOptionsFor(owner)).toEqual(["ACTIVE", "ONBOARDING", "PROBATION"]);
-    expect(statusOptionsFor(person)).toHaveLength(6);
+    expect(statusOptionsFor(personTarget(actor, owner))).toEqual([
+      "ACTIVE",
+      "ONBOARDING",
+      "PROBATION",
+    ]);
+    expect(statusOptionsFor(personTarget(actor, person))).toHaveLength(6);
+  });
+
+  it("attributes a refusal to Owner continuity only for writes that can trigger it", () => {
+    const owner = personTarget(
+      actor,
+      operations.user.responses["200"].parse(personBody(peopleIds.owner, otherOwner)),
+    );
+    const colleague = personTarget(actor, person);
+    expect(mayBreakOwnerContinuity(owner, { kind: "delete" })).toBe(true);
+    expect(mayBreakOwnerContinuity(owner, { kind: "update", status: "TERMINATED" })).toBe(true);
+    expect(mayBreakOwnerContinuity(owner, { kind: "update", status: "PROBATION" })).toBe(false);
+    expect(mayBreakOwnerContinuity(owner, { kind: "update" })).toBe(false);
+    expect(mayBreakOwnerContinuity(colleague, { kind: "delete" })).toBe(false);
   });
 
   it("offers a reissued invitation only to an employee who has not activated", () => {
