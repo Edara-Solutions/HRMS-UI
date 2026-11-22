@@ -37,28 +37,29 @@ export function SessionList({ identity, service }: SessionListProps) {
       await service.revokeSession(selectedId);
     },
     onSuccess: async () => {
-      setSelectedId(null);
       if (state.session?.sessionId === selectedId) {
+        setSelectedId(null);
         await navigate({
           to: identity.audience === "company" ? "/company/login" : "/platform/login",
         });
         return;
       }
-      await queries.invalidateQueries({ queryKey: queryRoot });
-      setFeedback(t("account.sessionRevoked"));
+      await reconcile("account.sessionRevoked");
     },
-    onError: async (error) => {
-      if (error instanceof OperationRefusal && error.status === 404) {
-        setSelectedId(null);
-        revoke.reset();
-        await queries.invalidateQueries({ queryKey: queryRoot });
-        setFeedback(t("account.sessionAlreadyEnded"));
-        return;
-      }
-      await queries.invalidateQueries({ queryKey: queryRoot });
-      setFeedback(t("account.uncertainChange"));
-    },
+    onError: (error) =>
+      reconcile(
+        error instanceof OperationRefusal && error.status === 404
+          ? "account.sessionAlreadyEnded"
+          : "account.uncertainChange",
+      ),
   });
+
+  async function reconcile(message: string) {
+    setSelectedId(null);
+    revoke.reset();
+    await queries.invalidateQueries({ queryKey: queryRoot });
+    setFeedback(t(message));
+  }
 
   if (sessions.isPending) return <p role="status">{t("account.loading")}</p>;
   if (sessions.isError)
@@ -108,7 +109,7 @@ export function SessionList({ identity, service }: SessionListProps) {
                   </bdi>
                 </p>
               </div>
-              {identity.audience === "company" || !session.isCurrent ? (
+              {service.canRevokeCurrent || !session.isCurrent ? (
                 <Button
                   intent="destructive-trigger"
                   disabled={revoke.isPending}
@@ -157,12 +158,13 @@ export function SessionList({ identity, service }: SessionListProps) {
         descriptionId={descriptionId}
       >
         <DialogTitle id={titleId}>{t("account.revokeTitle")}</DialogTitle>
-        <DialogDescription id={descriptionId}>{t("account.revokeDescription")}</DialogDescription>
-        {revoke.isError ? (
-          <p role="status" className="mt-3 text-sm">
-            {t("account.uncertainChange")}
-          </p>
-        ) : null}
+        <DialogDescription id={descriptionId}>
+          {t(
+            service.canRevokeCurrent
+              ? "account.revokeDescription"
+              : "account.revokeOtherDescription",
+          )}
+        </DialogDescription>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button
             intent="destructive"

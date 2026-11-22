@@ -48,6 +48,7 @@ function companyService() {
       meta: { mode: "page", page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
     }),
     revokeSession: vi.fn().mockResolvedValue(undefined),
+    canRevokeCurrent: true,
     signOut: vi.fn().mockResolvedValue({ remoteConfirmed: true }),
   } satisfies SelfService;
 }
@@ -59,7 +60,7 @@ const otherRow = {
   isCurrent: false,
 };
 
-function platformSessions(items: Array<typeof row>) {
+function sessionPage(items: Array<typeof row>) {
   return {
     items,
     meta: { mode: "page" as const, page: 1, pageSize: 20, totalItems: items.length, totalPages: 1 },
@@ -67,7 +68,34 @@ function platformSessions(items: Array<typeof row>) {
 }
 
 function platformService() {
-  return { ...companyService(), schemas: platformSelfSchemas };
+  return { ...companyService(), schemas: platformSelfSchemas, canRevokeCurrent: false };
+}
+
+function listOtherSessionThenItsRemoval(
+  readSessions: ReturnType<typeof companyService>["readSessions"],
+) {
+  readSessions
+    .mockResolvedValueOnce(sessionPage([row, otherRow]))
+    .mockResolvedValue(sessionPage([row]));
+}
+
+function refusal(audience: "company" | "platform", status: number) {
+  return new OperationRefusal(
+    {
+      audience,
+      key: `DELETE /api/v1/${audience}/me/sessions/{sessionId}`,
+      parseResponse: () => undefined,
+    },
+    status,
+    { detail: "internal canary" },
+  );
+}
+
+async function confirmRevocation(trigger: HTMLElement) {
+  fireEvent.click(trigger);
+  fireEvent.click(
+    within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke session" }),
+  );
 }
 
 const platformIdentity = { audience: "platform" as const, publicId: "platform-user" };
@@ -125,13 +153,16 @@ describe("SELF sessions workflow", () => {
 
   it("revokes another Platform session after confirmation and never offers the current one", async () => {
     const service = platformService();
-    service.readSessions
-      .mockResolvedValueOnce(platformSessions([row, otherRow]))
-      .mockResolvedValue(platformSessions([row]));
+    listOtherSessionThenItsRemoval(service.readSessions);
     renderWorkflow(<SessionList identity={platformIdentity} service={service} />);
     const revokeButtons = await screen.findAllByRole("button", { name: "Revoke session" });
     expect(revokeButtons).toHaveLength(1);
     fireEvent.click(revokeButtons[0]);
+    expect(
+      within(screen.getByRole("dialog")).getByText(
+        "Access from this session will end. Your current session stays signed in.",
+      ),
+    ).toBeInTheDocument();
     fireEvent.click(
       within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke session" }),
     );
@@ -143,31 +174,37 @@ describe("SELF sessions workflow", () => {
     );
   });
 
-  it("refreshes the Platform list when the session has already ended", async () => {
-    const service = platformService();
-    service.readSessions
-      .mockResolvedValueOnce(platformSessions([row, otherRow]))
-      .mockResolvedValue(platformSessions([row]));
-    service.revokeSession.mockRejectedValueOnce(
-      new OperationRefusal(
-        {
-          audience: "platform",
-          key: "DELETE /api/v1/platform/me/sessions/{sessionId}",
-          parseResponse: () => undefined,
-        },
-        404,
-        { detail: "internal canary" },
-      ),
-    );
-    renderWorkflow(<SessionList identity={platformIdentity} service={service} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Revoke session" }));
-    fireEvent.click(
-      within(screen.getByRole("dialog")).getByRole("button", { name: "Revoke session" }),
-    );
+  it.each([
+    ["Platform", platformService, platformIdentity],
+    ["Company", companyService, identity],
+  ] as const)("refreshes the %s list when the session has already ended", async (_, makeService, who) => {
+    const service = makeService();
+    listOtherSessionThenItsRemoval(service.readSessions);
+    service.revokeSession.mockRejectedValueOnce(refusal(who.audience, 404));
+    renderWorkflow(<SessionList identity={who} service={service} />);
+    const triggers = await screen.findAllByRole("button", { name: "Revoke session" });
+    await confirmRevocation(triggers[triggers.length - 1]);
+    await waitFor(() => expect(service.revokeSession).toHaveBeenCalledWith(otherRow.id));
     expect(await screen.findByText("That session has already ended.")).toBeInTheDocument();
     await waitFor(() => expect(screen.queryByText("Office laptop")).not.toBeInTheDocument());
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(screen.queryByText("internal canary")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the uncertain-change message when Platform refuses with a conflict", async () => {
+    const service = platformService();
+    service.readSessions.mockResolvedValue(sessionPage([row, otherRow]));
+    service.revokeSession.mockRejectedValueOnce(refusal("platform", 409));
+    renderWorkflow(<SessionList identity={platformIdentity} service={service} />);
+    await confirmRevocation(await screen.findByRole("button", { name: "Revoke session" }));
+    expect(
+      await screen.findByText(
+        "We could not confirm the change. Review the refreshed account details before trying again.",
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(service.readSessions).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByText("That session has already ended.")).not.toBeInTheDocument();
   });
 
   it("shows an empty list without a fabricated page count", async () => {
