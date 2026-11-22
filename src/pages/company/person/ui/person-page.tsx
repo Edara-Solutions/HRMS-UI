@@ -102,7 +102,7 @@ function PersonWorkspace({
   const { data: roles } = useQuery({ ...queries.roles, enabled: canReadRoles });
   const commands = useConfirmedCommand(personRoots(userPublicId));
   if (!actor) return null;
-  const target = personTarget(actor, person, assignment, roles?.items ?? []);
+  const target = personTarget(actor, person);
   const name = `${person.firstName} ${person.lastName}`;
   const availability = (operation: OperationKey, command: PersonCommand) =>
     access.availability(operation, targetFacts(target, person.status, command));
@@ -114,13 +114,13 @@ function PersonWorkspace({
         <Badge variant={person.status === "ACTIVE" ? "success" : "default"}>
           {t(`status.${person.status}`)}
         </Badge>
-        {target.owner && <Badge variant="primary">{t("person.owner")}</Badge>}
+        {target.holdsOwnerRole && <Badge variant="primary">{t("person.owner")}</Badge>}
         {target.self && <Badge variant="default">{t("roster.you")}</Badge>}
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-6">
-          <PersonProfileForm person={person} />
+          <PersonProfileForm person={person} target={target} />
           {canReadSessions.state !== "hidden" && (
             <PersonSessionsCard
               person={person}
@@ -150,6 +150,7 @@ function PersonWorkspace({
           />
           <PersonAccountCard
             person={person}
+            target={target}
             invitation={availability(
               "POST /api/v1/company/users/{publicId}/invitation",
               "invitation",

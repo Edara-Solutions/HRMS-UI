@@ -138241,7 +138241,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -138485,6 +138486,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -139508,7 +139525,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -139752,6 +139770,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -141432,7 +141466,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -141676,6 +141711,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }
@@ -142572,7 +142623,8 @@
                           "mustChangePassword",
                           "lastLoginAt",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "ownerContinuity"
                         ],
                         "properties": {
                           "publicId": {
@@ -142816,6 +142868,22 @@
                           "updatedAt": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "ownerContinuity": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": [
+                              "holdsOwnerRole",
+                              "isLastUsableOwner"
+                            ],
+                            "properties": {
+                              "holdsOwnerRole": {
+                                "type": "boolean"
+                              },
+                              "isLastUsableOwner": {
+                                "type": "boolean"
+                              }
+                            }
                           }
                         }
                       }
@@ -143581,7 +143649,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -143825,6 +143894,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }
@@ -144812,7 +144897,8 @@
                     "mustChangePassword",
                     "lastLoginAt",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "ownerContinuity"
                   ],
                   "properties": {
                     "publicId": {
@@ -145056,6 +145142,22 @@
                     "updatedAt": {
                       "format": "date-time",
                       "type": "string"
+                    },
+                    "ownerContinuity": {
+                      "additionalProperties": false,
+                      "type": "object",
+                      "required": [
+                        "holdsOwnerRole",
+                        "isLastUsableOwner"
+                      ],
+                      "properties": {
+                        "holdsOwnerRole": {
+                          "type": "boolean"
+                        },
+                        "isLastUsableOwner": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 }

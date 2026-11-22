@@ -1,15 +1,15 @@
 {
-  "commit": "c01277764f80e392d12e1167ef6b6f214f60532d",
-  "ref": "feat/platform-revoke-own-session",
+  "commit": "4dc814e4b621d139b07043da37067a3e3561cfa2",
+  "ref": "dev",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "dea6289e463b0c093c4b18466e1d3f9a392a1029b222a5f236117b398a6a8978"
+      "sha256": "d6432b499b535a98ac7098c44c25f923a257cd32da0d627cb405e60c3c5d0374"
     },
     "company": {
       "file": "contracts/openapi.company.json",
-      "sha256": "d8a40676a6de547b24d310b2f126702b19718bb51f78b12baa02370d2e89061b"
+      "sha256": "5999164ae8c9f34148c2670344b5ea1d013a12ccbc2da74e2b8587fadd94e1de"
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",

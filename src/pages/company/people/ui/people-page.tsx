@@ -25,7 +25,9 @@ import { Label } from "@/shared/ui/label";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { changePeopleStatus, deletePeople, rosterQuery, rosterRoot } from "../api/people";
 import {
+  type BulkAction,
   type BulkSummary,
+  mayBreakOwnerContinuity,
   type Person,
   type PersonStatus,
   personStatuses,
@@ -39,8 +41,6 @@ import { CreatePersonDialog } from "./create-person-dialog";
 interface CompanyPeoplePageProps {
   search: RosterSearch;
 }
-
-type PendingBulk = { kind: "status"; status: PersonStatus } | { kind: "delete" };
 
 export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
   const { t } = useTranslation("people");
@@ -57,7 +57,7 @@ export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
   const [draft, setDraft] = useState(search.q ?? "");
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<PersonStatus>();
-  const [pendingBulk, setPendingBulk] = useState<PendingBulk | null>(null);
+  const [pendingBulk, setPendingBulk] = useState<BulkAction | null>(null);
   const [summary, setSummary] = useState<{
     action: "status" | "delete";
     result: BulkSummary;
@@ -74,7 +74,7 @@ export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
 
   const bulk = useMutation({
     retry: false,
-    mutationFn: async ({ action, targets }: { action: PendingBulk; targets: Person[] }) => {
+    mutationFn: async ({ action, targets }: { action: BulkAction; targets: Person[] }) => {
       const ids = targets.map((person) => person.publicId);
       return action.kind === "status" ? changePeopleStatus(ids, action.status) : deletePeople(ids);
     },
@@ -82,7 +82,11 @@ export function CompanyPeoplePage({ search }: CompanyPeoplePageProps) {
       setSummary({
         action: action.kind,
         result: summarizeBulk(result, targets.length),
-        labels: targets.map((person) => `${person.firstName} ${person.lastName}`),
+        labels: targets.map((person) =>
+          mayBreakOwnerContinuity(action, person)
+            ? `${person.firstName} ${person.lastName}: ${t("refusal.owner-continuity")}`
+            : `${person.firstName} ${person.lastName}`,
+        ),
       });
       setSelected(new Set());
     },

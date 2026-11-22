@@ -6,6 +6,8 @@ import { companySessionFixture } from "../../../../test/audience-fixtures";
 import { accessPolicyBody } from "../../../../test/company-organization-fixtures";
 import {
   assignmentBody,
+  lastUsableOwner,
+  otherOwner,
   peopleCanaries,
   peopleIds,
   personBody,
@@ -29,18 +31,29 @@ const administrator = [
   "company-access-policies:read",
 ];
 
+interface RenderPersonOptions {
+  target?: string;
+  targetRole?: string | null;
+  permissions?: string[];
+  actorIsOwner?: boolean;
+  mode?: string;
+  status?: string;
+  person?: Record<string, unknown>;
+}
+
 function renderPerson({
-  target = peopleIds.colleague as string,
-  targetRole = peopleIds.employeeRole as string | null,
+  target = peopleIds.colleague,
+  targetRole = peopleIds.employeeRole,
   permissions = administrator,
   actorIsOwner = false,
   mode = "NORMAL",
   status = "ACTIVE",
-} = {}) {
+  person,
+}: RenderPersonOptions = {}) {
   const net = operationNetwork.install();
   net.on("GET /api/v1/company/users/{publicId}", () => ({
     status: 200,
-    body: personBody(target, { status }),
+    body: personBody(target, { status, ...person }),
   }));
   net.on("GET /api/v1/company/users/{publicId}/role", () =>
     targetRole
@@ -140,16 +153,154 @@ describe("Company person detail", () => {
     expect(screen.getAllByText("Use your own account pages for this.").length).toBeGreaterThan(0);
   });
 
-  it("protects Owner continuity: no delete, revoke or reassignment of the Owner", async () => {
-    renderPerson({ target: peopleIds.owner, targetRole: peopleIds.ownerRole });
+  it("protects the last usable Owner from removal using the backend's eligibility", async () => {
+    renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: lastUsableOwner,
+    });
     expect(await screen.findByText("Owner", { selector: "span" })).toBeInTheDocument();
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Delete person" })).toBeDisabled(),
     );
     expect(screen.getByRole("button", { name: "Remove role" })).toBeDisabled();
     expect(
+      screen.getAllByText(
+        "This person is the Company's last usable Owner. Transfer ownership first.",
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(
       screen.getAllByText("The company Owner changes only through ownership transfer.").length,
     ).toBeGreaterThan(0);
+  });
+
+  it("keeps Owner protection when the role catalogue cannot be read", async () => {
+    renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: lastUsableOwner,
+      permissions: administrator.filter((permission) => permission !== "roles:read"),
+    });
+    expect(await screen.findByText("Owner", { selector: "span" })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Delete person" })).toBeDisabled(),
+    );
+  });
+
+  it("never infers ownership from the role catalogue", async () => {
+    renderPerson({ target: peopleIds.owner, targetRole: peopleIds.ownerRole });
+    const remove = await screen.findByRole("button", { name: "Delete person" });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Remove role" })).toBeEnabled());
+    expect(remove).toBeEnabled();
+    expect(screen.queryByText("Owner", { selector: "span" })).toBeNull();
+  });
+
+  it("allows removing an Owner who is not the last usable Owner", async () => {
+    renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      status: "SUSPENDED",
+      person: otherOwner,
+    });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Delete person" })).toBeEnabled(),
+    );
+    expect(await screen.findByRole("button", { name: "Remove role" })).toBeDisabled();
+  });
+
+  it("offers the last usable Owner only working statuses and says why", async () => {
+    renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: lastUsableOwner,
+    });
+    const status = await screen.findByRole("combobox", { name: "Status" });
+    await waitFor(() => expect(status).toBeEnabled());
+    fireEvent.click(status);
+    const options = (await screen.findAllByRole("option")).map((option) => option.textContent);
+    expect(options).toEqual(["Active", "Onboarding", "Probation"]);
+  });
+
+  it("explains a server refusal to remove an Owner", async () => {
+    const net = renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: otherOwner,
+    });
+    net.on("DELETE /api/v1/company/users/{publicId}", () => ({
+      status: 403,
+      body: problemBody(403),
+    }));
+    net.on("GET /api/v1/company/me", () => ({
+      status: 200,
+      body: companySessionFixture({ publicId: peopleIds.actor, permissions: administrator }).user,
+    }));
+    const remove = await screen.findByRole("button", { name: "Delete person" });
+    await waitFor(() => expect(remove).toBeEnabled());
+    fireEvent.click(remove);
+    await confirmIn("Delete person", "EMP-0");
+    expect(
+      await screen.findByText(
+        "This change would leave the Company without a usable Owner. Transfer ownership first.",
+      ),
+    ).toBeInTheDocument();
+    expect(navigations).toEqual([]);
+  });
+
+  it("explains a server refusal to set an Owner's status that cannot sign in", async () => {
+    const net = renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: otherOwner,
+    });
+    net.on("PATCH /api/v1/company/users/{publicId}", () => ({
+      status: 403,
+      body: problemBody(403),
+    }));
+    net.on("GET /api/v1/company/me", () => ({
+      status: 200,
+      body: companySessionFixture({ publicId: peopleIds.actor, permissions: administrator }).user,
+    }));
+    const status = await screen.findByRole("combobox", { name: "Status" });
+    await waitFor(() => expect(status).toBeEnabled());
+    fireEvent.click(status);
+    fireEvent.click(await screen.findByRole("option", { name: "Suspended" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save details" }));
+    expect(
+      await screen.findByText(
+        "This change would leave the Company without a usable Owner. Transfer ownership first.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the generic refusal for an Owner edit that cannot affect continuity", async () => {
+    const net = renderPerson({
+      target: peopleIds.owner,
+      targetRole: peopleIds.ownerRole,
+      person: otherOwner,
+    });
+    net.on("PATCH /api/v1/company/users/{publicId}", () => ({
+      status: 403,
+      body: problemBody(403),
+    }));
+    net.on("GET /api/v1/company/me", () => ({
+      status: 200,
+      body: companySessionFixture({ publicId: peopleIds.actor, permissions: administrator }).user,
+    }));
+    const firstName = await screen.findByLabelText("First name");
+    await waitFor(() => expect(firstName).toBeEnabled());
+    fireEvent.change(firstName, { target: { value: "Layla" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save details" }));
+    expect(
+      await screen.findByText(
+        "You can no longer make this change. Your access and this record were refreshed.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "This change would leave the Company without a usable Owner. Transfer ownership first.",
+      ),
+    ).toBeNull();
   });
 
   it("never offers the Owner role for assignment", async () => {
