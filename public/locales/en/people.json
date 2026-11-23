@@ -15,6 +15,8 @@
   "restriction.final-root": "This target is protected.",
   "restriction.system-role": "System roles cannot be changed this way.",
   "restriction.owner-continuity": "The company Owner changes only through ownership transfer.",
+  "restriction.last-usable-owner": "This person is the Company's last usable Owner. Transfer ownership first.",
+  "refusal.owner-continuity": "This change would leave the Company without a usable Owner. Transfer ownership first.",
   "restriction.lifecycle": "This action is not available in the current state.",
   "restriction.prerequisite": "Only the current Owner can transfer ownership.",
   "restriction.restricted-mode": "Changes are paused for your company workspace.",

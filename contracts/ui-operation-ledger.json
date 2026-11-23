@@ -55,6 +55,11 @@
     "consumers": ["src/pages/platform/lead-detail/api/crm.ts"]
   },
   {
+    "key": "DELETE /api/v1/platform/me/sessions/{sessionId}",
+    "audience": "platform",
+    "consumers": ["src/shared/platform-self/index.ts"]
+  },
+  {
     "key": "DELETE /api/v1/platform/plan-prices/{publicId}",
     "audience": "platform",
     "consumers": ["src/pages/platform/plans/ui/plan-detail-page.tsx"]

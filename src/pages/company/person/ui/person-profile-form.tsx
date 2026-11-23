@@ -15,10 +15,12 @@ import {
   buildPersonUpdate,
   employmentTypes,
   isPersonField,
+  mayBreakOwnerContinuity,
   type PersonFormValues,
   type PersonRecord,
+  type PersonTarget,
   personFormSchema,
-  personStatuses,
+  statusOptionsFor,
   toPersonForm,
   workLocations,
 } from "../model/person";
@@ -39,7 +41,13 @@ interface Feedback {
   message: string;
 }
 
-export function PersonProfileForm({ person }: { person: PersonRecord }) {
+export function PersonProfileForm({
+  person,
+  target,
+}: {
+  person: PersonRecord;
+  target: PersonTarget;
+}) {
   const { t } = useTranslation("people");
   const access = useCompanyAccess();
   const recover = useCompanyMutationRecovery();
@@ -80,7 +88,12 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
       if (outcome.kind === "invalid")
         for (const field of outcome.fields)
           if (isPersonField(field)) form.setError(field, { message: "rejected" });
-      setFeedback({ tone: "alert", message: t(`outcome.${outcome.kind}`) });
+      const message =
+        outcome.kind === "refused" &&
+        mayBreakOwnerContinuity(target, { kind: "update", status: update.status })
+          ? t("refusal.owner-continuity")
+          : t(`outcome.${outcome.kind}`);
+      setFeedback({ tone: "alert", message });
     }
   }
 
@@ -149,11 +162,20 @@ export function PersonProfileForm({ person }: { person: PersonRecord }) {
                   id="person-status"
                   value={field.value}
                   disabled={!editable}
-                  options={personStatuses.map((value) => ({ value, label: t(`status.${value}`) }))}
+                  aria-describedby={target.isLastUsableOwner ? "person-status-note" : undefined}
+                  options={statusOptionsFor(target).map((value) => ({
+                    value,
+                    label: t(`status.${value}`),
+                  }))}
                   onValueChange={field.onChange}
                 />
               )}
             />
+            {target.isLastUsableOwner && (
+              <p id="person-status-note" className="text-xs text-[var(--color-text-muted)]">
+                {t("restriction.last-usable-owner")}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="person-employmentType">{t("field.employmentType")}</Label>

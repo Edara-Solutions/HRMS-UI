@@ -5,6 +5,7 @@ import { useCompanySession } from "@/shared/auth";
 import { companySessionFixture } from "../../../../test/audience-fixtures";
 import { accessPolicyBody } from "../../../../test/company-organization-fixtures";
 import {
+  lastUsableOwner,
   peopleCanaries,
   peopleIds,
   personBody,
@@ -109,6 +110,35 @@ describe("Company roster", () => {
       ],
     });
     for (const canary of peopleCanaries) expect(document.body.textContent).not.toContain(canary);
+  });
+
+  it("explains a bulk removal refused for the last usable Owner", async () => {
+    const net = renderRoster({
+      roster: {
+        ...rosterBody([peopleIds.colleague]),
+        items: [personBody(peopleIds.colleague), personBody(peopleIds.owner, lastUsableOwner)],
+      },
+    });
+    net.on(bulkDeleteKey, () => ({
+      status: 200,
+      body: {
+        success: [{ publicId: peopleIds.colleague }],
+        errors: [{ index: 1, publicId: peopleIds.owner, error: "bulk-error-canary" }],
+      },
+    }));
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Select Omar Nabil" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Laila Hassan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete selected" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("Type 2 to confirm"), {
+      target: { value: "2" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete selected" }));
+    const summary = await screen.findByRole("alert");
+    expect(summary).toHaveTextContent(
+      "Laila Hassan: This change would leave the Company without a usable Owner. Transfer ownership first.",
+    );
+    expect(summary).not.toHaveTextContent("Omar Nabil");
   });
 
   it("requires the typed count before a bulk delete and never retries it", async () => {

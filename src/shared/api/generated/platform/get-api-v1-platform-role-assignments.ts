@@ -15,6 +15,7 @@ export const responseSchemas = {
             platformUserPublicId: z.string().uuid(),
             rolePublicId: z.string().uuid(),
             expiresAt: z.union([z.string(), z.null()]),
+            state: z.union([z.literal("ACTIVE"), z.literal("EXPIRED"), z.literal("REVOKED")]),
           })
           .strict(),
       ),
