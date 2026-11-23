@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { X } from "lucide-react";
+import { useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import {
@@ -11,7 +12,11 @@ import {
   usePlatformMutationRecovery,
 } from "@/shared/api";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
+import { Label } from "@/shared/ui/label";
 import { type SchemaField, SchemaForm } from "@/shared/ui/schema-form";
+import { StateSelect } from "@/shared/ui/state-select";
+import { editableLeadStatuses } from "../model/status-transitions";
 
 type Lead = z.output<(typeof operations.lead.responses)["200"]>["lead"];
 interface Props {
@@ -27,7 +32,7 @@ const readOperations = [
   operations.eligibility,
   operations.requests,
 ];
-const textFields = ["companyName", "website", "industry", "country", "city"] as const;
+const textFields = ["companyName", "website", "industry"] as const;
 
 export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onCancel }: Props) {
   const { t } = useTranslation("platform-leads");
@@ -35,6 +40,9 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
   const recover = usePlatformMutationRecovery();
   const queryClient = useQueryClient();
   const locked = useRef(false);
+  const locationId = useId();
+  const [country, setCountry] = useState(lead?.country ?? "");
+  const [state, setState] = useState(lead?.city ?? "");
   const [feedback, setFeedback] = useState<string>();
   const [duplicate, setDuplicate] = useState<z.output<
     (typeof operations.create.responses)[201]
@@ -115,13 +123,22 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
           message: t("contact.nameRequired"),
         });
     });
-  const statuses = bodySchema.shape.status.options.map((item) => item.value);
-  const statusOptions =
-    lead && !statuses.some((status) => status === lead.status)
-      ? [...statuses, lead.status]
-      : statuses;
+  const updateFormSchema = operations.update.requestSchema.shape.body.superRefine(
+    (body, context) => {
+      if ((body.status ?? lead?.status) === "LOST" && !(body.lostReason ?? lead?.lostReason)) {
+        context.addIssue({ code: "custom", path: ["lostReason"], message: t("invalid") });
+      }
+    },
+  );
   const options = (values: readonly string[]) =>
     values.map((value) => ({ value, label: t(`enum.${value}`) }));
+  const formDisabled =
+    !!disabled || mutation.isPending || mutation.isError || available.state !== "enabled";
+  const changeCountry = (next: string) => {
+    if (next === country) return;
+    setCountry(next);
+    setState("");
+  };
   const fields: SchemaField[] = [
     ...textFields.map((name) => ({
       name,
@@ -130,6 +147,86 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
       nullable: !!lead,
       ...(name === "companyName" ? { section: t("section.company") } : {}),
     })),
+    {
+      name: "country",
+      label: t("field.country"),
+      value: lead?.country ?? "",
+      nullable: !!lead,
+      control: (
+        <div className="space-y-1.5">
+          <Label htmlFor={`${locationId}-country`}>{t("field.country")}</Label>
+          <input type="hidden" name="country" value={country} />
+          <div className="flex items-center gap-1">
+            <div className="min-w-0 flex-1">
+              <CountrySelect
+                id={`${locationId}-country`}
+                value={country}
+                onValueChange={changeCountry}
+                disabled={formDisabled}
+                placeholder={t("location.selectCountry")}
+                loadingPlaceholder={t("location.loadingCountries")}
+                unavailablePlaceholder={t("location.noCountries")}
+                searchPlaceholder={t("location.searchCountries")}
+                emptyMessage={t("location.noCountries")}
+              />
+            </div>
+            {country && (
+              <Button
+                intent="utility"
+                size="iconSm"
+                aria-label={t("location.clearCountry")}
+                title={t("location.clearCountry")}
+                disabled={formDisabled}
+                onClick={() => changeCountry("")}
+              >
+                <X aria-hidden="true" size={15} />
+              </Button>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      name: "city",
+      label: t("location.state"),
+      value: lead?.city ?? "",
+      nullable: !!lead,
+      control: (
+        <div className="space-y-1.5">
+          <Label htmlFor={`${locationId}-state`}>{t("location.state")}</Label>
+          <input type="hidden" name="city" value={state} />
+          <div className="flex items-center gap-1">
+            <div className="min-w-0 flex-1">
+              <StateSelect
+                key={country}
+                id={`${locationId}-state`}
+                country={country}
+                value={state}
+                onValueChange={setState}
+                disabled={formDisabled}
+                placeholder={t(country ? "location.selectState" : "location.chooseCountryFirst")}
+                loadingPlaceholder={t("location.loadingStates")}
+                unavailablePlaceholder={t("location.noStates")}
+                searchPlaceholder={t("location.searchStates")}
+                emptyMessage={t("location.noStates")}
+              />
+            </div>
+            {state && (
+              <Button
+                intent="utility"
+                size="iconSm"
+                aria-label={t("location.clearState")}
+                title={t("location.clearState")}
+                disabled={formDisabled}
+                onClick={() => setState("")}
+              >
+                <X aria-hidden="true" size={15} />
+              </Button>
+            )}
+          </div>
+        </div>
+      ),
+    },
     {
       name: "companySizeRange",
       label: t("field.companySizeRange"),
@@ -152,7 +249,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
             label: t("field.status"),
             required: true,
             value: lead.status,
-            options: options(statusOptions),
+            options: options(editableLeadStatuses(lead.status)),
           },
           {
             name: "lostReason",
@@ -208,7 +305,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
   return (
     <div className="space-y-3">
       <SchemaForm
-        schema={lead ? operations.update.requestSchema.shape.body : createFormSchema}
+        schema={lead ? updateFormSchema : createFormSchema}
         fields={fields}
         changedOnly={!!lead}
         label={t(lead ? "save" : "create")}
@@ -216,9 +313,7 @@ export function LeadRegistryForm({ lead, disabled, onPendingChange, onSaved, onC
         onCancel={onCancel}
         cancelDisabled={mutation.isPending}
         invalidLabel={t("invalid")}
-        disabled={
-          disabled || mutation.isPending || mutation.isError || available.state !== "enabled"
-        }
+        disabled={formDisabled}
         onSubmit={(body) => {
           if (locked.current) return;
           locked.current = true;

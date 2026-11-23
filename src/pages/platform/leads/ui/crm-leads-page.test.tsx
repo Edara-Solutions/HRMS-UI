@@ -17,6 +17,11 @@ import {
 import { navigations } from "../../../../test/router-mock";
 import { PlatformLeadsPage } from "./crm-leads-page";
 
+vi.mock("@/shared/ui/location-select-data", () => ({
+  loadCountries: async () => [{ id: 65, name: "Egypt" }],
+  loadStates: async () => [{ id: 3235, name: "Cairo Governorate" }],
+}));
+
 vi.mock("@/shared/api/operation-request", async (original) => {
   const actual =
     await original<
@@ -70,6 +75,15 @@ describe("Lead registry", () => {
     await screen.findAllByRole("link", { name: "Acme Lead" });
     fireEvent.click(screen.getByRole("button", { name: "Create lead" }));
     const dialog = await screen.findByRole("dialog");
+    const country = within(dialog).getByRole("combobox", { name: "Country" });
+    const state = () => within(dialog).getByRole("combobox", { name: "State / Region" });
+    expect(state()).toBeDisabled();
+    await waitFor(() => expect(country).toBeEnabled());
+    fireEvent.click(country);
+    fireEvent.click(await screen.findByRole("option", { name: "Egypt" }));
+    await waitFor(() => expect(state()).toBeEnabled());
+    fireEvent.click(state());
+    fireEvent.click(await screen.findByRole("option", { name: "Cairo Governorate" }));
     fireEvent.change(within(dialog).getByLabelText("Company name"), {
       target: { value: "New Lead" },
     });
@@ -88,6 +102,8 @@ describe("Lead registry", () => {
     expect(net.calls.find((call) => call.key === operations.create.key)?.input).toEqual({
       body: {
         companyName: "New Lead",
+        country: "Egypt",
+        city: "Cairo Governorate",
         companySizeRange: "5_TO_20",
         source: "CRM",
         status: "NEW",
