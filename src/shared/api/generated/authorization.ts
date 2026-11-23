@@ -370,97 +370,6 @@ export const operationAuthorization = {
     authorization: "D",
     permission: "delegation:audit:read",
   },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/users": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:users:read",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:users:read",
-  },
-  "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:users:update",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:roles:read",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles/{rolePublicId}": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:roles:read",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/profile": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:profile:read",
-  },
-  "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/profile": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:profile:update",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/setup": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:setup:read",
-  },
-  "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/start": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:setup:update",
-  },
-  "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:setup:update",
-  },
-  "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/skip": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:setup:update",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-settings": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:email-settings:read",
-  },
-  "PUT /api/v1/platform/access-sessions/{sessionPublicId}/email-settings": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:email-settings:update",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:email-readiness:read",
-  },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:template-assignments:read",
-  },
-  "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:template-assignments:create",
-  },
-  "DELETE /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments/{emailTypeKey}":
-    {
-      audience: "delegated",
-      authorization: "D",
-      permission: "delegation:template-assignments:delete",
-    },
-  "GET /api/v1/platform/access-sessions/{sessionPublicId}/sending-domain": {
-    audience: "delegated",
-    authorization: "D",
-    permission: "delegation:sending-domains:read",
-  },
   "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types": {
     audience: "delegated",
     authorization: "D",
@@ -702,12 +611,57 @@ export const operationAuthorization = {
     authorization: "P",
     permission: "companies:restore",
   },
+  "POST /api/v1/platform/access-requests": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "GET /api/v1/platform/access-requests": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "GET /api/v1/platform/access-requests/mine": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/cancel": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:open",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/approve": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "POST /api/v1/platform/access-requests/{requestPublicId}/reject": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
   "POST /api/v1/platform/access-sessions": {
     audience: "platform",
     authorization: "P",
     permission: "delegation:open",
   },
+  "GET /api/v1/platform/access-sessions/live": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
+  "POST /api/v1/platform/access-sessions/{sessionPublicId}/end": {
+    audience: "platform",
+    authorization: "P",
+    permission: "delegation:approve",
+  },
   "GET /api/v1/platform/access-sessions/{sessionPublicId}": {
+    audience: "platform",
+    authorization: "SELF",
+    permission: null,
+  },
+  "POST /api/v1/platform/access-sessions/{sessionPublicId}/enter": {
     audience: "platform",
     authorization: "SELF",
     permission: null,
@@ -1090,6 +1044,7 @@ export type OperationPermission = Exclude<
 >;
 export const generatedRefusalCodes = [
   "ACCESS_SESSION_INACTIVE",
+  "ACCESS_SESSION_READ_ONLY",
   "COMPANY_ACCESS_DENIED",
   "DIAGNOSTIC_RATE_LIMITED",
   "DIAGNOSTIC_REQUEST_CONFLICT",

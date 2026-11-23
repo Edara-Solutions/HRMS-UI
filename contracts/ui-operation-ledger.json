@@ -35,11 +35,6 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
-    "key": "DELETE /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments/{emailTypeKey}",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
     "key": "DELETE /api/v1/platform/companies/{publicId}",
     "audience": "platform",
     "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
@@ -288,6 +283,16 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
+    "key": "GET /api/v1/platform/access-requests",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "GET /api/v1/platform/access-requests/mine",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
     "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}",
     "audience": "platform",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
@@ -313,54 +318,9 @@
     "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
   },
   {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-settings",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/profile",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles/{rolePublicId}",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/sending-domain",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/setup",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+    "key": "GET /api/v1/platform/access-sessions/live",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
     "key": "GET /api/v1/platform/announcements",
@@ -392,10 +352,7 @@
   {
     "key": "GET /api/v1/platform/companies/{publicId}",
     "audience": "platform",
-    "consumers": [
-      "src/pages/platform/access-session/api/access-session.ts",
-      "src/pages/platform/company-detail/api/company-detail.ts"
-    ]
+    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
   },
   {
     "key": "GET /api/v1/platform/companies/{publicId}/access-policy",
@@ -668,16 +625,6 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
-    "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/profile",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
     "key": "PATCH /api/v1/platform/companies/{publicId}",
     "audience": "platform",
     "consumers": [
@@ -861,14 +808,37 @@
     "consumers": ["src/pages/company/people/api/people.ts"]
   },
   {
+    "key": "POST /api/v1/platform/access-requests",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/approve",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/cancel",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
+    "key": "POST /api/v1/platform/access-requests/{requestPublicId}/reject",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
+  },
+  {
     "key": "POST /api/v1/platform/access-sessions",
     "audience": "platform",
-    "consumers": ["src/pages/platform/company-detail/api/company-detail.ts"]
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close",
     "audience": "platform",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+    "consumers": [
+      "src/features/access-request/api/access-requests.ts",
+      "src/pages/platform/access-session/api/access-session.ts"
+    ]
   },
   {
     "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends",
@@ -876,23 +846,13 @@
     "consumers": ["src/pages/platform/access-session/api/email-diagnostics.ts"]
   },
   {
-    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/end",
+    "audience": "platform",
+    "consumers": ["src/features/access-request/api/access-requests.ts"]
   },
   {
-    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/skip",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
-  },
-  {
-    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/start",
-    "audience": "delegated",
+    "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/enter",
+    "audience": "platform",
     "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
   },
   {
@@ -1153,11 +1113,6 @@
     "key": "PUT /api/v1/company/roles/{publicId}/permissions",
     "audience": "company",
     "consumers": ["src/pages/company/role/api/role.ts"]
-  },
-  {
-    "key": "PUT /api/v1/platform/access-sessions/{sessionPublicId}/email-settings",
-    "audience": "delegated",
-    "consumers": ["src/pages/platform/access-session/api/access-session.ts"]
   },
   {
     "key": "PUT /api/v1/platform/notification-settings/{typeKey}",

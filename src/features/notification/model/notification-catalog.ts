@@ -4,6 +4,7 @@ import {
   Building2,
   ClipboardCheck,
   CreditCard,
+  KeyRound,
   type LucideIcon,
   Megaphone,
   ShieldCheck,
@@ -26,7 +27,13 @@ export type NotificationTone = "info" | "success" | "warning";
 
 /** The verified routes a row may navigate to; one member per click-through in the catalog. */
 export type NotificationRoute =
-  | { readonly to: "/platform/leads" | "/company/dashboard" | "/company/me/profile" }
+  | {
+      readonly to:
+        | "/platform/leads"
+        | "/platform/access-requests"
+        | "/company/dashboard"
+        | "/company/me/profile";
+    }
   | { readonly to: "/platform/conversion-requests/$publicId"; readonly publicId: string };
 
 export interface NotificationSubject {
@@ -102,6 +109,60 @@ export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = 
         ? { to: "/platform/conversion-requests/$publicId", publicId: subject.publicId }
         : null,
   }),
+  catalogEntry("platform.access-requested", {
+    importance: "high",
+    tone: "warning",
+    icon: KeyRound,
+    paramsSchema: z.object({
+      requesterName: z.string(),
+      companyName: z.string(),
+      scope: z.enum(["READ", "CHANGE"]),
+      minutes: z.number(),
+    }),
+    enumParams: ["scope"],
+    route: () => ({ to: "/platform/access-requests" }),
+  }),
+  catalogEntry("platform.access-decided", {
+    importance: "high",
+    tone: "info",
+    icon: KeyRound,
+    paramsSchema: z.object({
+      decision: z.enum(["approved", "rejected"]),
+      companyName: z.string(),
+      deciderName: z.string(),
+      scope: z.enum(["READ", "CHANGE"]),
+      minutes: z.number(),
+    }),
+    enumParams: ["decision", "scope"],
+    route: () => ({ to: "/platform/access-requests" }),
+  }),
+  catalogEntry("platform.access-request-lapsed", {
+    importance: "normal",
+    tone: "info",
+    icon: KeyRound,
+    paramsSchema: z.object({ companyName: z.string() }),
+    route: () => ({ to: "/platform/access-requests" }),
+  }),
+  catalogEntry("platform.access-session-ending", {
+    importance: "high",
+    tone: "warning",
+    icon: KeyRound,
+    paramsSchema: z.object({ companyName: z.string(), endsAt: z.string() }),
+    route: () => ({ to: "/platform/access-requests" }),
+  }),
+  catalogEntry("platform.access-session-ended", {
+    importance: "high",
+    tone: "warning",
+    icon: KeyRound,
+    paramsSchema: z.object({
+      cause: z.enum(["EXPIRED", "ENDED_BY_APPROVER"]),
+      companyName: z.string(),
+      endedByName: z.string(),
+      note: z.string(),
+    }),
+    enumParams: ["cause"],
+    route: () => ({ to: "/platform/access-requests" }),
+  }),
   catalogEntry("platform.announcement", {
     importance: "normal",
     tone: "info",
@@ -141,6 +202,14 @@ export const NOTIFICATION_CATALOG: ReadonlyMap<string, NotificationTypeEntry> = 
     icon: ClipboardCheck,
     paramsSchema: z.object({ decision: z.enum(["approved", "rejected"]) }),
     enumParams: ["decision"],
+    route: null,
+  }),
+  catalogEntry("company.support-access-opened", {
+    importance: "high",
+    tone: "warning",
+    icon: KeyRound,
+    paramsSchema: z.object({ scope: z.enum(["READ", "CHANGE"]), expiresAt: z.string() }),
+    enumParams: ["scope"],
     route: null,
   }),
   catalogEntry("company.announcement", {

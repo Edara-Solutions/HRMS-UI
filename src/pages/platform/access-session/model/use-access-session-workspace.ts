@@ -7,30 +7,18 @@ import {
   usePlatformAccess,
   usePlatformMutationRecovery,
 } from "@/shared/api";
+import { dropSupportAccess } from "@/shared/auth";
+import { enterSupportAccess } from "@/shared/company-auth";
 import {
   accessSessionQueries,
   closeAccessSession,
-  delegatedCommands,
   delegatedQueries,
+  enterAccessSession,
 } from "../api/access-session";
 import { type AccessSession, canClose, sessionLiveness } from "./session";
 import { useEmailDiagnostics } from "./use-email-diagnostics";
 
 const maxTimerDelay = 2_147_483_647;
-
-export type ActivityKind =
-  | "employeeCorrected"
-  | "profileSaved"
-  | "stepChanged"
-  | "emailSettingsSaved"
-  | "templateAssigned"
-  | "templateRemoved";
-
-export interface ActivityEntry {
-  id: number;
-  kind: ActivityKind;
-  at: number;
-}
 
 function useExpiryClock(expiresAt: string | undefined) {
   const [now, setNow] = useState(() => Date.now());
@@ -75,7 +63,6 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
   const [terminal, setTerminal] = useState<ContentState>();
   const projectedState = contentState(session, now, permitted);
   const state = projectedState === "inactive" ? projectedState : (terminal ?? projectedState);
-  const [activity, setActivity] = useState<readonly ActivityEntry[]>([]);
   const sessionKey = queries.session.queryKey;
   const root = delegated.root;
 
@@ -126,14 +113,22 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
     });
   }, [queryClient, root, reconcile]);
 
-  const record = useCallback((kind: ActivityKind) => {
-    setActivity((entries) => [{ id: entries.length + 1, kind, at: Date.now() }, ...entries]);
-  }, []);
+  const enter = useMutation({
+    mutationFn: async () => {
+      const entry = await enterAccessSession(sessionPublicId);
+      await enterSupportAccess({ ...entry, sessionPublicId });
+    },
+    retry: false,
+    onError: (error) => void reconcile(error),
+  });
 
   const close = useMutation({
     mutationFn: () => closeAccessSession(sessionPublicId),
     retry: false,
-    onSuccess: (closed) => queryClient.setQueryData(sessionKey, closed),
+    onSuccess: (closed) => {
+      dropSupportAccess(sessionPublicId);
+      queryClient.setQueryData(sessionKey, closed);
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: sessionKey, exact: true }),
   });
 
@@ -148,15 +143,13 @@ export function useAccessSessionWorkspace(sessionPublicId: string) {
     state,
     queries,
     delegated,
-    commands: delegatedCommands(sessionPublicId),
-    activity,
-    record,
     reconcile,
+    enter,
     close,
     diagnostics,
     closable: session !== undefined && canClose(session),
     availability: (operation: { key: string }) =>
-      access.delegatedAvailability(operation.key, liveness),
+      access.delegatedAvailability(operation.key, liveness, session?.scope),
   };
 }
 

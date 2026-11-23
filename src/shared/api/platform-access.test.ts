@@ -41,14 +41,18 @@ describe("Platform access", () => {
   });
 
   it("grants a delegated operation only with delegation:open, its own action and a live session", () => {
-    const update = "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}";
+    const update =
+      "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends";
     expect(accessFor([], ["delegation:open"]).delegatedAvailability(update, "live")).toEqual({
       state: "hidden",
     });
     expect(
-      accessFor([], ["delegation:users:update"]).delegatedAvailability(update, "live"),
+      accessFor([], ["delegation:email-diagnostics:test-send"]).delegatedAvailability(
+        update,
+        "live",
+      ),
     ).toEqual({ state: "hidden" });
-    const granted = accessFor([], ["delegation:open", "delegation:users:update"]);
+    const granted = accessFor([], ["delegation:open", "delegation:email-diagnostics:test-send"]);
     expect(granted.delegatedAvailability(update, "live")).toEqual({ state: "enabled" });
     expect(granted.delegatedAvailability(update, "inactive")).toEqual({
       state: "disabled",

@@ -3,35 +3,39 @@ import { z } from "zod";
 import { defineOperation } from "../runtime";
 
 export const requestSchema = z
-  .object({
-    body: z
-      .object({
-        companyPublicId: z.string().uuid(),
-        reason: z.union([
-          z.literal("SUPPORT_REQUEST"),
-          z.literal("INCIDENT_RESPONSE"),
-          z.literal("PROVISIONING"),
-          z.literal("CUSTOMER_REQUEST"),
-        ]),
-      })
-      .strict(),
-  })
+  .object({ body: z.object({ requestPublicId: z.string().uuid() }).strict() })
   .strict();
 export const responseSchemas = {
   "201": z
     .object({
       publicId: z.string().uuid(),
-      companyPublicId: z.string().uuid(),
+      company: z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+      operator: z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+      approver: z.union([
+        z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+        z.null(),
+      ]),
       reason: z.union([
         z.literal("SUPPORT_REQUEST"),
         z.literal("INCIDENT_RESPONSE"),
         z.literal("PROVISIONING"),
         z.literal("CUSTOMER_REQUEST"),
       ]),
-      status: z.union([z.literal("OPEN"), z.literal("EXPIRED"), z.literal("CLOSED")]),
+      scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+      status: z.union([
+        z.literal("OPEN"),
+        z.literal("EXPIRED"),
+        z.literal("CLOSED"),
+        z.literal("ENDED"),
+      ]),
       openedAt: z.string().datetime({ offset: true }),
       expiresAt: z.string().datetime({ offset: true }),
       closedAt: z.union([z.string().datetime({ offset: true }), z.null()]),
+      endedBy: z.union([
+        z.object({ publicId: z.string().uuid(), name: z.string() }).strict(),
+        z.null(),
+      ]),
+      endNote: z.union([z.string(), z.null()]),
     })
     .strict(),
   "400": z.object({
@@ -140,6 +144,76 @@ export const responseSchemas = {
     effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
   }),
   "404": z.object({
+    type: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    title: z.string(),
+    status: z.number().int().min(400).max(599),
+    detail: z.string(),
+    instance: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    traceId: z.string().regex(/^[0-9a-f]{32}$/),
+    invalidParams: z.array(z.string().min(1)).optional(),
+    code: z.literal("COMPANY_ACCESS_DENIED").optional(),
+    mode: z
+      .union([
+        z.literal("NORMAL"),
+        z.literal("READ_ONLY"),
+        z.literal("FROZEN"),
+        z.literal("BLOCKED"),
+        z.literal("MAINTENANCE"),
+      ])
+      .optional(),
+    reason: z.union([z.string().max(255), z.null()]).optional(),
+    effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
+  }),
+  "409": z.object({
+    type: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    title: z.string(),
+    status: z.number().int().min(400).max(599),
+    detail: z.string(),
+    instance: z.string().refine((value) => {
+      try {
+        new URL(value, "https://contract.invalid");
+        return true;
+      } catch {
+        return false;
+      }
+    }),
+    traceId: z.string().regex(/^[0-9a-f]{32}$/),
+    invalidParams: z.array(z.string().min(1)).optional(),
+    code: z.literal("COMPANY_ACCESS_DENIED").optional(),
+    mode: z
+      .union([
+        z.literal("NORMAL"),
+        z.literal("READ_ONLY"),
+        z.literal("FROZEN"),
+        z.literal("BLOCKED"),
+        z.literal("MAINTENANCE"),
+      ])
+      .optional(),
+    reason: z.union([z.string().max(255), z.null()]).optional(),
+    effectiveUntil: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
+  }),
+  "422": z.object({
     type: z.string().refine((value) => {
       try {
         new URL(value, "https://contract.invalid");

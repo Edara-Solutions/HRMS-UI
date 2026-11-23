@@ -4,6 +4,7 @@ import {
   type AudienceName,
   hasEveryPermission,
   isPlatformPortalEnabled,
+  isSupportDelegate,
   type PermissionAction,
   projectRouteAccess,
   RouteAccessRefusal,
@@ -100,5 +101,17 @@ export async function requireAuthenticated(options: AuthGuardOptions = {}) {
     !hasEveryPermission(session.user, options.requiredPermissions)
   )
     throw redirect({ to: "/forbidden" });
+  if (
+    isPersonalCompanyPath(pathname) &&
+    audience === "company" &&
+    isSupportDelegate(useCompanySession.getState().session?.user)
+  )
+    throw redirect({ to: "/company/dashboard" });
   return session;
+}
+
+function isPersonalCompanyPath(pathname: string | undefined) {
+  return (
+    pathname !== undefined && (pathname.startsWith("/company/me/") || pathname === "/company/me")
+  );
 }

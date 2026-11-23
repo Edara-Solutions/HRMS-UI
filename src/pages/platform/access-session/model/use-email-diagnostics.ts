@@ -24,7 +24,9 @@ export function useEmailDiagnostics(
   const access = usePlatformAccess();
   const generation = usePlatformSession((state) => state.generation);
   const sendAllowed =
-    open && access.delegatedAvailability(operations.diagnosticSend.key, "live").state === "enabled";
+    open &&
+    access.delegatedAvailability(operations.diagnosticSend.key, "live", session?.scope).state ===
+      "enabled";
   const [state, setState] = useState<DiagnosticState>({ phase: "idle" });
   const [checking, setChecking] = useState(false);
   const lock = useRef(false);
@@ -62,7 +64,8 @@ export function useEmailDiagnostics(
     sendAllowed &&
     session !== undefined &&
     sessionLiveness(session, Date.now()) === "live" &&
-    access.delegatedAvailability(operations.diagnosticSend.key, "live").state === "enabled";
+    access.delegatedAvailability(operations.diagnosticSend.key, "live", session.scope).state ===
+      "enabled";
 
   function prepare(type: DiagnosticType, locale: "en" | "ar") {
     if (

@@ -98,6 +98,11 @@ export const requestSchema = z
               z.literal("platform.company_email_diagnostic.accepted"),
               z.literal("platform.access_session.opened"),
               z.literal("platform.access_session.closed"),
+              z.literal("platform.access_session.ended"),
+              z.literal("platform.access_request.submitted"),
+              z.literal("platform.access_request.approved"),
+              z.literal("platform.access_request.rejected"),
+              z.literal("platform.access_request.cancelled"),
             ]),
           )
           .min(1)
@@ -5215,6 +5220,360 @@ export const responseSchemas = {
               details: z
                 .object({
                   accessSessionPublicId: z.string(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.access_session.ended"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("PLATFORM"),
+              companyPublicId: z.null(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessSessionPublicId: z.string(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.access_request.submitted"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("PLATFORM"),
+              companyPublicId: z.null(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessRequestPublicId: z.string(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                  scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+                  requestedMinutes: z.number().int(),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.access_request.approved"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("PLATFORM"),
+              companyPublicId: z.null(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessRequestPublicId: z.string(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                  grantedScope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+                  grantedMinutes: z.number().int(),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.access_request.rejected"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("PLATFORM"),
+              companyPublicId: z.null(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessRequestPublicId: z.string(),
+                  reason: z.union([
+                    z.literal("SUPPORT_REQUEST"),
+                    z.literal("INCIDENT_RESPONSE"),
+                    z.literal("PROVISIONING"),
+                    z.literal("CUSTOMER_REQUEST"),
+                  ]),
+                })
+                .strict(),
+              recordingBinding: z.union([z.literal("TRANSACTIONAL"), z.literal("STANDALONE")]),
+              recordedAt: z.string().datetime({ offset: true }),
+            })
+            .strict(),
+          z
+            .object({
+              eventType: z.literal("platform.access_request.cancelled"),
+              eventVersion: z.literal(1),
+              occurredAt: z.string().datetime({ offset: true }),
+              scope: z.literal("PLATFORM"),
+              companyPublicId: z.null(),
+              outcome: z.union([z.literal("SUCCESS"), z.literal("FAILURE")]),
+              actor: z.union([
+                z
+                  .object({
+                    kind: z.literal("USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("PLATFORM_USER"),
+                    publicId: z.string().uuid(),
+                    name: z.union([z.string(), z.null()]),
+                  })
+                  .strict(),
+                z
+                  .object({
+                    kind: z.literal("SYSTEM"),
+                    component: z.union([
+                      z.literal("EMAIL_WORKER"),
+                      z.literal("SCHEDULER"),
+                      z.literal("SCRIPT"),
+                    ]),
+                  })
+                  .strict(),
+                z.object({ kind: z.literal("ANONYMOUS") }).strict(),
+                z.object({ kind: z.literal("ATTRIBUTION_FAILED") }).strict(),
+                z.object({ kind: z.literal("ERASED_USER") }).strict(),
+              ]),
+              traceId: z.union([z.string(), z.null()]),
+              origin: z
+                .object({
+                  ip: z.union([z.string(), z.null()]),
+                  userAgent: z.union([z.string(), z.null()]),
+                  country: z.union([z.string(), z.null()]),
+                  city: z.union([z.string(), z.null()]),
+                })
+                .strict(),
+              targets: z.array(
+                z
+                  .object({
+                    targetType: z.string(),
+                    publicId: z.string(),
+                    name: z.union([z.string(), z.null()]).optional(),
+                  })
+                  .strict(),
+              ),
+              details: z
+                .object({
+                  accessRequestPublicId: z.string(),
                   reason: z.union([
                     z.literal("SUPPORT_REQUEST"),
                     z.literal("INCIDENT_RESPONSE"),

@@ -31,10 +31,13 @@ export function SessionRail({ session, companyName, workspace }: SessionRailProp
   const facts = [
     [t("rail.company"), companyName],
     [t("rail.reason"), t(`reason.${session.reason}`)],
+    [t("rail.scope"), t(`access.scope.${session.scope}`)],
+    ...(session.approver ? [[t("rail.approvedBy"), session.approver.name]] : []),
     [t("rail.origin"), t("rail.originValue")],
     [t("rail.openedAt"), formatInstant(session.openedAt, locale)],
     [t("rail.expiresAt"), formatInstant(session.expiresAt, locale)],
     ...(session.closedAt ? [[t("rail.closedAt"), formatInstant(session.closedAt, locale)]] : []),
+    ...(session.endedBy ? [[t("rail.endedBy"), session.endedBy.name]] : []),
   ];
 
   return (
@@ -42,7 +45,11 @@ export function SessionRail({ session, companyName, workspace }: SessionRailProp
       <Card as="section">
         <CardHeader className="flex flex-row items-center justify-between gap-2">
           <CardTitle id="session-rail-title">{t("rail.title")}</CardTitle>
-          <Badge variant={status === "OPEN" ? "success" : "default"}>{t(`status.${status}`)}</Badge>
+          <Badge
+            variant={status === "OPEN" ? "success" : status === "ENDED" ? "danger" : "default"}
+          >
+            {t(`status.${status}`)}
+          </Badge>
         </CardHeader>
         <CardContent className="space-y-4 p-4">
           <dl className="space-y-3 text-sm">
@@ -53,6 +60,14 @@ export function SessionRail({ session, companyName, workspace }: SessionRailProp
               </div>
             ))}
           </dl>
+          {session.endNote && (
+            <p className="whitespace-pre-wrap break-words rounded-[var(--radius-md)] bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]">
+              <bdi>{session.endNote}</bdi>
+            </p>
+          )}
+          {session.scope === "READ" && (
+            <p className="text-xs leading-5 text-[var(--color-text-muted)]">{t("rail.readOnly")}</p>
+          )}
           <p className="text-xs leading-5 text-[var(--color-text-muted)]">{t("rail.fixed")}</p>
           {workspace.closable && (
             <Button
@@ -66,30 +81,6 @@ export function SessionRail({ session, companyName, workspace }: SessionRailProp
           <p role={close.isError ? "alert" : "status"} className="text-sm">
             {close.isError ? t("close.failed") : close.isSuccess ? t("close.confirmed") : null}
           </p>
-        </CardContent>
-      </Card>
-      <Card as="section" aria-labelledby="session-activity-title">
-        <CardHeader>
-          <CardTitle id="session-activity-title">{t("activity.title")}</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 text-sm">
-          {workspace.activity.length === 0 ? (
-            <p className="text-[var(--color-text-muted)]">{t("activity.empty")}</p>
-          ) : (
-            <ol className="space-y-2">
-              {workspace.activity.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap justify-between gap-x-3">
-                  <span>{t(`activity.${entry.kind}`)}</span>
-                  <time
-                    dateTime={new Date(entry.at).toISOString()}
-                    className="text-xs text-[var(--color-text-muted)]"
-                  >
-                    {formatInstant(new Date(entry.at).toISOString(), locale)}
-                  </time>
-                </li>
-              ))}
-            </ol>
-          )}
         </CardContent>
       </Card>
       <ConfirmDialog

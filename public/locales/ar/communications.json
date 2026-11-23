@@ -153,5 +153,6 @@
   "routing.confirm.action": "حفظ التوجيه",
   "routing.saved": "تم حفظ توجيه {{type}}.",
   "domain.state.verified": "موثّق",
-  "domain.hint.verified": "النطاق موثّق. جاهزية الإرسال منه غير متاحة لك."
+  "domain.hint.verified": "النطاق موثّق. جاهزية الإرسال منه غير متاحة لك.",
+  "restriction.access-session-read-only": "جلسة الوصول هذه للقراءة فقط."
 }

@@ -40,6 +40,7 @@ import { Route as PlatformConversionRequestsIndexRouteImport } from "./app/route
 import { Route as PlatformCompaniesIndexRouteImport } from "./app/routes/platform/companies/index"
 import { Route as PlatformAuditIndexRouteImport } from "./app/routes/platform/audit/index"
 import { Route as PlatformAnnouncementsIndexRouteImport } from "./app/routes/platform/announcements/index"
+import { Route as PlatformAccessRequestsIndexRouteImport } from "./app/routes/platform/access-requests/index"
 import { Route as CompanySetupIndexRouteImport } from "./app/routes/company/setup/index"
 import { Route as CompanyRolesIndexRouteImport } from "./app/routes/company/roles/index"
 import { Route as CompanyProfileIndexRouteImport } from "./app/routes/company/profile/index"
@@ -228,6 +229,12 @@ const PlatformAnnouncementsIndexRoute =
     path: "/announcements/",
     getParentRoute: () => PlatformRouteRoute,
   } as any)
+const PlatformAccessRequestsIndexRoute =
+  PlatformAccessRequestsIndexRouteImport.update({
+    id: "/access-requests/",
+    path: "/access-requests/",
+    getParentRoute: () => PlatformRouteRoute,
+  } as any)
 const CompanySetupIndexRoute = CompanySetupIndexRouteImport.update({
   id: "/setup/",
   path: "/setup/",
@@ -395,6 +402,7 @@ export interface FileRoutesByFullPath {
   "/company/profile/": typeof CompanyProfileIndexRoute
   "/company/roles/": typeof CompanyRolesIndexRoute
   "/company/setup/": typeof CompanySetupIndexRoute
+  "/platform/access-requests/": typeof PlatformAccessRequestsIndexRoute
   "/platform/announcements/": typeof PlatformAnnouncementsIndexRoute
   "/platform/audit/": typeof PlatformAuditIndexRoute
   "/platform/companies/": typeof PlatformCompaniesIndexRoute
@@ -451,6 +459,7 @@ export interface FileRoutesByTo {
   "/company/profile": typeof CompanyProfileIndexRoute
   "/company/roles": typeof CompanyRolesIndexRoute
   "/company/setup": typeof CompanySetupIndexRoute
+  "/platform/access-requests": typeof PlatformAccessRequestsIndexRoute
   "/platform/announcements": typeof PlatformAnnouncementsIndexRoute
   "/platform/audit": typeof PlatformAuditIndexRoute
   "/platform/companies": typeof PlatformCompaniesIndexRoute
@@ -510,6 +519,7 @@ export interface FileRoutesById {
   "/company/profile/": typeof CompanyProfileIndexRoute
   "/company/roles/": typeof CompanyRolesIndexRoute
   "/company/setup/": typeof CompanySetupIndexRoute
+  "/platform/access-requests/": typeof PlatformAccessRequestsIndexRoute
   "/platform/announcements/": typeof PlatformAnnouncementsIndexRoute
   "/platform/audit/": typeof PlatformAuditIndexRoute
   "/platform/companies/": typeof PlatformCompaniesIndexRoute
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | "/company/profile/"
     | "/company/roles/"
     | "/company/setup/"
+    | "/platform/access-requests/"
     | "/platform/announcements/"
     | "/platform/audit/"
     | "/platform/companies/"
@@ -626,6 +637,7 @@ export interface FileRouteTypes {
     | "/company/profile"
     | "/company/roles"
     | "/company/setup"
+    | "/platform/access-requests"
     | "/platform/announcements"
     | "/platform/audit"
     | "/platform/companies"
@@ -684,6 +696,7 @@ export interface FileRouteTypes {
     | "/company/profile/"
     | "/company/roles/"
     | "/company/setup/"
+    | "/platform/access-requests/"
     | "/platform/announcements/"
     | "/platform/audit/"
     | "/platform/companies/"
@@ -945,6 +958,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlatformAnnouncementsIndexRouteImport
       parentRoute: typeof PlatformRouteRoute
     }
+    "/platform/access-requests/": {
+      id: "/platform/access-requests/"
+      path: "/access-requests"
+      fullPath: "/platform/access-requests/"
+      preLoaderRoute: typeof PlatformAccessRequestsIndexRouteImport
+      parentRoute: typeof PlatformRouteRoute
+    }
     "/company/setup/": {
       id: "/company/setup/"
       path: "/setup"
@@ -1172,6 +1192,7 @@ interface PlatformRouteRouteChildren {
   PlatformPeoplePublicIdRoute: typeof PlatformPeoplePublicIdRoute
   PlatformPlansPublicIdRoute: typeof PlatformPlansPublicIdRoute
   PlatformRolesPublicIdRoute: typeof PlatformRolesPublicIdRoute
+  PlatformAccessRequestsIndexRoute: typeof PlatformAccessRequestsIndexRoute
   PlatformAnnouncementsIndexRoute: typeof PlatformAnnouncementsIndexRoute
   PlatformAuditIndexRoute: typeof PlatformAuditIndexRoute
   PlatformCompaniesIndexRoute: typeof PlatformCompaniesIndexRoute
@@ -1203,6 +1224,7 @@ const PlatformRouteRouteChildren: PlatformRouteRouteChildren = {
   PlatformPeoplePublicIdRoute: PlatformPeoplePublicIdRoute,
   PlatformPlansPublicIdRoute: PlatformPlansPublicIdRoute,
   PlatformRolesPublicIdRoute: PlatformRolesPublicIdRoute,
+  PlatformAccessRequestsIndexRoute: PlatformAccessRequestsIndexRoute,
   PlatformAnnouncementsIndexRoute: PlatformAnnouncementsIndexRoute,
   PlatformAuditIndexRoute: PlatformAuditIndexRoute,
   PlatformCompaniesIndexRoute: PlatformCompaniesIndexRoute,

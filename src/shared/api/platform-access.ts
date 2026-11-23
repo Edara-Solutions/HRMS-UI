@@ -56,13 +56,18 @@ export function usePlatformAccess() {
             ...target,
           })
         : { state: "hidden" as const },
-    delegatedAvailability: (operation: string, accessSession: "live" | "inactive") =>
+    delegatedAvailability: (
+      operation: string,
+      accessSession: "live" | "inactive",
+      scope: "READ" | "CHANGE" = "CHANGE",
+    ) =>
       isOperationKey(operation)
         ? projectActionAvailability(operation, {
             ...facts,
             accessSession,
             delegatedScopeMatches: true,
             delegatedGrant: facts.permissions?.includes(delegationOpenPermission) ?? false,
+            delegatedReadOnly: scope === "READ",
           })
         : { state: "hidden" as const },
   };

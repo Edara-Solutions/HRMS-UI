@@ -29,7 +29,7 @@ import { executeOperationRequest, OperationRefusal } from "./operation-request";
 import { delegatedApiClient, platformApiClient } from "./platform-client";
 
 const sessionPublicId = "3f0f7a52-5d5b-4b8e-9d7e-7c3e8b1f2a10";
-const readiness = { ready: true };
+const readiness = { items: [] };
 
 beforeEach(() => usePlatformSession.getState().setSession(platformSessionFixture()));
 afterEach(() => {
@@ -84,15 +84,15 @@ describe("delegated Company operations", () => {
 
   it("sends through the delegated client with the Platform sign-in token", async () => {
     const requests = stubNetwork({
-      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-readiness`]: () =>
+      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-diagnostics/types`]: () =>
         json(readiness),
     });
     await expect(
-      requestDelegatedOperation(operations.emailReadiness, { params: { sessionPublicId } }),
+      requestDelegatedOperation(operations.diagnosticTypes, { params: { sessionPublicId } }),
     ).resolves.toEqual(readiness);
     expect(requests).toEqual([
       {
-        key: `GET /api/v1/platform/access-sessions/${sessionPublicId}/email-readiness`,
+        key: `GET /api/v1/platform/access-sessions/${sessionPublicId}/email-diagnostics/types`,
         authorization: "Bearer access-canary",
         body: undefined,
       },
@@ -103,7 +103,7 @@ describe("delegated Company operations", () => {
     const requests = stubNetwork({});
     const input = { params: { sessionPublicId } };
     await expect(
-      executeOperationRequest(platformApiClient, operations.emailReadiness, input),
+      executeOperationRequest(platformApiClient, operations.diagnosticTypes, input),
     ).rejects.toBeInstanceOf(ContractViolation);
     await expect(
       executeOperationRequest(delegatedApiClient, accessSessionOperations.session, input),
@@ -114,7 +114,7 @@ describe("delegated Company operations", () => {
   it("refuses a malformed session identifier before any request", async () => {
     const requests = stubNetwork({});
     await expect(
-      requestDelegatedOperation(operations.emailReadiness, {
+      requestDelegatedOperation(operations.diagnosticTypes, {
         params: { sessionPublicId: "../users" },
       }),
     ).rejects.toBeInstanceOf(ContractViolation);
@@ -123,10 +123,10 @@ describe("delegated Company operations", () => {
 
   it("keeps an inactive session refusal distinct and free of backend text", async () => {
     stubNetwork({
-      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-readiness`]: () =>
-        problem(403),
+      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-diagnostics/types`]: () =>
+        problem(403, { code: "ACCESS_SESSION_INACTIVE" }),
     });
-    const refusal = await requestDelegatedOperation(operations.emailReadiness, {
+    const refusal = await requestDelegatedOperation(operations.diagnosticTypes, {
       params: { sessionPublicId },
     }).catch((error: unknown) => error);
     expect(refusal).toBeInstanceOf(OperationRefusal);
@@ -136,7 +136,7 @@ describe("delegated Company operations", () => {
 
   it("drops a response that settles after the Platform identity was replaced", async () => {
     stubNetwork({
-      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-readiness`]: () => {
+      [`GET /api/v1/platform/access-sessions/${sessionPublicId}/email-diagnostics/types`]: () => {
         usePlatformSession
           .getState()
           .setSession(platformSessionFixture({ publicId: "5c7f0f4e-2b5d-4d51-9a55-0d3b1f6a7c21" }));
@@ -144,17 +144,17 @@ describe("delegated Company operations", () => {
       },
     });
     await expect(
-      requestDelegatedOperation(operations.emailReadiness, { params: { sessionPublicId } }),
+      requestDelegatedOperation(operations.diagnosticTypes, { params: { sessionPublicId } }),
     ).rejects.toBeInstanceOf(AudienceSessionChanged);
   });
 
   it("roots cache keys at the delegated audience, operator and Access Session", () => {
-    const key = delegatedQueryKey("operator", sessionPublicId, operations.users, "1");
+    const key = delegatedQueryKey("operator", sessionPublicId, operations.auditTrail, "1");
     expect(key).toEqual([
       "platform-delegated",
       "operator",
       sessionPublicId,
-      operations.users.key,
+      operations.auditTrail.key,
       "1",
     ]);
     expect(delegatedQueryKey("operator", sessionPublicId)).toEqual(key.slice(0, 3));

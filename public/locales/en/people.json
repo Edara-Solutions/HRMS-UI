@@ -192,5 +192,6 @@
   "role.deleteHint": "People with this role lose its permissions.",
   "role.delete": "Delete role",
   "role.deleteConfirm.title": "Delete {{role}}?",
-  "role.deleteConfirm.description": "Everyone with {{role}} loses its permissions. This cannot be undone."
+  "role.deleteConfirm.description": "Everyone with {{role}} loses its permissions. This cannot be undone.",
+  "restriction.access-session-read-only": "This access session is read only."
 }

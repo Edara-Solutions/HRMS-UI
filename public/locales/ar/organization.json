@@ -189,5 +189,6 @@
   "dashboard.error.action": "حاول مرة أخرى",
   "dashboard.contract": "تعذر التحقق من الاستجابة. هذا القسم غير متاح.",
   "dashboard.empty.title": "لا شيء لعرضه بعد",
-  "dashboard.empty.description": "لا يتضمن دورك أي قسم من النظرة العامة. اطلب الوصول من مسؤول الشركة."
+  "dashboard.empty.description": "لا يتضمن دورك أي قسم من النظرة العامة. اطلب الوصول من مسؤول الشركة.",
+  "restriction.access-session-read-only": "جلسة الوصول هذه للقراءة فقط."
 }

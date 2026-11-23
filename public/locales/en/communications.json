@@ -153,5 +153,6 @@
   "routing.confirm.action": "Save routing",
   "routing.saved": "Routing for {{type}} saved.",
   "domain.state.verified": "Verified",
-  "domain.hint.verified": "The domain is verified. Its sending readiness is not available to you."
+  "domain.hint.verified": "The domain is verified. Its sending readiness is not available to you.",
+  "restriction.access-session-read-only": "This access session is read only."
 }

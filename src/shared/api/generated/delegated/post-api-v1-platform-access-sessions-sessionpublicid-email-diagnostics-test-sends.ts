@@ -106,7 +106,11 @@ export const responseSchemas = {
       }),
       traceId: z.string().regex(/^[0-9a-f]{32}$/),
       invalidParams: z.array(z.string().min(1)).optional(),
-      code: z.union([z.literal("ACCESS_SESSION_INACTIVE"), z.literal("PERMISSION_DENIED")]),
+      code: z.union([
+        z.literal("ACCESS_SESSION_INACTIVE"),
+        z.literal("ACCESS_SESSION_READ_ONLY"),
+        z.literal("PERMISSION_DENIED"),
+      ]),
     })
     .strict(),
   "404": z

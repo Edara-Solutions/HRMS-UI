@@ -156,5 +156,6 @@
   "role.deleteConfirm.description": "{{role}} is removed permanently.",
   "role.grantsConfirm.title": "Change the actions of {{role}}?",
   "role.grantsConfirm.description": "{{added}} actions are added and {{removed}} removed for everyone holding {{role}}, on their next request.",
-  "role.deleted": "{{role}} was deleted."
+  "role.deleted": "{{role}} was deleted.",
+  "restriction.access-session-read-only": "This access session is read only."
 }

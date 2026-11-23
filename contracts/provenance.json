@@ -1,23 +1,23 @@
 {
-  "commit": "d45b447d080aa6ec15a8184b77bdb46e0f552641",
+  "commit": "ed4c212cf7412456a07dce4c0a64a8addf6943a1",
   "ref": "dev",
   "generatorVersion": 1,
   "contracts": {
     "internal": {
       "file": "contracts/openapi.json",
-      "sha256": "b1e0f99efc3c350135f86acf1641f96ae83deae84e269c93161eb94aa3093a26"
+      "sha256": "6af04fbe3d68df3690ecdfbc7a4cb3a686f750b15d56f2f186a717d96571616e"
     },
     "company": {
       "file": "contracts/openapi.company.json",
-      "sha256": "5999164ae8c9f34148c2670344b5ea1d013a12ccbc2da74e2b8587fadd94e1de"
+      "sha256": "b314fc9ef0bcf89629dbc4859b8e886c60ba59c9e64e82488ce18b93581739ce"
     },
     "delegated": {
       "file": "contracts/openapi.delegated.json",
-      "sha256": "7ba7d972d33156c10e062a543fcbd5e57fd36be61f35695f403e4b9bd5197afb"
+      "sha256": "b9f7b2d65d2f7e416310f5507eb86c0227bd204321d1e797227ce4dfbe6bb9f4"
     },
     "platform": {
       "file": "contracts/openapi.platform.json",
-      "sha256": "789a53873a8451c9037cd2ad4bb1cc415fb1079a3cd5b3979e8ba3bf94d8d0da"
+      "sha256": "7ae2cb1eb701cc902266edd07fe104725d035856d2c3b32223b44988efc9ee01"
     },
     "public": {
       "file": "contracts/openapi.public.json",
@@ -321,10 +321,6 @@
     ],
     "delegated": [
       {
-        "file": "delete-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments-emailtypekey.ts",
-        "key": "DELETE /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments/{emailTypeKey}"
-      },
-      {
         "file": "get-api-v1-platform-access-sessions-sessionpublicid-audit-trail.ts",
         "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/audit-trail"
       },
@@ -341,76 +337,8 @@
         "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/types/{key}/preview"
       },
       {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-readiness.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-readiness"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-settings.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-settings"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-profile.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/profile"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-roles.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-roles-rolepublicid.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/roles/{rolePublicId}"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-sending-domain.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/sending-domain"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-setup.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/setup"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-users.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users"
-      },
-      {
-        "file": "get-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid.ts",
-        "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}"
-      },
-      {
-        "file": "patch-api-v1-platform-access-sessions-sessionpublicid-profile.ts",
-        "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/profile"
-      },
-      {
-        "file": "patch-api-v1-platform-access-sessions-sessionpublicid-users-userpublicid.ts",
-        "key": "PATCH /api/v1/platform/access-sessions/{sessionPublicId}/users/{userPublicId}"
-      },
-      {
         "file": "post-api-v1-platform-access-sessions-sessionpublicid-email-diagnostics-test-sends.ts",
         "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-diagnostics/test-sends"
-      },
-      {
-        "file": "post-api-v1-platform-access-sessions-sessionpublicid-email-template-assignments.ts",
-        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/email-template-assignments"
-      },
-      {
-        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-complete.ts",
-        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/complete"
-      },
-      {
-        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-skip.ts",
-        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/skip"
-      },
-      {
-        "file": "post-api-v1-platform-access-sessions-sessionpublicid-setup-steppublicid-start.ts",
-        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/setup/{stepPublicId}/start"
-      },
-      {
-        "file": "put-api-v1-platform-access-sessions-sessionpublicid-email-settings.ts",
-        "key": "PUT /api/v1/platform/access-sessions/{sessionPublicId}/email-settings"
       }
     ],
     "platform": [
@@ -463,8 +391,20 @@
         "key": "DELETE /api/v1/platform/users/{publicId}/sessions/{sessionPublicId}"
       },
       {
+        "file": "get-api-v1-platform-access-requests.ts",
+        "key": "GET /api/v1/platform/access-requests"
+      },
+      {
+        "file": "get-api-v1-platform-access-requests-mine.ts",
+        "key": "GET /api/v1/platform/access-requests/mine"
+      },
+      {
         "file": "get-api-v1-platform-access-sessions-sessionpublicid.ts",
         "key": "GET /api/v1/platform/access-sessions/{sessionPublicId}"
+      },
+      {
+        "file": "get-api-v1-platform-access-sessions-live.ts",
+        "key": "GET /api/v1/platform/access-sessions/live"
       },
       {
         "file": "get-api-v1-platform-announcements.ts",
@@ -687,12 +627,36 @@
         "key": "PATCH /api/v1/platform/users/{publicId}"
       },
       {
+        "file": "post-api-v1-platform-access-requests.ts",
+        "key": "POST /api/v1/platform/access-requests"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-approve.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/approve"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-cancel.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/cancel"
+      },
+      {
+        "file": "post-api-v1-platform-access-requests-requestpublicid-reject.ts",
+        "key": "POST /api/v1/platform/access-requests/{requestPublicId}/reject"
+      },
+      {
         "file": "post-api-v1-platform-access-sessions.ts",
         "key": "POST /api/v1/platform/access-sessions"
       },
       {
         "file": "post-api-v1-platform-access-sessions-sessionpublicid-close.ts",
         "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/close"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-end.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/end"
+      },
+      {
+        "file": "post-api-v1-platform-access-sessions-sessionpublicid-enter.ts",
+        "key": "POST /api/v1/platform/access-sessions/{sessionPublicId}/enter"
       },
       {
         "file": "post-api-v1-platform-announcements.ts",

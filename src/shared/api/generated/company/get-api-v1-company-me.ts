@@ -20,6 +20,16 @@ export const responseSchemas = {
       photoUrl: z.union([z.string(), z.null()]),
       locale: z.string(),
       timezone: z.string(),
+      delegation: z
+        .object({
+          accessSessionPublicId: z.string().uuid(),
+          companyName: z.string(),
+          reason: z.string(),
+          scope: z.union([z.literal("READ"), z.literal("CHANGE")]),
+          expiresAt: z.string().datetime({ offset: true }),
+        })
+        .strict()
+        .optional(),
     })
     .strict(),
   "401": z.object({

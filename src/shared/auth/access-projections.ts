@@ -37,6 +37,7 @@ export type ActionRestriction =
   | "restricted-mode"
   | "access-unverified"
   | "access-session-inactive"
+  | "access-session-read-only"
   | "company-blocked";
 export type ActionAvailability =
   | { state: "hidden" }
@@ -54,6 +55,8 @@ export interface AccessFacts {
   accessSession?: "live" | "inactive" | "foreign" | "missing";
   delegatedScopeMatches?: boolean;
   delegatedGrant?: boolean;
+  delegatedReadOnly?: boolean;
+  supportDelegate?: boolean;
   restriction?: ActionRestriction;
   target?: {
     self?: boolean;
@@ -229,6 +232,14 @@ const platformWorkRoutes: RouteDeclaration[] = [
     operation: "GET /api/v1/platform/lead-conversion-requests/{publicId}",
   },
   {
+    path: "/platform/access-requests",
+    audience: "platform",
+    category: "work",
+    operation: "GET /api/v1/platform/access-requests/mine",
+    alternativeOperations: ["GET /api/v1/platform/access-requests"],
+    label: { en: "Access requests", ar: "طلبات الوصول" },
+  },
+  {
     path: "/platform/companies",
     audience: "platform",
     category: "work",
@@ -390,9 +401,12 @@ export function projectActionAvailability(
       return { state: "disabled", reason: "access-session-inactive" };
     if (facts.accessSession !== "live" || !facts.delegatedScopeMatches || !facts.delegatedGrant)
       return { state: "hidden" };
+    if (facts.delegatedReadOnly && !operation.startsWith("GET "))
+      return { state: "disabled", reason: "access-session-read-only" };
   }
   if (policy.authorization !== "SELF" && facts.audience === "company") {
-    if (facts.companyMode === "BLOCKED") return { state: "disabled", reason: "company-blocked" };
+    if (facts.companyMode === "BLOCKED" && !facts.supportDelegate)
+      return { state: "disabled", reason: "company-blocked" };
     const write = !operation.startsWith("GET ") && !operation.startsWith("HEAD ");
     // An unknown mode fails closed, but says so instead of claiming the workspace is restricted.
     if (write && facts.companyMode === undefined)
@@ -428,7 +442,8 @@ export function projectRouteAccess(pathname: string, facts: AccessFacts): Access
   if (!facts.authenticated) return "authenticate";
   if (facts.mustChangePassword && route.category !== "credential") return "credential-completion";
   if (route.category === "self" || route.category === "credential") return "allow";
-  if (route.audience === "company" && facts.companyMode === "BLOCKED") return "company-blocked";
+  if (route.audience === "company" && facts.companyMode === "BLOCKED" && !facts.supportDelegate)
+    return "company-blocked";
   if (route.operation) {
     const available = projectActionAvailability(route.operation, facts);
     if (

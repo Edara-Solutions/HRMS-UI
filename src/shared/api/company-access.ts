@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type AccessFacts, projectActionAvailability } from "../auth/access-projections";
-import { useCompanySession } from "../auth/company-session";
+import { isSupportDelegate, useCompanySession } from "../auth/company-session";
 import { loadCompanyIdentity } from "./company-api";
 import { companyAccessPolicyQuery } from "./company-operation";
 import type { OperationKey, RefusalMode } from "./generated/authorization";
@@ -32,6 +32,7 @@ export function useCompanyAccess() {
     permissions: user?.permissions ?? [],
     owner: user?.isOwner,
     companyMode: policy.data?.mode,
+    supportDelegate: isSupportDelegate(user),
   };
 
   return {

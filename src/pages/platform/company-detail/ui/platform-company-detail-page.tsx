@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { SupportAccessCard } from "@/features/access-request";
 import { RegistryForm } from "@/features/platform-company-registry";
 import {
   OperationRefusal,
@@ -23,7 +24,6 @@ import { LifecycleCard } from "./lifecycle-card";
 import { PolicyPanel } from "./policy-panel";
 import { ReadPanel } from "./read-panel";
 import { SubscriptionPanel } from "./subscription-panel";
-import { SupportSessionCard } from "./support-session-card";
 
 interface Props {
   publicId: string;
@@ -147,7 +147,7 @@ export function PlatformCompanyDetailPage({ publicId }: Props) {
             />
           )}
           {record && !companyError && (
-            <SupportSessionCard
+            <SupportAccessCard
               companyPublicId={record.publicId}
               companyName={record.name}
               blocked={blocked}

@@ -131,6 +131,7 @@ const groupMap: Record<AudienceName, GroupSpec[]> = {
       title: { en: "Requests", ar: "الطلبات" },
       entries: [
         { path: "conversion-requests", icon: <ArrowRightLeft size={17} />, attention: true },
+        { path: "access-requests", icon: <KeyRound size={17} />, attention: true },
       ],
     },
     {
