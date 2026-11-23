@@ -7,18 +7,21 @@ import { useConversionPlans } from "../api/plans";
 interface Props {
   disabled?: boolean;
   label: string;
+  title?: string;
+  description?: string;
   onSubmit: (body: unknown) => void;
 }
-export function ConversionPlanForm({ disabled, label, onSubmit }: Props) {
+export function ConversionPlanForm({ disabled, label, title, description, onSubmit }: Props) {
   const { t } = useTranslation("platform-leads");
   const { data, error, isPending, refetch } = useConversionPlans();
   return (
     <QueryPanel
-      title={t("plan.title")}
+      title={title ?? t("plan.title")}
       pending={isPending}
       error={error}
       retry={() => void refetch()}
     >
+      {description && <p className="text-sm text-[var(--color-text-muted)]">{description}</p>}
       {data?.length ? (
         <SchemaForm
           schema={operations.changePlan.requestSchema.shape.body}
