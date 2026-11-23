@@ -98,6 +98,7 @@ export function Dialog({
     panelRef.current?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (event.defaultPrevented) return;
       if (event.key === "Escape") {
         handleEscape();
         return;

@@ -9,6 +9,8 @@ interface CountrySelectProps {
   onValueChange: (value: string) => void;
   id?: string;
   placeholder?: string;
+  loadingPlaceholder?: string;
+  unavailablePlaceholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
@@ -22,6 +24,8 @@ export function CountrySelect({
   onValueChange,
   id,
   placeholder = "Select country",
+  loadingPlaceholder = "Loading countries",
+  unavailablePlaceholder = placeholder,
   searchPlaceholder = "Search countries",
   emptyMessage = "No countries found",
   disabled = false,
@@ -56,7 +60,16 @@ export function CountrySelect({
       disabled={disabled || isLoading || countries.length === 0}
     >
       <SelectTrigger id={id} ref={ref} onBlur={onBlur} className={className}>
-        <SelectValue placeholder={isLoading ? "Loading countries" : placeholder} />
+        <SelectValue
+          placeholder={
+            value ||
+            (isLoading
+              ? loadingPlaceholder
+              : countries.length
+                ? placeholder
+                : unavailablePlaceholder)
+          }
+        />
       </SelectTrigger>
       <LocationSelectContent
         searchPlaceholder={searchPlaceholder}

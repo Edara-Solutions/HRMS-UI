@@ -27,6 +27,7 @@ interface Props {
   onCancel?: () => void;
   cancelLabel?: string;
   cancelDisabled?: boolean;
+  children?: ReactNode;
 }
 /** A schema-validated form with an explicit field whitelist; transport stays with its owner. */
 export function SchemaForm({
@@ -41,6 +42,7 @@ export function SchemaForm({
   onCancel,
   cancelLabel,
   cancelDisabled,
+  children,
 }: Props) {
   const id = useId();
   const [invalid, setInvalid] = useState(false);
@@ -148,6 +150,7 @@ export function SchemaForm({
           </div>
         </Fragment>
       ))}
+      {children}
       {invalid && (
         <p role="alert" className="sm:col-span-2">
           {invalidLabel}

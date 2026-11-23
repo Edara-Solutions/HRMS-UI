@@ -10,6 +10,8 @@ interface StateSelectProps {
   onValueChange: (value: string) => void;
   id?: string;
   placeholder?: string;
+  loadingPlaceholder?: string;
+  unavailablePlaceholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
@@ -23,6 +25,8 @@ export function StateSelect({
   onValueChange,
   id,
   placeholder = "Select state",
+  loadingPlaceholder = "Loading states",
+  unavailablePlaceholder = placeholder,
   searchPlaceholder = "Search states",
   emptyMessage = "No states found",
   disabled = false,
@@ -67,7 +71,16 @@ export function StateSelect({
       disabled={disabled || !country || isLoading || states.length === 0}
     >
       <SelectTrigger id={id} ref={ref} onBlur={onBlur}>
-        <SelectValue placeholder={isLoading ? "Loading states" : placeholder} />
+        <SelectValue
+          placeholder={
+            value ||
+            (isLoading
+              ? loadingPlaceholder
+              : country && !states.length
+                ? unavailablePlaceholder
+                : placeholder)
+          }
+        />
       </SelectTrigger>
       <LocationSelectContent
         searchPlaceholder={searchPlaceholder}

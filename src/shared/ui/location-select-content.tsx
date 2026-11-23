@@ -38,7 +38,9 @@ export function LocationSelectContent({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => event.stopPropagation()}
+          onKeyDown={(event) => {
+            if (event.key !== "Escape") event.stopPropagation();
+          }}
           placeholder={searchPlaceholder}
         />
       </div>

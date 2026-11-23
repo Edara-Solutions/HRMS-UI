@@ -383,6 +383,12 @@ export function SelectContent({ children, className }: SelectContentProps) {
       role="listbox"
       aria-labelledby={triggerId}
       aria-hidden={!open}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape" || !open) return;
+        event.preventDefault();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }}
       style={style}
       className={cn(
         "scrollbar-calm z-[60] overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-md)]",

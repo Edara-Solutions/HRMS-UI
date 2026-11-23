@@ -82,6 +82,8 @@ interface DateTimePickerProps {
   description?: string;
   placeholder?: string;
   disabled?: boolean;
+  validate?: (value: string | undefined) => string | undefined;
+  showDateEdge?: boolean;
 }
 
 export function DateTimePicker({
@@ -98,6 +100,8 @@ export function DateTimePicker({
   description,
   placeholder,
   disabled = false,
+  validate,
+  showDateEdge = true,
 }: DateTimePickerProps) {
   const { titleId, descriptionId } = useDialogIds();
   const copy = { ...defaultText, ...text };
@@ -107,6 +111,7 @@ export function DateTimePicker({
   const parsedValue = parseDateValue(value);
   const initialDraft = parsedValue ?? new Date();
   const [open, setOpen] = useState(false);
+  const [validateDraft, setValidateDraft] = useState(false);
   const [draft, setDraft] = useState<Date | undefined>(parsedValue);
   const [draftEdgeDateType, setDraftEdgeDateType] = useState<DateEdgeType>(edgeDateType);
   const [minuteInput, setMinuteInput] = useState(() => String(initialDraft.getMinutes()));
@@ -126,6 +131,7 @@ export function DateTimePicker({
     setDraftEdgeDateType(edgeDateType);
     setMinuteInput(String(nextDraft.getMinutes()));
     setMonth(new Date(nextDraft.getFullYear(), nextDraft.getMonth(), 1));
+    setValidateDraft(false);
     setOpen(true);
   }
 
@@ -176,6 +182,8 @@ export function DateTimePicker({
     });
   }
 
+  const draftError = validateDraft ? validate?.(draft?.toISOString()) : undefined;
+
   return (
     <div className={label ? "min-h-[74px]" : undefined}>
       {label ? <Label htmlFor={id}>{label}</Label> : null}
@@ -210,7 +218,7 @@ export function DateTimePicker({
         onClose={() => setOpen(false)}
         titleId={titleId}
         descriptionId={descriptionId}
-        className="max-w-[440px] p-6"
+        className="max-h-[90dvh] max-w-[440px] overflow-y-auto p-5 sm:p-6"
       >
         <DialogTitle id={titleId} className="tracking-[-0.02em]">
           {accessibleLabel}
@@ -292,11 +300,18 @@ export function DateTimePicker({
             </Select>
           </div>
         </div>
-        <EdgeDateTypeField
-          id={`${id}-edge`}
-          value={draftEdgeDateType}
-          onValueChange={setDraftEdgeDateType}
-        />
+        {showDateEdge && (
+          <EdgeDateTypeField
+            id={`${id}-edge`}
+            value={draftEdgeDateType}
+            onValueChange={setDraftEdgeDateType}
+          />
+        )}
+        {draftError && (
+          <p role="alert" className="mt-3 text-sm text-[var(--color-danger)]">
+            {draftError}
+          </p>
+        )}
         <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--color-border)] pt-4">
           <Button
             variant="ghost"
@@ -316,6 +331,10 @@ export function DateTimePicker({
               size="sm"
               onClick={() => {
                 const nextValue = draft?.toISOString();
+                if (validate?.(nextValue)) {
+                  setValidateDraft(true);
+                  return;
+                }
                 if (onEdgeValueChange) {
                   onEdgeValueChange(toDateEdgeValue(nextValue, draftEdgeDateType));
                 } else {
