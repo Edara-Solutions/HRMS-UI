@@ -61,6 +61,10 @@ export function crmQueries(userPublicId: string, publicId: string, page: number)
       select: (value) => ({
         isEligible: value.isEligible,
         reasons: value.reasons.map(({ code }) => code),
+        primaryContact: value.primaryContact && {
+          name: value.primaryContact.name,
+          email: value.primaryContact.email,
+        },
       }),
     }),
     activities: queryOptions({
@@ -88,6 +92,7 @@ export function crmQueries(userPublicId: string, publicId: string, page: number)
         domain: value.domain,
         status: value.status,
         health: value.health,
+        verifiedAt: value.verifiedAt,
         records: value.dnsRecords.map(({ kind, host, recordType, value }) => ({
           kind,
           host,

@@ -19,7 +19,7 @@ const readOperations = [
   operations.readiness,
   operations.requests,
 ];
-export function useLeadCommands(publicId: string) {
+export function useLeadCommands(publicId: string, activityPage: number) {
   const { t } = useTranslation("platform-leads");
   const access = usePlatformAccess();
   const recover = usePlatformMutationRecovery();
@@ -27,6 +27,7 @@ export function useLeadCommands(publicId: string) {
   const navigate = useNavigate();
   const [pending, setPending] = useState<LeadCommandInput | null>(null);
   const [feedback, setFeedback] = useState<string>();
+  const [activityFormVersion, setActivityFormVersion] = useState(0);
   const locked = useRef(false);
   const userPublicId = access.user?.publicId ?? "";
   const reconcile = () =>
@@ -44,6 +45,15 @@ export function useLeadCommands(publicId: string) {
     },
     onSuccess: async (_result, item) => {
       setFeedback(t("done"));
+      if (item.kind === "addActivity") {
+        setActivityFormVersion((version) => version + 1);
+        if (activityPage > 1)
+          await navigate({
+            to: "/platform/leads/$publicId",
+            params: { publicId },
+            search: { activityPage: 1 },
+          });
+      }
       if (item.kind === "remove")
         await navigate({
           to: "/platform/leads",
@@ -64,11 +74,18 @@ export function useLeadCommands(publicId: string) {
       setPending(null);
     },
   });
+  const execute = (item: LeadCommandInput, onSuccess?: () => void) => {
+    if (locked.current || mutation.isError) return;
+    locked.current = true;
+    mutation.mutate(item, { onSuccess });
+  };
   return {
+    activityFormVersion,
     pending,
     feedback,
     busy: mutation.isPending,
     failed: mutation.isError,
+    execute,
     request: (item: LeadCommandInput) => {
       if (!locked.current && !mutation.isError) setPending(item);
     },
@@ -76,10 +93,7 @@ export function useLeadCommands(publicId: string) {
       if (!locked.current) setPending(null);
     },
     confirm: () => {
-      if (pending && !locked.current) {
-        locked.current = true;
-        mutation.mutate(pending);
-      }
+      if (pending) execute(pending);
     },
     reconcile: async () => {
       await reconcile();
