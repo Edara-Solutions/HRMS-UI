@@ -138,6 +138,9 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
             value={duration}
             disabled={disabled}
             readOnly={!!plan}
+            className={
+              plan ? "bg-[var(--color-surface-2)] text-[var(--color-text-muted)]" : undefined
+            }
             aria-invalid={fieldInvalid("duration")}
             onChange={(event) => setDuration(event.target.value)}
           />
@@ -157,6 +160,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
               size="sm"
               pressed={features.includes(feature)}
               disabled={disabled || featureChangesDisabled}
+              className="border border-[var(--color-border)] aria-pressed:border-transparent"
               onClick={() =>
                 setFeatures((current) =>
                   current.includes(feature)
@@ -206,7 +210,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
       <div className="grid gap-4 sm:grid-cols-2">
         <fieldset className="space-y-2">
           <legend className="text-sm font-semibold">{t("visibility")}</legend>
-          <div className="flex flex-wrap gap-2">
+          <div className="inline-flex flex-wrap gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-0.5">
             <Button
               type="button"
               variant="ghost"
@@ -231,7 +235,7 @@ export function PlanForm({ plan, disabled, invalidFields = [], onSubmit, onCance
         </fieldset>
         <fieldset className="space-y-2">
           <legend className="text-sm font-semibold">{t("status")}</legend>
-          <div className="flex flex-wrap gap-2">
+          <div className="inline-flex flex-wrap gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-2)] p-0.5">
             <Button
               type="button"
               variant="ghost"

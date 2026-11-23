@@ -181,8 +181,8 @@ test("delivers all catalogue commands and explicit price inspection", async ({ p
   const copy = arabic ? ar : en;
   const { calls, company } = await open(page, arabic);
   await page.goto("/platform/plans");
-  await page.getByLabel(copy.status, { exact: true }).selectOption("false");
-  await page.getByRole("button", { name: copy.filter, exact: true }).click();
+  await page.getByRole("combobox", { name: copy.statusLabel }).click();
+  await page.getByRole("option", { name: copy.inactive, exact: true }).click();
   await expect(page).toHaveURL(/isActive=false/);
   await page.getByRole("button", { name: copy.createPlan, exact: true }).click();
   let dialog = page.getByRole("dialog");
