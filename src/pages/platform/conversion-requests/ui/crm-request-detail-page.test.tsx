@@ -63,6 +63,7 @@ describe("Request inspection and delivery", () => {
   it("confirms approval and preserves setup without exposing provisioning credentials", async () => {
     const net = open();
     net.on(operations.approve.key, () => ({ status: 200, body: approvedBody() }));
+    fireEvent.click(await screen.findByRole("tab", { name: "Actions" }));
     const approve = await screen.findByRole("button", { name: "Approve conversion" });
     fireEvent.click(approve);
     const dialog = await screen.findByRole("dialog");

@@ -29,14 +29,16 @@ export function canApprove(value: ConversionRequest) {
     value.plan.isActive &&
     !value.lead.isConverted &&
     !value.lead.isArchived &&
-    [
-      "QUALIFIED",
-      "DEMO_SCHEDULED",
-      "WAITING_QUOTATION",
-      "QUOTATION_SENT",
-      "TRIAL_STARTED",
-      "NEGOTIATION",
-    ].includes(value.lead.status) &&
+    value.lead.status !== "WON_CONVERTED" &&
+    (import.meta.env.ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE === "true" ||
+      [
+        "QUALIFIED",
+        "DEMO_SCHEDULED",
+        "WAITING_QUOTATION",
+        "QUOTATION_SENT",
+        "TRIAL_STARTED",
+        "NEGOTIATION",
+      ].includes(value.lead.status)) &&
     !!value.primaryContact?.name?.trim() &&
     !!value.primaryContact?.email?.trim()
   );

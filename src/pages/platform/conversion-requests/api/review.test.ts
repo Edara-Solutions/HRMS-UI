@@ -26,12 +26,16 @@ vi.mock("@/shared/api/operation-request", async (original) => {
   };
 });
 beforeEach(() => {
+  vi.stubEnv("ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE", "false");
   operationNetwork.install();
   usePlatformSession
     .getState()
     .setSession(platformSessionFixture({ permissions: leadPermissions }));
 });
-afterEach(() => usePlatformSession.getState().clearSession());
+afterEach(() => {
+  vi.unstubAllEnvs();
+  usePlatformSession.getState().clearSession();
+});
 describe("Conversion transitions and original delivery", () => {
   it.each([
     { status: "APPROVED" },
@@ -50,6 +54,26 @@ describe("Conversion transitions and original delivery", () => {
       runReviewCommand(leadIds.request, { kind: "approve", body: { templateKey: 1 } }),
     ).rejects.toThrow("changed");
     expect(operationNetwork.current.count(operations.approve.key)).toBe(0);
+  });
+  it("rechecks and approves an early-stage lead with the override enabled", async () => {
+    vi.stubEnv("ALLOW_CONVERT_LEAD_TO_COMPANY_FROM_ANY_STATE", "true");
+    const net = operationNetwork.current;
+    net.on(operations.request.key, () => ({
+      status: 200,
+      body: conversionBody({ lead: leadBody({ status: "NEW" }) }),
+    }));
+    net.on(operations.approve.key, () => ({ status: 200, body: approvedBody() }));
+
+    await runReviewCommand(leadIds.request, { kind: "approve", body: { templateKey: 1 } });
+
+    expect(net.count(operations.approve.key)).toBe(1);
+    expect(
+      canApprove(
+        operations.request.responses[200].parse(
+          conversionBody({ lead: leadBody({ status: "NEW", isArchived: true }) }),
+        ),
+      ),
+    ).toBe(false);
   });
   it.each([
     "approve",
