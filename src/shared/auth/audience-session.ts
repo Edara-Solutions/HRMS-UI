@@ -52,6 +52,10 @@ export function createAudienceSessionStore<User extends { mustChangePassword: bo
   storageKey: string,
   sessionSchema?: z.ZodType<AudienceSession<User>>,
   clearIdentityCache: () => void = () => {},
+  onStorageAdopted: (
+    previous: AudienceSession<User> | null,
+    next: AudienceSession<User> | null,
+  ) => void = () => {},
 ) {
   const persistedSessionSchema = sessionSchema
     ? z
@@ -79,9 +83,11 @@ export function createAudienceSessionStore<User extends { mustChangePassword: bo
     }
   };
   const adoptStorage = () => {
+    const previous = store.getState().session;
     attempt += 1;
     clearIdentityCache();
     void store.persist?.rehydrate();
+    onStorageAdopted(previous, store.getState().session);
   };
   const synchronizeStorage = (event: StorageEvent) => {
     if (event.storageArea !== localStorage || (event.key !== storageKey && event.key !== null))

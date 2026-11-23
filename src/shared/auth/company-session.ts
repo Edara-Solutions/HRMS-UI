@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { companyQueryClient } from "@/shared/api/company-query-client";
 import type { SuccessResponse as CompanyMeUser } from "@/shared/api/generated/company/get-api-v1-company-me";
 import { responseSchemas as meSchemas } from "@/shared/api/generated/company/get-api-v1-company-me";
@@ -23,10 +24,38 @@ export function dropSupportAccess(accessSessionPublicId: string) {
     useCompanySession.getState().clearSession();
 }
 
+function returnToSupportSession(delegation: CompanyDelegation | undefined) {
+  const sessionId = z.string().uuid().safeParse(delegation?.accessSessionPublicId);
+  if (sessionId.success) {
+    window.location.assign(supportSessionPath(sessionId.data));
+  }
+}
+
 export function endSupportAccess() {
   const delegation = useCompanySession.getState().session?.user.delegation;
   useCompanySession.getState().clearSession();
-  if (delegation) window.location.assign(supportSessionPath(delegation.accessSessionPublicId));
+  returnToSupportSession(delegation);
+}
+
+const companyCredentialPaths = [
+  "/company/accept-invitation",
+  "/company/change-password",
+  "/company/forgot-password",
+  "/company/login",
+  "/company/reset-password",
+];
+
+function isCompanyPortalPath(pathname: string) {
+  return (
+    (pathname === "/company" || pathname.startsWith("/company/")) &&
+    !companyCredentialPaths.includes(pathname)
+  );
+}
+
+function leaveEndedSupportAccess(previous: CompanySession | null, next: CompanySession | null) {
+  if (!next && isCompanyPortalPath(window.location.pathname)) {
+    returnToSupportSession(previous?.user.delegation);
+  }
 }
 
 export function useCompanyDelegation(): CompanyDelegation | null {
@@ -43,4 +72,5 @@ export const useCompanySession = createAudienceSessionStore<CompanyUser>(
     companyQueryClient.clear();
     clearCredentialContext("company");
   },
+  leaveEndedSupportAccess,
 );

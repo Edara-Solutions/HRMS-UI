@@ -8,7 +8,7 @@ import { operation as resetConfirm } from "../api/generated/company/post-api-v1-
 import { operation as resetRequest } from "../api/generated/company/post-api-v1-company-auth-password-reset-request";
 import { ContractViolation } from "../api/generated/runtime";
 import { executeOperationRequest } from "../api/operation-request";
-import { isSupportDelegate, useCompanySession } from "../auth/company-session";
+import { type CompanySession, isSupportDelegate, useCompanySession } from "../auth/company-session";
 
 export const companyCredentialSchemas = {
   login: login.requestSchema.shape.body,
@@ -82,39 +82,52 @@ export interface SupportAccessEntry {
   companyPublicId: string;
 }
 
-export async function enterSupportAccess(entry: SupportAccessEntry) {
-  const store = useCompanySession.getState();
-  if (store.session && !isSupportDelegate(store.session.user))
+async function loadSupportSession(entry: SupportAccessEntry): Promise<CompanySession> {
+  const { operation: me } = await import("../api/generated/company/get-api-v1-company-me");
+  const identity = await executeOperationRequest(
+    companyApiClient,
+    me,
+    {},
+    { accessToken: entry.accessToken },
+  );
+  const user = me.responses["200"].parse(identity);
+  if (
+    user.companyPublicId !== entry.companyPublicId ||
+    user.delegation?.accessSessionPublicId !== entry.sessionPublicId
+  ) {
+    throw new ContractViolation({
+      audience: me.audience,
+      key: me.key,
+      status: 200,
+      phase: "response",
+    });
+  }
+  return {
+    accessToken: entry.accessToken,
+    refreshToken: "",
+    sessionId: entry.sessionPublicId,
+    expiresIn: entry.expiresIn,
+    mustChangePassword: false,
+    user,
+  };
+}
+
+function assertNoCompanyMember() {
+  const { session } = useCompanySession.getState();
+  if (session && !isSupportDelegate(session.user)) {
     throw new Error("A Company member is signed in in this browser");
-  if (store.session) store.clearSession();
-  return useCompanySession.getState().authenticate(async () => {
-    const { operation: me } = await import("../api/generated/company/get-api-v1-company-me");
-    const identity = await executeOperationRequest(
-      companyApiClient,
-      me,
-      {},
-      { accessToken: entry.accessToken },
-    );
-    const user = me.responses["200"].parse(identity);
-    if (
-      user.companyPublicId !== entry.companyPublicId ||
-      user.delegation?.accessSessionPublicId !== entry.sessionPublicId
-    )
-      throw new ContractViolation({
-        audience: me.audience,
-        key: me.key,
-        status: 200,
-        phase: "response",
-      });
-    return {
-      accessToken: entry.accessToken,
-      refreshToken: "",
-      sessionId: entry.sessionPublicId,
-      expiresIn: entry.expiresIn,
-      mustChangePassword: false,
-      user,
-    };
-  });
+  }
+}
+
+export async function enterSupportAccess(entry: SupportAccessEntry) {
+  assertNoCompanyMember();
+  if (!useCompanySession.getState().session) {
+    return useCompanySession.getState().authenticate(() => loadSupportSession(entry));
+  }
+  const session = await loadSupportSession(entry);
+  assertNoCompanyMember();
+  useCompanySession.getState().setSession(session);
+  return session;
 }
 
 export async function revalidateCompanySession() {
