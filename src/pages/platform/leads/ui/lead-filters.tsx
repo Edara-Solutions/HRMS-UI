@@ -5,6 +5,7 @@ import { platformLeadOperations as operations } from "@/shared/api";
 import { usePreferencesStore } from "@/shared/config";
 import { getDateEdgeDate, getDateEdgeType } from "@/shared/lib/date-edge";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { DatePicker, type DatePickerText } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
@@ -45,9 +46,6 @@ export function LeadFilters({ search, change, reset }: Props) {
   const { t } = useTranslation(["platform-leads", "common"]);
   const locale = usePreferencesStore((state) => state.locale);
   const [query, setQuery] = useTypedFilter(search.q, (q) => change({ q, page: 1 }));
-  const [country, setCountry] = useTypedFilter(search.country, (next) =>
-    change({ country: next, page: 1 }),
-  );
   const pickerText: DatePickerText = {
     description: t("common:datePicker.description"),
     placeholder: t("common:datePicker.placeholder"),
@@ -120,11 +118,14 @@ export function LeadFilters({ search, change, reset }: Props) {
         </Select>
       </div>
       <div className={narrow}>
-        <Input
-          aria-label={t("field.country")}
+        <label htmlFor="lead-country" className="sr-only">
+          {t("field.country")}
+        </label>
+        <CountrySelect
+          id="lead-country"
           placeholder={t("leads.countryPlaceholder")}
-          value={country}
-          onChange={(event) => setCountry(event.target.value)}
+          value={search.country ?? ""}
+          onValueChange={(country) => change({ country: country || undefined, page: 1 })}
         />
       </div>
       {(["createdFrom", "createdTo"] as const).map((field) => (
